@@ -11,7 +11,7 @@ file(
 
 add_executable(
 # executable name
-	  avm
+	  pfa
 # source files
 	${source_files}
 )
