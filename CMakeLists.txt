@@ -15,3 +15,12 @@ add_executable(
 # source files
 	${source_files}
 )
+
+#if (UNIX)
+#  message("Setting GCC flags")
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Winit-self -Wunused-function -pipe")
+#else()
+#  message(status "Setting MSVC flags")
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc-")
+#endif()
+#message("** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
