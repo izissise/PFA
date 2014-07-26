@@ -4,22 +4,33 @@ project(PFA)
 
 # All source files using globs
 file(
-        GLOB_RECURSE
-        source_files
-        src/*
+  GLOB_RECURSE
+  source_files
+  src/*
 )
+
+file(
+        GLOB_RECURSE
+        include_files
+        inc/*
+)
+
+include_directories("inc/")
 
 add_executable(
 # executable name
-	  pfa
+pfa
 # source files
 	${source_files}
+	${include_files}
 )
 
 #if (UNIX)
 #  message("Setting GCC flags")
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Winit-self -Wunused-function -pipe")
-#else()
+#elseif(APPLE)
+#
+#elseif(WIN)
 #  message(status "Setting MSVC flags")
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc-")
 #endif()
