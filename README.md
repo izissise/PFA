@@ -14,3 +14,5 @@ For exemple:
 
 cmake . -G"Unix Makefiles"
 
+cmake . -G"Unix Makefiles" -DCMAKE_BUILD_TYPE:STRING=Debug
+
