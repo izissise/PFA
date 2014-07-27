@@ -3,7 +3,6 @@
 PROJECT="pfa"
 
 # Run and execute tests with coverage info
-cd ..
 mkdir -p Debug
 mkdir -p coverage
 cd Debug
