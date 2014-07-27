@@ -5,10 +5,10 @@
 # include <string>
 # include <stdexcept>
 
-void printv(const std::string& s);
+void printv(std::ostream& f, const std::string& s);
 
 template<typename T, typename... Args>
-void printv(const std::string& s, T value, Args... args)
+void printv(std::ostream& f, const std::string& s, T value, Args... args)
 {
   size_t prevPos;;
   size_t pos;
@@ -17,17 +17,17 @@ void printv(const std::string& s, T value, Args... args)
   prevPos = 0;
   while ((pos = s.find('%', prevPos)) != std::string::npos)
     {
-      std::cout << s.substr(prevPos, pos);
+      f << s.substr(prevPos, pos);
       if (s[pos + 1] != '%')
         {
-          std::cout << value;
-          printv(s.substr(pos + 1), args...); // call even when *s == 0 to detect extra arguments
+          f << value;
+          printv(f, s.substr(pos + 1), args...); // call even when *s == 0 to detect extra arguments
           return;
         }
       else
         {
           ++pos;
-          std::cout << '%';
+          f << '%';
         }
       prevPos = pos + 1;
     }
