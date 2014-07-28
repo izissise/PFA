@@ -10,18 +10,18 @@ void printv(std::ostream& f, const std::string& s);
 template<typename T, typename... Args>
 void printv(std::ostream& f, const std::string& s, T value, Args... args)
 {
-  size_t prevPos;;
+  size_t prevPos;
   size_t pos;
 
   pos = 0;
   prevPos = 0;
   while ((pos = s.find('%', prevPos)) != std::string::npos)
     {
-      f << s.substr(prevPos, pos);
+      f << s.substr(prevPos, pos - prevPos);
       if (s[pos + 1] != '%')
         {
           f << value;
-          printv(f, s.substr(pos + 1), args...); // call even when *s == 0 to detect extra arguments
+          printv(f, s.substr(pos + 1), args...);
           return;
         }
       else

@@ -9,7 +9,7 @@ void printv(std::ostream& f, const std::string& s)
   prevPos = 0;
   while ((pos = s.find('%', prevPos)) != std::string::npos)
     {
-      f << s.substr(prevPos, pos);
+      f << s.substr(prevPos, pos - prevPos);
       if (s[pos + 1] != '%')
         throw std::runtime_error("invalid format string: missing arguments");
       else

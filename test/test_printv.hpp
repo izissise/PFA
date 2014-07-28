@@ -13,6 +13,7 @@ class TestPrintv : public CppUnit::TestCase
 {
   CPPUNIT_TEST_SUITE(TestPrintv);
       CPPUNIT_TEST(randTest);
+      CPPUNIT_TEST(condTest);
       CPPUNIT_TEST(lessArgTest);
       CPPUNIT_TEST(moreArgTest);
   CPPUNIT_TEST_SUITE_END();
@@ -23,6 +24,7 @@ public:
 
 protected:
     void randTest();
+    void condTest();
     void lessArgTest();
     void moreArgTest();
 

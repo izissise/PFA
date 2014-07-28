@@ -16,9 +16,14 @@ void TestPrintv::tearDown()
 void TestPrintv::randTest()
 {
   printv(fixture, "Hello i'm testing %% printv with up to % arg like: % % %",
-         5, "wor%ld", 854L, "");
-  std::cout << fixture.str() << std::endl;
-  CPPUNIT_ASSERT(true);
+         5, "wor%ld", 854L, "a");
+  CPPUNIT_ASSERT(fixture.str() == "Hello i'm testing % printv with up to 5 arg like: wor%ld 854 a");
+}
+
+void TestPrintv::condTest()
+{
+  printv(fixture, "%%%%%", 5);
+  CPPUNIT_ASSERT(fixture.str() == "%%5");
 }
 
 void TestPrintv::lessArgTest()
