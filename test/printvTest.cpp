@@ -1,6 +1,7 @@
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+#include <string>
 #include <sstream>
 #include <stdexcept>
 
@@ -9,10 +10,10 @@
 class TestPrintv : public CppUnit::TestCase
 {
   CPPUNIT_TEST_SUITE(TestPrintv);
-    CPPUNIT_TEST(randTest);
-    CPPUNIT_TEST(condTest);
-    CPPUNIT_TEST(lessArgTest);
-    CPPUNIT_TEST(moreArgTest);
+  CPPUNIT_TEST(randTest);
+  CPPUNIT_TEST(condTest);
+  CPPUNIT_TEST(lessArgTest);
+  CPPUNIT_TEST(moreArgTest);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -39,6 +40,9 @@ protected:
   {
     printv(*fixture, "%%%%%", 5);
     CPPUNIT_ASSERT(fixture->str() == "%%5");
+    fixture->str("");
+    printv(*fixture, "%%%%");
+    CPPUNIT_ASSERT(fixture->str() == "%%");
   };
 
   void lessArgTest()
@@ -46,12 +50,12 @@ protected:
     try
       {
         printv(*fixture, "There is no arg but a %");
+        CPPUNIT_ASSERT(false);
       }
-    catch (std::exception& e)
+    catch (std::runtime_error& e)
       {
-
+        CPPUNIT_ASSERT(std::string("invalid format string: missing arguments") == e.what());
       }
-    CPPUNIT_ASSERT(true);
   };
 
   void moreArgTest()
@@ -59,12 +63,12 @@ protected:
     try
       {
         printv(*fixture, "There is no arg but passing some anyways.", 4563);
+        CPPUNIT_ASSERT(false);
       }
-    catch (std::exception& e)
+    catch (std::logic_error& e)
       {
-
+        CPPUNIT_ASSERT(std::string("extra arguments provided to printv") == e.what());
       }
-    CPPUNIT_ASSERT(true);
   };
 
 private:

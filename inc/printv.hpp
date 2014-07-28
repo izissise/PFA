@@ -31,7 +31,7 @@ void printv(std::ostream& f, const std::string& s, T value, Args... args)
         }
       prevPos = pos + 1;
     }
-  throw std::logic_error("extra arguments provided to printf");
+  throw std::logic_error("extra arguments provided to printv");
 }
 
 #endif // PRINTV_HPP_INCLUDED
