@@ -1,10 +1,15 @@
-cmake_minimum_required(VERSION 2.6)
-
 project(PFA)
 
-# The version number.
-set (VERSION_MAJOR 0)
-set (VERSION_MINOR 1)
+cmake_minimum_required(VERSION 2.6)
+
+ENABLE_TESTING()
+
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+
+# cmake modules
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+find_package(CppUnit REQUIRED)
 
 # All source files using globs
 file(
@@ -19,22 +24,50 @@ file(
   inc/*
 )
 
+include_directories("inc/")
+
+add_library(
+# executable name
+  pfa SHARED
+# source files
+  ${source_files}
+  ${include_files}
+)
+
+add_executable(
+# executable name
+  pfaexe
+# source files
+  main.cpp
+)
+
+target_link_libraries(pfaexe pfa)
+
 file(
   GLOB_RECURSE
   test_files
   test/*
 )
 
-include_directories("test/")
-include_directories("inc/")
-
 add_executable(
 # executable name
-  pfa
+  UnitTester
 # source files
-  ${source_files}
-  ${include_files}
+  ${test_files}
 )
+
+target_link_libraries(UnitTester ${CPPUNIT_LIBRARY} pfa dl)
+
+# Add coverage options for CI
+if(COVERAGE)
+	set_target_properties(pfa pfaexe UnitTester PROPERTIES
+						  COMPILE_FLAGS "-fprofile-arcs -ftest-coverage"
+						  LINK_FLAGS "-coverage")
+endif(COVERAGE)
+
+# The version number.
+set (VERSION_MAJOR 0)
+set (VERSION_MINOR 1)
 
 if (UNIX)
   message("Setting GCC flags")
