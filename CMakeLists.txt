@@ -19,6 +19,13 @@ file(
   inc/*
 )
 
+file(
+  GLOB_RECURSE
+  test_files
+  test/*
+)
+
+include_directories("test/")
 include_directories("inc/")
 
 add_executable(
