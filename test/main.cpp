@@ -9,35 +9,30 @@
 #include <cstring>
 
 int main(int argc, char* argv[]) {
-	// Definimos las variables para recuperar los resultados
-	using namespace CppUnit;
-	using namespace std;
+  using namespace CppUnit;
 
-	TestResult controller;
-	TestResultCollector result;
-	controller.addListener(&result);
+  TestResult controller;
+  TestResultCollector result;
+  controller.addListener(&result);
 
-	TextUi::TestRunner runner;
-	TestFactoryRegistry& registry = TestFactoryRegistry::getRegistry();
-	Test* testToRun = registry.makeTest(); 
+  TextUi::TestRunner runner;
+  TestFactoryRegistry& registry = TestFactoryRegistry::getRegistry();
+  Test* testToRun = registry.makeTest();
 
-	if(argc > 1){
-		testToRun = testToRun->findTest(argv[1]);
-	}
+  if(argc > 1)
+    testToRun = testToRun->findTest(argv[1]);
 
-	runner.addTest(testToRun);
-	runner.run(controller);
-	
-	// Escribimos los resultados como salida XMl
-	ofstream xmlFileOut("cpptestresults.xml");
-	XmlOutputter xmlOut(&result, xmlFileOut);
-	xmlOut.write();
-	xmlFileOut.close();
+  runner.addTest(testToRun);
+  runner.run(controller);
 
-	// También queremos ver los resultados por pantalla
-	TextOutputter textOutput(&result, std::cout);
-	textOutput.write();
-	
-	return 0;
+  std::ofstream xmlFileOut("cpptestresults.xml");
+  XmlOutputter xmlOut(&result, xmlFileOut);
+  xmlOut.write();
+  xmlFileOut.close();
+
+  TextOutputter textOutput(&result, std::cout);
+  textOutput.write();
+
+  return 0;
 }
 
