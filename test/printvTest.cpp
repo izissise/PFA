@@ -55,7 +55,9 @@ protected:
     catch (std::runtime_error& e)
       {
         CPPUNIT_ASSERT(std::string("invalid format string: missing arguments") == e.what());
+        return;
       }
+    CPPUNIT_ASSERT(false);
   };
 
   void moreArgTest()
@@ -68,7 +70,9 @@ protected:
     catch (std::logic_error& e)
       {
         CPPUNIT_ASSERT(std::string("extra arguments provided to printv") == e.what());
+        return;
       }
+    CPPUNIT_ASSERT(false);
   };
 
 private:
