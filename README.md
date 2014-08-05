@@ -16,3 +16,5 @@ cmake . -G"Unix Makefiles"
 
 cmake . -G"Unix Makefiles" -DCMAKE_BUILD_TYPE:STRING=Debug
 
+Also, this might usefull:
+-DCMAKE_VERBOSE_MAKEFILE=On
