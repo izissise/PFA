@@ -6,6 +6,6 @@
 
 int main(UNUSED int ac, UNUSED char *av[])
 {
-  printv(std::cout, "Program version: %\n", PROJECT_VERSION);
+  printv(std::cout, "Program version: %\n", xstr(PROJECT_VERSION));
   return 0;
 }

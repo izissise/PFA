@@ -62,6 +62,7 @@ configure_file (
 )
 
 include_directories("${INCLUDE_DIRECTORY}/")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/${INCLUDE_DIRECTORY}/")
 
 add_library(
 # executable name
@@ -103,7 +104,7 @@ if(BUILD_TESTS AND CPPUNIT_FOUND)
   include_directories(${CPPUNIT_INCLUDE_DIRS})
   target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} pfa dl)
 
-  set_target_properties(pfa UnitTester PROPERTIES
+  set_target_properties(pfa pfaexe UnitTester PROPERTIES
   				       COMPILE_FLAGS "--coverage"
 				       LINK_FLAGS "-coverage")
 
