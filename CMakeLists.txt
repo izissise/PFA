@@ -56,7 +56,12 @@ add_executable(
   ${test_files}
 )
 
-target_link_libraries(UnitTester ${CPPUNIT_LIBRARY} pfa dl)
+if (CPPUNIT_FOUND)
+  include_directories(${CPPUNIT_INCLUDE_DIRS})
+  target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} pfa dl)
+else()
+  message(WARNING "CppUnit library is not found")
+endif ()
 
 # Add coverage options for CI
 if(COVERAGE)
