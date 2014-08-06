@@ -10,6 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 # cmake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
+find_package(SFML 2.1 REQUIRED system window graphics network audio)
 
 # All source files using globs
 file(
@@ -62,6 +63,11 @@ if (CPPUNIT_FOUND)
 else()
   message(WARNING "CppUnit library is not found")
 endif ()
+
+if (SFML_FOUND)
+  include_directories(${SFML_INCLUDE_DIR})
+  target_link_libraries (pfa ${SFML_LIBRARIES})
+endif()
 
 # Add coverage options for CI
 if(COVERAGE)

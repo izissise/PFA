@@ -34,4 +34,6 @@ void printv(std::ostream& f, const std::string& s, T value, Args... args)
   throw std::logic_error("extra arguments provided to printv");
 }
 
+void testSfml();
+
 #endif // PRINTV_HPP_INCLUDED
