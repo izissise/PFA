@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Project)
 
-set(INCLUDE_DIRECTORY "inc")
+set(NAMELIB "pfa")
+set(NAMEEXEC "pfaexe")
+
+set(INCLUDE_DIRECTORY "${NAMELIB}/inc")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -45,14 +48,20 @@ ENDIF()
 # All source files using globs
 file(
   GLOB_RECURSE
-  source_files
-  src/*
+  lib_source_files
+  ${NAMELIB}/src/*
 )
 
 file(
   GLOB_RECURSE
-  include_files
+  lib_include_files
   ${INCLUDE_DIRECTORY}/*
+)
+
+file(
+  GLOB_RECURSE
+  exec_source_files
+  ${NAMEEXEC}/src/*
 )
 
 # configure a header file to pass some of the CMake settings
@@ -67,20 +76,20 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/${INCLUDE_DIRECTORY}/")
 
 add_library(
 # executable name
-  pfa STATIC
+  ${NAMELIB} STATIC
 # source files
-  ${source_files}
-  ${include_files}
+  ${lib_source_files}
+  ${lib_include_files}
 )
 
 add_executable(
 # executable name
-  pfaexe
+  ${NAMEEXEC}
 # source files
-  main.cpp
+  ${exec_source_files}
 )
 
-target_link_libraries(pfaexe pfa)
+target_link_libraries(${NAMEEXEC} ${NAMELIB})
 
 file(
   GLOB_RECURSE
