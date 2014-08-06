@@ -112,9 +112,9 @@ if(BUILD_TESTS AND CPPUNIT_FOUND)
   )
 
   include_directories(${CPPUNIT_INCLUDE_DIRS})
-  target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} pfa dl)
+  target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} ${NAMELIB} dl)
 
-  set_target_properties(pfa pfaexe UnitTester PROPERTIES
+  set_target_properties(${NAMELIB} ${NAMEEXEC} UnitTester PROPERTIES
   				       COMPILE_FLAGS "--coverage"
 				       LINK_FLAGS "-coverage")
 
@@ -129,7 +129,7 @@ ENDIF()
 
 if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
-  target_link_libraries (pfa ${SFML_LIBRARIES})
+  target_link_libraries (${NAMELIB} ${SFML_LIBRARIES})
 endif()
 
 # --- cppcheck ---
