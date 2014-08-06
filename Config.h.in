@@ -1,0 +1,9 @@
+#ifndef _CONFIG_H_
+# define _CONFIG_H_
+
+# define xstr(s) str(s)
+# define str(s) #s
+
+# define PROJECT_VERSION @PROJECTVERSION@
+
+#endif

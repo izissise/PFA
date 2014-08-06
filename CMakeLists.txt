@@ -1,9 +1,8 @@
-project(PFA)
+cmake_minimum_required(VERSION 2.8)
 
-cmake_minimum_required(VERSION 2.6)
+project(Project)
 
-ENABLE_TESTING()
-
+set(INCLUDE_DIRECTORY "inc")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -11,6 +10,37 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
 find_package(SFML 2.1 REQUIRED system window graphics network audio)
+
+INCLUDE(EnableCppExtras)
+INCLUDE(CheckIncludeFile)
+INCLUDE(CheckIncludeFileCXX)
+INCLUDE(InstallFilesRecursive)
+INCLUDE(EnableCoverageReport)
+INCLUDE(EnableSlocCount)
+INCLUDE(GenerateDoxygen)
+INCLUDE(GenerateCppcheck)
+INCLUDE(DefineProjectVersion)
+INCLUDE(CurrentDate)
+
+# --- user options ---
+OPTION(BUILD_TESTS "Decide if the test suite shall be built or not" ON)
+
+# --- global definitions ---
+DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
+CURRENT_DATE(PROJECT_BUILD_DATE)
+
+# --- global compiler flags ---
+INCLUDE(PedanticCompilerWarnings)
+
+# decide how to do name demangling
+CHECK_INCLUDE_FILE_CXX("cxxabi.h" HAVE_CXXABI_H)
+IF(HAVE_CXXABI_H)
+  ADD_DEFINITIONS(-DDEMANGLE_GCC)
+ELSEIF(MSVC)
+  ADD_DEFINITIONS(-DDEMANGLE_MSVC)
+ELSE()
+  MESSAGE(WARNING "No demangling solution found for the system.")
+ENDIF()
 
 # All source files using globs
 file(
@@ -22,14 +52,22 @@ file(
 file(
   GLOB_RECURSE
   include_files
-  inc/*
+  ${INCLUDE_DIRECTORY}/*
 )
 
-include_directories("inc/")
+# configure a header file to pass some of the CMake settings
+# to the source code
+configure_file (
+  "Config.h.in"
+  "${INCLUDE_DIRECTORY}/Config.h"
+)
+
+include_directories("${INCLUDE_DIRECTORY}/")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/${INCLUDE_DIRECTORY}/")
 
 add_library(
 # executable name
-  pfa SHARED
+  pfa STATIC
 # source files
   ${source_files}
   ${include_files}
@@ -50,44 +88,43 @@ file(
   test/*
 )
 
-add_executable(
-# executable name
-  UnitTester
-# source files
-  ${test_files}
-)
+if(NOT CPPUNIT_FOUND)
+  message(WARNING "CppUnit library can't be found, Unit test won't be compiled")
+endif()
 
-if (CPPUNIT_FOUND)
+# --- enable unit tests if desired ---
+if(BUILD_TESTS AND CPPUNIT_FOUND)
+
+  add_executable(
+  # executable name
+    UnitTester
+  # source files
+   ${test_files}
+  )
+
   include_directories(${CPPUNIT_INCLUDE_DIRS})
   target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} pfa dl)
-else()
-  message(WARNING "CppUnit library is not found")
-endif ()
+
+  set_target_properties(pfa pfaexe UnitTester PROPERTIES
+  				       COMPILE_FLAGS "--coverage"
+				       LINK_FLAGS "-coverage")
+
+  # --- coverage report ---
+  ENABLE_COVERAGE_REPORT(TARGETS ${RSC_NAME}
+                         TESTS  ${RSC_TEST_NAME}
+                         FILTER ${test_files})
+
+  ENABLE_TESTING()
+
+ENDIF()
 
 if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
   target_link_libraries (pfa ${SFML_LIBRARIES})
 endif()
 
-# Add coverage options for CI
-if(COVERAGE)
-	set_target_properties(pfa pfaexe UnitTester PROPERTIES
-						  COMPILE_FLAGS "-fprofile-arcs -ftest-coverage"
-						  LINK_FLAGS "-coverage")
-endif(COVERAGE)
-
-# The version number.
-set (VERSION_MAJOR 0)
-set (VERSION_MINOR 1)
-
-if (UNIX)
-  message("Setting GCC flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wall -Wextra -Winit-self -Wunused-function -pipe")
-elseif(APPLE)
-  message("Setting Clang flags")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wall -Wextra -Winit-self -Wunused-function -pipe")
-elseif(WIN)
-  message(status "Setting MSVC flags") # http://msdn.microsoft.com/en-us/library/19z1t1wy.aspx
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc-")
-endif()
-message("** CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+# --- cppcheck ---
+GENERATE_CPPCHECK(SOURCES src test
+                  "${CMAKE_CURRENT_BINARY_DIR}/src" "${CMAKE_CURRENT_BINARY_DIR}/test"
+                  ENABLE_IDS style
+                  INLINE_SUPPRESSION)
