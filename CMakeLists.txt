@@ -88,35 +88,34 @@ file(
   test/*
 )
 
-if(NOT CPPUNIT_FOUND)
-  message(WARNING "CppUnit library can't be found, Unit test won't be compiled")
-endif()
-
 # --- enable unit tests if desired ---
-if(BUILD_TESTS AND CPPUNIT_FOUND)
+if(BUILD_TESTS)
+  if(NOT CPPUNIT_FOUND)
+    message(WARNING "CppUnit library can't be found, Unit test won't be compiled")
+  else()
 
-  add_executable(
-  # executable name
-    UnitTester
-  # source files
-   ${test_files}
-  )
+    add_executable(
+    # executable name
+      UnitTester
+    # source files
+     ${test_files}
+    )
 
-  include_directories(${CPPUNIT_INCLUDE_DIRS})
-  target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} pfa dl)
+    include_directories(${CPPUNIT_INCLUDE_DIRS})
+    target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} pfa dl)
 
-  set_target_properties(pfa pfaexe UnitTester PROPERTIES
-  				       COMPILE_FLAGS "--coverage"
-				       LINK_FLAGS "-coverage")
+    set_target_properties(pfa pfaexe UnitTester PROPERTIES
+                                                COMPILE_FLAGS "--coverage"
+                                                LINK_FLAGS "-coverage")
 
-  # --- coverage report ---
-  ENABLE_COVERAGE_REPORT(TARGETS ${RSC_NAME}
+    # --- coverage report ---
+    ENABLE_COVERAGE_REPORT(TARGETS ${RSC_NAME}
                          TESTS  ${RSC_TEST_NAME}
                          FILTER ${test_files})
 
-  ENABLE_TESTING()
-
-ENDIF()
+    ENABLE_TESTING()
+  endif()
+endif()
 
 if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
