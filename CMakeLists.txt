@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Project)
 
-set(INCLUDE_DIRECTORY "inc")
+set(NAMELIB "pfa")
+set(NAMEEXEC "pfaexe")
+
+set(INCLUDE_DIRECTORY "${NAMELIB}/inc")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -45,14 +48,20 @@ ENDIF()
 # All source files using globs
 file(
   GLOB_RECURSE
-  source_files
-  src/*
+  lib_source_files
+  ${NAMELIB}/src/*
 )
 
 file(
   GLOB_RECURSE
-  include_files
+  lib_include_files
   ${INCLUDE_DIRECTORY}/*
+)
+
+file(
+  GLOB_RECURSE
+  exec_source_files
+  ${NAMEEXEC}/src/*
 )
 
 # configure a header file to pass some of the CMake settings
@@ -67,20 +76,20 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/${INCLUDE_DIRECTORY}/")
 
 add_library(
 # executable name
-  pfa STATIC
+  ${NAMELIB} STATIC
 # source files
-  ${source_files}
-  ${include_files}
+  ${lib_source_files}
+  ${lib_include_files}
 )
 
 add_executable(
 # executable name
-  pfaexe
+  ${NAMEEXEC}
 # source files
-  main.cpp
+  ${exec_source_files}
 )
 
-target_link_libraries(pfaexe pfa)
+target_link_libraries(${NAMEEXEC} ${NAMELIB})
 
 file(
   GLOB_RECURSE
@@ -102,16 +111,16 @@ if(BUILD_TESTS)
     )
 
     include_directories(${CPPUNIT_INCLUDE_DIRS})
-    target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} pfa dl)
+    target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} ${NAMELIB} dl)
 
-    set_target_properties(pfa pfaexe UnitTester PROPERTIES
+    set_target_properties(${NAMELIB} ${NAMEEXEC} UnitTester PROPERTIES
                                                 COMPILE_FLAGS "--coverage"
                                                 LINK_FLAGS "-coverage")
 
     # --- coverage report ---
     ENABLE_COVERAGE_REPORT(TARGETS ${RSC_NAME}
-                         TESTS  ${RSC_TEST_NAME}
-                         FILTER ${test_files})
+                           TESTS  ${RSC_TEST_NAME}
+                           FILTER ${test_files})
 
     ENABLE_TESTING()
   endif()
@@ -119,7 +128,7 @@ endif()
 
 if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
-  target_link_libraries (pfa ${SFML_LIBRARIES})
+  target_link_libraries (${NAMELIB} ${SFML_LIBRARIES})
 endif()
 
 # --- cppcheck ---
