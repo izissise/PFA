@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Project)
 
-set(NAMELIB "pfa")
-set(NAMEEXEC "pfaexe")
+set(NAME_LIB "pfa")
+set(NAME_EXEC "pfaexe")
+set(TEST_EXEC "UnitTester")
 
-set(INCLUDE_DIRECTORY "${NAMELIB}/inc")
+set(INCLUDE_DIRECTORY "${NAME_LIB}/inc")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -22,11 +23,14 @@ INCLUDE(EnableCoverageReport)
 INCLUDE(EnableSlocCount)
 INCLUDE(GenerateDoxygen)
 INCLUDE(GenerateCppcheck)
+INCLUDE(GenerateCccc)
 INCLUDE(DefineProjectVersion)
 INCLUDE(CurrentDate)
 
 # --- user options ---
-OPTION(BUILD_TESTS "Decide if the test suite shall be built or not" ON)
+OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." ON)
+OPTION(CODE_METRICS "Decide if code's metrics should be generated." ON)
+OPTION(CODE_CHECK "Decide if code should be checked for common errors." ON)
 
 # --- global definitions ---
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
@@ -49,7 +53,7 @@ ENDIF()
 file(
   GLOB_RECURSE
   lib_source_files
-  ${NAMELIB}/src/*
+  ${NAME_LIB}/src/*
 )
 
 file(
@@ -61,7 +65,7 @@ file(
 file(
   GLOB_RECURSE
   exec_source_files
-  ${NAMEEXEC}/src/*
+  ${NAME_EXEC}/src/*
 )
 
 # configure a header file to pass some of the CMake settings
@@ -76,7 +80,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/${INCLUDE_DIRECTORY}/")
 
 add_library(
 # executable name
-  ${NAMELIB} STATIC
+  ${NAME_LIB} STATIC
 # source files
   ${lib_source_files}
   ${lib_include_files}
@@ -84,12 +88,12 @@ add_library(
 
 add_executable(
 # executable name
-  ${NAMEEXEC}
+  ${NAME_EXEC}
 # source files
   ${exec_source_files}
 )
 
-target_link_libraries(${NAMEEXEC} ${NAMELIB})
+target_link_libraries(${NAME_EXEC} ${NAME_LIB})
 
 file(
   GLOB_RECURSE
@@ -105,20 +109,20 @@ if(BUILD_TESTS)
 
     add_executable(
     # executable name
-      UnitTester
+      ${TEST_EXEC}
     # source files
      ${test_files}
     )
 
     include_directories(${CPPUNIT_INCLUDE_DIRS})
-    target_link_libraries (UnitTester ${CPPUNIT_LIBRARY} ${NAMELIB} dl)
+    target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB} dl)
 
-    set_target_properties(${NAMELIB} ${NAMEEXEC} UnitTester PROPERTIES
+    set_target_properties(${NAME_LIB} ${NAME_EXEC} ${TEST_EXEC} PROPERTIES
                                                 COMPILE_FLAGS "--coverage"
                                                 LINK_FLAGS "-coverage")
 
     # --- coverage report ---
-    ENABLE_COVERAGE_REPORT(TARGETS ${RSC_NAME}
+    ENABLE_COVERAGE_REPORT(TARGETS ${TEST_EXEC}
                            TESTS  ${RSC_TEST_NAME}
                            FILTER ${test_files})
 
@@ -128,11 +132,18 @@ endif()
 
 if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
-  target_link_libraries (${NAMELIB} ${SFML_LIBRARIES})
+  target_link_libraries (${NAME_LIB} ${SFML_LIBRARIES})
 endif()
 
-# --- cppcheck ---
-GENERATE_CPPCHECK(SOURCES src test
-                  "${CMAKE_CURRENT_BINARY_DIR}/src" "${CMAKE_CURRENT_BINARY_DIR}/test"
+if(CODE_CHECK)
+  # --- cppcheck ---
+  GENERATE_CPPCHECK(SOURCES src test
+                  "${CMAKE_CURRENT_BINARY_DIR}/${NAME_EXEC}/src" "${CMAKE_CURRENT_BINARY_DIR}/test"
                   ENABLE_IDS style
                   INLINE_SUPPRESSION)
+endif()
+
+if(CODE_METRICS)
+  # --- cccc ---
+  GENERATE_CCCC(SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${NAME_EXEC}/src" "${CMAKE_CURRENT_BINARY_DIR}/test")
+endif()
