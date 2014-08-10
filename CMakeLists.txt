@@ -137,13 +137,15 @@ endif()
 
 if(CODE_CHECK)
   # --- cppcheck ---
-  GENERATE_CPPCHECK(SOURCES src test
-                  "${CMAKE_CURRENT_BINARY_DIR}/${NAME_EXEC}/src" "${CMAKE_CURRENT_BINARY_DIR}/test"
-                  ENABLE_IDS style
-                  INLINE_SUPPRESSION)
+  GENERATE_CPPCHECK(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src"
+                            "${PROJECT_SOURCE_DIR}/test"
+                            ENABLE_IDS style
+                            INLINE_SUPPRESSION)
 endif()
 
 if(CODE_METRICS)
   # --- cccc ---
-  GENERATE_CCCC(SOURCES "${CMAKE_CURRENT_BINARY_DIR}/${NAME_EXEC}/src" "${CMAKE_CURRENT_BINARY_DIR}/test")
+  GENERATE_CCCC(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
+                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+                        "${PROJECT_SOURCE_DIR}/test")
 endif()

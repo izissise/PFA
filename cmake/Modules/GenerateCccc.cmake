@@ -2,30 +2,8 @@
 # The function GENERATE_CCCC is provided to create a "cccc" target that
 # performs static code analysis using the cccc utility program.
 #
-# GENERATE_CCCC(SOURCES <sources to check...>
-#                   [SUPPRESSION_FILE <file>]
-#                   [ENABLE_IDS <id...>]
-#                   [TARGET_NAME <name>]
-#                   [INCLUDES <dir...>]
-#                   [INLINE_SUPPRESSION])
+# GENERATE_CCCC(SOURCES <sources to check...>)
 #
-# Generates a target "cccc" that executes cccc on the specified sources.
-# Sources may either be file names or directories containing files where all
-# C++ files will be parsed automatically. Use directories whenever possible
-# because there is a limitation in arguments to pass to the cccc binary.
-# SUPPRESSION_FILE may be give additionally to specify suppressions for#
-# cccc. The sources mentioned in the suppression file must be in the same
-# format like given for SOURCES. This means if you specified them relative to
-# CMAKE_CURRENT_SOURCE_DIR, then the same relative paths must be used in the
-# suppression file.
-# ENABLE_IDS allows to specify which additional cccc check ids to execute,
-# e.g. all or style. They are combined with AND.
-# With TARGET_NAME a different name for the generated check target can be
-# specified. This is useful if several calles to this function are made in one
-# CMake project, as otherwise the target names collide.
-# Additional include directories for the cccc program can be given with
-# INCLUDES.
-# If INLINE_SUPPRESSION is set, cccc inline-suppression comments are parsed.
 #
 # cccc will be executed with CMAKE_CURRENT_SOURCE_DIR as working directory.
 #
@@ -60,7 +38,7 @@ FUNCTION(GENERATE_CCCC)
 
     IF(CCCC_FOUND)
     
-        PARSE_ARGUMENTS(ARG "SOURCES" ${ARGN})
+        PARSE_ARGUMENTS(ARG "SOURCES" "" ${ARGN})
         
         SET(TARGET_NAME "cccc")
         SET(TARGET_NAME_SUFFIX "")
@@ -72,14 +50,20 @@ FUNCTION(GENERATE_CCCC)
         ENDIF()
         
         SET(CCCC_CHECKFILE "${CMAKE_BINARY_DIR}/cccc-files${TARGET_NAME_SUFFIX}")
-        SET(CCCC_REPORT_FILE "${CMAKE_BINARY_DIR}/cccc-report${TARGET_NAME_SUFFIX}.xml")
+        SET(CCCC_REPORT_FILE "${CMAKE_BINARY_DIR}/cccc${TARGET_NAME_SUFFIX}.xml")
         SET(CCCC_WRAPPER_SCRIPT "${CMAKE_BINARY_DIR}/cccc${TARGET_NAME_SUFFIX}.cmake")
     
         # write a list file containing all sources to check for the call to
         # cccc
         SET(SOURCE_ARGS "")
         FOREACH(SOURCE ${ARG_SOURCES})
-            SET(SOURCE_ARGS "${SOURCE_ARGS} \"${SOURCE}\"")
+            file(
+            GLOB_RECURSE
+            source_glob_file
+            ${SOURCE}/*
+            )
+            STRING(REGEX REPLACE ";" " " SPACE_SOURCE_ARGS "${source_glob_file}")
+            SET(SOURCE_ARGS "${SOURCE_ARGS} ${SPACE_SOURCE_ARGS}")
         ENDFOREACH()
         
         # prepare a cmake wrapper to write the stderr output of cccc to
@@ -87,10 +71,10 @@ FUNCTION(GENERATE_CCCC)
         
         FILE(WRITE ${CCCC_WRAPPER_SCRIPT}
 "
-EXECUTE_PROCESS(COMMAND \"${CCCC_EXECUTABLE}\" ${SOURCE_ARGS}
+EXECUTE_PROCESS(COMMAND \"${CCCC_EXECUTABLE}\" --outdir=cccc ${SOURCE_ARGS}
                 RESULT_VARIABLE CCCC_EXIT_CODE
                 ERROR_VARIABLE ERROR_OUT
-                WORKING_DIRECTORY \"${CMAKE_CURRENT_SOURCE_DIR}\")
+                WORKING_DIRECTORY \"${CMAKE_BINARY_DIR}\")
 IF(NOT CCCC_EXIT_CODE EQUAL 0)
     MESSAGE(FATAL_ERROR \"Error executing cccc for target ${TARGET}, return code: \${CCCC_EXIT_CODE}\")
 ENDIF()
