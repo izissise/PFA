@@ -142,6 +142,7 @@ if(CODE_CHECK)
                             "${PROJECT_SOURCE_DIR}/test"
                             ENABLE_IDS style
                             INLINE_SUPPRESSION)
+  message(STATUS "Execute make cppcheck to generate cppcheck report.")
 endif()
 
 if(CODE_METRICS)
@@ -149,9 +150,14 @@ if(CODE_METRICS)
   GENERATE_CCCC(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
                         "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
                         "${PROJECT_SOURCE_DIR}/test")
+  message(STATUS "Execute make cccc to generate cccc metrics.")
 endif()
 
 if(GENERATE_DOC)
   # --- Doxygen --- #
-  GENERATE_DOXYGEN(VERSION "${PROJECTVERSION}")
+  GENERATE_DOXYGEN(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
+                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+                        "${PROJECT_SOURCE_DIR}/test"
+                        VERSION "${PROJECTVERSION}")
+  message(STATUS "Execute make doc to generate doxygen documentation.")
 endif()

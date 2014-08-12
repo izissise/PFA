@@ -1,7 +1,7 @@
-# include <SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
 #include "printv.hpp"
 
-void printv(std::ostream& f, const std::string& s)
+std::ostream& printv(std::ostream& f, const std::string& s)
 {
   size_t prevPos;;
   size_t pos;
@@ -21,25 +21,26 @@ void printv(std::ostream& f, const std::string& s)
       prevPos = pos + 1;
     }
   f << s.substr(prevPos);
+  return f;
 }
 
 void testSfml()
 {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
-    
-    while (window.isOpen())
+  sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+  sf::CircleShape shape(100.f);
+  shape.setFillColor(sf::Color::Green);
+
+  while (window.isOpen())
     {
-        sf::Event event;
-        while (window.pollEvent(event))
+      sf::Event event;
+      while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
-                window.close();
+          if (event.type == sf::Event::Closed)
+            window.close();
         }
-        
-        window.clear();
-        window.draw(shape);
-        window.display();
+
+      window.clear();
+      window.draw(shape);
+      window.display();
     }
 }

@@ -5,10 +5,22 @@
 # include <string>
 # include <stdexcept>
 
-void printv(std::ostream& f, const std::string& s);
+/**
+ * \fn std::ostream& printv(std::ostream& f, const std::string& s)
+ * \brief Printf like function but using variadic template.
+ * \param[out] f The output stream (ex: std::cout).
+ * \param[in] s The format string each '%%' is an argument.
+ * \return f so you can reuse it.
+ *
+ * For the format string, when you want to pass some arguments, you only have
+ * to pass a '%%' without precising the type, you can also write a % with '%% %'.
+ *
+ */
+
+std::ostream& printv(std::ostream& f, const std::string& s);
 
 template<typename T, typename... Args>
-void printv(std::ostream& f, const std::string& s, T value, Args... args)
+std::ostream& printv(std::ostream& f, const std::string& s, T value, Args... args)
 {
   size_t prevPos;
   size_t pos;
@@ -22,7 +34,7 @@ void printv(std::ostream& f, const std::string& s, T value, Args... args)
         {
           f << value;
           printv(f, s.substr(pos + 1), args...);
-          return;
+          return f;
         }
       else
         {
@@ -32,6 +44,7 @@ void printv(std::ostream& f, const std::string& s, T value, Args... args)
       prevPos = pos + 1;
     }
   throw std::logic_error("extra arguments provided to printv");
+  return f;
 }
 
 void testSfml();

@@ -47,7 +47,7 @@ FUNCTION(GENERATE_DOXYGEN)
     IF(DOXYGEN_FOUND)
         
         # argument parsing
-        PARSE_ARGUMENTS(ARG "NAME;VERSION;INSTALL_DIR" "AUTO_INSTALL" ${ARGN})
+        PARSE_ARGUMENTS(ARG "SOURCES;NAME;VERSION;INSTALL_DIR" "AUTO_INSTALL" ${ARGN})
     
         # name
         SET(DOC_PROJECT_NAME "${CMAKE_PROJECT_NAME}")
@@ -63,6 +63,19 @@ FUNCTION(GENERATE_DOXYGEN)
             SET(DOC_PROJECT_VERSION "${ARG_VERSION}")
         ENDIF()
         
+        # write a list file containing all sources to check for the call to
+        # doxygen
+        SET(DOC_SOURCES "")
+        FOREACH(SOURCE ${ARG_SOURCES})
+            file(
+            GLOB_RECURSE
+            source_glob_file
+            ${SOURCE}/*
+            )
+            STRING(REGEX REPLACE ";" " " SPACE_SOURCE_ARGS "${source_glob_file}")
+            SET(DOC_SOURCES "${DOC_SOURCES} ${SPACE_SOURCE_ARGS}")
+        ENDFOREACH()
+        
         # install dir
         SET(DOC_INSTALL_DIR "share/${DOC_PROJECT_NAME}") 
         LIST(LENGTH ARG_INSTALL_DIR INSTALL_DIR_LENGTH)
@@ -71,7 +84,7 @@ FUNCTION(GENERATE_DOXYGEN)
         ENDIF()
         
         SET(DOC_API_DIR ${CMAKE_BINARY_DIR}/doc)
-        SET(DOC_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
+        SET(DOC_BASE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
         SET(DOC_WARN_FILE ${CMAKE_BINARY_DIR}/doxygen-warn.log)
         
         SET(DOXYFILE ${CMAKE_BINARY_DIR}/Doxyfile)
