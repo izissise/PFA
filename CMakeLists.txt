@@ -31,6 +31,7 @@ INCLUDE(CurrentDate)
 OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." ON)
 OPTION(CODE_METRICS "Decide if code's metrics should be generated." ON)
 OPTION(CODE_CHECK "Decide if code should be checked for common errors." ON)
+OPTION(GENERATE_DOC "Decide if documentation should be generated." ON)
 
 # --- global definitions ---
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
@@ -71,7 +72,7 @@ file(
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-  "Config.h.in"
+  "${INCLUDE_DIRECTORY}/Config.h.in"
   "${INCLUDE_DIRECTORY}/Config.h"
 )
 
@@ -148,4 +149,9 @@ if(CODE_METRICS)
   GENERATE_CCCC(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
                         "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
                         "${PROJECT_SOURCE_DIR}/test")
+endif()
+
+if(GENERATE_DOC)
+  # --- Doxygen --- #
+  GENERATE_DOXYGEN(VERSION "${PROJECTVERSION}")
 endif()
