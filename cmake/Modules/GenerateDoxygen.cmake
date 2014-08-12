@@ -67,15 +67,9 @@ FUNCTION(GENERATE_DOXYGEN)
         # doxygen
         SET(DOC_SOURCES "")
         FOREACH(SOURCE ${ARG_SOURCES})
-            file(
-            GLOB_RECURSE
-            source_glob_file
-            ${SOURCE}/*
-            )
-            STRING(REGEX REPLACE ";" " " SPACE_SOURCE_ARGS "${source_glob_file}")
-            SET(DOC_SOURCES "${DOC_SOURCES} ${SPACE_SOURCE_ARGS}")
+            SET(DOC_SOURCES "${DOC_SOURCES} \"${SOURCE}\"")
         ENDFOREACH()
-        
+
         # install dir
         SET(DOC_INSTALL_DIR "share/${DOC_PROJECT_NAME}") 
         LIST(LENGTH ARG_INSTALL_DIR INSTALL_DIR_LENGTH)
