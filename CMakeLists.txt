@@ -24,6 +24,7 @@ INCLUDE(EnableSlocCount)
 INCLUDE(GenerateDoxygen)
 INCLUDE(GenerateCppcheck)
 INCLUDE(GenerateCccc)
+INCLUDE(GenerateValgrind)
 INCLUDE(DefineProjectVersion)
 INCLUDE(CurrentDate)
 
@@ -32,6 +33,7 @@ OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." ON)
 OPTION(CODE_METRICS "Decide if code's metrics should be generated." ON)
 OPTION(CODE_CHECK "Decide if code should be checked for common errors." ON)
 OPTION(GENERATE_DOC "Decide if documentation should be generated." ON)
+OPTION(VALGRIND_CHECK "Decide if valgrind should be executed with the test binary to check for memory leaks." ON)
 
 # --- global definitions ---
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
@@ -136,6 +138,9 @@ if (SFML_FOUND)
   target_link_libraries (${NAME_LIB} ${SFML_LIBRARIES})
 endif()
 
+
+
+#Extra targets:
 if(CODE_CHECK)
   # --- cppcheck ---
   GENERATE_CPPCHECK(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src"
@@ -160,4 +165,10 @@ if(GENERATE_DOC)
                         "${PROJECT_SOURCE_DIR}/test"
                         VERSION "${PROJECTVERSION}")
   message(STATUS "Execute make doc to generate doxygen documentation.")
+endif()
+
+if(VALGRIND_CHECK)
+  # --- Valgrind --- #
+  GENERATE_VALGRIND(BIN "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}")
+  message(STATUS "Execute make valgrind to check for memory leaks.")
 endif()
