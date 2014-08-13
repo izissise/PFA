@@ -13,7 +13,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 # cmake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
-find_package(SFML 2.1 REQUIRED system window graphics network audio)
+find_package(SFML 2.1 system window graphics network audio)
 
 INCLUDE(EnableCppExtras)
 INCLUDE(CheckIncludeFile)
