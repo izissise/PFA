@@ -13,8 +13,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 # cmake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
-find_package(SFML 2.1 system window graphics network audio)
+find_package(SFML 2.1 COMPONENTS system window graphics network audio)
 
+INCLUDE(CMakeDependentOption)
 INCLUDE(EnableCppExtras)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
@@ -30,10 +31,11 @@ INCLUDE(CurrentDate)
 
 # --- user options ---
 OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." ON)
+CMAKE_DEPENDENT_OPTION(BUILD_TESTS_COVERAGE "Decide if a coverage report should be generated." ON "BUILD_TESTS" OFF)
+CMAKE_DEPENDENT_OPTION(VALGRIND_CHECK "Decide if valgrind should be executed with the test binary to check for memory leaks." ON "BUILD_TESTS" OFF)
 OPTION(CODE_METRICS "Decide if code's metrics should be generated." ON)
 OPTION(CODE_CHECK "Decide if code should be checked for common errors." ON)
 OPTION(GENERATE_DOC "Decide if documentation should be generated." ON)
-OPTION(VALGRIND_CHECK "Decide if valgrind should be executed with the test binary to check for memory leaks." ON)
 
 # --- global definitions ---
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
@@ -110,6 +112,8 @@ if(BUILD_TESTS)
     message(WARNING "CppUnit library can't be found, Unit test won't be compiled")
   else()
 
+    ENABLE_TESTING()
+
     add_executable(
     # executable name
       ${TEST_EXEC}
@@ -117,19 +121,27 @@ if(BUILD_TESTS)
      ${test_files}
     )
 
+    FOREACH(test ${test_files})
+      MESSAGE("  ### adding test ${test}")
+      GET_FILENAME_COMPONENT(TestName ${test} NAME_WE)
+      ADD_TEST(NAME ${TestName} COMMAND UnitTester ${TestName})
+    ENDFOREACH(test)
+
+    add_test(NAME UnitTester COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}")
+
     include_directories(${CPPUNIT_INCLUDE_DIRS})
     target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB} dl)
 
-    set_target_properties(${NAME_LIB} ${NAME_EXEC} ${TEST_EXEC} PROPERTIES
-                                                COMPILE_FLAGS "--coverage"
-                                                LINK_FLAGS "-coverage")
+    if(BUILD_TESTS_COVERAGE)
+      # --- coverage report ---
+      ENABLE_COVERAGE_REPORT(TARGETS ${TEST_EXEC} ${NAME_EXEC}
+                             TESTS ${test_files})
+    endif()
 
-    # --- coverage report ---
-    ENABLE_COVERAGE_REPORT(TARGETS ${TEST_EXEC}
-                           TESTS  ${RSC_TEST_NAME}
-                           FILTER ${test_files})
-
-    ENABLE_TESTING()
+    if(VALGRIND_CHECK)
+      # --- Valgrind --- #
+      GENERATE_VALGRIND(BIN "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}")
+    endif()
   endif()
 endif()
 
@@ -147,7 +159,6 @@ if(CODE_CHECK)
                             "${PROJECT_SOURCE_DIR}/test"
                             ENABLE_IDS style
                             INLINE_SUPPRESSION)
-  message(STATUS "Execute make cppcheck to generate cppcheck report.")
 endif()
 
 if(CODE_METRICS)
@@ -155,12 +166,10 @@ if(CODE_METRICS)
   GENERATE_CCCC(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
                         "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
                         "${PROJECT_SOURCE_DIR}/test")
-  message(STATUS "Execute make cccc to generate cccc metrics.")
   # --- SlocCount --- #
     ENABLE_SLOCCOUNT(FOLDERS "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
                         "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
                         "${PROJECT_SOURCE_DIR}/test")
-  message(STATUS "Execute make sloccount to count line of code in the project.")
 endif()
 
 if(GENERATE_DOC)
@@ -169,11 +178,5 @@ if(GENERATE_DOC)
                         "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
                         "${PROJECT_SOURCE_DIR}/test"
                         VERSION "${PROJECTVERSION}")
-  message(STATUS "Execute make doc to generate doxygen documentation.")
 endif()
 
-if(VALGRIND_CHECK)
-  # --- Valgrind --- #
-  GENERATE_VALGRIND(BIN "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}")
-  message(STATUS "Execute make valgrind to check for memory leaks.")
-endif()

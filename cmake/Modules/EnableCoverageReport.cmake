@@ -8,9 +8,6 @@
 #
 # ENABLE_COVERAGE_REPORT(TARGETS target... [FILTER filter...] [TESTS test targets...])
 #
-# To generate a coverage report first build the project with
-# CMAKE_BUILD_TYPE=coverage, then call make test and afterwards make coverage.
-#
 # The coverage report is based on gcov. Depending on the availability of lcov
 # a HTML report will be generated and/or an XML report of gcovr is found.
 # The generated coverage target executes all found solutions. Special targets
@@ -62,7 +59,7 @@ FUNCTION(ENABLE_COVERAGE_REPORT)
     ENDIF()
     
     STRING(TOLOWER "${CMAKE_BUILD_TYPE}" COVERAGE_BUILD_TYPE)
-    IF(CMAKE_COMPILER_IS_GNUCXX AND TOOL_FOUND AND "${COVERAGE_BUILD_TYPE}" MATCHES "coverage")
+    IF(CMAKE_COMPILER_IS_GNUCXX AND TOOL_FOUND)
     
         MESSAGE(STATUS "Coverage support enabled for targets: ${ARG_TARGETS}")
     

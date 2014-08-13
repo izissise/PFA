@@ -2,7 +2,7 @@
 # The function GENERATE_VALGRIND is provided to create a "doc" target that
 # generates a valgrind documentation (currently only as HTML report).
 #
-# GENERATE_VALGRIND(BIN <Binary to execute in valgrind>)
+# GENERATE_VALGRIND(BIN "Binary to execute in valgrind")
 #
 #     BIN: The binary to execute 
 #
