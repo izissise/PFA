@@ -13,7 +13,7 @@
  * \return f so you can reuse it.
  *
  * For the format string, when you want to pass some arguments, you only have
- * to pass a '%%' without precising the type, you can also write a % with '%% %'.
+ * to pass a '%%' without precising the type, you can also write a % with '%%%'.
  *
  */
 

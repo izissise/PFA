@@ -38,7 +38,7 @@ DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
 CURRENT_DATE(PROJECT_BUILD_DATE)
 
 # --- global compiler flags ---
-INCLUDE(PedanticCompilerWarnings)
+INCLUDE(SuperPedanticCompilerWarnings)
 
 # decide how to do name demangling
 CHECK_INCLUDE_FILE_CXX("cxxabi.h" HAVE_CXXABI_H)

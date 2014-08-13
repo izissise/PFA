@@ -17,6 +17,11 @@ class TestPrintv : public CppUnit::TestCase
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  TestPrintv()
+    : fixture(NULL)
+  {};
+  virtual ~TestPrintv() {};
+
   void setUp()
   {
     fixture = new std::stringstream();
