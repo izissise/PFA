@@ -156,6 +156,11 @@ if(CODE_METRICS)
                         "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
                         "${PROJECT_SOURCE_DIR}/test")
   message(STATUS "Execute make cccc to generate cccc metrics.")
+  # --- SlocCount --- #
+    ENABLE_SLOCCOUNT(FOLDERS "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
+                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+                        "${PROJECT_SOURCE_DIR}/test")
+  message(STATUS "Execute make sloccount to count line of code in the project.")
 endif()
 
 if(GENERATE_DOC)
