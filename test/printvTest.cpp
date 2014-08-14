@@ -52,32 +52,16 @@ protected:
 
   void lessArgTest()
   {
-    try
-      {
-        printv(*fixture, "There is no arg but a %");
-        CPPUNIT_ASSERT(false);
-      }
-    catch (std::runtime_error& e)
-      {
-        CPPUNIT_ASSERT(std::string("invalid format string: missing arguments") == e.what());
-        return;
-      }
-    CPPUNIT_ASSERT(false);
+    CPPUNIT_ASSERT_THROW(
+      printv(*fixture, "There is no arg but a %"),
+      std::runtime_error);
   };
 
   void moreArgTest()
   {
-    try
-      {
-        printv(*fixture, "There is no arg but passing some anyways.", 4563);
-        CPPUNIT_ASSERT(false);
-      }
-    catch (std::logic_error& e)
-      {
-        CPPUNIT_ASSERT(std::string("extra arguments provided to printv") == e.what());
-        return;
-      }
-    CPPUNIT_ASSERT(false);
+    CPPUNIT_ASSERT_THROW(
+      printv(*fixture, "There is no arg but passing some anyways.", 4563),
+      std::logic_error);
   };
 
 private:

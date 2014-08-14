@@ -111,7 +111,6 @@ if(BUILD_TESTS)
   if(NOT CPPUNIT_FOUND)
     message(WARNING "CppUnit library can't be found, Unit test won't be compiled")
   else()
-
     ENABLE_TESTING()
 
     add_executable(
@@ -121,7 +120,13 @@ if(BUILD_TESTS)
      ${test_files}
     )
 
-    FOREACH(test ${test_files})
+    file(
+      GLOB_RECURSE
+      UnitTests_SRCS
+      RELATIVE
+      "${CMAKE_CURRENT_SOURCE_DIR}/test"
+      "test/*Test.cpp")
+    FOREACH(test ${UnitTests_SRCS})
       MESSAGE("  ### adding test ${test}")
       GET_FILENAME_COMPONENT(TestName ${test} NAME_WE)
       ADD_TEST(NAME ${TestName} COMMAND UnitTester ${TestName})
@@ -167,7 +172,7 @@ if(CODE_METRICS)
                         "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
                         "${PROJECT_SOURCE_DIR}/test")
   # --- SlocCount --- #
-    ENABLE_SLOCCOUNT(FOLDERS "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
+  ENABLE_SLOCCOUNT(FOLDERS "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
                         "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
                         "${PROJECT_SOURCE_DIR}/test")
 endif()
@@ -179,4 +184,3 @@ if(GENERATE_DOC)
                         "${PROJECT_SOURCE_DIR}/test"
                         VERSION "${PROJECTVERSION}")
 endif()
-
