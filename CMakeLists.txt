@@ -111,8 +111,6 @@ if(BUILD_TESTS)
   if(NOT CPPUNIT_FOUND)
     message(WARNING "CppUnit library can't be found, Unit test won't be compiled")
   else()
-    ENABLE_TESTING()
-
     add_executable(
     # executable name
       ${TEST_EXEC}
@@ -120,33 +118,27 @@ if(BUILD_TESTS)
      ${test_files}
     )
 
-    file(
-      GLOB_RECURSE
-      UnitTests_SRCS
-      RELATIVE
-      "${CMAKE_CURRENT_SOURCE_DIR}/test"
-      "test/*Test.cpp")
-    FOREACH(test ${UnitTests_SRCS})
-      MESSAGE("  ### adding test ${test}")
-      GET_FILENAME_COMPONENT(TestName ${test} NAME_WE)
-      ADD_TEST(NAME ${TestName} COMMAND UnitTester ${TestName})
-    ENDFOREACH(test)
-
-    add_test(NAME UnitTester COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}")
-
-    include_directories(${CPPUNIT_INCLUDE_DIRS})
-    target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB} dl)
-
     if(BUILD_TESTS_COVERAGE)
       # --- coverage report ---
-      ENABLE_COVERAGE_REPORT(TARGETS ${TEST_EXEC} ${NAME_EXEC}
-                             TESTS ${test_files})
+      ENABLE_COVERAGE_REPORT(TARGETS ${TEST_EXEC} TESTS ${test_files})
     endif()
 
     if(VALGRIND_CHECK)
       # --- Valgrind --- #
       GENERATE_VALGRIND(BIN "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}")
     endif()
+
+    set(TEST_REPORT_FILE "cpptestresults.xml")
+    # Execute ${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC} binary to execute tests
+    ADD_CUSTOM_COMMAND(OUTPUT ${TEST_REPORT_FILE}
+                           DEPENDS ${TEST_EXEC}
+                           COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}" ARGS "--xml-file=${TEST_REPORT_FILE}"
+                           WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    ADD_CUSTOM_TARGET(test DEPENDS ${TEST_REPORT_FILE})
+
+    include_directories(${CPPUNIT_INCLUDE_DIRS})
+    target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB})
+
   endif()
 endif()
 
@@ -154,8 +146,6 @@ if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
   target_link_libraries (${NAME_LIB} ${SFML_LIBRARIES})
 endif()
-
-
 
 #Extra targets:
 if(CODE_CHECK)
