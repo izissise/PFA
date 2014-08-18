@@ -1,6 +1,10 @@
 #include "Menu.hpp"
 
-Menu::Menu() : _window(sf::VideoMode(1600, 900), "Name")
+#include <iostream>
+
+Menu::Menu(Settings &set) :
+  _window(sf::VideoMode(std::stoi(set.getCvarList().getCvar("r_width")),
+			std::stoi(set.getCvarList().getCvar("r_height"))), "Name")
 {
 }
 

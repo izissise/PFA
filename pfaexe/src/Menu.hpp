@@ -2,11 +2,13 @@
 #define _MENU_H_
 
 # include <SFML/Window.hpp>
+# include <string>
+# include "Settings.hpp"
 
 class Menu
 {
 public:
-  Menu();
+  Menu(Settings &set);
   virtual ~Menu();
 
   void	run();

@@ -14,11 +14,13 @@
 #include "Config.h"
 #include "Unused.hpp"
 #include "printv.hpp"
+#include "Settings.hpp"
 #include "Menu.hpp"
 
 int	main(UNUSED int ac, UNUSED char *av[])
 {
-  Menu	menu;
+  Settings	set;
+  Menu		menu(set);
 
   printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
   // testSfml();
