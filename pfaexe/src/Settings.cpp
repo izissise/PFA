@@ -22,7 +22,9 @@ CvarList	&Settings::getCvarList()
 
 void	Settings::setKeyword(const std::vector<std::string> &tokens)
 {
-  std::cout << "set Keyword function" << std::endl;
+  if (tokens.size() < 3)
+    throw (Exception("Missing parameters for set command"));
+  _vars.setCvar(tokens[1], tokens[2]);
 }
 
 void	Settings::bindKeyword(const std::vector<std::string> &tokens)
@@ -59,5 +61,10 @@ void	Settings::loadConfigFile(const std::string &filename)
   else
     throw (Exception("File [" + filename + "] not found"));
   for (const auto &it : content)
-    parseCommandLine(it);
+    try {
+      parseCommandLine(it);
+    }
+    catch (const Exception &e) {
+      std::cerr << e.what() << std::endl;
+    }
 }
