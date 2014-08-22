@@ -15,6 +15,8 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
 find_package(SFML 2.1 COMPONENTS system window graphics network audio)
 
+find_package(Boost 1.56.0 COMPONENTS filesystem system thread date_time REQUIRED)
+
 INCLUDE(CMakeDependentOption)
 INCLUDE(EnableCppExtras)
 INCLUDE(CheckIncludeFile)
@@ -109,7 +111,7 @@ file(
 # --- enable unit tests if desired ---
 if(BUILD_TESTS)
   if(NOT CPPUNIT_FOUND)
-    message(WARNING "CppUnit library can't be found, Unit test won't be compiled")
+    MESSAGE(WARNING "CppUnit library can't be found, Unit test won't be compiled")
   else()
     add_executable(
     # executable name
@@ -134,7 +136,7 @@ if(BUILD_TESTS)
                            DEPENDS ${TEST_EXEC}
                            COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}" ARGS "--xml-file=${TEST_REPORT_FILE}"
                            WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    ADD_CUSTOM_TARGET(test DEPENDS ${TEST_REPORT_FILE})
+    ADD_CUSTOM_TARGET(launchtest DEPENDS ${TEST_REPORT_FILE})
 
     include_directories(${CPPUNIT_INCLUDE_DIRS})
     target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB})
@@ -145,6 +147,12 @@ endif()
 if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
   target_link_libraries (${NAME_LIB} ${SFML_LIBRARIES})
+endif()
+
+if (Boost_FOUND)
+   include_directories(${Boost_INCLUDE_DIRS})
+   link_directories(${Boost_LIBRARY_DIRS})
+   target_link_libraries (${NAME_LIB} ${Boost_LIBRARIES})
 endif()
 
 #Extra targets:
