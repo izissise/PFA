@@ -3,10 +3,12 @@ cmake_minimum_required(VERSION 2.8)
 project(Project)
 
 set(NAME_LIB "pfa")
-set(NAME_EXEC "pfaexe")
+set(NAME_CLIENT "client")
+set(NAME_SERVER "server")
 set(TEST_EXEC "UnitTester")
 
-set(INCLUDE_DIRECTORY "${NAME_LIB}/inc")
+set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/")
+set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -14,8 +16,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
 find_package(SFML 2.1 COMPONENTS system window graphics network audio)
-
-find_package(Boost 1.56.0 COMPONENTS filesystem system thread date_time REQUIRED)
+find_package(Boost 1.55.0 COMPONENTS filesystem system regex REQUIRED)
 
 INCLUDE(CMakeDependentOption)
 INCLUDE(EnableCppExtras)
@@ -66,24 +67,30 @@ file(
 file(
   GLOB_RECURSE
   lib_include_files
-  ${INCLUDE_DIRECTORY}/*
+  ${NAME_LIB}/src/*
 )
 
 file(
   GLOB_RECURSE
   exec_source_files
-  ${NAME_EXEC}/src/*
+  ${NAME_CLIENT}/src/*
+)
+
+file(
+  GLOB_RECURSE
+  server_source_files
+  ${NAME_SERVER}/src/*
 )
 
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-  "${INCLUDE_DIRECTORY}/Config.h.in"
-  "${INCLUDE_DIRECTORY}/Config.h"
+  "${NAME_LIB}/inc/Config.h.in"
+  "${NAME_LIB}/inc/Config.h"
 )
 
-include_directories("${INCLUDE_DIRECTORY}/")
-include_directories("${CMAKE_CURRENT_BINARY_DIR}/${INCLUDE_DIRECTORY}/")
+include_directories("${INCLUDE_DIRECTORY}")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
 
 add_library(
 # executable name
@@ -95,12 +102,18 @@ add_library(
 
 add_executable(
 # executable name
-  ${NAME_EXEC}
+  ${NAME_CLIENT}
 # source files
   ${exec_source_files}
 )
 
-target_link_libraries(${NAME_EXEC} ${NAME_LIB})
+add_executable(
+  ${NAME_SERVER}
+  ${server_source_files}
+)
+
+target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
+target_link_libraries(${NAME_SERVER} ${NAME_LIB})
 
 file(
   GLOB_RECURSE
@@ -158,7 +171,7 @@ endif()
 #Extra targets:
 if(CODE_CHECK)
   # --- cppcheck ---
-  GENERATE_CPPCHECK(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src"
+  GENERATE_CPPCHECK(SOURCES ${SRC_DIRECTORY}
                             "${PROJECT_SOURCE_DIR}/test"
                             ENABLE_IDS style
                             INLINE_SUPPRESSION)
@@ -166,19 +179,16 @@ endif()
 
 if(CODE_METRICS)
   # --- cccc ---
-  GENERATE_CCCC(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
-                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+  GENERATE_CCCC(SOURCES ${SRC_DIRECTORY} ${INCLUDE_DIRECTORY}
                         "${PROJECT_SOURCE_DIR}/test")
   # --- SlocCount --- #
-  ENABLE_SLOCCOUNT(FOLDERS "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
-                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+  ENABLE_SLOCCOUNT(FOLDERS ${SRC_DIRECTORY} ${INCLUDE_DIRECTORY}
                         "${PROJECT_SOURCE_DIR}/test")
 endif()
 
 if(GENERATE_DOC)
   # --- Doxygen --- #
-  GENERATE_DOXYGEN(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
-                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+  GENERATE_DOXYGEN(SOURCES ${SRC_DIRECTORY} ${INCLUDE_DIRECTORY}
                         "${PROJECT_SOURCE_DIR}/test"
                         VERSION "${PROJECTVERSION}")
 endif()
