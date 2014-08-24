@@ -31,6 +31,9 @@ INCLUDE(GenerateCccc)
 INCLUDE(GenerateValgrind)
 INCLUDE(DefineProjectVersion)
 INCLUDE(CurrentDate)
+# --- global compiler flags ---
+INCLUDE(SuperPedanticCompilerWarnings)
+INCLUDE(DemangleCppABI)
 
 # --- user options ---
 OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." ON)
@@ -44,19 +47,6 @@ OPTION(GENERATE_DOC "Decide if documentation should be generated." ON)
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
 CURRENT_DATE(PROJECT_BUILD_DATE)
 
-# --- global compiler flags ---
-INCLUDE(SuperPedanticCompilerWarnings)
-
-# decide how to do name demangling
-CHECK_INCLUDE_FILE_CXX("cxxabi.h" HAVE_CXXABI_H)
-IF(HAVE_CXXABI_H)
-  ADD_DEFINITIONS(-DDEMANGLE_GCC)
-ELSEIF(MSVC)
-  ADD_DEFINITIONS(-DDEMANGLE_MSVC)
-ELSE()
-  MESSAGE(WARNING "No demangling solution found for the system.")
-ENDIF()
-
 # All source files using globs
 file(
   GLOB_RECURSE
@@ -67,19 +57,31 @@ file(
 file(
   GLOB_RECURSE
   lib_include_files
-  ${NAME_LIB}/src/*
+  ${NAME_LIB}/inc/*
 )
 
 file(
   GLOB_RECURSE
-  exec_source_files
+  client_source_files
   ${NAME_CLIENT}/src/*
+)
+
+file(
+  GLOB_RECURSE
+  client_include_files
+  ${NAME_CLIENT}/inc/*
 )
 
 file(
   GLOB_RECURSE
   server_source_files
   ${NAME_SERVER}/src/*
+)
+
+file(
+  GLOB_RECURSE
+  server_include_files
+  ${NAME_SERVER}/inc/*
 )
 
 # configure a header file to pass some of the CMake settings
@@ -104,12 +106,15 @@ add_executable(
 # executable name
   ${NAME_CLIENT}
 # source files
-  ${exec_source_files}
+  ${client_source_files}
+  ${client_include_files}
 )
 
 add_executable(
   ${NAME_SERVER}
+# source files
   ${server_source_files}
+  ${server_include_files}
 )
 
 target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
