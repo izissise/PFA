@@ -24,13 +24,11 @@ Controls::Action	Controls::getActionFromKey(key k) const
 
 bool	Controls::getActionState(Action act) const
 {
-  key	k = -1;
-
   for (auto &it : _keyAction)
     if (it.second == act)
       {
-	k = it.first;
-	break ;
+	if (isPressed(it.first))
+	  return true;
       }
-  return ((k == -1) ? false : isPressed(k));
+  return false;
 }
