@@ -27,9 +27,20 @@ void	Settings::setKeyword(const std::vector<std::string> &tokens)
   _vars.setCvar(tokens[1], tokens[2]);
 }
 
-void	Settings::bindKeyword(const std::vector<std::string> &tokens)
+void		Settings::bindKeyword(const std::vector<std::string> &tokens)
 {
-  std::cout << "bind Keyword function" << std::endl;
+  key		k;
+  Action	act;
+
+  if (tokens.size() < 3)
+    throw (Exception("Missing parameters for bind command"));
+  k = _ctrl.getKeyFromCode(tokens[1]);
+  if (k == sf::Keyboard::Unknown)
+    throw (Exception("Unknown key ["+ tokens[1] +"]"));
+  act = _ctrl.getActionFromCode(tokens[2]);
+  if (act == Action::Unknown)
+    throw (Exception("Unknown Action ["+ tokens[2] +"] for key ["+ tokens[1] +"]"));
+  _ctrl.bindActionOnKey(k, act);
 }
 
 void	Settings::parseCommandLine(const std::string &cmd)
