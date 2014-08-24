@@ -44,10 +44,10 @@ std::string typeName(UNUSED T a)
     res = demangled;
   free(demangled);
 # elif DEMANGLE_ABI == MSVC
-  const char* decorated_name = typeid(instance).name();
+  const char* decorated_name = typeid(T).name();
   char undecorated_name[1024];
   if (!UnDecorateSymbolName(decorated_name, undecorated_name, sizeof(undecorated_name) / sizeof(*undecorated_name), UNDNAME_COMPLETE))
-    throw std::runtime_error(std::string("typeName: ") + GetLastError());
+    throw std::runtime_error(std::string("typeName: windows error."));
   res = undecorated_name;
 # else
   throw std::runtime_error("typeName: ""No demangling ABI.");
