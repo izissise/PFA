@@ -5,6 +5,7 @@
 # include <vector>
 # include <string>
 # include "Cvar.hpp"
+# include "Controls.hpp"
 
 class Settings
 {
@@ -22,6 +23,7 @@ private:
   void		bindKeyword(const std::vector<std::string> &tokens);
 
   CvarList			_vars;
+  Controls			_ctrl;
   std::map<std::string, func>	_parseKey;
 };
 
