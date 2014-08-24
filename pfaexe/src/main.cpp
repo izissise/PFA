@@ -24,6 +24,6 @@ int	main(UNUSED int ac, UNUSED char *av[])
 
   printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
   // testSfml();
-  menu.run();
+  menu.run(set);
   return 0;
 }

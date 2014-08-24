@@ -13,10 +13,11 @@ Menu::~Menu()
 {
 }
 
-void		Menu::run()
+void		Menu::run(Settings &set)
 {
   sf::Event	event;
   sf::Sprite	sprite(_background);
+  Controls	ctrl = set.getControls();
 
   while (_window.isOpen())
     {
@@ -24,6 +25,11 @@ void		Menu::run()
 	{
 	  if (event.type == sf::Event::Closed)
 	    _window.close();
+	  else if (event.type == sf::Event::KeyPressed)
+	    {
+	      std::cout << "Action for key " << event.key.code << " is: "
+			<< static_cast<int>(ctrl.getActionFromKey(event.key.code)) << std::endl;
+	    }
 	}
       _window.clear();
       _window.draw(sprite);

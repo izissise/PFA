@@ -20,6 +20,11 @@ CvarList	&Settings::getCvarList()
   return (_vars);
 }
 
+Controls	&Settings::getControls()
+{
+  return (_ctrl);
+}
+
 void	Settings::setKeyword(const std::vector<std::string> &tokens)
 {
   if (tokens.size() < 3)

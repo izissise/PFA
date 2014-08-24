@@ -11,7 +11,7 @@ public:
   Menu(Settings &set);
   virtual ~Menu();
 
-  void	run();
+  void	run(Settings &set);
 
 private:
   sf::RenderWindow		_window;

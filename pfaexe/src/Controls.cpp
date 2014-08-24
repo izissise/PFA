@@ -5,6 +5,33 @@ Controls::Controls()
 {
   using namespace sf;
 
+  _keycode["A"] = Keyboard::A;
+  _keycode["B"] = Keyboard::B;
+  _keycode["C"] = Keyboard::C;
+  _keycode["D"] = Keyboard::D;
+  _keycode["E"] = Keyboard::E;
+  _keycode["F"] = Keyboard::F;
+  _keycode["G"] = Keyboard::G;
+  _keycode["H"] = Keyboard::H;
+  _keycode["I"] = Keyboard::I;
+  _keycode["J"] = Keyboard::J;
+  _keycode["K"] = Keyboard::K;
+  _keycode["L"] = Keyboard::L;
+  _keycode["M"] = Keyboard::M;
+  _keycode["N"] = Keyboard::N;
+  _keycode["O"] = Keyboard::O;
+  _keycode["P"] = Keyboard::P;
+  _keycode["Q"] = Keyboard::Q;
+  _keycode["R"] = Keyboard::R;
+  _keycode["S"] = Keyboard::S;
+  _keycode["T"] = Keyboard::T;
+  _keycode["U"] = Keyboard::U;
+  _keycode["V"] = Keyboard::V;
+  _keycode["W"] = Keyboard::W;
+  _keycode["X"] = Keyboard::X;
+  _keycode["Y"] = Keyboard::Y;
+  _keycode["Z"] = Keyboard::Z;
+  _keycode["NUM0"] = Keyboard::Num0;
   _keycode["NUM0"] = Keyboard::Num0;
   _keycode["NUM1"] = Keyboard::Num1;
   _keycode["NUM2"] = Keyboard::Num2;

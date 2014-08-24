@@ -14,6 +14,7 @@ public:
   virtual ~Settings();
 
   CvarList	&getCvarList();
+  Controls	&getControls();
   void		loadConfigFile(const std::string &filename);
   void		parseCommandLine(const std::string &cmd);
 
