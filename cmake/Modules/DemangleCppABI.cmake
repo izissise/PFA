@@ -1,4 +1,4 @@
-#
+# Set DEMANGLE_ABI with the ABI you should use to demangle symbols
 #
 # Copyright (C) 2011 by Johannes Wienke <jwienke at techfak dot uni-bielefeld dot de>
 #
@@ -25,9 +25,10 @@ INCLUDE(CheckIncludeFileCXX)
 # decide how to do name demangling
 CHECK_INCLUDE_FILE_CXX("cxxabi.h" HAVE_CXXABI_H)
 IF(HAVE_CXXABI_H)
-  ADD_DEFINITIONS(-DDEMANGLE_GCC)
+  SET(DEMANGLE_ABI "GCC")
 ELSEIF(MSVC)
-  ADD_DEFINITIONS(-DDEMANGLE_MSVC)
+  SET(DEMANGLE_ABI "MSVC")
 ELSE()
+  SET(DEMANGLE_ABI "NONE")
   MESSAGE(WARNING "No demangling solution found for the system.")
 ENDIF()
