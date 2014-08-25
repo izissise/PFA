@@ -3,10 +3,12 @@ cmake_minimum_required(VERSION 2.8)
 project(Project)
 
 set(NAME_LIB "pfa")
-set(NAME_EXEC "pfaexe")
+set(NAME_CLIENT "client")
+set(NAME_SERVER "server")
 set(TEST_EXEC "UnitTester")
 
-set(INCLUDE_DIRECTORY "${NAME_LIB}/inc")
+set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/")
+set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -14,6 +16,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
 find_package(SFML 2.1 COMPONENTS system window graphics network audio)
+find_package(Boost 1.55.0 COMPONENTS filesystem system regex REQUIRED)
 
 INCLUDE(CMakeDependentOption)
 INCLUDE(EnableCppExtras)
@@ -28,6 +31,9 @@ INCLUDE(GenerateCccc)
 INCLUDE(GenerateValgrind)
 INCLUDE(DefineProjectVersion)
 INCLUDE(CurrentDate)
+# --- global compiler flags ---
+INCLUDE(SuperPedanticCompilerWarnings)
+INCLUDE(DemangleCppABI)
 
 # --- user options ---
 OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." ON)
@@ -41,19 +47,6 @@ OPTION(GENERATE_DOC "Decide if documentation should be generated." ON)
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
 CURRENT_DATE(PROJECT_BUILD_DATE)
 
-# --- global compiler flags ---
-INCLUDE(SuperPedanticCompilerWarnings)
-
-# decide how to do name demangling
-CHECK_INCLUDE_FILE_CXX("cxxabi.h" HAVE_CXXABI_H)
-IF(HAVE_CXXABI_H)
-  ADD_DEFINITIONS(-DDEMANGLE_GCC)
-ELSEIF(MSVC)
-  ADD_DEFINITIONS(-DDEMANGLE_MSVC)
-ELSE()
-  MESSAGE(WARNING "No demangling solution found for the system.")
-ENDIF()
-
 # All source files using globs
 file(
   GLOB_RECURSE
@@ -64,24 +57,42 @@ file(
 file(
   GLOB_RECURSE
   lib_include_files
-  ${INCLUDE_DIRECTORY}/*
+  ${NAME_LIB}/inc/*
 )
 
 file(
   GLOB_RECURSE
-  exec_source_files
-  ${NAME_EXEC}/src/*
+  client_source_files
+  ${NAME_CLIENT}/src/*
+)
+
+file(
+  GLOB_RECURSE
+  client_include_files
+  ${NAME_CLIENT}/inc/*
+)
+
+file(
+  GLOB_RECURSE
+  server_source_files
+  ${NAME_SERVER}/src/*
+)
+
+file(
+  GLOB_RECURSE
+  server_include_files
+  ${NAME_SERVER}/inc/*
 )
 
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-  "${INCLUDE_DIRECTORY}/Config.h.in"
-  "${INCLUDE_DIRECTORY}/Config.h"
+  "${NAME_LIB}/inc/Config.h.in"
+  "${NAME_LIB}/inc/Config.h"
 )
 
-include_directories("${INCLUDE_DIRECTORY}/")
-include_directories("${CMAKE_CURRENT_BINARY_DIR}/${INCLUDE_DIRECTORY}/")
+include_directories("${INCLUDE_DIRECTORY}")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
 
 add_library(
 # executable name
@@ -93,12 +104,21 @@ add_library(
 
 add_executable(
 # executable name
-  ${NAME_EXEC}
+  ${NAME_CLIENT}
 # source files
-  ${exec_source_files}
+  ${client_source_files}
+  ${client_include_files}
 )
 
-target_link_libraries(${NAME_EXEC} ${NAME_LIB})
+add_executable(
+  ${NAME_SERVER}
+# source files
+  ${server_source_files}
+  ${server_include_files}
+)
+
+target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
+target_link_libraries(${NAME_SERVER} ${NAME_LIB})
 
 file(
   GLOB_RECURSE
@@ -109,7 +129,7 @@ file(
 # --- enable unit tests if desired ---
 if(BUILD_TESTS)
   if(NOT CPPUNIT_FOUND)
-    message(WARNING "CppUnit library can't be found, Unit test won't be compiled")
+    MESSAGE(WARNING "CppUnit library can't be found, Unit test won't be compiled")
   else()
     add_executable(
     # executable name
@@ -134,7 +154,7 @@ if(BUILD_TESTS)
                            DEPENDS ${TEST_EXEC}
                            COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}" ARGS "--xml-file=${TEST_REPORT_FILE}"
                            WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    ADD_CUSTOM_TARGET(test DEPENDS ${TEST_REPORT_FILE})
+    ADD_CUSTOM_TARGET(launchtest DEPENDS ${TEST_REPORT_FILE})
 
     include_directories(${CPPUNIT_INCLUDE_DIRS})
     target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB})
@@ -147,10 +167,16 @@ if (SFML_FOUND)
   target_link_libraries (${NAME_LIB} ${SFML_LIBRARIES})
 endif()
 
+if (Boost_FOUND)
+   include_directories(${Boost_INCLUDE_DIRS})
+   link_directories(${Boost_LIBRARY_DIRS})
+   target_link_libraries (${NAME_LIB} ${Boost_LIBRARIES})
+endif()
+
 #Extra targets:
 if(CODE_CHECK)
   # --- cppcheck ---
-  GENERATE_CPPCHECK(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src"
+  GENERATE_CPPCHECK(SOURCES ${SRC_DIRECTORY}
                             "${PROJECT_SOURCE_DIR}/test"
                             ENABLE_IDS style
                             INLINE_SUPPRESSION)
@@ -158,19 +184,16 @@ endif()
 
 if(CODE_METRICS)
   # --- cccc ---
-  GENERATE_CCCC(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
-                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+  GENERATE_CCCC(SOURCES ${SRC_DIRECTORY} ${INCLUDE_DIRECTORY}
                         "${PROJECT_SOURCE_DIR}/test")
   # --- SlocCount --- #
-  ENABLE_SLOCCOUNT(FOLDERS "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
-                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+  ENABLE_SLOCCOUNT(FOLDERS ${SRC_DIRECTORY} ${INCLUDE_DIRECTORY}
                         "${PROJECT_SOURCE_DIR}/test")
 endif()
 
 if(GENERATE_DOC)
   # --- Doxygen --- #
-  GENERATE_DOXYGEN(SOURCES "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/src" "${PROJECT_SOURCE_DIR}/${NAME_EXEC}/inc"
-                        "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src" "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc"
+  GENERATE_DOXYGEN(SOURCES ${SRC_DIRECTORY} ${INCLUDE_DIRECTORY}
                         "${PROJECT_SOURCE_DIR}/test"
                         VERSION "${PROJECTVERSION}")
 endif()

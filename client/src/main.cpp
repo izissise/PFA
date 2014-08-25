@@ -12,16 +12,15 @@
 #include <iostream>
 
 #include "Config.h"
+#include "demangle.hpp"
 #include "Unused.hpp"
 #include "printv.hpp"
-#include "Menu.hpp"
 
-int	main(UNUSED int ac, UNUSED char *av[])
+int main(UNUSED int ac, UNUSED char *av[])
 {
-  Menu	menu;
-
-  printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
-  // testSfml();
-  menu.run();
-  return 0;
+    std::cout << typeName(std::string("a")) << std::endl;
+    printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
+    testBoost();
+    testSfml();
+    return 0;
 }

@@ -48,5 +48,6 @@ std::ostream& printv(std::ostream& f, const std::string& s, T value, Args... arg
 }
 
 void testSfml();
+void testBoost();
 
 #endif // PRINTV_HPP_INCLUDED
