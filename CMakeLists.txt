@@ -16,7 +16,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
 find_package(SFML 2.1 COMPONENTS system window graphics network audio)
-find_package(Boost 1.55.0 COMPONENTS filesystem system regex REQUIRED)
+find_package(Boost 1.55.0 COMPONENTS filesystem system regex program_options REQUIRED)
 
 INCLUDE(CMakeDependentOption)
 INCLUDE(EnableCppExtras)
