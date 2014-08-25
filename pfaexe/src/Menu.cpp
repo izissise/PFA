@@ -27,8 +27,18 @@ void		Menu::run(Settings &set)
 	    _window.close();
 	  else if (event.type == sf::Event::KeyPressed)
 	    {
-	      std::cout << "Action for key " << event.key.code << " is: "
-			<< static_cast<int>(ctrl.getActionFromKey(event.key.code)) << std::endl;
+	      try {
+		std::cout << "Action for key " << ctrl.getCodeFromKey(event.key.code) << " is: ";
+	      }
+	      catch (const Exception &e) {
+		std::cout << "Action for key " << "Unknown" << " is: ";
+	      }
+	      try {
+		std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(event.key.code)) << std::endl;
+	      }
+	      catch (const std::out_of_range &oor) {
+		std::cout << "Unknown" << std::endl;
+	      }
 	    }
 	}
       _window.clear();

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "Controls.hpp"
+#include "Exception.hpp"
 
 Controls::Controls()
 {
@@ -32,7 +33,6 @@ Controls::Controls()
   _keycode["Y"] = Keyboard::Y;
   _keycode["Z"] = Keyboard::Z;
   _keycode["NUM0"] = Keyboard::Num0;
-  _keycode["NUM0"] = Keyboard::Num0;
   _keycode["NUM1"] = Keyboard::Num1;
   _keycode["NUM2"] = Keyboard::Num2;
   _keycode["NUM3"] = Keyboard::Num3;
@@ -63,7 +63,7 @@ Controls::Controls()
   _keycode["EQUAL"] = Keyboard::Equal;
   _keycode["DASH"] = Keyboard::Dash;
   _keycode["SPACE"] = Keyboard::Space;
-  _keycode["RETURN"] = Keyboard::Return;
+  _keycode["ENTER"] = Keyboard::Return;
   _keycode["BACKSPACE"] = Keyboard::BackSpace;
   _keycode["TAB"] = Keyboard::Tab;
   _keycode["PGUP"] = Keyboard::PageUp;
@@ -146,6 +146,13 @@ Action	Controls::getActionFromCode(const std::string &code) const
 	  static_cast<Action>(std::distance(_actions.begin(), it)));
 }
 
+const std::string	&Controls::getCodeFromAction(Action act) const
+{
+  if (static_cast<int>(act) < 0 || static_cast<unsigned int>(act) >= _actions.size())
+    throw (std::out_of_range("No such action"));
+  return (_actions[static_cast<unsigned int>(act)]);
+}
+
 bool	Controls::getActionState(Action act) const
 {
   for (auto &it : _keyAction)
@@ -162,6 +169,16 @@ key	Controls::getKeyFromCode(const std::string &code) const
   auto	it = _keycode.find(code);
 
   return ((it == _keycode.end()) ? sf::Keyboard::Unknown : it->second);
+}
+
+const std::string	&Controls::getCodeFromKey(key k) const
+{
+  for (auto &it : _keycode)
+    {
+      if (it.second == k)
+	return it.first;
+    }
+  throw (Exception("Key not bound"));
 }
 
 void	Controls::bindActionOnKey(key k, Action act)

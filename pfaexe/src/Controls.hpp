@@ -30,6 +30,8 @@ public:
   Action	getActionFromCode(const std::string &code) const;
   bool		getActionState(Action act) const;
   key		getKeyFromCode(const std::string &code) const;
+  const std::string	&getCodeFromKey(key k) const;
+  const std::string	&getCodeFromAction(Action act) const;
 
   void		bindActionOnKey(key k, Action act);
 private:
