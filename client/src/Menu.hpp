@@ -5,6 +5,8 @@
 # include <string>
 # include "Settings.hpp"
 
+# define FPS 60
+
 class Menu
 {
 public:
