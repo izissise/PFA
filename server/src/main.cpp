@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <boost/program_options.hpp>
+#include <boost/asio.hpp>
 
 #include "Server.h"
 #include "Config.h"
@@ -24,6 +25,7 @@ int parse_argument(int ac, char *av[], t_arg &arg)
     po::options_description desc("Allowed options");
     desc.add_options()
     ("help,h", "produce help message")
+    ("ipv6,i", "use ipv6")
     ("quiet,q", "display nothing")
     ("debug,d", "display debug message")
     ("port", po::value<int>(), "the port of the server")
@@ -42,6 +44,8 @@ int parse_argument(int ac, char *av[], t_arg &arg)
         arg.quiet = true;
     if (vm.count("debug"))
         arg.quiet = true;
+    if (vm.count("ipv6"))
+        arg.ipv6 = true;
     if (vm.count("port"))
         arg.port = vm["port"].as<int>();
     return (0);
@@ -57,4 +61,15 @@ int	main(int ac, char *av[])
     std::cout << "Actual port => " << arg.port << std::endl;
     std::cout << "Quiet => " << arg.quiet << std::endl;
     std::cout << "Debug => " << arg.debug << std::endl;
+
+    try {
+        boost::asio::io_service io_service;
+        Server server(arg, io_service);
+        io_service.run();
+    }
+    catch (std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+    return (0);
 }
