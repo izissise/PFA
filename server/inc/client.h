@@ -18,7 +18,7 @@ public:
     void            start();
     void handle_write(const boost::system::error_code& /*error*/,
                       size_t /*bytes_transferred*/);
-    
+
 private:
     Client(boost::asio::io_service &io_service);
 

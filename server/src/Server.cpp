@@ -1,5 +1,5 @@
 #include <boost/lexical_cast.hpp>
-#include "Server.h"
+#include "server.h"
 
 using boost::asio::ip::tcp;
 
@@ -13,7 +13,7 @@ void Server::start_accept()
 {
     Client::pointer new_connection =
     Client::create(_acceptor.get_io_service());
-    
+
     _acceptor.async_accept(new_connection->socket(),
                            boost::bind(&Server::handle_accept, this, new_connection,
                                        boost::asio::placeholders::error));

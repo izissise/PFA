@@ -13,7 +13,7 @@
 #include <boost/program_options.hpp>
 #include <boost/asio.hpp>
 
-#include "Server.h"
+#include "server.h"
 #include "Config.h"
 #include "Unused.hpp"
 #include "printv.hpp"
@@ -30,11 +30,11 @@ int parse_argument(int ac, char *av[], t_arg &arg)
     ("debug,d", "display debug message")
     ("port", po::value<int>(), "the port of the server")
     ;
-    
+
     po::variables_map vm;
     po::store(po::parse_command_line(ac, av, desc), vm);
     po::notify(vm);
-    
+
     if (vm.count("help"))
     {
         std::cout << desc << std::endl;
@@ -55,7 +55,7 @@ int	main(int ac, char *av[])
 {
     t_arg arg;
     printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
-    
+
     if (parse_argument(ac, av, arg) == 1)
         return (1);
     std::cout << "Actual port => " << arg.port << std::endl;
