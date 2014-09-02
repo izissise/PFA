@@ -12,51 +12,49 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 
+#include "Server.h"
 #include "Config.h"
 #include "Unused.hpp"
 #include "printv.hpp"
 
-#define DEFAULT_PORT 6060
-
 namespace po = boost::program_options;
 
-int parse_argument(int ac, char *av[])
+int parse_argument(int ac, char *av[], t_arg &arg)
 {
     po::options_description desc("Allowed options");
     desc.add_options()
     ("help,h", "produce help message")
     ("quiet,q", "display nothing")
+    ("debug,d", "display debug message")
     ("port", po::value<int>(), "the port of the server")
-    ("compression", po::value<int>(), "set compression level")
     ;
     
     po::variables_map vm;
     po::store(po::parse_command_line(ac, av, desc), vm);
     po::notify(vm);
     
-    if (vm.count("help")) {
-        std::cout << desc << "\n";
+    if (vm.count("help"))
+    {
+        std::cout << desc << std::endl;
         return (1);
     }
-    
-    if (vm.count("compression")) {
-        std::cout << "Compression level was set to "
-        << vm["compression"].as<int>() << ".\n";
-    } else {
-        std::cout << "Compression level was not set.\n";
-    }
-    
+    if (vm.count("quiet"))
+        arg.quiet = true;
+    if (vm.count("debug"))
+        arg.quiet = true;
     if (vm.count("port"))
-        std::cout << "Actual port => " << vm["port"].as<int>() << std::endl;
-    else
-        std::cout << "Actual port => " << DEFAULT_PORT << std::endl;
-    
+        arg.port = vm["port"].as<int>();
     return (0);
 }
 
 int	main(int ac, char *av[])
 {
+    t_arg arg;
     printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
     
-    return parse_argument(ac, av);
+    if (parse_argument(ac, av, arg) == 1)
+        return (1);
+    std::cout << "Actual port => " << arg.port << std::endl;
+    std::cout << "Quiet => " << arg.quiet << std::endl;
+    std::cout << "Debug => " << arg.debug << std::endl;
 }
