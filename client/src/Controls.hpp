@@ -3,24 +3,25 @@
 
 # include <SFML/Window.hpp>
 # include <map>
+# include <array>
 # include <vector>
 
-typedef unsigned int	key;
+typedef int	key;
 
 enum class	Action
-  {
-    Unknown = -1,
+{
+  Unknown = -1,
     Forward = 0,
     Back,
     Right,
     Left,
     Use,
+    ToggleConsole,
     Last
-  };
+    };
 
 class Controls
 {
-private:
 public:
   Controls();
   virtual ~Controls();
@@ -34,11 +35,12 @@ public:
   const std::string	&getCodeFromAction(Action act) const;
 
   void		bindActionOnKey(key k, Action act);
+
 private:
-  std::map<key, bool>		_keyState;
-  std::map<key, Action>		_keyAction;
-  std::map<std::string, key>	_keycode;
-  std::vector<std::string>	_actions;
+  std::map<key, bool>			_keyState;
+  std::map<Action, std::array<key, 5>>	_actionKeys;
+  std::map<std::string, key>		_keycode;
+  std::vector<std::string>		_actions;
 };
 
 #endif /* _CONTROLS_H_ */

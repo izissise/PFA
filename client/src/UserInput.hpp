@@ -4,7 +4,7 @@
 # include <SFML/Graphics.hpp>
 # include <string>
 
-typedef unsigned int	key;
+typedef int	key;
 
 class UserInput
 {

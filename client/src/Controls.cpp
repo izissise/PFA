@@ -118,6 +118,7 @@ Controls::Controls()
   _actions.push_back("right");
   _actions.push_back("left");
   _actions.push_back("use");
+  _actions.push_back("toggleConsole");
 }
 
 Controls::~Controls()
@@ -133,9 +134,13 @@ bool	Controls::isPressed(key k) const
 
 Action	Controls::getActionFromKey(key k) const
 {
-  auto	it = _keyAction.find(k);
-
-  return ((it == _keyAction.end()) ? Action::Unknown : it->second);
+  for (auto &it : _actionKeys)
+    {
+      for (auto &elem : it.second)
+	if (elem == k)
+	  return it.first;
+    }
+  return Action::Unknown;
 }
 
 Action	Controls::getActionFromCode(const std::string &code) const
@@ -155,12 +160,17 @@ const std::string	&Controls::getCodeFromAction(Action act) const
 
 bool	Controls::getActionState(Action act) const
 {
-  for (auto &it : _keyAction)
-    if (it.second == act)
-      {
-	if (isPressed(it.first))
-	  return true;
-      }
+  std::array<key, 5>	tab;
+
+  try {
+    tab = _actionKeys.at(act);
+    for (auto &key : tab)
+      if (_keyState.at(key) == true)
+	return true;
+  }
+  catch (const std::out_of_range &oor) {
+    return false;
+  }
   return false;
 }
 
@@ -183,5 +193,22 @@ const std::string	&Controls::getCodeFromKey(key k) const
 
 void	Controls::bindActionOnKey(key k, Action act)
 {
-  _keyAction[k] = act;
+  std::array<key, 5>	keys;
+  auto			it = _actionKeys.find(act);
+
+  if (it == _actionKeys.end())
+    {
+      _actionKeys.insert(std::pair<Action, std::array<key, 5>> (act, {sf::Keyboard::Unknown}));
+      _actionKeys[act].front() = k;
+    }
+  keys = it->second;
+  for (auto &key : keys)
+    if (key == sf::Keyboard::Unknown)
+      {
+	key = k;
+	return ;
+      }
+  for (unsigned int i = 0; i < keys.size() - 1; ++i)
+    keys[i] = keys[i + 1];
+  keys.back() = k;
 }

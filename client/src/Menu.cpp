@@ -18,7 +18,7 @@ Menu::~Menu()
 {
 }
 
-void		Menu::run(Settings &set)
+void		Menu::run(Settings &set, Console &con)
 {
   sf::Event	event;
   sf::Sprite	sprite(_background);
@@ -33,6 +33,8 @@ void		Menu::run(Settings &set)
   while (_window.isOpen())
     {
       begin = std::chrono::steady_clock::now();
+      if (ctrl.getActionState(Action::ToggleConsole))
+	con.run(_window);
       while (_window.pollEvent(event))
         {
 	  if (event.type == sf::Event::Closed)

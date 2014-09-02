@@ -4,6 +4,7 @@
 # include <SFML/Graphics.hpp>
 # include <string>
 # include "Settings.hpp"
+# include "Console.hpp"
 
 class Menu
 {
@@ -11,7 +12,7 @@ public:
   Menu(Settings &set);
   virtual ~Menu();
 
-  void	run(Settings &set);
+  void	run(Settings &set, Console &con);
 
 private:
   sf::RenderWindow		_window;
