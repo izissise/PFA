@@ -59,7 +59,7 @@ protected:
 
   void frameDurationAlign()
   {
-    auto target = std::chrono::milliseconds(8);
+    std::chrono::milliseconds target(8);
 
     TimeHandling time(target);
     std::chrono::nanoseconds res = benchmark_func([&time] {

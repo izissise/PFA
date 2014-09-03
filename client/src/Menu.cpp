@@ -24,8 +24,7 @@ void		Menu::run(Settings &set)
   sf::Event	event;
   sf::Sprite	sprite(_background);
   Controls	ctrl = set.getControls();
-  long int gfps = 1000 / std::stoi(set.getCvarList().getCvar("r_gameFps"));
-  TimeHandling time(std::chrono::milliseconds(gfps));
+  TimeHandling time(std::chrono::milliseconds(1000 / std::stoi(set.getCvarList().getCvar("r_gameFps"))));
 
   time.start();
   while (_window.isOpen())
@@ -51,8 +50,6 @@ void		Menu::run(Settings &set)
             }
           time.endFrame();
         }
-
-
 
       _window.clear();
       _window.draw(sprite);
