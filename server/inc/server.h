@@ -27,7 +27,7 @@ private:
     void    start_accept();
     void    handle_accept(Client::pointer new_connection,
                           const boost::system::error_code& error);
-    
+
     t_arg                   _arg;
     boost::asio::io_service _io_service;
     tcp::acceptor           _acceptor;
