@@ -29,7 +29,7 @@ void		Menu::run(Settings &set, Console &con)
   std::chrono::duration<double, std::milli>	time;
   std::chrono::steady_clock::time_point		begin;
 
-  _window.setKeyRepeatEnabled(false);
+  //  _window.setKeyRepeatEnabled(false);
   // text.setString(strtext);
   while (_window.isOpen())
     {
@@ -45,7 +45,6 @@ void		Menu::run(Settings &set, Console &con)
 	    con.run(event);
 	  else
 	    {
-	      std::cout << "Normal" << std::endl;
 	      if (event.type == sf::Event::KeyPressed)
 		{
 		  std::cout << "keypress" << std::endl;
