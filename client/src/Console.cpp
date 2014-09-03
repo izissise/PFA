@@ -9,18 +9,12 @@ Console::~Console()
 }
 
 
-void		Console::run(sf::RenderWindow &window)
+void		Console::run(sf::Event event)
 {
-  Controls	ctrl = _set->getControls();
-  sf::Event	event;
-  bool		runConsole = true;
+  Controls	&ctrl = _set->getControls();
 
-  while (runConsole)
-    {
-      while (window.pollEvent(event))
-        {
-	  if (event.type == sf::Event::Closed || ctrl.getActionState(Action::ToggleConsole))
-	    runConsole = false;
-	}
-    }
+  if (event.type == sf::Event::KeyPressed)
+    ctrl.pressKey(event.key.code);
+  if (event.type == sf::Event::KeyReleased)
+    ctrl.releaseKey(event.key.code);
 }

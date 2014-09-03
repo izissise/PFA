@@ -10,7 +10,7 @@ public:
   Console(Settings * const set);
   virtual ~Console();
 
-  void		run(sf::RenderWindow &window);
+  void		run(sf::Event event);
 private:
   Settings		*_set;
 };

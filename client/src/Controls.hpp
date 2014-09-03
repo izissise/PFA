@@ -20,6 +20,25 @@ enum class	Action
     Last
     };
 
+enum class	actionType
+{
+  Default = 0,
+    Toggle
+    };
+
+typedef struct	s_action
+{
+  std::string	code;
+  actionType	type;
+  bool		state;
+
+  s_action(const std::string &c,
+	       actionType t = actionType::Default) :
+    code(c), type(t), state(false)
+  {
+  }
+}		t_action;
+
 class Controls
 {
 public:
@@ -35,12 +54,14 @@ public:
   const std::string	&getCodeFromAction(Action act) const;
 
   void		bindActionOnKey(key k, Action act);
+  void		pressKey(key k);
+  void		releaseKey(key k);
 
 private:
   std::map<key, bool>			_keyState;
   std::map<Action, std::array<key, 5>>	_actionKeys;
   std::map<std::string, key>		_keycode;
-  std::vector<std::string>		_actions;
+  std::vector<t_action>			_actions;
 };
 
 #endif /* _CONTROLS_H_ */

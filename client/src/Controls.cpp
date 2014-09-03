@@ -113,12 +113,12 @@ Controls::Controls()
   // _keycode["MOUSE5"] = K_MOUSE5;
   // _keycode["MWHEELUP"] = K_MWHEELUP;
   // _keycode["MWHEELDOWN"] = K_MWHEELDOWN;
-  _actions.push_back("forward");
-  _actions.push_back("back");
-  _actions.push_back("right");
-  _actions.push_back("left");
-  _actions.push_back("use");
-  _actions.push_back("toggleConsole");
+  _actions.push_back(t_action("forward"));
+  _actions.push_back(t_action("back"));
+  _actions.push_back(t_action("right"));
+  _actions.push_back(t_action("left"));
+  _actions.push_back(t_action("use"));
+  _actions.push_back(t_action("console", actionType::Toggle));
 }
 
 Controls::~Controls()
@@ -145,7 +145,8 @@ Action	Controls::getActionFromKey(key k) const
 
 Action	Controls::getActionFromCode(const std::string &code) const
 {
-  auto	it = std::find(_actions.begin(), _actions.end(), code);
+  auto	it = std::find_if(_actions.begin(), _actions.end(), [&code](const t_action &act)
+			  { return (act.code == code); });
 
   return ((it == _actions.end()) ? Action::Unknown :
 	  static_cast<Action>(std::distance(_actions.begin(), it)));
@@ -155,23 +156,14 @@ const std::string	&Controls::getCodeFromAction(Action act) const
 {
   if (static_cast<int>(act) < 0 || static_cast<unsigned int>(act) >= _actions.size())
     throw (std::out_of_range("No such action"));
-  return (_actions[static_cast<unsigned int>(act)]);
+  return (_actions[static_cast<unsigned int>(act)].code);
 }
 
 bool	Controls::getActionState(Action act) const
 {
-  std::array<key, 5>	tab;
-
-  try {
-    tab = _actionKeys.at(act);
-    for (auto &key : tab)
-      if (_keyState.at(key) == true)
-	return true;
-  }
-  catch (const std::out_of_range &oor) {
-    return false;
-  }
-  return false;
+  if (static_cast<int>(act) < 0 || static_cast<unsigned int>(act) >= _actions.size())
+    throw (std::out_of_range("No such action"));
+  return (_actions[static_cast<unsigned int>(act)].state);
 }
 
 key	Controls::getKeyFromCode(const std::string &code) const
@@ -213,4 +205,34 @@ void	Controls::bindActionOnKey(key k, Action act)
   for (unsigned int i = 0; i < keys.size() - 1; ++i)
     keys[i] = keys[i + 1];
   keys.back() = k;
+}
+
+void		Controls::pressKey(key k)
+{
+  Action	act;
+
+  _keyState[k] = true;
+  act = getActionFromKey(k);
+  if (static_cast<int>(act) < 0 || static_cast<unsigned int>(act) >= _actions.size())
+    return ;
+
+  t_action &action = _actions[static_cast<unsigned int>(act)];
+  if (action.type == actionType::Toggle)
+    action.state = !action.state;
+  else
+    action.state = true;
+}
+
+void		Controls::releaseKey(key k)
+{
+  Action	act;
+
+  _keyState[k] = false;
+  act = getActionFromKey(k);
+  if (static_cast<int>(act) < 0 || static_cast<unsigned int>(act) >= _actions.size())
+    return ;
+
+  t_action &action = _actions[static_cast<unsigned int>(act)];
+  if (action.type != actionType::Toggle)
+    action.state = false;
 }
