@@ -4,7 +4,6 @@
 #include <ratio>
 #include "Menu.hpp"
 #include "Exception.hpp"
-#include "UserInput.hpp"
 
 Menu::Menu(Settings &set) :
   _window(sf::VideoMode(std::stoi(set.getCvarList().getCvar("r_width")),
@@ -22,18 +21,21 @@ void		Menu::run(Settings &set, Console &con)
 {
   sf::Event	event;
   sf::Sprite	sprite(_background);
-  UserInput    	input;
-  //  sf::Text	text;
   Controls	&ctrl = set.getControls();
   double	fps = 1000.0 / std::stod(set.getCvarList().getCvar("com_fps"));
   std::chrono::duration<double, std::milli>	time;
   std::chrono::steady_clock::time_point		begin;
 
   //  _window.setKeyRepeatEnabled(false);
-  // text.setString(strtext);
   while (_window.isOpen())
     {
       begin = std::chrono::steady_clock::now();
+      _window.clear();
+      bool console = ctrl.getActionState(Action::ToggleConsole);
+
+      _window.draw(sprite);
+      if (console)
+	con.draw(_window);
       while (_window.pollEvent(event))
         {
 	  if (event.type == sf::Event::Closed)
@@ -41,8 +43,8 @@ void		Menu::run(Settings &set, Console &con)
 	      _window.close();
 	      break ;
 	    }
-	  if (ctrl.getActionState(Action::ToggleConsole))
-	    con.run(event);
+	  if (console)
+	    con.run(_window, event);
 	  else
 	    {
 	      if (event.type == sf::Event::KeyPressed)
@@ -64,20 +66,12 @@ void		Menu::run(Settings &set, Console &con)
 		}
 	      else if (event.type == sf::Event::KeyReleased)
 		ctrl.releaseKey(event.key.code);
-	      if (input.getInput(event))
-		{
-		  std::cout << "Input: " << input.getString().toAnsiString() << std::endl;
-		  input.clear();
-		}
 	    }
 	}
       time = std::chrono::duration_cast<std::chrono::duration<double, std::milli>>
 	(std::chrono::steady_clock::now() - begin);
       if (time.count() < fps)
 	std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(fps - time.count())));
-      _window.clear();
-      _window.draw(sprite);
-      //      _window.draw(text);
       _window.display();
     }
 }

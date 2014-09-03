@@ -16,8 +16,8 @@ bool	UserInput::getInput(const sf::Event &event)
 
   if (event.type == sf::Event::TextEntered && _input.getSize() < _maxSize)
     {
-      if (isprint(event.text.unicode))
-	_input.insert(_input.getSize(), event.text.unicode);
+      if (isprint(event.text.unicode) || event.text.unicode > 128)
+      _input.insert(_input.getSize(), event.text.unicode);
     }
   else if (event.type == sf::Event::KeyPressed)
     {
