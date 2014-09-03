@@ -193,15 +193,17 @@ const std::string	&Controls::getCodeFromKey(key k) const
 
 void	Controls::bindActionOnKey(key k, Action act)
 {
-  std::array<key, 5>	keys;
   auto			it = _actionKeys.find(act);
 
   if (it == _actionKeys.end())
     {
-      _actionKeys.insert(std::pair<Action, std::array<key, 5>> (act, {sf::Keyboard::Unknown}));
+      _actionKeys.insert(std::pair<Action, std::array<key, 5>> (act,
+	{sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Keyboard::Unknown}));
       _actionKeys[act].front() = k;
+      return ;
     }
-  keys = it->second;
+
+  std::array<key, 5>	&keys = it->second;
   for (auto &key : keys)
     if (key == sf::Keyboard::Unknown)
       {
