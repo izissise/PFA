@@ -9,8 +9,8 @@ Menu::Menu(Settings &set) :
   _window(sf::VideoMode(std::stoi(set.getCvarList().getCvar("r_width")),
 			std::stoi(set.getCvarList().getCvar("r_height"))), "Name")
 {
-    if (!_background.loadFromFile("../client/assets/background.jpg"))
-        throw (Exception("Cant load background file"));
+  if (!_background.loadFromFile("../client/assets/background.jpg"))
+    throw (Exception("Cant load background file"));
 }
 
 Menu::~Menu()
