@@ -1,7 +1,7 @@
 #include <thread>
 #include <chrono>
 #include <ctime>
-#include <ratio>
+#include <thread>
 
 #include "Menu.hpp"
 #include "Exception.hpp"
@@ -19,14 +19,33 @@ Menu::~Menu()
 {
 }
 
+void Menu::updateThread()
+{
+// TimeHandling time(std::chrono::milliseconds(1000 / std::stoi(set.getCvarList().getCvar("com_gameFps"))));
+
+
+
+  // the updating loop
+// time.start();
+  while (_window.isOpen())
+    {
+
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(8));
+      //time.endFrame();
+    }
+}
+
+
 void		Menu::run(Settings &set, Console &con)
 {
   sf::Event	event;
-  sf::Sprite	sprite(_background);
   Controls	&ctrl = set.getControls();
-  TimeHandling time(std::chrono::milliseconds(1000 / std::stoi(set.getCvarList().getCvar("com_gameFps"))));
+  sf::Sprite	sprite(_background);
 
-  time.start();
+  std::thread upThread(std::bind(&Menu::updateThread, this));
+
+  _window.setVerticalSyncEnabled(true);
   while (_window.isOpen())
     {
       bool console = ctrl.getActionState(Action::ToggleConsole);
@@ -61,13 +80,14 @@ void		Menu::run(Settings &set, Console &con)
               else if (event.type == sf::Event::KeyReleased)
                 ctrl.releaseKey(event.key.code);
             }
-          time.endFrame();
         }
 
-      _window.clear();
       _window.draw(sprite);
+
       if (console)
         con.draw(_window);
       _window.display();
     }
+
+  upThread.join();
 }

@@ -12,6 +12,7 @@ public:
   Menu(Settings &set);
   virtual ~Menu();
 
+  void updateThread();
   void	run(Settings &set, Console &con);
 
 private:
