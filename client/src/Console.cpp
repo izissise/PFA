@@ -43,10 +43,24 @@ void		Console::run(sf::RenderWindow &window, sf::Event event)
 	_history.content.pop_back();
       _input.clear();
     }
-  if (event.type == sf::Event::KeyPressed)
-    ctrl.pressKey(event.key.code);
-  else if (event.type == sf::Event::KeyReleased)
-    ctrl.releaseKey(event.key.code);
+  switch (event.type)
+    {
+    case sf::Event::KeyPressed:
+      ctrl.pressKey(event.key.code);
+      break;
+    case sf::Event::KeyReleased:
+      ctrl.releaseKey(event.key.code);
+      break;
+    case sf::Event::MouseWheelMoved:
+      _history.pos =
+	((static_cast<int>(_history.pos) + event.mouseWheel.delta < 0) ? 0 :
+	 (_history.pos + event.mouseWheel.delta > _history.content.size()) ?
+	 _history.content.size() :
+	 _history.pos + event.mouseWheel.delta);
+      break;
+    default:
+      break;
+    }
 }
 
 void		Console::draw(sf::RenderWindow &window)
