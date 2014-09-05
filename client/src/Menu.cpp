@@ -29,10 +29,12 @@ void		Menu::run(Settings &set, Console &con)
   // Loading Textures and initializing panels
 
   sf::Texture	background;
+  sf::Texture	menuTexture;
 
-  if (!background.loadFromFile("../client/assets/background.jpg"))
+  if (!background.loadFromFile("../client/assets/background.jpg") ||
+      !menuTexture.loadFromFile("../client/assets/menuTexture.jpg"))
     throw (Exception("Can't load background file"));
-  MainMenu	*mainPanel = new MainMenu(NULL, &background);
+  MainMenu	*mainPanel = new MainMenu(&menuTexture, &background);
 
   _panels.push_back(mainPanel);
   while (_window.isOpen())

@@ -1,16 +1,17 @@
 #include "AWidget.hpp"
 
-AWidget::AWidget(const std::string &id, const sf::Vector2u &pos, sf::Text *text) :
+AWidget::AWidget(const std::string &id, const sf::Vector2f &pos, sf::Text *text) :
   _id(id), _pos(pos), _text(text)
 {
   if (_text)
-    _text->setPosition(static_cast<sf::Vector2f>(pos));
+    _text->setPosition(pos);
 }
 
 AWidget::~AWidget()
 {
   if (_text)
     delete _text;
+  _text = NULL;
 }
 
 void	AWidget::draw(sf::RenderWindow &window) const
@@ -23,6 +24,23 @@ void	AWidget::draw(sf::RenderWindow &window) const
 
 void	AWidget::addSprite(sf::Sprite &sprite)
 {
-  sprite.setPosition(static_cast<sf::Vector2f>(_pos));
+  sprite.setPosition(_pos);
   _sprites.push_back(sprite);
+}
+
+void	AWidget::alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
+			   float xPercent, float yPercent)
+{
+  sf::Vector2f	npos(pos.x + (xPercent / 100.0) * size.x,
+		     pos.y + (yPercent / 100.0) * size.y);
+  sf::FloatRect	textSize = _text->getLocalBounds();
+
+  npos.x -= textSize.width / 2.0;
+  npos.y -= (textSize.height);
+  _text->setPosition(npos.x, npos.y);
+}
+
+void	AWidget::setTextPosition(int x, int y)
+{
+  _text->setPosition(x, y);
 }

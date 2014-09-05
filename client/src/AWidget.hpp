@@ -6,17 +6,20 @@
 class AWidget
 {
 public:
-  AWidget(const std::string &id, const sf::Vector2u &pos, sf::Text *text);
+  AWidget(const std::string &id, const sf::Vector2f &pos, sf::Text *text);
   virtual ~AWidget();
 
   virtual int	update(sf::Event event) = 0;
   virtual void	draw(sf::RenderWindow &window) const;
 
   void		addSprite(sf::Sprite &sprite);
+  void		alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
+			  float xPercent, float yPercent);
+  void		setTextPosition(int x, int y);
 
 protected:
   const std::string		_id;
-  sf::Vector2u			_pos;
+  sf::Vector2f			_pos;
   std::vector<sf::Sprite>	_sprites;
   sf::Text			*_text;
 };

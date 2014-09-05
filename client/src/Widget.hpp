@@ -6,7 +6,7 @@
 class Widget : public AWidget
 {
 public:
-  Widget(const std::string &id, const sf::Vector2u &pos, sf::Text *text = NULL);
+  Widget(const std::string &id, const sf::Vector2f &pos, sf::Text *text = NULL);
 
   int	update(sf::Event event);
 };
