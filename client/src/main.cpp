@@ -27,8 +27,6 @@ int	main(UNUSED int ac, UNUSED char *av[])
     Menu       	menu(set);
 
     printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
-    //testBoost();
-    //testSfml();
     menu.run(set, con);
 return 0;
 }
