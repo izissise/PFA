@@ -1,5 +1,5 @@
 #ifndef _MENU_H_
-#define _MENU_H_
+# define _MENU_H_
 
 # include <SFML/Graphics.hpp>
 # include <string>
@@ -9,15 +9,16 @@
 class Menu
 {
 public:
-  Menu(Settings &set);
+  Menu(Settings& settings);
   virtual ~Menu();
 
-  void updateThread();
-  void	run(Settings &set, Console &con);
+  bool run(const sf::Event& event, const Controls& ctrl);
+  void draw(sf::RenderWindow& window);
 
 private:
-  sf::RenderWindow		_window;
-  sf::Texture			_background;
+  Console _console;
+  bool _consoleActive;
+  sf::Texture _background;
 };
 
 #endif /* _MENU_H_ */
