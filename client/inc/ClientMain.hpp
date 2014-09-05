@@ -28,7 +28,6 @@ private:
 private:
   Settings _settings;
   sf::RenderWindow _window;
-  Console _console;
   Menu _menu;
   std::thread _updateThread;
 };

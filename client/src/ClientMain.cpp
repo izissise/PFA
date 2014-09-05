@@ -3,7 +3,7 @@
 ClientMain::ClientMain()
   : _window(sf::VideoMode(std::stoi(_settings.getCvarList().getCvar("r_width")),
                           std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
-  _console(&_settings),
+  _menu(_settings),
   _updateThread(std::bind(&ClientMain::update, this))
 {
   _window.setVerticalSyncEnabled(true);
@@ -36,7 +36,6 @@ void ClientMain::run()
 
   while (_window.isOpen())
     {
-      bool console = ctrl.getActionState(Action::ToggleConsole);
       while (_window.pollEvent(event))
         {
           if (event.type == sf::Event::Closed)
@@ -44,9 +43,7 @@ void ClientMain::run()
               _window.close();
               break ;
             }
-          if (console)
-            _console.run(_window, event);
-          else
+          if (!_menu.run(event, ctrl))
             {
               if (event.type == sf::Event::KeyPressed)
                 {
@@ -72,9 +69,6 @@ void ClientMain::run()
 
       //draw stuff here
       _menu.draw(_window);
-
-      if (console)
-        _console.draw(_window);
 
       _window.display();
     }

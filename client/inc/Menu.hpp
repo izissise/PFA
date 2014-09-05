@@ -9,14 +9,16 @@
 class Menu
 {
 public:
-  Menu();
+  Menu(Settings& settings);
   virtual ~Menu();
 
-  void run();
-  void draw(sf::RenderWindow& window) const;
+  bool run(const sf::Event& event, const Controls& ctrl);
+  void draw(sf::RenderWindow& window);
 
 private:
-  sf::Texture			_background;
+  Console _console;
+  bool _consoleActive;
+  sf::Texture _background;
 };
 
 #endif /* _MENU_H_ */
