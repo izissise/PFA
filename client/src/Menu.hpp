@@ -5,6 +5,7 @@
 # include <string>
 # include "Settings.hpp"
 # include "Console.hpp"
+# include "APanelScreen.hpp"
 
 class Menu
 {
@@ -16,7 +17,8 @@ public:
 
 private:
   sf::RenderWindow		_window;
-  sf::Texture			_background;
+  std::vector<APanelScreen *>	_panels;
+  int				_panelPos;
 };
 
 #endif /* _MENU_H_ */

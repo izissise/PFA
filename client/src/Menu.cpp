@@ -4,13 +4,13 @@
 #include <ratio>
 #include "Menu.hpp"
 #include "Exception.hpp"
+#include "MainMenu.hpp"
 
 Menu::Menu(Settings &set) :
   _window(sf::VideoMode(std::stoi(set.getCvarList().getCvar("r_width")),
 			std::stoi(set.getCvarList().getCvar("r_height"))), "Name")
 {
-  if (!_background.loadFromFile("../client/assets/background.jpg"))
-    throw (Exception("Cant load background file"));
+  _panelPos = 0;
 }
 
 Menu::~Menu()
@@ -20,22 +20,25 @@ Menu::~Menu()
 void		Menu::run(Settings &set, Console &con)
 {
   sf::Event	event;
-  sf::Sprite	sprite(_background);
   Controls	&ctrl = set.getControls();
   double	fps = 1000.0 / std::stod(set.getCvarList().getCvar("com_fps"));
   std::chrono::duration<double, std::milli>	time;
   std::chrono::steady_clock::time_point		begin;
+  bool						console = false;
 
-  //  _window.setKeyRepeatEnabled(false);
+  // Loading Textures and initializing panels
+
+  sf::Texture	background;
+
+  if (!background.loadFromFile("../client/assets/background.jpg"))
+    throw (Exception("Can't load background file"));
+  MainMenu	*mainPanel = new MainMenu(NULL, &background);
+
+  _panels.push_back(mainPanel);
   while (_window.isOpen())
     {
       begin = std::chrono::steady_clock::now();
       _window.clear();
-      bool console = ctrl.getActionState(Action::ToggleConsole);
-
-      _window.draw(sprite);
-      if (console)
-	con.draw(_window);
       while (_window.pollEvent(event))
         {
 	  if (event.type == sf::Event::Closed)
@@ -47,6 +50,7 @@ void		Menu::run(Settings &set, Console &con)
 	    con.run(_window, event);
 	  else
 	    {
+	      _panels[_panelPos]->run(event);
 	      if (event.type == sf::Event::KeyPressed)
 		{
 		  std::cout << "keypress" << std::endl;
@@ -68,6 +72,10 @@ void		Menu::run(Settings &set, Console &con)
 		ctrl.releaseKey(event.key.code);
 	    }
 	}
+      _panels[_panelPos]->draw(_window);
+      console = ctrl.getActionState(Action::ToggleConsole);
+      if (console)
+	con.draw(_window);
       time = std::chrono::duration_cast<std::chrono::duration<double, std::milli>>
 	(std::chrono::steady_clock::now() - begin);
       if (time.count() < fps)

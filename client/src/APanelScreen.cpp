@@ -1,6 +1,7 @@
 #include "APanelScreen.hpp"
 
-APanelScreen::APanelScreen(sf::Texture * const texture) : _texture(texture)
+APanelScreen::APanelScreen(sf::Texture * const texture, sf::Texture * const background) :
+  _texture(texture), _background(background)
 {
 }
 
@@ -8,9 +9,13 @@ APanelScreen::~APanelScreen()
 {
 }
 
-void	APanelScreen::draw(sf::RenderWindow &window)
+void		APanelScreen::draw(sf::RenderWindow &window)
 {
-  for (auto &elem : _sprites)
-    window.draw(elem.second, _texture);
-  window.draw(_text);
+  if (_background)
+    {
+      sf::Sprite	background(*_background);
+      window.draw(background);
+    }
+  for (auto &widget : _widgets)
+    widget->draw(window);
 }
