@@ -57,6 +57,13 @@ void	AWidget::setTextAttr(unsigned int style)
   _text->setStyle(style);
 }
 
+void		AWidget::setFunction(const std::function<int (AWidget &widget,
+							      const sf::Event &event,
+							      sf::RenderWindow &ref)> &func)
+{
+  _update = func;
+}
+
 bool		AWidget::isOver(const sf::RenderWindow &ref) const
 {
   return _zone.contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(ref)));

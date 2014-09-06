@@ -28,8 +28,17 @@ MainMenu::MainMenu(sf::Texture * const texture) :
   wPlay->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
   wOpt->alignText({50,230}, {260, 60}, 50, 50);
   wOpt->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
+
+ auto updateFunc =
+   [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref) -> int
+   {
+     if (widget.isOver(ref) && widget.isClicked(event, sf::Mouse::Left))
+       ref.close();
+     return 0;
+   };
   wQuit->alignText({50,310}, {260, 60}, 50, 50);
   wQuit->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
+  wQuit->setFunction(updateFunc);
 
   _widgets.push_back(wBackground);
   _widgets.push_back(wMback);
@@ -43,8 +52,8 @@ MainMenu::~MainMenu()
 {
 }
 
-int	MainMenu::run(const sf::Event &event, const sf::RenderWindow &ref)
+int	MainMenu::run(const sf::Event &event, sf::RenderWindow &ref)
 {
-  for (auto &widget : _widgets)
-    widget->update(event, ref);
+  for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
+    (*rit)->update(event, ref);
 }

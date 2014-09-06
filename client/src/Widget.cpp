@@ -3,10 +3,13 @@
 Widget::Widget(const std::string &id, const sf::FloatRect &zone, sf::Text *text) :
   AWidget(id, zone, text)
 {
+  _update = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref) -> int
+    {
+      return 0;
+    };
 }
-#include <iostream>
-int	Widget::update(const sf::Event &event, const sf::RenderWindow &ref)
+
+int	Widget::update(const sf::Event &event, sf::RenderWindow &ref)
 {
-  if (isOver(ref) && isClicked(event, sf::Mouse::Left))
-    std::cout << "Widget " + _id + " is clicked" << std::endl;
+  return (_update(*this, event, ref));
 }
