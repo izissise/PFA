@@ -6,10 +6,10 @@
 class AWidget
 {
 public:
-  AWidget(const std::string &id, const sf::Vector2f &pos, sf::Text *text);
+  AWidget(const std::string &id, const sf::FloatRect &zone, sf::Text *text);
   virtual ~AWidget();
 
-  virtual int	update(const sf::Event &event) = 0;
+  virtual int	update(const sf::Event &event, const sf::RenderWindow &ref) = 0;
   virtual void	draw(sf::RenderWindow &window) const;
 
   void		addSprite(sf::Sprite &sprite);
@@ -19,13 +19,13 @@ public:
   void		setTextPosition(int x, int y);
   void		setTextAttr(unsigned int style);
 
-protected:
-  bool		isOver() const;
-  bool		isClicked(const sf::Event &event) const;
+public:		// public so the lambda can call it
+  bool		isOver(const sf::RenderWindow &ref) const;
+  bool		isClicked(const sf::Event &event, sf::Mouse::Button button) const;
 
 protected:
   const std::string		_id;
-  sf::Vector2f			_pos;
+  sf::FloatRect			_zone;
   std::vector<sf::Sprite>	_sprites;
   sf::Text			*_text;
 };

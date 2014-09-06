@@ -50,7 +50,7 @@ void		Menu::run(Settings &set, Console &con)
 	    con.run(_window, event);
 	  else
 	    {
-	      _panels[_panelPos]->run(event);
+	      _panels[_panelPos]->run(event, _window);
 	      if (event.type == sf::Event::KeyPressed)
 		{
 		  std::cout << "keypress" << std::endl;

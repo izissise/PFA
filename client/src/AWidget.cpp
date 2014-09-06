@@ -1,10 +1,10 @@
 #include "AWidget.hpp"
 
-AWidget::AWidget(const std::string &id, const sf::Vector2f &pos, sf::Text *text) :
-  _id(id), _pos(pos), _text(text)
+AWidget::AWidget(const std::string &id, const sf::FloatRect &zone, sf::Text *text) :
+  _id(id), _zone(zone), _text(text)
 {
   if (_text)
-    _text->setPosition(pos);
+    _text->setPosition(zone.left, zone.top);
 }
 
 AWidget::~AWidget()
@@ -24,7 +24,7 @@ void	AWidget::draw(sf::RenderWindow &window) const
 
 void	AWidget::addSprite(sf::Sprite &sprite)
 {
-  sprite.setPosition(_pos);
+  sprite.setPosition(_zone.left, _zone.top);
   _sprites.push_back(sprite);
 }
 
@@ -57,12 +57,21 @@ void	AWidget::setTextAttr(unsigned int style)
   _text->setStyle(style);
 }
 
-bool	AWidget::isOver() const
+bool		AWidget::isOver(const sf::RenderWindow &ref) const
 {
-  return false;
+  return _zone.contains(static_cast<sf::Vector2f>(sf::Mouse::getPosition(ref)));
 }
 
-bool	AWidget::isClicked(const sf::Event &event) const
+/*
+** We consider isOver functio  is previously called
+*/
+
+bool	AWidget::isClicked(const sf::Event &event, sf::Mouse::Button button) const
 {
+  if (event.type == sf::Event::MouseButtonPressed)
+    {
+      if (event.mouseButton.button == button)
+	return true;
+    }
   return false;
 }

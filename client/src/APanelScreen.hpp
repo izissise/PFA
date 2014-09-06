@@ -10,7 +10,7 @@ public:
   APanelScreen(sf::Texture * const texture);
   virtual ~APanelScreen() = 0;
 
-  virtual int	run(const sf::Event &event) = 0;
+  virtual int	run(const sf::Event &event, const sf::RenderWindow &ref) = 0;
   virtual void	draw(sf::RenderWindow &window);
 
 protected:
