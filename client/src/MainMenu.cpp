@@ -41,7 +41,7 @@ MainMenu::~MainMenu()
 {
 }
 
-int	MainMenu::run(sf::Event event)
+int	MainMenu::run(const sf::Event &event)
 {
   for (auto &widget : _widgets)
     widget->update(event);

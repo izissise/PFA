@@ -26,7 +26,7 @@ Console::~Console()
 }
 
 
-void		Console::run(sf::RenderWindow &window, sf::Event event)
+void		Console::run(sf::RenderWindow &window, const sf::Event &event)
 {
   Controls	&ctrl = _set->getControls();
 

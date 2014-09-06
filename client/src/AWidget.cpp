@@ -56,3 +56,13 @@ void	AWidget::setTextAttr(unsigned int style)
 {
   _text->setStyle(style);
 }
+
+bool	AWidget::isOver() const
+{
+  return false;
+}
+
+bool	AWidget::isClicked(const sf::Event &event) const
+{
+  return false;
+}

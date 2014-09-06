@@ -9,7 +9,7 @@ public:
   AWidget(const std::string &id, const sf::Vector2f &pos, sf::Text *text);
   virtual ~AWidget();
 
-  virtual int	update(sf::Event event) = 0;
+  virtual int	update(const sf::Event &event) = 0;
   virtual void	draw(sf::RenderWindow &window) const;
 
   void		addSprite(sf::Sprite &sprite);
@@ -18,6 +18,10 @@ public:
 			  float xPercent, float yPercent);
   void		setTextPosition(int x, int y);
   void		setTextAttr(unsigned int style);
+
+protected:
+  bool		isOver() const;
+  bool		isClicked(const sf::Event &event) const;
 
 protected:
   const std::string		_id;

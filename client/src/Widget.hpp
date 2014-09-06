@@ -8,7 +8,7 @@ class Widget : public AWidget
 public:
   Widget(const std::string &id, const sf::Vector2f &pos, sf::Text *text = NULL);
 
-  int	update(sf::Event event);
+  int	update(const sf::Event &event);
 };
 
 #endif /* _WIDGET_H_ */

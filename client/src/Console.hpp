@@ -26,7 +26,7 @@ public:
   Console(Settings * const set);
   virtual ~Console();
 
-  void		run(sf::RenderWindow &window, sf::Event event);
+  void		run(sf::RenderWindow &window, const sf::Event &event);
   void		draw(sf::RenderWindow &window);
 
 private:

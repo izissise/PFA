@@ -9,7 +9,7 @@ public:
   MainMenu(sf::Texture * const texture = NULL);
   virtual ~MainMenu();
 
-  int		run(sf::Event event);
+  int		run(const sf::Event &event);
 };
 
 #endif /* _MAINMENU_H_ */

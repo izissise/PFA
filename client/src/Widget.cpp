@@ -5,7 +5,7 @@ Widget::Widget(const std::string &id, const sf::Vector2f &pos, sf::Text *text) :
 {
 }
 #include <iostream>
-int	Widget::update(sf::Event event)
+int	Widget::update(const sf::Event &event)
 {
   if (event.type == sf::Event::MouseButtonPressed)
     {
