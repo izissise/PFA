@@ -13,9 +13,11 @@ public:
   virtual void	draw(sf::RenderWindow &window) const;
 
   void		addSprite(sf::Sprite &sprite);
+  void		addSprite(sf::Texture * const texture, const sf::IntRect &rect);
   void		alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
 			  float xPercent, float yPercent);
   void		setTextPosition(int x, int y);
+  void		setTextAttr(unsigned int style);
 
 protected:
   const std::string		_id;

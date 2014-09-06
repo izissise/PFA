@@ -7,16 +7,21 @@
 class APanelScreen
 {
 public:
-  APanelScreen(sf::Texture * const texture, sf::Texture * const background);
+  APanelScreen(sf::Texture * const texture);
   virtual ~APanelScreen() = 0;
 
   virtual int	run(sf::Event event) = 0;
   virtual void	draw(sf::RenderWindow &window);
 
 protected:
+  void		saveTexture(sf::Texture * const texture);
+  sf::Texture	*addSpriteForWidget(AWidget * const widget,
+				    const sf::Color &color,
+				    const sf::Vector2u &size);
+
+protected:
   sf::Font			_font;
-  sf::Texture			*_background;
-  sf::Texture			*_texture;
+  std::vector<sf::Texture *>	_textures;
   std::vector<AWidget *>	_widgets;
 };
 

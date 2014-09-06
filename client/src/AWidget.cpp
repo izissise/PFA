@@ -28,6 +28,13 @@ void	AWidget::addSprite(sf::Sprite &sprite)
   _sprites.push_back(sprite);
 }
 
+void	AWidget::addSprite(sf::Texture * const texture, const sf::IntRect &rect)
+{
+  sf::Sprite	sprite(*texture, rect);
+
+  addSprite(sprite);
+}
+
 void	AWidget::alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
 			   float xPercent, float yPercent)
 {
@@ -43,4 +50,9 @@ void	AWidget::alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
 void	AWidget::setTextPosition(int x, int y)
 {
   _text->setPosition(x, y);
+}
+
+void	AWidget::setTextAttr(unsigned int style)
+{
+  _text->setStyle(style);
 }
