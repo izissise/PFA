@@ -16,8 +16,8 @@ AWidget::~AWidget()
 
 void	AWidget::draw(sf::RenderWindow &window) const
 {
-  for (auto &sprite : _sprites)
-    window.draw(sprite);
+  if (!_sprites.empty())
+    window.draw(_sprites.front());
   if (_text)
     window.draw(*_text);
 }
