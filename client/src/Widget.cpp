@@ -1,9 +1,10 @@
 #include "Widget.hpp"
 
-Widget::Widget(const std::string &id, const sf::FloatRect &zone, sf::Text *text) :
+Widget::Widget(const std::string &id, const sf::FloatRect &zone,
+	       const sf::Text &text) :
   AWidget(id, zone, text)
 {
-  _update = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref) -> int
+  _updates["main"] = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref) -> int
     {
       return 0;
     };
@@ -11,5 +12,7 @@ Widget::Widget(const std::string &id, const sf::FloatRect &zone, sf::Text *text)
 
 int	Widget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
-  return (_update(*this, event, ref));
+  for (auto &func : _updates)
+    func.second(*this, event, ref);
+  return 0;
 }

@@ -6,7 +6,7 @@
 class MainMenu : public APanelScreen
 {
 public:
-  MainMenu(sf::Texture * const texture = NULL);
+  MainMenu(const sf::Texture &texture);
   virtual ~MainMenu();
 
   int		run(const sf::Event &event, sf::RenderWindow &ref, Settings &set);

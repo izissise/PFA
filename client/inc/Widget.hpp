@@ -6,7 +6,8 @@
 class Widget : public AWidget
 {
 public:
-  Widget(const std::string &id, const sf::FloatRect &zone, sf::Text *text = NULL);
+  Widget(const std::string &id, const sf::FloatRect &zone,
+	 const sf::Text &text = sf::Text());
 
   int	update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 };

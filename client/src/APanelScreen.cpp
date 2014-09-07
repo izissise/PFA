@@ -1,9 +1,7 @@
 #include "APanelScreen.hpp"
 
-APanelScreen::APanelScreen(sf::Texture * const texture)
+APanelScreen::APanelScreen(const sf::Texture &texture)
 {
-  if (texture)
-    _textures.push_back(texture);
 }
 
 APanelScreen::~APanelScreen()
@@ -21,9 +19,9 @@ void		APanelScreen::saveTexture(sf::Texture * const texture)
   _textures.push_back(texture);
 }
 
-sf::Texture	*APanelScreen::addSpriteForWidget(AWidget * const widget,
-						  const sf::Color &color,
-						  const sf::Vector2u &size)
+const sf::Texture	*APanelScreen::addSpriteForWidget(AWidget * const widget,
+							  const sf::Color &color,
+							  const sf::Vector2u &size)
 {
   sf::Image	image;
   sf::Texture	*texture = new sf::Texture;

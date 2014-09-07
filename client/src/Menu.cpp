@@ -15,7 +15,7 @@ Menu::Menu(Settings& settings)
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
     throw (Exception("Can't load Menu texture"));
 
-  MainMenu	*mainMenu = new MainMenu(&_menuTexture);
+  MainMenu	*mainMenu = new MainMenu(_menuTexture);
   _panels.push_back(mainMenu);
 }
 
