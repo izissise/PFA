@@ -9,7 +9,7 @@ Widget::Widget(const std::string &id, const sf::FloatRect &zone, sf::Text *text)
     };
 }
 
-int	Widget::update(const sf::Event &event, sf::RenderWindow &ref)
+int	Widget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
   return (_update(*this, event, ref));
 }

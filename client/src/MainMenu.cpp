@@ -52,8 +52,8 @@ MainMenu::~MainMenu()
 {
 }
 
-int	MainMenu::run(const sf::Event &event, sf::RenderWindow &ref)
+int	MainMenu::run(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
-    (*rit)->update(event, ref);
+    (*rit)->update(event, ref, set);
 }

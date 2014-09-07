@@ -36,6 +36,7 @@ void ClientMain::run()
 
   while (_window.isOpen())
     {
+      _window.clear();
       while (_window.pollEvent(event))
         {
           if (event.type == sf::Event::Closed)
@@ -43,7 +44,7 @@ void ClientMain::run()
               _window.close();
               break ;
             }
-          if (!_menu.run(event, ctrl))
+          if (!_menu.run(event, _window, _settings))
             {
               if (event.type == sf::Event::KeyPressed)
                 {
@@ -66,11 +67,8 @@ void ClientMain::run()
                 ctrl.releaseKey(event.key.code);
             }
         }
-
-      //draw stuff here
+      // draw stuff here
       _menu.draw(_window);
-
       _window.display();
     }
-
 }
