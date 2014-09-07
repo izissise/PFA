@@ -11,25 +11,16 @@
 
 #include <iostream>
 
-#include "Config.h"
-#include "Menu.hpp"
-#include "Settings.hpp"
-#include "Console.hpp"
+#include "ClientMain.hpp"
 #include "demangle.hpp"
 #include "Unused.hpp"
 #include "printv.hpp"
 
 int	main(UNUSED int ac, UNUSED char *av[])
 {
+  ClientMain game;
 
-    Settings	set;
-    Console	con(&set);
-    Menu       	menu(set);
-
-    std::cout << typeName(std::string("a")) << std::endl;
-    printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
-    //testBoost();
-    //testSfml();
-    menu.run(set, con);
-return 0;
+  printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
+  game.run();
+  return 0;
 }

@@ -134,6 +134,8 @@ bool	Controls::isPressed(key k) const
 
 Action	Controls::getActionFromKey(key k) const
 {
+  if (k == sf::Keyboard::Unknown)
+    return Action::Unknown;
   for (auto &it : _actionKeys)
     {
       for (auto &elem : it.second)

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Project)
 
-set(NAME_LIB "pfa")
+set(NAME_LIB "common")
 set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
 set(TEST_EXEC "UnitTester")
@@ -15,6 +15,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 # cmake modules
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
+find_package(Threads)
 find_package(SFML 2.1 COMPONENTS system window graphics network audio)
 find_package(Boost 1.55.0 COMPONENTS filesystem system regex program_options REQUIRED)
 
@@ -160,6 +161,10 @@ if(BUILD_TESTS)
     target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB})
 
   endif()
+endif()
+
+if (THREADS_FOUND)
+  target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 if (SFML_FOUND)

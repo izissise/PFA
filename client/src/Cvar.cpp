@@ -6,7 +6,8 @@ CvarList::CvarList()
 {
   addCvar("r_width", new t_cvar({"600", "1", "1920"}, "1600", Number));
   addCvar("r_height", new t_cvar({"800", "1", "1080"}, "900", Number));
-  addCvar("com_fps", new t_cvar({"5, 1000"}, "60", Number));
+  addCvar("com_displayFps", new t_cvar({"-1, 1000"}, "-1", Number));
+  addCvar("com_gameFps", new t_cvar({"20, 300"}, "125", Number));
 }
 
 CvarList::~CvarList()
@@ -42,30 +43,30 @@ void	CvarList::setCvar(const std::string &name, const std::string &value)
       (cvar->type == Number && cvar->restrictValue.size() > 3))
     {
       if (std::find(cvar->restrictValue.begin(), cvar->restrictValue.end(), value) ==
-	  cvar->restrictValue.end())
-	throw(Exception("Value for " + name + " isn't correct, default: " +
-			*(cvar->restrictValue.begin())));
+          cvar->restrictValue.end())
+        throw(Exception("Value for " + name + " isn't correct, default: " +
+                        * (cvar->restrictValue.begin())));
     }
   else if (cvar->type == Number)
     {
       try
-	{
-	  numValue = std::stod(value);
-	}
+        {
+          numValue = std::stod(value);
+        }
       catch (const std::invalid_argument &ia)
-	{
-	  throw (Exception(name + " cvar's value must be a number"));
-	}
+        {
+          throw (Exception(name + " cvar's value must be a number"));
+        }
       if (cvar->restrictValue.size() > 1) // Means the cvar has value limits
-	{
-	  if (numValue < std::stod(*(cvar->restrictValue.begin() + 1)))
-	    throw (Exception("Value for " + name + ": " + value + ", minimum: " +
-			     *(cvar->restrictValue.begin() + 1)));
-	  if (cvar->restrictValue.size() > 2 &&
-	      numValue > std::stod(*(cvar->restrictValue.begin() + 2)))
-	    throw (Exception("Value for " + name + ": " + value + ", maximum: " +
-			     *(cvar->restrictValue.begin() + 2)));
-	}
+        {
+          if (numValue < std::stod(*(cvar->restrictValue.begin() + 1)))
+            throw (Exception("Value for " + name + ": " + value + ", minimum: " +
+                             * (cvar->restrictValue.begin() + 1)));
+          if (cvar->restrictValue.size() > 2 &&
+              numValue > std::stod(*(cvar->restrictValue.begin() + 2)))
+            throw (Exception("Value for " + name + ": " + value + ", maximum: " +
+                             * (cvar->restrictValue.begin() + 2)));
+        }
     }
   cvar->value = value;
 }

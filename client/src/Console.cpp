@@ -1,7 +1,7 @@
 #include "Console.hpp"
 #include "Exception.hpp"
 
-Console::Console(Settings * const set) : _set(set), _history()
+Console::Console(Settings* set) : _set(set), _history()
 {
   sf::Color	color(20, 20, 20);
   int		width = std::stoi(set->getCvarList().getCvar("r_width"));
@@ -26,21 +26,21 @@ Console::~Console()
 }
 
 
-void		Console::run(sf::RenderWindow &window, const sf::Event &event)
+void		Console::run(const sf::Event& event)
 {
   Controls	&ctrl = _set->getControls();
 
   if (_input.getInput(event))
     {
       try {
-	_set->parseCommandLine(_input.getString().toAnsiString());
-      }
+          _set->parseCommandLine(_input.getString().toAnsiString());
+        }
       catch (const Exception &e) {
-	std::cerr << e.what() << std::endl;
-      }
+          std::cerr << e.what() << std::endl;
+        }
       _history.content.push_front(_input.getString());
       if (_history.content.size() > _history.maxSize)
-	_history.content.pop_back();
+        _history.content.pop_back();
       _input.clear();
     }
   switch (event.type)
@@ -53,10 +53,10 @@ void		Console::run(sf::RenderWindow &window, const sf::Event &event)
       break;
     case sf::Event::MouseWheelMoved:
       _history.pos =
-	((static_cast<int>(_history.pos) + event.mouseWheel.delta < 0) ? 0 :
-	 (_history.pos + event.mouseWheel.delta > _history.content.size()) ?
-	 _history.content.size() :
-	 _history.pos + event.mouseWheel.delta);
+        ((static_cast<int>(_history.pos) + event.mouseWheel.delta < 0) ? 0 :
+         (_history.pos + event.mouseWheel.delta > _history.content.size()) ?
+         _history.content.size() :
+         _history.pos + event.mouseWheel.delta);
       break;
     default:
       break;
