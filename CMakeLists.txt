@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Project)
 
-set(NAME_LIB "pfa")
+set(NAME_LIB "common")
 set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
 set(TEST_EXEC "UnitTester")

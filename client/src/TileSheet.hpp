@@ -20,9 +20,14 @@ public:
     return _sprites[id];
   }
 
-  inline unsigned getSize(void)
+  inline unsigned getSize(void) const
   {
     return _spriteSize;
+  }
+
+  inline const sf::Texture& getTexture(void) const
+  {
+    return _spriteSheet;
   }
 
   void		dumpSheet(sf::RenderWindow& window);
