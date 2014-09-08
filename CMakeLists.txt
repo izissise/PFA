@@ -7,8 +7,6 @@ set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
 set(TEST_EXEC "UnitTester")
 
-set(SFML_STATIC_LIBRARIES TRUE)
-
 set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/")
 set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
@@ -20,6 +18,7 @@ find_package(CppUnit)
 find_package(Threads)
 find_package(SFML 2.1 COMPONENTS system window graphics audio)
 find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
+find_package(ENet)
 
 INCLUDE(CMakeDependentOption)
 INCLUDE(EnableCppExtras)
@@ -177,6 +176,13 @@ endif()
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
    target_link_libraries (${NAME_SERVER} ${Boost_LIBRARIES})
+   target_link_libraries (${NAME_CLIENT} ${Boost_LIBRARIES})
+endif()
+
+if (ENET_FOUND)
+   include_directories(${ENet_INCLUDE_DIRS})
+   target_link_libraries(${NAME_SERVER} ${ENet_LIBRARIES})
+   target_link_libraries(${NAME_CLIENT} ${ENet_LIBRARIES})
 endif()
 
 #Extra targets:
