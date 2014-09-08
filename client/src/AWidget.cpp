@@ -129,3 +129,9 @@ void	AWidget::resize(const sf::Vector2f &size)
   textPos.y *= ratioY;
   _text.setPosition(textPos);
 }
+
+void	AWidget::trigger(const std::string &event)
+{
+  if (event == "hide")
+    setHidden(!_hidden);
+}

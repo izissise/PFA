@@ -21,5 +21,5 @@ void	Observable::removeObserver(IObserver * const observer)
 void	Observable::notify(const std::string &message) const
 {
   for (auto &observer : _observers)
-    observer->update(message);
+    observer->trigger(message);
 }

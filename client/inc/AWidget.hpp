@@ -5,19 +5,20 @@
 #include <map>
 #include <functional>
 #include <list>
+#include "Observer.hpp"
 #include "Settings.hpp"
 
 #define SIZEX 1600.0
 #define SIZEY 900.0
 
-class AWidget
+class AWidget : public IObserver, public Observable
 {
 public:
   enum	wAction
     {
       None = 0,
-      Handled = 100,
-      ChangePanel = 200
+      Handled = 1,
+      ChangePanel = 2
     };
 inline int	operator()(AWidget::wAction a)
 {
@@ -45,6 +46,7 @@ public:
 			    <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
 			    &func);
   void		resize(const sf::Vector2f &size);
+  void		trigger(const std::string &event);
 
 public:		// public so the lambda can call it
   bool		isOver(const sf::RenderWindow &ref) const;

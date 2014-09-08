@@ -7,7 +7,7 @@
 class IObserver
 {
 public:
-  virtual void update(const std::string &data) = 0;
+  virtual void	trigger(const std::string &event) = 0;
 };
 
 class Observable

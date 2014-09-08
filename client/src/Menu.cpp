@@ -52,8 +52,7 @@ bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
 
 void	Menu::draw(sf::RenderWindow& window)
 {
+  _panels[_panelPos]->draw(window);
   if (_consoleActive)
     _console.draw(window);
-  else
-    _panels[_panelPos]->draw(window);
 }
