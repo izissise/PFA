@@ -5,89 +5,43 @@
 
 #include "Menu.hpp"
 #include "Exception.hpp"
-#include "TimeHandling.hpp"
+#include "MainMenu.hpp"
 
-Menu::Menu(Settings &set) :
-  _window(sf::VideoMode(std::stoi(set.getCvarList().getCvar("r_width")),
-                        std::stoi(set.getCvarList().getCvar("r_height"))), "Name")
+Menu::Menu(Settings& settings)
+  : _console(&settings),
+    _consoleActive(false),
+    _panelPos(0)
 {
-  if (!_background.loadFromFile("../client/assets/background.jpg"))
-    throw (Exception("Cant load background file"));
+  if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
+    throw (Exception("Can't load Menu texture"));
+
+  MainMenu	*mainMenu = new MainMenu(&_menuTexture);
+  _panels.push_back(mainMenu);
 }
 
 Menu::~Menu()
 {
 }
 
-void Menu::updateThread()
+bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
 {
-// TimeHandling time(std::chrono::milliseconds(1000 / std::stoi(set.getCvarList().getCvar("com_gameFps"))));
+  bool	handled = false;
 
-
-
-  // the updating loop
-// time.start();
-  while (_window.isOpen())
+  _consoleActive = set.getControls().getActionState(Action::ToggleConsole);
+  if (_consoleActive)
     {
-
-
-      std::this_thread::sleep_for(std::chrono::milliseconds(8));
-      //time.endFrame();
+      _console.run(event);
+      handled = true;
     }
+  else
+    _panels[_panelPos]->run(event, window, set);
+  return handled;
 }
 
-
-void		Menu::run(Settings &set, Console &con)
+void	Menu::draw(sf::RenderWindow& window)
 {
-  sf::Event	event;
-  Controls	&ctrl = set.getControls();
-  sf::Sprite	sprite(_background);
-
-  std::thread upThread(std::bind(&Menu::updateThread, this));
-
-  _window.setVerticalSyncEnabled(true);
-  while (_window.isOpen())
-    {
-      bool console = ctrl.getActionState(Action::ToggleConsole);
-      while (_window.pollEvent(event))
-        {
-          if (event.type == sf::Event::Closed)
-            {
-              _window.close();
-              break ;
-            }
-          if (console)
-            con.run(_window, event);
-          else
-            {
-              if (event.type == sf::Event::KeyPressed)
-                {
-                  std::cout << "keypress" << std::endl;
-                  ctrl.pressKey(event.key.code);
-                  try {
-                      std::cout << "Action for key " << ctrl.getCodeFromKey(event.key.code) << " is: ";
-                    }
-                  catch (const Exception &e) {
-                      std::cout << "Action for key " << "Unknown" << " is: ";
-                    }
-                  try {
-                      std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(event.key.code)) << std::endl;
-                    }
-                  catch (const std::out_of_range &oor) {
-                      std::cout << "Unknown" << std::endl;
-                    }
-                }
-              else if (event.type == sf::Event::KeyReleased)
-                ctrl.releaseKey(event.key.code);
-            }
-        }
-
-      _window.draw(sprite);
-
-      if (console)
-        con.draw(_window);
-      _window.display();
-    }
-
-  upThread.join();
+  if (_consoleActive)
+    _console.draw(window);
+  else
+    _panels[_panelPos]->draw(window);
 }

@@ -38,12 +38,12 @@ INCLUDE(SuperPedanticCompilerWarnings)
 INCLUDE(DemangleCppABI)
 
 # --- user options ---
-OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." ON)
+OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_TESTS_COVERAGE "Decide if a coverage report should be generated." ON "BUILD_TESTS" OFF)
 CMAKE_DEPENDENT_OPTION(VALGRIND_CHECK "Decide if valgrind should be executed with the test binary to check for memory leaks." ON "BUILD_TESTS" OFF)
-OPTION(CODE_METRICS "Decide if code's metrics should be generated." ON)
-OPTION(CODE_CHECK "Decide if code should be checked for common errors." ON)
-OPTION(GENERATE_DOC "Decide if documentation should be generated." ON)
+OPTION(CODE_METRICS "Decide if code's metrics should be generated." OFF)
+OPTION(CODE_CHECK "Decide if code should be checked for common errors." OFF)
+OPTION(GENERATE_DOC "Decide if documentation should be generated." OFF)
 
 # --- global definitions ---
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
