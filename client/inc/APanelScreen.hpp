@@ -4,14 +4,19 @@
 #include <vector>
 #include "Widget.hpp"
 
-class APanelScreen
+class APanelScreen : public IObserver, public Observable
 {
 public:
-  APanelScreen(const sf::Texture &texture, Settings &set);
+  APanelScreen();
   virtual ~APanelScreen() = 0;
 
   virtual int	run(const sf::Event &event, sf::RenderWindow &ref, Settings &set) = 0;
   virtual void	draw(sf::RenderWindow &window);
+  virtual void	construct(const sf::Texture &texture, Settings &set,
+			  const std::vector<APanelScreen *> &panels) = 0;
+  bool		isHidden() const;
+
+  void		setHide(bool hide);
 
 protected:
   sf::Vector2f		toPixel(const sf::Vector2f &perCent,
@@ -23,8 +28,10 @@ protected:
   const sf::Texture	*addSpriteForWidget(AWidget * const widget,
 					    const sf::Color &color,
 					    const sf::Vector2f &size);
+  virtual void		trigger(const std::string &event);
 
 protected:
+  bool					_hide;
   sf::Font				_font;
   std::vector<const sf::Texture *>	_textures;
   std::vector<AWidget *>		_widgets;

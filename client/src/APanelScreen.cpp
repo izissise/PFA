@@ -1,6 +1,7 @@
 #include "APanelScreen.hpp"
 
-APanelScreen::APanelScreen(const sf::Texture &texture, Settings &set)
+APanelScreen::APanelScreen() :
+  _hide(false)
 {
 }
 
@@ -52,4 +53,20 @@ const sf::Texture	*APanelScreen::addSpriteForWidget(AWidget * const widget,
   saveTexture(texture);
   widget->addSprite(sprite);
   return (_textures.back());
+}
+
+bool	APanelScreen::isHidden() const
+{
+  return _hide;
+}
+
+void	APanelScreen::setHide(bool hide)
+{
+  _hide = hide;
+}
+
+void	APanelScreen::trigger(const std::string &event)
+{
+  if (event == "hide")
+    _hide = !_hide;
 }

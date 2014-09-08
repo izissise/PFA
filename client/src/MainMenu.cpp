@@ -1,12 +1,22 @@
 #include <iostream>
 #include "MainMenu.hpp"
 
-MainMenu::MainMenu(const sf::Texture &texture, Settings &set) :
-  APanelScreen(texture, set)
+MainMenu::MainMenu() :
+  APanelScreen()
 {
   if (!_font.loadFromFile("../client/assets/font.otf"))
     std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
+}
 
+MainMenu::~MainMenu()
+{
+  for (auto &widget : _widgets)
+    delete widget;
+}
+
+void	MainMenu::construct(const sf::Texture &texture, Settings &set,
+			    const std::vector<APanelScreen *> &panels)
+{
   Widget	*wBackground = new Widget("background", {0, 0, 1920, 1080});
   Widget	*wMback = new Widget("menuback", {30, 50, 300, 600});
   Widget	*wMenuTitle = new Widget("menu-title", {30, 50, 300, 70},
@@ -15,13 +25,10 @@ MainMenu::MainMenu(const sf::Texture &texture, Settings &set) :
   				    sf::Text("PLAY ONLINE", _font, 30));
   Widget	*wOpt = new Widget("opt", {50, 230, 260, 60}, sf::Text("OPTION", _font, 30));
   Widget	*wQuit = new Widget("quit", {50, 310, 260, 60}, sf::Text("QUIT", _font, 30));
-  Widget	*wPanOption = new Widget("panOpt", {380, 50, 400, 700});
 
-  wPanOption->setHidden(true);
   wBackground->addSprite(texture, sf::IntRect(0, 0, 1920, 1080));
   addSpriteForWidget(wMback, sf::Color(125, 125, 125, 150), {300, 600});
   addSpriteForWidget(wMenuTitle, sf::Color(10, 06, 12, 255), {300, 70});
-  addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 150), {1100, 800});
 
   wMenuTitle->setTextAttr(sf::Text::Bold);
   wMenuTitle->alignText({30,50}, {300, 70}, 25, 50);
@@ -29,7 +36,8 @@ MainMenu::MainMenu(const sf::Texture &texture, Settings &set) :
   createPlayButton(texture, wPlay);
   createOptButton(texture, wOpt);
   createQuitButton(texture, wQuit);
-  wOpt->addObserver(wPanOption);
+
+  wOpt->addObserver(panels[0]);
 
   _widgets.push_back(wBackground);
   _widgets.push_back(wMback);
@@ -37,15 +45,8 @@ MainMenu::MainMenu(const sf::Texture &texture, Settings &set) :
   _widgets.push_back(wPlay);
   _widgets.push_back(wOpt);
   _widgets.push_back(wQuit);
-  _widgets.push_back(wPanOption);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
-}
-
-MainMenu::~MainMenu()
-{
-  for (auto &widget : _widgets)
-    delete widget;
 }
 
 int	MainMenu::run(const sf::Event &event, sf::RenderWindow &ref, Settings &set)

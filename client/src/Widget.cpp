@@ -7,7 +7,7 @@ Widget::Widget(const std::string &id, const sf::FloatRect &zone,
   _updates["main"] = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
     -> int
     {
-      return widget(AWidget::wAction::None);
+      return 0;
     };
 }
 
@@ -15,7 +15,7 @@ int		Widget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set
 {
   int	retVal = 0;
 
-  if (_hidden)
+  if (_hide)
     return 0;
   for (auto &func : _updates)
     {

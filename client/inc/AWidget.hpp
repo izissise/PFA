@@ -54,12 +54,12 @@ public:		// public so the lambda can call it
   void		eOver(unsigned int spritePos);
 
 protected:
+  bool				_hide;
   const std::string		_id;
   sf::FloatRect			_zone;
   int				_spritePos;
   std::vector<sf::Sprite>	_sprites;
   sf::Text			_text;
-  bool				_hidden;
   std::map<std::string, std::function
 	   <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>>
     _updates;

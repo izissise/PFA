@@ -6,6 +6,7 @@
 #include "Menu.hpp"
 #include "Exception.hpp"
 #include "MainMenu.hpp"
+#include "OptionPanel.hpp"
 
 Menu::Menu(Settings& settings)
   : _console(&settings),
@@ -15,9 +16,14 @@ Menu::Menu(Settings& settings)
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
     throw (Exception("Can't load Menu texture"));
 
-  MainMenu	*mainMenu = new MainMenu(_menuTexture, settings);
+  MainMenu	*mainMenu = new MainMenu;
+  OptionPanel	*optPanel = new OptionPanel;
 
   _panels.push_back(mainMenu);
+  _panels.push_back(optPanel);
+
+  mainMenu->construct(_menuTexture, settings, {optPanel});
+  optPanel->construct(_menuTexture, settings, {});
 }
 
 Menu::~Menu()
@@ -27,7 +33,6 @@ Menu::~Menu()
 bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
 {
   bool	handled = false;
-  int	retVal;
 
   _consoleActive = set.getControls().getActionState(Action::ToggleConsole);
   if (_consoleActive)
@@ -37,14 +42,10 @@ bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
     }
   else
     {
-      std::string	ret;
-
-      if ((retVal = _panels[_panelPos]->run(event, window, set)) != 0)
+      for (auto &panel : _panels)
 	{
-	  ret = std::to_string(retVal);
-	  //	  std::cout << ret << std::endl;
-	  if (ret.at(0) == '2')
-	    _panelPos = ret.at(2) - '0';
+	  if (!panel->isHidden())
+	    handled = panel->run(event, window, set);
 	}
     }
   return handled;
@@ -52,7 +53,11 @@ bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
 
 void	Menu::draw(sf::RenderWindow& window)
 {
-  _panels[_panelPos]->draw(window);
+  for (auto &panel : _panels)
+    {
+      if (!panel->isHidden())
+	panel->draw(window);
+    }
   if (_consoleActive)
     _console.draw(window);
 }

@@ -2,7 +2,7 @@
 
 AWidget::AWidget(const std::string &id, const sf::FloatRect &zone,
 		 const sf::Text &text) :
-  _id(id), _zone(zone), _spritePos(-1), _text(text), _hidden(false)
+  _hide(false), _id(id), _zone(zone), _spritePos(-1), _text(text)
 {
   _text.setPosition(zone.left, zone.top);
 }
@@ -13,7 +13,7 @@ AWidget::~AWidget()
 
 void	AWidget::draw(sf::RenderWindow &window) const
 {
-  if (_hidden)
+  if (_hide)
     return ;
   if (_spritePos > -1)
     window.draw(_sprites[_spritePos]);
@@ -70,7 +70,7 @@ void	AWidget::setTextAttr(unsigned int style)
 
 void	AWidget::setHidden(bool state)
 {
-  _hidden = state;
+  _hide = state;
 }
 
 void		AWidget::setFunction(const std::string &key, const std::function
@@ -133,5 +133,7 @@ void	AWidget::resize(const sf::Vector2f &size)
 void	AWidget::trigger(const std::string &event)
 {
   if (event == "hide")
-    setHidden(!_hidden);
+    setHidden(!_hide);
+  else if (event == "uncheck")
+    eOver(0);
 }

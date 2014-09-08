@@ -6,9 +6,11 @@
 class MainMenu : public APanelScreen
 {
 public:
-  MainMenu(const sf::Texture &texture, Settings &set);
+  MainMenu();
   virtual ~MainMenu();
 
+  void		construct(const sf::Texture &texture, Settings &set,
+			  const std::vector<APanelScreen *> &panels);
   int		run(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 
 private:
