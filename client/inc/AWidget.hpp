@@ -7,25 +7,44 @@
 #include <list>
 #include "Settings.hpp"
 
+#define SIZEX 1600.0
+#define SIZEY 900.0
+
 class AWidget
 {
+public:
+  enum	wAction
+    {
+      None = 0,
+      Handled = 100,
+      ChangePanel = 200
+    };
+inline int	operator()(AWidget::wAction a)
+{
+  return static_cast<int>(a);
+};
+
 public:
   AWidget(const std::string &id, const sf::FloatRect &zone,
 	  const sf::Text &text);
   virtual ~AWidget();
 
-  virtual int	update(const sf::Event &event, sf::RenderWindow &ref, Settings &set) = 0;
-  virtual void	draw(sf::RenderWindow &window) const;
+  virtual int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set) = 0;
+  virtual void		draw(sf::RenderWindow &window) const;
 
   void		addSprite(sf::Sprite &sprite);
   void		addSprite(const sf::Texture &texture, const sf::IntRect &rect);
   void		alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
 			  float xPercent, float yPercent);
+  void		alignTextLeft(const sf::Vector2f &pos, const sf::Vector2f &size,
+			      float xPercent, float yPercent);
   void		setTextPosition(int x, int y);
   void		setTextAttr(unsigned int style);
+  void		setHidden(bool state);
   void		setFunction(const std::string &key, const std::function
 			    <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
 			    &func);
+  void		resize(const sf::Vector2f &size);
 
 public:		// public so the lambda can call it
   bool		isOver(const sf::RenderWindow &ref) const;
@@ -38,9 +57,15 @@ protected:
   int				_spritePos;
   std::vector<sf::Sprite>	_sprites;
   sf::Text			_text;
+  bool				_hidden;
   std::map<std::string, std::function
 	   <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>>
     _updates;
+};
+
+inline int	operator&(AWidget::wAction a, AWidget::wAction b)
+{
+  return (static_cast<int>(a) & static_cast<int>(b));
 };
 
 #endif /* _AWIDGET_H_ */

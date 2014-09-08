@@ -15,7 +15,8 @@ Menu::Menu(Settings& settings)
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
     throw (Exception("Can't load Menu texture"));
 
-  MainMenu	*mainMenu = new MainMenu(_menuTexture);
+  MainMenu	*mainMenu = new MainMenu(_menuTexture, settings);
+
   _panels.push_back(mainMenu);
 }
 
@@ -26,6 +27,7 @@ Menu::~Menu()
 bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
 {
   bool	handled = false;
+  int	retVal;
 
   _consoleActive = set.getControls().getActionState(Action::ToggleConsole);
   if (_consoleActive)
@@ -34,7 +36,17 @@ bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
       handled = true;
     }
   else
-    _panels[_panelPos]->run(event, window, set);
+    {
+      std::string	ret;
+
+      if ((retVal = _panels[_panelPos]->run(event, window, set)) != 0)
+	{
+	  ret = std::to_string(retVal);
+	  //	  std::cout << ret << std::endl;
+	  if (ret.at(0) == '2')
+	    _panelPos = ret.at(2) - '0';
+	}
+    }
   return handled;
 }
 

@@ -1,8 +1,8 @@
 #include <iostream>
 #include "MainMenu.hpp"
 
-MainMenu::MainMenu(const sf::Texture &texture) :
-  APanelScreen(texture)
+MainMenu::MainMenu(const sf::Texture &texture, Settings &set) :
+  APanelScreen(texture, set)
 {
   if (!_font.loadFromFile("../client/assets/font.otf"))
     std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
@@ -95,6 +95,8 @@ MainMenu::MainMenu(const sf::Texture &texture) :
   _widgets.push_back(wPlay);
   _widgets.push_back(wOpt);
   _widgets.push_back(wQuit);
+  resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
+	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
 MainMenu::~MainMenu()

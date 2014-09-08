@@ -2,7 +2,7 @@
 
 AWidget::AWidget(const std::string &id, const sf::FloatRect &zone,
 		 const sf::Text &text) :
-  _id(id), _zone(zone), _spritePos(-1), _text(text)
+  _id(id), _zone(zone), _spritePos(-1), _text(text), _hidden(false)
 {
   _text.setPosition(zone.left, zone.top);
 }
@@ -13,6 +13,8 @@ AWidget::~AWidget()
 
 void	AWidget::draw(sf::RenderWindow &window) const
 {
+  if (_hidden)
+    return ;
   if (_spritePos > -1)
     window.draw(_sprites[_spritePos]);
   window.draw(_text);
@@ -45,6 +47,17 @@ void	AWidget::alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
   _text.setPosition(npos.x, npos.y);
 }
 
+void	AWidget::alignTextLeft(const sf::Vector2f &pos, const sf::Vector2f &size,
+			       float xPercent, float yPercent)
+{
+  sf::Vector2f	npos(pos.x + (xPercent / 100.0) * size.x,
+		     pos.y + (yPercent / 100.0) * size.y);
+  sf::FloatRect	textSize = _text.getLocalBounds();
+
+  npos.y -= (textSize.height);
+  _text.setPosition(npos.x, npos.y);
+}
+
 void	AWidget::setTextPosition(int x, int y)
 {
   _text.setPosition(x, y);
@@ -53,6 +66,11 @@ void	AWidget::setTextPosition(int x, int y)
 void	AWidget::setTextAttr(unsigned int style)
 {
   _text.setStyle(style);
+}
+
+void	AWidget::setHidden(bool state)
+{
+  _hidden = state;
 }
 
 void		AWidget::setFunction(const std::string &key, const std::function
@@ -84,4 +102,30 @@ bool	AWidget::isClicked(const sf::Event &event, sf::Mouse::Button button) const
 void	AWidget::eOver(unsigned int spritePos)
 {
   _spritePos = spritePos;
+}
+
+void	AWidget::resize(const sf::Vector2f &size)
+{
+  float	ratioX = size.x / SIZEX;
+  float	ratioY = size.y / SIZEY;
+  sf::Vector2f textPos(_text.getPosition());
+  sf::Vector2f spritePos;
+
+  std::cout << _zone.left << std::endl;
+  _zone.left *= ratioX;
+  _zone.top *= ratioY;
+  _zone.width *= ratioX;
+  _zone.height *= ratioY;
+  for (auto &elem : _sprites)
+    {
+      spritePos = elem.getPosition();
+      spritePos.x *= ratioX;
+      spritePos.y *= ratioY;
+      elem.setPosition(spritePos);
+      elem.setScale(ratioX, ratioY);
+    }
+  _text.setScale(ratioX, ratioY);
+  textPos.x *= ratioX;
+  textPos.y *= ratioY;
+  _text.setPosition(textPos);
 }

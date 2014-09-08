@@ -15,6 +15,8 @@ int		Widget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set
 {
   int	retVal = 0;
 
+  if (_hidden)
+    return 0;
   for (auto &func : _updates)
     {
       if ((retVal = func.second(*this, event, ref)) != 0)
