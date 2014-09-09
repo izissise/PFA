@@ -43,11 +43,11 @@ INCLUDE(CheckApplyCXXCompilerFlags)
 if (UNIX)
   COMPILER_CXX_FLAGS(FLAGS "-pipe" "-Wall" "-Wextra"
 			   "--std=c++1y"
-			   "-Wchar-subscripts" "-Winit-self -Wswitch-enum"
-			   "-Wstrict-aliasing=3" "-Wstrict-overflow=5"
+			   "-Wchar-subscripts" "-Winit-self" "-Wswitch-enum"
+			   "-Wstrict-aliasing=3"
 			   "-Wundef" "-Wno-endif-labels"
-			   "-Wshadow" "-Wno-system-headers" "-Wno-builtin-macro-redefined"
-			   "-Wmissing-declarations" "-Wsign-conversion"
+			   "-Wshadow" "-Wno-builtin-macro-redefined"
+			   "-Wmissing-declarations"
 			   "-Wdocumentation"
 			   )
 elseif (MSVC)
