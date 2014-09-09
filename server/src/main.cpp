@@ -19,6 +19,8 @@
 
 namespace po = boost::program_options;
 
+int parse_argument(int ac, char *av[], t_arg &arg);
+
 int parse_argument(int ac, char *av[], t_arg &arg)
 {
     po::options_description desc("Allowed options");
@@ -56,12 +58,12 @@ int	main(int ac, char *av[])
     {
         t_arg arg;
         printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
-        
+
         if (parse_argument(ac, av, arg) == 1)
             return (1);
         Server serv(arg);
         serv.run();
-        
+
         return (0);
     }
     catch (std::exception &e)

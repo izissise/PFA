@@ -24,11 +24,11 @@ Server::~Server()
 void Server::run()
 {
     ENetEvent event;
-    
+
     std::cout << "Actual port => " << _arg.port << std::endl;
     std::cout << "Quiet => " << _arg.quiet << std::endl;
     std::cout << "Debug => " << _arg.debug << std::endl;
-    
+
     int val;
 
     while ((val = enet_host_service(_server, &event, 1000)) >= 0)
@@ -48,6 +48,7 @@ void Server::run()
             case ENET_EVENT_TYPE_DISCONNECT:
                 std::cout << event.peer->data << " disconnected." << std::endl;
                 event.peer->data = NULL;
+			case ENET_EVENT_TYPE_NONE:
             default:
                 break;
         }

@@ -2,6 +2,7 @@
 #define _NETWORKEXCEPTION_HPP_
 
 #include <exception>
+#include <stdexcept>
 #include <iostream>
 
 class NetworkException : public std::runtime_error
