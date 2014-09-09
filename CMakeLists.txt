@@ -7,8 +7,13 @@ set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
 set(TEST_EXEC "UnitTester")
 
-set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/")
-set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/")
+set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/"
+					  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/"
+					  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/")
+set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/"
+				  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/"
+				  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/")
+set(DOC_PATH "${PROJECT_SOURCE_DIR}/doc")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -20,7 +25,6 @@ find_package(SFML 2.1 COMPONENTS system window graphics network audio)
 find_package(Boost 1.55.0 COMPONENTS filesystem system regex program_options REQUIRED)
 
 INCLUDE(CMakeDependentOption)
-INCLUDE(EnableCppExtras)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(InstallFilesRecursive)
@@ -32,9 +36,24 @@ INCLUDE(GenerateCccc)
 INCLUDE(GenerateValgrind)
 INCLUDE(DefineProjectVersion)
 INCLUDE(CurrentDate)
-# --- global compiler flags ---
-INCLUDE(SuperPedanticCompilerWarnings)
 INCLUDE(DemangleCppABI)
+INCLUDE(CheckApplyCXXCompilerFlags)
+# --- global compiler flags ---
+if (UNIX)
+  COMPILER_CXX_FLAGS(FLAGS "-pipe" "-Wall" "-Wextra"
+			   "--std=c++1y"
+			   "-Wchar-subscripts" "-Winit-self -Wswitch-enum"
+			   "-Wstrict-aliasing=3" "-Wstrict-overflow=5"
+			   "-Wundef" "-Wno-endif-labels"
+			   "-Wshadow" "-Wno-system-headers" "-Wno-builtin-macro-redefined"
+			   "-Wmissing-declarations" "-Wsign-conversion"
+			   "-Wdocumentation"
+			   )
+elseif (MSVC)
+  COMPILER_CXX_FLAGS(FLAGS "/wd4251" # needs to have dll-interface to be used by clients
+			   "/wd4275" # exported class derived from non-exported class
+			   )
+endif()
 
 # --- user options ---
 OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." OFF)
@@ -199,6 +218,6 @@ endif()
 if(GENERATE_DOC)
   # --- Doxygen --- #
   GENERATE_DOXYGEN(SOURCES ${SRC_DIRECTORY} ${INCLUDE_DIRECTORY}
-                        "${PROJECT_SOURCE_DIR}/test"
+                        "${PROJECT_SOURCE_DIR}/test" ${DOC_PATH}
                         VERSION "${PROJECTVERSION}")
 endif()
