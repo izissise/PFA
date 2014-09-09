@@ -21,11 +21,11 @@ sf::Vector2f	APanelScreen::toPixel(const sf::Vector2f &perCent,
   return sf::Vector2f(perCent.x * size.x, perCent.y * size.y);
 }
 
-sf::FloatRect	APanelScreen::toPixel(const sf::FloatRect &perCent,
-				      const sf::Vector2f &size) const
+sf::FloatRect	APanelScreen::toPixel(const sf::Vector2f &perCent,
+				      const sf::FloatRect &rect) const
 {
-  return sf::FloatRect(perCent.left * size.x, perCent.top * size.y,
-		       perCent.width * size.x, perCent.height * size.y);
+  return sf::FloatRect(rect.left * perCent.x, rect.top * perCent.y,
+		       rect.width * perCent.x, rect.height * perCent.y);
 }
 
 void		APanelScreen::resizeWidgets(const sf::Vector2f &size)

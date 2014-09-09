@@ -137,8 +137,7 @@ public:
 			    <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
 			    &func);
 
-  /**
-   * \fn void resize(const sf::Vector2f &size)
+  /**   * \fn void resize(const sf::Vector2f &size)
    * \brief Resize the widget
    * \param[in] A vector specifying the resolution to adapt to
    *
