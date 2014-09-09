@@ -102,7 +102,7 @@ protected:
   /**
    * \fn const sf::Texture *addSpriteForWidget(AWidget * const widget, const sf::Color &color, const sf::Vector2f &size)
    * \brief Add a sprite to a widget
-   * \param[in] The widget, the 'texture' defined by a sf::Color and the sprite's size
+   * \param[in] widget: The widget, color: the color of the sprite, size: the size of the sprite, draw: specify if by default the sprite is displayed
    * \return Return the texture
    *
    * This method create the needed texture, store it inside the panel.
@@ -111,12 +111,13 @@ protected:
    */
   const sf::Texture	*addSpriteForWidget(AWidget * const widget,
 					    const sf::Color &color,
-					    const sf::Vector2f &size);
+					    const sf::Vector2f &size,
+					    bool display = true);
 
   /**
    * \fn void trigger(const t_event &event)
    * \brief Trigger the panel from an event
-   * \param[in] The event
+   * \param[in] event: A structure containing a flag and an int
    *
    * This allow a widget to update a status of a panel.
    * Example: click on a button -> display the panel

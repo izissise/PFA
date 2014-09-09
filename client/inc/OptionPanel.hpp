@@ -16,6 +16,7 @@ private:
   void		createOptPanel(const sf::Texture &texture, Widget *);
   void		createBarGame(const sf::Texture &texture, Widget *);
   void		createBarKeyboard(const sf::Texture &texture, Widget *);
+  void		createCheckBox(const sf::Texture &texture, Widget *);
 };
 
 #endif /* _OPTIONPANEL_H_ */

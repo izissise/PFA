@@ -2,7 +2,7 @@
 
 AWidget::AWidget(const std::string &id, const sf::FloatRect &zone,
 		 const sf::Text &text) :
-  _hide(false), _id(id), _zone(zone), _spritePos(-1), _text(text)
+  _hide(false), _id(id), _zone(zone), _text(text)
 {
   _text.setPosition(zone.left, zone.top);
 }
@@ -15,22 +15,21 @@ void	AWidget::draw(sf::RenderWindow &window) const
 {
   if (_hide)
     return ;
-  if (_spritePos > -1)
-    window.draw(_sprites[_spritePos]);
+  for (auto &elem : _sprites)
+    if (elem.draw)
+    window.draw(elem.sprite);
   window.draw(_text);
 }
 
-void	AWidget::addSprite(sf::Sprite &sprite)
+void	AWidget::addSprite(t_sprite &elem)
 {
-  sprite.setPosition(_zone.left, _zone.top);
-  _sprites.push_back(sprite);
-  if (_spritePos == -1)
-    _spritePos = 0;
+  elem.sprite.setPosition(_zone.left, _zone.top);
+  _sprites.push_back(elem);
 }
 
-void	AWidget::addSprite(const sf::Texture &texture, const sf::IntRect &rect)
+void		AWidget::addSprite(const sf::Texture &texture, const sf::IntRect &rect, bool draw)
 {
-  sf::Sprite	sprite(texture, rect);
+  t_sprite	sprite(sf::Sprite(texture, rect), draw);
 
   addSprite(sprite);
 }
@@ -99,9 +98,14 @@ bool	AWidget::isClicked(const sf::Event &event, sf::Mouse::Button button) const
   return false;
 }
 
-void	AWidget::setSprite(unsigned int spritePos)
+void	AWidget::setSpriteAttr(unsigned int spritePos, bool draw)
 {
-  _spritePos = spritePos;
+  _sprites[spritePos].draw = draw;
+}
+
+void	AWidget::toggleSpriteAttr(unsigned int spritePos)
+{
+  _sprites[spritePos].draw = !_sprites[spritePos].draw;
 }
 
 void	AWidget::resize(const sf::Vector2f &size)
@@ -118,11 +122,11 @@ void	AWidget::resize(const sf::Vector2f &size)
   _zone.height *= ratioY;
   for (auto &elem : _sprites)
     {
-      spritePos = elem.getPosition();
+      spritePos = elem.sprite.getPosition();
       spritePos.x *= ratioX;
       spritePos.y *= ratioY;
-      elem.setPosition(spritePos);
-      elem.setScale(ratioX, ratioY);
+      elem.sprite.setPosition(spritePos);
+      elem.sprite.setScale(ratioX, ratioY);
     }
   _text.setScale(ratioX, ratioY);
   textPos.x *= ratioX;
@@ -134,7 +138,7 @@ void	AWidget::trigger(const t_event &event)
 {
   if (event.e & wEvent::SetSprite)
     {
-      setSprite(event.additional);
+      setSpriteAttr(event.additional, true);
     }
   else if (event.e & wEvent::Hide)
     {

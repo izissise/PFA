@@ -36,22 +36,24 @@ void		APanelScreen::resizeWidgets(const sf::Vector2f &size)
 
 void		APanelScreen::saveTexture(sf::Texture * const texture)
 {
-  _textures.push_back(texture);
+  if (std::find(_textures.begin(), _textures.end(), texture) == _textures.end())
+    _textures.push_back(texture);
 }
 
 const sf::Texture	*APanelScreen::addSpriteForWidget(AWidget * const widget,
 							  const sf::Color &color,
-							  const sf::Vector2f &size)
+							  const sf::Vector2f &size,
+							  bool display)
 {
   sf::Image	image;
   sf::Texture	*texture = new sf::Texture;
-  sf::Sprite	sprite;
+  t_sprite	elem(sf::Sprite(), display);
 
   image.create(size.x, size.y, color);
   texture->loadFromImage(image);
-  sprite.setTexture(*texture);
+  elem.sprite.setTexture(*texture);
   saveTexture(texture);
-  widget->addSprite(sprite);
+  widget->addSprite(elem);
   return (_textures.back());
 }
 

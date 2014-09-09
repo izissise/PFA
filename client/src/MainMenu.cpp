@@ -60,7 +60,8 @@ void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
       bool	isOver;
 
       isOver = widget.isOver(ref);
-      widget.setSprite(isOver);
+      widget.setSpriteAttr(0, !isOver);
+      widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
 	  if (widget.isClicked(event, sf::Mouse::Left))
@@ -72,7 +73,7 @@ void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
     };
   wPlay->alignText({50,150}, {260, 60}, 50, 50);
   wPlay->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
-  wPlay->addSprite(texture, sf::IntRect(260, 1080, 260, 60));
+  wPlay->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
   wPlay->setFunction("main", updateFunc);
 }
 
@@ -87,7 +88,8 @@ void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
       bool	isOver;
 
       isOver = widget.isOver(ref);
-      widget.setSprite(isOver);
+      widget.setSpriteAttr(0, !isOver);
+      widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
 	  if (widget.isClicked(event, sf::Mouse::Left))
@@ -100,7 +102,7 @@ void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
     };
   wOpt->alignText({50,230}, {260, 60}, 50, 50);
   wOpt->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
-  wOpt->addSprite(texture, sf::IntRect(260, 1080, 260, 60));
+  wOpt->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
   wOpt->setFunction("main", updateFunc);
 }
 
@@ -115,7 +117,8 @@ void	MainMenu::createQuitButton(const sf::Texture &texture, Widget *wQuit)
       bool	isOver;
 
       isOver = widget.isOver(ref);
-      widget.setSprite(isOver);
+      widget.setSpriteAttr(0, !isOver);
+      widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
  	 if (widget.isClicked(event, sf::Mouse::Left))
@@ -128,6 +131,6 @@ void	MainMenu::createQuitButton(const sf::Texture &texture, Widget *wQuit)
     };
   wQuit->alignText({50,310}, {260, 60}, 50, 50);
   wQuit->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
-  wQuit->addSprite(texture, sf::IntRect(260, 1080, 260, 60));
+  wQuit->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
   wQuit->setFunction("main", updateFunc);
 }

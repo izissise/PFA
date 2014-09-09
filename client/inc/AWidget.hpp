@@ -30,6 +30,16 @@ typedef struct	s_event
   }
 }		t_event;
 
+typedef struct	s_sprite
+{
+  sf::Sprite	sprite;
+  bool		draw;
+  s_sprite(const sf::Sprite &s, bool d = true) :
+    sprite(s), draw(d)
+  {
+  }
+}		t_sprite;
+
 class AWidget : public IObserver, public Observable
 {
 public:
@@ -62,19 +72,19 @@ public:
   /**
    * \fn void addSprite(sf::Sprite &sprite)
    * \brief Add a sprite to the widget container.
-   * \param[in] The sprite to store
+   * \param[in] elem: the sprite to store
    *
    */
-  void		addSprite(sf::Sprite &sprite);
+  void		addSprite(t_sprite &elem);
 
   /**
    * \fn void addSprite(const sf::Texture &texture, const sf::IntRect &rect);
    * \brief Add a sprite to the widget container.
-   * \param[in] texture: the used texture, rect: the sprite attribute
+   * \param[in] texture: the used texture, rect: the sprite attribute, draw: draw the sprite or not
    *
    * This method is used to not create a local sf::Sprite
    */
-  void		addSprite(const sf::Texture &texture, const sf::IntRect &rect);
+  void		addSprite(const sf::Texture &texture, const sf::IntRect &rect, bool draw = true);
 
   /**
    * \fn void alignText(const sf::Vector2f &pos, const sf::Vector2f &size, float xPercent, float yPercent);
@@ -175,15 +185,14 @@ public:		// public so the lambda can call it
    * Combining this function with the isOver function let you know if the widget is clicked
    */
   bool		isClicked(const sf::Event &event, sf::Mouse::Button button) const;
-
-  void		setSprite(unsigned int spritePos);
+  void		setSpriteAttr(unsigned int spritePos, bool draw);
+  void		toggleSpriteAttr(unsigned int spritePos);
 
 protected:
   bool				_hide;
   const std::string		_id;
   sf::FloatRect			_zone;
-  int				_spritePos;
-  std::vector<sf::Sprite>	_sprites;
+  std::vector<t_sprite>		_sprites;
   sf::Text			_text;
   std::map<std::string, std::function
 	   <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>>

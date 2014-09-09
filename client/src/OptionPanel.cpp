@@ -20,10 +20,12 @@ void	OptionPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
   Widget	*wBarGame = new Widget("gameBar", {380, 50, 260, 70}, sf::Text("Game", _font, 30));
   Widget	*wBarKeyboard = new Widget("keyboardBar", {640, 50, 260, 70},
 					   sf::Text("Keyboard", _font, 30));
+  Widget	*wCheckBox = new Widget("checkBox", {450, 200, 50, 50});
 
   createOptPanel(texture, wPanOption);
   createBarGame(texture, wBarGame);
   createBarKeyboard(texture, wBarKeyboard);
+  createCheckBox(texture, wCheckBox);
 
   wBarGame->addObserver(wBarKeyboard);
   wBarKeyboard->addObserver(wBarGame);
@@ -31,6 +33,7 @@ void	OptionPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
   _widgets.push_back(wPanOption);
   _widgets.push_back(wBarGame);
   _widgets.push_back(wBarKeyboard);
+  _widgets.push_back(wCheckBox);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
@@ -56,15 +59,14 @@ void	OptionPanel::createBarGame(const sf::Texture &texture UNUSED, Widget *wBarG
  	 if (widget.isClicked(event, sf::Mouse::Left))
 	   {
 	     widget.notify(t_event(wEvent::SetSprite, 0));
-	     widget.setSprite(1);
+	     widget.toggleSpriteAttr(0);
 	     return 1;
 	   }
 	}
       return 0;
     };
-  addSpriteForWidget(wBarGame, sf::Color(65, 65, 65, 150), {260, 70});
-  addSpriteForWidget(wBarGame, sf::Color(125, 125, 125, 150), {260, 70});
-  wBarGame->setSprite(1);
+  addSpriteForWidget(wBarGame, sf::Color(55, 55, 55, 150), {260, 70}, false);
+  addSpriteForWidget(wBarGame, sf::Color(125, 125, 125, 150), {260, 70}, true);
   wBarGame->alignText({380,50}, {260, 70}, 50, 50);
   wBarGame->setFunction("main", updateFunc);
 }
@@ -85,14 +87,43 @@ void	OptionPanel::createBarKeyboard(const sf::Texture &texture UNUSED, Widget *w
  	 if (widget.isClicked(event, sf::Mouse::Left))
 	   {
 	     widget.notify(t_event(wEvent::SetSprite, 0));
-	     widget.setSprite(1);
+	     widget.toggleSpriteAttr(0);
 	     return 1;
 	   }
 	}
       return 0;
     };
-  addSpriteForWidget(wBarKeyboard, sf::Color(65, 65, 65, 150), {260, 70});
-  addSpriteForWidget(wBarKeyboard, sf::Color(125, 125, 125, 150), {260, 70});
+  addSpriteForWidget(wBarKeyboard, sf::Color(55, 55, 55, 150), {260, 70});
+  addSpriteForWidget(wBarKeyboard, sf::Color(125, 125, 125, 150), {260, 70}, false);
   wBarKeyboard->alignText({640,50}, {260, 70}, 50, 50);
   wBarKeyboard->setFunction("main", updateFunc);
+}
+
+void	OptionPanel::createCheckBox(const sf::Texture &texture, Widget *wCheckBox)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = widget.isOver(ref);
+      widget.setSpriteAttr(0, !isOver);
+      widget.setSpriteAttr(1, isOver);
+      if (isOver)
+	{
+	  if (widget.isClicked(event, sf::Mouse::Left))
+	    {
+	      widget.toggleSpriteAttr(2);
+	      return 1;
+	    }
+	}
+      return 0;
+    };
+  wCheckBox->addSprite(texture, sf::IntRect(520, 1080, 50, 50));
+  wCheckBox->addSprite(texture, sf::IntRect(570, 1080, 50, 50), false);
+  wCheckBox->addSprite(texture, sf::IntRect(620, 1080, 50, 50), false);
+  wCheckBox->setFunction("main", updateFunc);
 }
