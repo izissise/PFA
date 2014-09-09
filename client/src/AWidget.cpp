@@ -27,9 +27,9 @@ void	AWidget::addSprite(t_sprite &elem)
   _sprites.push_back(elem);
 }
 
-void		AWidget::addSprite(const sf::Texture &texture, const sf::IntRect &rect, bool draw)
+void		AWidget::addSprite(const sf::Texture &texture, const sf::IntRect &rect, bool display)
 {
-  t_sprite	sprite(sf::Sprite(texture, rect), draw);
+  t_sprite	sprite(sf::Sprite(texture, rect), display);
 
   addSprite(sprite);
 }
@@ -98,9 +98,9 @@ bool	AWidget::isClicked(const sf::Event &event, sf::Mouse::Button button) const
   return false;
 }
 
-void	AWidget::setSpriteAttr(unsigned int spritePos, bool draw)
+void	AWidget::setSpriteAttr(unsigned int spritePos, bool display)
 {
-  _sprites[spritePos].draw = draw;
+  _sprites[spritePos].draw = display;
 }
 
 void	AWidget::toggleSpriteAttr(unsigned int spritePos)
@@ -108,14 +108,13 @@ void	AWidget::toggleSpriteAttr(unsigned int spritePos)
   _sprites[spritePos].draw = !_sprites[spritePos].draw;
 }
 
-void	AWidget::resize(const sf::Vector2f &size)
+void	AWidget::scale(const sf::Vector2f &size)
 {
   float	ratioX = size.x / SIZEX;
   float	ratioY = size.y / SIZEY;
   sf::Vector2f textPos(_text.getPosition());
   sf::Vector2f spritePos;
 
-  std::cout << _zone.left << std::endl;
   _zone.left *= ratioX;
   _zone.top *= ratioY;
   _zone.width *= ratioX;
@@ -126,19 +125,40 @@ void	AWidget::resize(const sf::Vector2f &size)
       spritePos.x *= ratioX;
       spritePos.y *= ratioY;
       elem.sprite.setPosition(spritePos);
-      elem.sprite.setScale(ratioX, ratioY);
+      elem.sprite.scale(ratioX, ratioY);
     }
-  _text.setScale(ratioX, ratioY);
+  _text.scale(ratioX, ratioY);
   textPos.x *= ratioX;
   textPos.y *= ratioY;
   _text.setPosition(textPos);
+}
+
+void	AWidget::resize(float pX, float pY)
+{
+  _zone.width *= pX;
+  _zone.height *= pY;
+  for (auto &elem : _sprites)
+    {
+      elem.sprite.scale(pX, pY);
+    }
+  _text.scale(pX, pY);
+}
+
+void		AWidget::setSpriteSize(unsigned int spritePos, float x, float y)
+{
+  t_sprite	&elem = _sprites[spritePos];
+  sf::FloatRect	rect = elem.sprite.getGlobalBounds();
+  float		ratioX = x / rect.width;
+  float		ratioY = y / rect.height;
+
+  elem.sprite.scale(ratioX, ratioY);
 }
 
 void	AWidget::trigger(const t_event &event)
 {
   if (event.e & wEvent::SetSprite)
     {
-      setSpriteAttr(event.additional, true);
+      setSpriteAttr(event.idx, event.value);
     }
   else if (event.e & wEvent::Hide)
     {

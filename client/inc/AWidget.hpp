@@ -23,9 +23,10 @@ enum class	wEvent
 typedef struct	s_event
 {
   wEvent	e;
-  int		additional;
-  s_event(wEvent event = wEvent::None, int add = 0) :
-    e(event), additional(add)
+  int		idx;
+  int		value;
+  s_event(wEvent event = wEvent::None, int add = 0, int v = 0) :
+    e(event), idx(add), value(v)
   {
   }
 }		t_event;
@@ -147,13 +148,26 @@ public:
 			    <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
 			    &func);
 
-  /**   * \fn void resize(const sf::Vector2f &size)
-   * \brief Resize the widget
-   * \param[in] A vector specifying the resolution to adapt to
+  /**
+   * \fn void scale(const sf::Vector2f &size)
+   * \brief Scale the widget
+   * \param[in] size A vector specifying the resolution to adapt to
    *
    * This method will resize all the widget's attributes
    */
-  void		resize(const sf::Vector2f &size);
+
+  void		scale(const sf::Vector2f &size);
+
+  /**
+   * \fn void resize(const sf::Vector2f &size)
+   * \brief Resize the widget
+   * \param[in] size A vector specifying the x/y percent
+   *
+   * This method will adapt the widget's size by x/y percent
+   */
+  void		resize(float pX, float pY);
+
+  void		setSpriteSize(unsigned int spritePos, float x, float y);
 
   /**
    * \fn void trigger(const t_event &event)
@@ -162,7 +176,6 @@ public:
    *
    * This method permit the widget to auto update its attributes when receiving externals events
    */
-
   void		trigger(const t_event &event);
 
 public:		// public so the lambda can call it

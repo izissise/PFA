@@ -58,8 +58,10 @@ void	OptionPanel::createBarGame(const sf::Texture &texture UNUSED, Widget *wBarG
 	{
  	 if (widget.isClicked(event, sf::Mouse::Left))
 	   {
-	     widget.notify(t_event(wEvent::SetSprite, 0));
-	     widget.toggleSpriteAttr(0);
+	     widget.notify(t_event(wEvent::SetSprite, 0, 1));
+	     widget.notify(t_event(wEvent::SetSprite, 1, 0));
+	     widget.setSpriteAttr(0, 0);
+	     widget.setSpriteAttr(1, 1);
 	     return 1;
 	   }
 	}
@@ -86,8 +88,10 @@ void	OptionPanel::createBarKeyboard(const sf::Texture &texture UNUSED, Widget *w
 	{
  	 if (widget.isClicked(event, sf::Mouse::Left))
 	   {
-	     widget.notify(t_event(wEvent::SetSprite, 0));
-	     widget.toggleSpriteAttr(0);
+	     widget.notify(t_event(wEvent::SetSprite, 0, 1));
+	     widget.notify(t_event(wEvent::SetSprite, 1, 0));
+	     widget.setSpriteAttr(0, 0);
+	     widget.setSpriteAttr(1, 1);
 	     return 1;
 	   }
 	}
@@ -124,6 +128,8 @@ void	OptionPanel::createCheckBox(const sf::Texture &texture, Widget *wCheckBox)
     };
   wCheckBox->addSprite(texture, sf::IntRect(520, 1080, 50, 50));
   wCheckBox->addSprite(texture, sf::IntRect(570, 1080, 50, 50), false);
-  wCheckBox->addSprite(texture, sf::IntRect(620, 1080, 50, 50), false);
+  wCheckBox->addSprite(texture, sf::IntRect(620, 1080, 32, 32), false);
+  wCheckBox->setSpriteSize(2, 50, 50);
   wCheckBox->setFunction("main", updateFunc);
+  wCheckBox->resize(0.5, 0.5);
 }

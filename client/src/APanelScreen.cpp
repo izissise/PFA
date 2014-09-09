@@ -31,7 +31,7 @@ sf::FloatRect	APanelScreen::toPixel(const sf::Vector2f &perCent,
 void		APanelScreen::resizeWidgets(const sf::Vector2f &size)
 {
   for (auto &elem : _widgets)
-    elem->resize(size);
+    elem->scale(size);
 }
 
 void		APanelScreen::saveTexture(sf::Texture * const texture)
