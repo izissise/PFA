@@ -4,10 +4,12 @@
 #include <set>
 #include <string>
 
+typedef struct s_event t_event;
+
 class IObserver
 {
 public:
-  virtual void	trigger(const std::string &event) = 0;
+  virtual void	trigger(const t_event &event) = 0;
 };
 
 class Observable
@@ -16,7 +18,7 @@ public:
   Observable();
   ~Observable();
 
-  void	notify(const std::string &data) const;
+  void	notify(const t_event &event) const;
   void	addObserver(IObserver * const observer);
   void	removeObserver(IObserver * const observer);
 

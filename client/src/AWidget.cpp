@@ -130,10 +130,17 @@ void	AWidget::resize(const sf::Vector2f &size)
   _text.setPosition(textPos);
 }
 
-void	AWidget::trigger(const std::string &event)
+void	AWidget::trigger(const t_event &event)
 {
-  if (event == "hide")
-    setHidden(!_hide);
-  else if (event == "uncheck")
+  if (event.e & wEvent::Hide)
+    {
+      if (event.e & wEvent::Toggle)
+	_hide = !_hide;
+      else
+	_hide = true;
+    }
+  /*
+  else if (event.e == "uncheck")
     eOver(0);
+  */
 }

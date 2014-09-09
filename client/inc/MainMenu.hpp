@@ -11,7 +11,6 @@ public:
 
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
-  int		run(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 
 private:
   void		createPlayButton(const sf::Texture &texture, Widget *);

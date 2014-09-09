@@ -65,8 +65,25 @@ void	APanelScreen::setHide(bool hide)
   _hide = hide;
 }
 
-void	APanelScreen::trigger(const std::string &event)
+int	APanelScreen::run(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
-  if (event == "hide")
-    _hide = !_hide;
+  int	retVal = 0;
+
+  for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
+    {
+      if ((retVal = (*rit)->update(event, ref, set)) != 0)
+	return (retVal);
+    }
+  return retVal;
+}
+
+void	APanelScreen::trigger(const t_event &event)
+{
+  if (event.e & wEvent::Hide)
+    {
+      if (event.e & wEvent::Toggle)
+	_hide = !_hide;
+      else
+	_hide = true;
+    }
 }

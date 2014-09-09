@@ -11,6 +11,25 @@
 #define SIZEX 1600.0
 #define SIZEY 900.0
 
+enum class	wEvent
+{
+  None = 0,
+    Toggle = 1,
+    Hide = 2,
+    Show = 4,
+    SwitchSprite = 8
+    };
+
+typedef struct	s_event
+{
+  wEvent	e;
+  int		additional;
+  s_event(wEvent event = wEvent::None, int add = 0) :
+    e(event), additional(add)
+  {
+  }
+}		t_event;
+
 class AWidget : public IObserver, public Observable
 {
 public:
@@ -46,7 +65,7 @@ public:
 			    <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
 			    &func);
   void		resize(const sf::Vector2f &size);
-  void		trigger(const std::string &event);
+  void		trigger(const t_event &event);
 
 public:		// public so the lambda can call it
   bool		isOver(const sf::RenderWindow &ref) const;
@@ -65,9 +84,14 @@ protected:
     _updates;
 };
 
-inline int	operator&(AWidget::wAction a, AWidget::wAction b)
+inline int	operator&(wEvent a, wEvent b)
 {
   return (static_cast<int>(a) & static_cast<int>(b));
 };
+
+inline wEvent	operator|(wEvent a, wEvent b)
+{
+  return (static_cast<wEvent>(static_cast<int>(a) | static_cast<int>(b)));
+}
 
 #endif /* _AWIDGET_H_ */

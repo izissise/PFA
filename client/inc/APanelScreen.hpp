@@ -10,7 +10,7 @@ public:
   APanelScreen();
   virtual ~APanelScreen() = 0;
 
-  virtual int	run(const sf::Event &event, sf::RenderWindow &ref, Settings &set) = 0;
+  virtual int	run(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   virtual void	draw(sf::RenderWindow &window);
   virtual void	construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels) = 0;
@@ -28,7 +28,7 @@ protected:
   const sf::Texture	*addSpriteForWidget(AWidget * const widget,
 					    const sf::Color &color,
 					    const sf::Vector2f &size);
-  virtual void		trigger(const std::string &event);
+  virtual void		trigger(const t_event &event);
 
 protected:
   bool					_hide;

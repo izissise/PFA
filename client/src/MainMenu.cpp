@@ -49,18 +49,6 @@ void	MainMenu::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-int	MainMenu::run(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
-{
-  int	retVal = 0;
-
-  for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
-    {
-      if ((retVal = (*rit)->update(event, ref, set)) != 0)
-	return (retVal);
-    }
-  return retVal;
-}
-
 void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
 {
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
@@ -104,7 +92,7 @@ void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
 	{
 	  if (widget.isClicked(event, sf::Mouse::Left))
 	    {
-	      widget.notify("hide");
+	      widget.notify(t_event(wEvent::Toggle | wEvent::Hide));
 	      return 1;
 	    }
 	}

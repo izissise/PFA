@@ -34,10 +34,6 @@ void	OptionPanel::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-int	OptionPanel::run(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
-{
-}
-
 void	OptionPanel::createOptPanel(const sf::Texture &texture, Widget *wPanOption)
 {
   addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 150), {1100, 730});
@@ -58,7 +54,7 @@ void	OptionPanel::createBarGame(const sf::Texture &texture, Widget *wBarGame)
 	{
  	 if (widget.isClicked(event, sf::Mouse::Left))
 	   {
-	     widget.notify("uncheck");
+	     widget.notify(t_event(wEvent::None,0));
 	     widget.eOver(1);
 	     return 1;
 	   }
@@ -86,7 +82,7 @@ void	OptionPanel::createBarKeyboard(const sf::Texture &texture, Widget *wBarKeyb
 	{
  	 if (widget.isClicked(event, sf::Mouse::Left))
 	   {
-	     widget.notify("uncheck");
+	     widget.notify(t_event(wEvent::None,0));
 	     widget.eOver(1);
 	     return 1;
 	   }

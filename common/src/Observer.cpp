@@ -18,7 +18,7 @@ void	Observable::removeObserver(IObserver * const observer)
   _observers.erase(observer);
 }
 
-void	Observable::notify(const std::string &message) const
+void	Observable::notify(const t_event &message) const
 {
   for (auto &observer : _observers)
     observer->trigger(message);
