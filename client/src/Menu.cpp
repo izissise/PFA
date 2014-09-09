@@ -8,9 +8,9 @@
 #include "MainMenu.hpp"
 #include "OptionPanel.hpp"
 
-Menu::Menu(Settings& settings)
-  : _console(&settings),
+Menu::Menu(Settings& settings) :
     _consoleActive(false),
+    _console(&settings),
     _panelPos(0)
 {
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))

@@ -17,7 +17,7 @@ enum class	wEvent
     Toggle = 1,
     Hide = 2,
     Show = 4,
-    SwitchSprite = 8
+    SetSprite = 8
     };
 
 typedef struct	s_event
@@ -176,7 +176,7 @@ public:		// public so the lambda can call it
    */
   bool		isClicked(const sf::Event &event, sf::Mouse::Button button) const;
 
-  void		eOver(unsigned int spritePos);
+  void		setSprite(unsigned int spritePos);
 
 protected:
   bool				_hide;

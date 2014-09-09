@@ -99,7 +99,7 @@ bool	AWidget::isClicked(const sf::Event &event, sf::Mouse::Button button) const
   return false;
 }
 
-void	AWidget::eOver(unsigned int spritePos)
+void	AWidget::setSprite(unsigned int spritePos)
 {
   _spritePos = spritePos;
 }
@@ -132,15 +132,15 @@ void	AWidget::resize(const sf::Vector2f &size)
 
 void	AWidget::trigger(const t_event &event)
 {
-  if (event.e & wEvent::Hide)
+  if (event.e & wEvent::SetSprite)
+    {
+      setSprite(event.additional);
+    }
+  else if (event.e & wEvent::Hide)
     {
       if (event.e & wEvent::Toggle)
 	_hide = !_hide;
       else
 	_hide = true;
     }
-  /*
-  else if (event.e == "uncheck")
-    eOver(0);
-  */
 }

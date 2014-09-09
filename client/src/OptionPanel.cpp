@@ -54,8 +54,8 @@ void	OptionPanel::createBarGame(const sf::Texture &texture, Widget *wBarGame)
 	{
  	 if (widget.isClicked(event, sf::Mouse::Left))
 	   {
-	     widget.notify(t_event(wEvent::None,0));
-	     widget.eOver(1);
+	     widget.notify(t_event(wEvent::SetSprite, 0));
+	     widget.setSprite(1);
 	     return 1;
 	   }
 	}
@@ -63,6 +63,7 @@ void	OptionPanel::createBarGame(const sf::Texture &texture, Widget *wBarGame)
     };
   addSpriteForWidget(wBarGame, sf::Color(65, 65, 65, 150), {260, 70});
   addSpriteForWidget(wBarGame, sf::Color(125, 125, 125, 150), {260, 70});
+  wBarGame->setSprite(1);
   wBarGame->alignText({380,50}, {260, 70}, 50, 50);
   wBarGame->setFunction("main", updateFunc);
 }
@@ -82,8 +83,8 @@ void	OptionPanel::createBarKeyboard(const sf::Texture &texture, Widget *wBarKeyb
 	{
  	 if (widget.isClicked(event, sf::Mouse::Left))
 	   {
-	     widget.notify(t_event(wEvent::None,0));
-	     widget.eOver(1);
+	     widget.notify(t_event(wEvent::SetSprite, 0));
+	     widget.setSprite(1);
 	     return 1;
 	   }
 	}
@@ -91,7 +92,6 @@ void	OptionPanel::createBarKeyboard(const sf::Texture &texture, Widget *wBarKeyb
     };
   addSpriteForWidget(wBarKeyboard, sf::Color(65, 65, 65, 150), {260, 70});
   addSpriteForWidget(wBarKeyboard, sf::Color(125, 125, 125, 150), {260, 70});
-  wBarKeyboard->eOver(1);
   wBarKeyboard->alignText({640,50}, {260, 70}, 50, 50);
   wBarKeyboard->setFunction("main", updateFunc);
 }

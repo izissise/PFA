@@ -60,7 +60,7 @@ void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
       bool	isOver;
 
       isOver = widget.isOver(ref);
-      widget.eOver(isOver);
+      widget.setSprite(isOver);
       if (isOver)
 	{
 	  if (widget.isClicked(event, sf::Mouse::Left))
@@ -87,7 +87,7 @@ void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
       bool	isOver;
 
       isOver = widget.isOver(ref);
-      widget.eOver(isOver);
+      widget.setSprite(isOver);
       if (isOver)
 	{
 	  if (widget.isClicked(event, sf::Mouse::Left))
@@ -115,7 +115,7 @@ void	MainMenu::createQuitButton(const sf::Texture &texture, Widget *wQuit)
       bool	isOver;
 
       isOver = widget.isOver(ref);
-      widget.eOver(isOver);
+      widget.setSprite(isOver);
       if (isOver)
 	{
  	 if (widget.isClicked(event, sf::Mouse::Left))
