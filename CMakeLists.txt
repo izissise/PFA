@@ -147,6 +147,27 @@ file(
   test/*
 )
 
+if (THREADS_FOUND)
+  target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+if (SFML_FOUND)
+  include_directories(${SFML_INCLUDE_DIR})
+  target_link_libraries (${NAME_CLIENT} ${SFML_LIBRARIES})
+endif()
+
+if (Boost_FOUND)
+   include_directories(${Boost_INCLUDE_DIRS})
+   target_link_libraries (${NAME_SERVER} ${Boost_LIBRARIES})
+   target_link_libraries (${NAME_CLIENT} ${Boost_LIBRARIES})
+endif()
+
+if (ENET_FOUND)
+   include_directories(${ENet_INCLUDE_DIRS})
+   target_link_libraries(${NAME_SERVER} ${ENet_LIBRARIES})
+   target_link_libraries(${NAME_CLIENT} ${ENet_LIBRARIES})
+endif()
+
 # --- enable unit tests if desired ---
 if(BUILD_TESTS)
   if(NOT CPPUNIT_FOUND)
@@ -181,27 +202,6 @@ if(BUILD_TESTS)
     target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB})
 
   endif()
-endif()
-
-if (THREADS_FOUND)
-  target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
-endif()
-
-if (SFML_FOUND)
-  include_directories(${SFML_INCLUDE_DIR})
-  target_link_libraries (${NAME_CLIENT} ${SFML_LIBRARIES})
-endif()
-
-if (Boost_FOUND)
-   include_directories(${Boost_INCLUDE_DIRS})
-   target_link_libraries (${NAME_SERVER} ${Boost_LIBRARIES})
-   target_link_libraries (${NAME_CLIENT} ${Boost_LIBRARIES})
-endif()
-
-if (ENET_FOUND)
-   include_directories(${ENet_INCLUDE_DIRS})
-   target_link_libraries(${NAME_SERVER} ${ENet_LIBRARIES})
-   target_link_libraries(${NAME_CLIENT} ${ENet_LIBRARIES})
 endif()
 
 #Extra targets:
