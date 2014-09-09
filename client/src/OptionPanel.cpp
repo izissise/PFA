@@ -1,4 +1,5 @@
 #include "OptionPanel.hpp"
+#include "Unused.hpp"
 
 OptionPanel::OptionPanel() :
   APanelScreen()
@@ -12,8 +13,8 @@ OptionPanel::~OptionPanel()
 {
 }
 
-void	OptionPanel::construct(const sf::Texture &texture, Settings &set,
-			       const std::vector<APanelScreen *> &panels)
+void	OptionPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
+			       const std::vector<APanelScreen *> &panels UNUSED)
 {
   Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730});
   Widget	*wBarGame = new Widget("gameBar", {380, 50, 260, 70}, sf::Text("Game", _font, 30));
@@ -34,12 +35,12 @@ void	OptionPanel::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void	OptionPanel::createOptPanel(const sf::Texture &texture, Widget *wPanOption)
+void	OptionPanel::createOptPanel(const sf::Texture &texture UNUSED, Widget *wPanOption)
 {
   addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 150), {1100, 730});
 }
 
-void	OptionPanel::createBarGame(const sf::Texture &texture, Widget *wBarGame)
+void	OptionPanel::createBarGame(const sf::Texture &texture UNUSED, Widget *wBarGame)
 {
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
@@ -68,7 +69,7 @@ void	OptionPanel::createBarGame(const sf::Texture &texture, Widget *wBarGame)
   wBarGame->setFunction("main", updateFunc);
 }
 
-void	OptionPanel::createBarKeyboard(const sf::Texture &texture, Widget *wBarKeyboard)
+void	OptionPanel::createBarKeyboard(const sf::Texture &texture UNUSED, Widget *wBarKeyboard)
 {
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;

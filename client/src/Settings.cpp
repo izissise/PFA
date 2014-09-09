@@ -34,7 +34,7 @@ void	Settings::setKeyword(const std::vector<std::string> &tokens)
 
 void		Settings::bindKeyword(const std::vector<std::string> &tokens)
 {
-  key		k;
+  ctrl::key	k;
   Action	act;
 
   if (tokens.size() < 3)

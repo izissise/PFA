@@ -1,17 +1,20 @@
 #include "Widget.hpp"
+#include "Unused.hpp"
 
 Widget::Widget(const std::string &id, const sf::FloatRect &zone,
 	       const sf::Text &text) :
   AWidget(id, zone, text)
 {
-  _updates["main"] = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  _updates["main"] = [](AWidget &widget UNUSED,
+			const sf::Event &event UNUSED,
+			sf::RenderWindow &ref UNUSED)
     -> int
     {
       return 0;
     };
 }
 
-int		Widget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
+int		Widget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set UNUSED)
 {
   int	retVal = 0;
 

@@ -68,7 +68,7 @@ void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
 	      return 0;
 	    }
 	}
-      return widget(AWidget::Handled);
+      return 0;
     };
   wPlay->alignText({50,150}, {260, 60}, 50, 50);
   wPlay->addSprite(texture, sf::IntRect(0, 1080, 260, 60));

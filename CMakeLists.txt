@@ -49,6 +49,7 @@ if (UNIX)
 			   "-Wshadow" "-Wno-builtin-macro-redefined"
 			   "-Wmissing-declarations"
 			   "-Wdocumentation"
+			   "-Wno-switch-enum"
 			   )
 elseif (MSVC)
   COMPILER_CXX_FLAGS(FLAGS "/wd4251" # needs to have dll-interface to be used by clients
