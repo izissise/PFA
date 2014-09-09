@@ -77,10 +77,12 @@ void	Settings::loadConfigFile(const std::string &filename)
   else
     throw (Exception("File [" + filename + "] not found"));
   for (const auto &it : content)
-    try {
-      parseCommandLine(it);
-    }
-    catch (const Exception &e) {
-      std::cerr << e.what() << std::endl;
-    }
+  {
+	  try {
+		  parseCommandLine(it);
+	  }
+	  catch (const Exception &e) {
+		  std::cerr << e.what() << std::endl;
+	  }
+  }
 }
