@@ -7,8 +7,13 @@ set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
 set(TEST_EXEC "UnitTester")
 
-set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/")
-set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/" "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/" "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/")
+set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/"
+					  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/"
+					  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/")
+set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/"
+				  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/"
+				  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/")
+set(DOC_PATH "${PROJECT_SOURCE_DIR}/doc")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
@@ -16,11 +21,11 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
 find_package(Threads)
-find_package(SFML 2.1 COMPONENTS system window graphics network audio)
-find_package(Boost 1.55.0 COMPONENTS filesystem system regex program_options REQUIRED)
+find_package(SFML 2.1 COMPONENTS system window graphics audio)
+find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
+find_package(ENet)
 
 INCLUDE(CMakeDependentOption)
-INCLUDE(EnableCppExtras)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(InstallFilesRecursive)
@@ -32,17 +37,32 @@ INCLUDE(GenerateCccc)
 INCLUDE(GenerateValgrind)
 INCLUDE(DefineProjectVersion)
 INCLUDE(CurrentDate)
-# --- global compiler flags ---
-INCLUDE(SuperPedanticCompilerWarnings)
 INCLUDE(DemangleCppABI)
+INCLUDE(CheckApplyCXXCompilerFlags)
+# --- global compiler flags ---
+if (UNIX)
+  COMPILER_CXX_FLAGS(FLAGS "-pipe" "-Wall" "-Wextra"
+			   "--std=c++1y"
+			   "-Wchar-subscripts" "-Winit-self" "-Wswitch-enum"
+			   "-Wstrict-aliasing=3"
+			   "-Wundef" "-Wno-endif-labels"
+			   "-Wshadow" "-Wno-builtin-macro-redefined"
+			   "-Wmissing-declarations"
+			   "-Wdocumentation"
+			   )
+elseif (MSVC)
+  COMPILER_CXX_FLAGS(FLAGS "/wd4251" # needs to have dll-interface to be used by clients
+			   "/wd4275" # exported class derived from non-exported class
+			   )
+endif()
 
 # --- user options ---
-OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." ON)
+OPTION(BUILD_TESTS "Decide if the test suite shall be built or not." OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_TESTS_COVERAGE "Decide if a coverage report should be generated." ON "BUILD_TESTS" OFF)
 CMAKE_DEPENDENT_OPTION(VALGRIND_CHECK "Decide if valgrind should be executed with the test binary to check for memory leaks." ON "BUILD_TESTS" OFF)
-OPTION(CODE_METRICS "Decide if code's metrics should be generated." ON)
-OPTION(CODE_CHECK "Decide if code should be checked for common errors." ON)
-OPTION(GENERATE_DOC "Decide if documentation should be generated." ON)
+OPTION(CODE_METRICS "Decide if code's metrics should be generated." OFF)
+OPTION(CODE_CHECK "Decide if code should be checked for common errors." OFF)
+OPTION(GENERATE_DOC "Decide if documentation should be generated." OFF)
 
 # --- global definitions ---
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
@@ -127,6 +147,27 @@ file(
   test/*
 )
 
+if (THREADS_FOUND)
+  target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+if (SFML_FOUND)
+  include_directories(${SFML_INCLUDE_DIR})
+  target_link_libraries (${NAME_CLIENT} ${SFML_LIBRARIES})
+endif()
+
+if (Boost_FOUND)
+   include_directories(${Boost_INCLUDE_DIRS})
+   target_link_libraries (${NAME_SERVER} ${Boost_LIBRARIES})
+   target_link_libraries (${NAME_CLIENT} ${Boost_LIBRARIES})
+endif()
+
+if (ENET_FOUND)
+   include_directories(${ENet_INCLUDE_DIRS})
+   target_link_libraries(${NAME_SERVER} ${ENet_LIBRARIES})
+   target_link_libraries(${NAME_CLIENT} ${ENet_LIBRARIES})
+endif()
+
 # --- enable unit tests if desired ---
 if(BUILD_TESTS)
   if(NOT CPPUNIT_FOUND)
@@ -163,21 +204,6 @@ if(BUILD_TESTS)
   endif()
 endif()
 
-if (THREADS_FOUND)
-  target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
-endif()
-
-if (SFML_FOUND)
-  include_directories(${SFML_INCLUDE_DIR})
-  target_link_libraries (${NAME_LIB} ${SFML_LIBRARIES})
-endif()
-
-if (Boost_FOUND)
-   include_directories(${Boost_INCLUDE_DIRS})
-   link_directories(${Boost_LIBRARY_DIRS})
-   target_link_libraries (${NAME_LIB} ${Boost_LIBRARIES})
-endif()
-
 #Extra targets:
 if(CODE_CHECK)
   # --- cppcheck ---
@@ -199,6 +225,6 @@ endif()
 if(GENERATE_DOC)
   # --- Doxygen --- #
   GENERATE_DOXYGEN(SOURCES ${SRC_DIRECTORY} ${INCLUDE_DIRECTORY}
-                        "${PROJECT_SOURCE_DIR}/test"
+                        "${PROJECT_SOURCE_DIR}/test" ${DOC_PATH}
                         VERSION "${PROJECTVERSION}")
 endif()

@@ -101,6 +101,7 @@ int main(int argc, char* argv[])
   std::vector<std::string> arg;
 
   try {
+  	if (argc > 0)
       arg.reserve(argc - 1);
       for(int i = 1; i < argc; i++)
         arg.push_back(argv[i]);
