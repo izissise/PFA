@@ -2,6 +2,7 @@
 #define Server_H_
 
 #include <iostream>
+#include <list>
 #include <enet/enet.h>
 #include "NetworkException.hpp"
 #include "client.hpp"
@@ -29,7 +30,7 @@ private:
     t_arg       _arg;
     ENetAddress _address;
     ENetHost*   _server;
-
+    std::list<Client *> _clients;
 };
 
 #endif
