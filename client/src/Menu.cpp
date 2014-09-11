@@ -6,7 +6,9 @@
 #include "Menu.hpp"
 #include "Exception.hpp"
 #include "MainMenu.hpp"
-#include "OptionPanel.hpp"
+#include "OptionTabPanel.hpp"
+#include "OptionGamePanel.hpp"
+#include "OptionKeyPanel.hpp"
 
 Menu::Menu(Settings& settings) :
     _consoleActive(false),
@@ -16,14 +18,19 @@ Menu::Menu(Settings& settings) :
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
     throw (Exception("Can't load Menu texture"));
 
-  MainMenu	*mainMenu = new MainMenu;
-  OptionPanel	*optPanel = new OptionPanel;
+  MainMenu		*mainMenu = new MainMenu;
+  OptionTabPanel	*optTabPanel = new OptionTabPanel;
+  OptionGamePanel	*optGamePanel = new OptionGamePanel;
+  OptionKeyPanel	*optKeyPanel = new OptionKeyPanel;
 
   _panels.push_back(mainMenu);
-  _panels.push_back(optPanel);
+  _panels.push_back(optTabPanel);
+  optTabPanel->addPanels({optGamePanel, optKeyPanel});
 
-  mainMenu->construct(_menuTexture, settings, {optPanel});
-  optPanel->construct(_menuTexture, settings, {});
+  mainMenu->construct(_menuTexture, settings, {optTabPanel});
+  optTabPanel->construct(_menuTexture, settings, {optGamePanel, optKeyPanel});
+  optGamePanel->construct(_menuTexture, settings, {});
+  optKeyPanel->construct(_menuTexture, settings, {});
 }
 
 Menu::~Menu()

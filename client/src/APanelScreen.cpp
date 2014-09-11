@@ -11,6 +11,10 @@ APanelScreen::~APanelScreen()
 
 void		APanelScreen::draw(sf::RenderWindow &window)
 {
+  if (_hide)
+    return ;
+  for (auto &panel : _panels)
+    panel->draw(window);
   for (auto &widget : _widgets)
     widget->draw(window);
 }
@@ -71,12 +75,23 @@ int	APanelScreen::run(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 {
   int	retVal = 0;
 
+  for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
+    {
+      if ((retVal = (*rit)->run(event, ref, set)) != 0)
+	return retVal;
+    }
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
     {
       if ((retVal = (*rit)->update(event, ref, set)) != 0)
-	return (retVal);
+	return retVal;
     }
   return retVal;
+}
+
+void	APanelScreen::addPanels(const std::vector<APanelScreen *> &panels)
+{
+  for (auto &panel : panels)
+    _panels.push_back(panel);
 }
 
 void	APanelScreen::trigger(const t_event &event)
@@ -86,6 +101,8 @@ void	APanelScreen::trigger(const t_event &event)
       if (event.e & wEvent::Toggle)
 	_hide = !_hide;
       else
-	_hide = true;
+	{
+	  _hide = event.value;
+	}
     }
 }

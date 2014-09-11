@@ -2,6 +2,7 @@
 #define _MAINMENU_H_
 
 #include "APanelScreen.hpp"
+#include "Widget.hpp"
 
 class MainMenu : public APanelScreen
 {

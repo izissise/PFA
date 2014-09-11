@@ -94,7 +94,7 @@ void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
 	{
 	  if (widget.isClicked(event, sf::Mouse::Left))
 	    {
-	      widget.notify(t_event(wEvent::Toggle | wEvent::Hide));
+	      widget.notify(t_event(wEvent::Hide | wEvent::Toggle, 0, 0));
 	      return 1;
 	    }
 	}

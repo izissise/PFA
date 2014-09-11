@@ -17,7 +17,7 @@ enum class	wEvent
     Toggle = 1,
     Hide = 2,
     Show = 4,
-    SetSprite = 8
+    SetSprite = 16
     };
 
 typedef struct	s_event
@@ -176,7 +176,7 @@ public:
    *
    * This method permit the widget to auto update its attributes when receiving externals events
    */
-  void		trigger(const t_event &event);
+  virtual void		trigger(const t_event &event);
 
 public:		// public so the lambda can call it
 

@@ -11,12 +11,7 @@ public:
 
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
-
-private:
-  void		createOptPanel(const sf::Texture &texture, Widget *);
-  void		createBarGame(const sf::Texture &texture, Widget *);
-  void		createBarKeyboard(const sf::Texture &texture, Widget *);
-  void		createCheckBox(const sf::Texture &texture, Widget *);
+  void		trigger(const t_event &event);
 };
 
 #endif /* _OPTIONPANEL_H_ */

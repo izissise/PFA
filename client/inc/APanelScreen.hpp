@@ -2,7 +2,7 @@
 #define _APANELSCREEN_H_
 
 #include <vector>
-#include "Widget.hpp"
+#include "AWidget.hpp"
 
 class APanelScreen : public IObserver, public Observable
 {
@@ -54,6 +54,7 @@ public:
    *
    */
   void		setHide(bool hide);
+  void	       	addPanels(const std::vector<APanelScreen *> &panels);
 
 protected:
   /**
@@ -129,6 +130,7 @@ protected:
   bool					_hide;
   sf::Font				_font;
   std::vector<const sf::Texture *>	_textures;
+  std::vector<APanelScreen *>		_panels;
   std::vector<AWidget *>		_widgets;
 };
 
