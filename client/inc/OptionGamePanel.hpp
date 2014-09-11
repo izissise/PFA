@@ -3,6 +3,7 @@
 
 #include "APanelScreen.hpp"
 #include "Widget.hpp"
+#include "TextWidget.hpp"
 
 class OptionGamePanel : public APanelScreen
 {
@@ -16,6 +17,7 @@ public:
 private:
   void		createOptPanel(const sf::Texture &texture, Widget *);
   void		createCheckBox(const sf::Texture &texture, Widget *);
+  void		createTextWidget(const sf::Texture &texture, TextWidget *);
 
 };
 

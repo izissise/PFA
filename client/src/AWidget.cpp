@@ -42,7 +42,7 @@ void	AWidget::alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
   sf::FloatRect	textSize = _text.getLocalBounds();
 
   npos.x -= textSize.width / 2.0;
-  npos.y -= (textSize.height);
+  npos.y -= (_text.getCharacterSize() / 1.5);
   _text.setPosition(npos.x, npos.y);
 }
 
@@ -51,9 +51,8 @@ void	AWidget::alignTextLeft(const sf::Vector2f &pos, const sf::Vector2f &size,
 {
   sf::Vector2f	npos(pos.x + (xPercent / 100.0) * size.x,
 		     pos.y + (yPercent / 100.0) * size.y);
-  sf::FloatRect	textSize = _text.getLocalBounds();
 
-  npos.y -= (textSize.height);
+  npos.y -= (_text.getCharacterSize() / 1.5);
   _text.setPosition(npos.x, npos.y);
 }
 

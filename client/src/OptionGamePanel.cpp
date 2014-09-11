@@ -17,12 +17,16 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 {
   Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730});
   Widget	*wCheckBox = new Widget("checkBox", {450, 200, 50, 50});
+  TextWidget	*wTextWidget = new TextWidget("nameText", {450, 300, 300, 50},
+					      sf::Text("", _font, 20), 30);
 
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
+  createTextWidget(texture, wTextWidget);
 
   _widgets.push_back(wPanOption);
   _widgets.push_back(wCheckBox);
+  _widgets.push_back(wTextWidget);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
@@ -57,8 +61,23 @@ void	OptionGamePanel::createCheckBox(const sf::Texture &texture, Widget *wCheckB
     };
   wCheckBox->addSprite(texture, sf::IntRect(520, 1080, 50, 50));
   wCheckBox->addSprite(texture, sf::IntRect(570, 1080, 50, 50), false);
-  wCheckBox->addSprite(texture, sf::IntRect(620, 1080, 32, 32), false);
-  wCheckBox->setSpriteSize(2, 50, 50);
+  wCheckBox->addSprite(texture, sf::IntRect(620, 1080, 50, 50), false);
+  // wCheckBox->setSpriteSize(2, 50, 50);
   wCheckBox->setFunction("main", updateFunc);
   wCheckBox->resize(0.5, 0.5);
+}
+
+void	OptionGamePanel::createTextWidget(const sf::Texture &texture UNUSED, TextWidget *wTextWidget)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &widget, const sf::Event &event UNUSED, sf::RenderWindow &ref UNUSED)
+    -> int
+    {
+      widget.alignText({450,300}, {300, 50}, 50, 50);
+      return 0;
+    };
+  addSpriteForWidget(wTextWidget, sf::Color(125, 125, 125, 200), {300, 50});
+  wTextWidget->setFunction("main", updateFunc);
 }
