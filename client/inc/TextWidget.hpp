@@ -11,12 +11,16 @@ public:
   TextWidget(const std::string &id, const sf::FloatRect &zone,
 	     const sf::Text &text = sf::Text(), int maxSize = 2048);
 
-  int	update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
-  void	draw(sf::RenderWindow &window) const;
+  int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  void		draw(sf::RenderWindow &window) const;
+
+private:
+  void	setDrawableText();
 
 private:
   Cursor	_cursor;
   bool		_isActive;
+  sf::Text	_textContent;
 };
 
 #endif /* _TEXTWIDGET_H_ */

@@ -14,6 +14,8 @@ public:
   void		setText(const sf::Text &text);
   void		update();
   void		draw(sf::RenderWindow &window) const;
+  std::size_t	getWidth() const;
+  unsigned int	getSize() const;
 
 private:
   sf::Text	_cursor;

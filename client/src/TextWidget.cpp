@@ -1,9 +1,10 @@
+#include <cmath>
 #include "TextWidget.hpp"
 #include "Unused.hpp"
 
 TextWidget::TextWidget(const std::string &id, const sf::FloatRect &zone,
 		       const sf::Text &text, int maxSize) :
-  AWidget(id, zone, text), UserInput(maxSize), _isActive(false)
+  AWidget(id, zone, text), UserInput(maxSize), _isActive(false), _textContent(text)
 {
   sf::Text	curText(text);
 
@@ -27,18 +28,37 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   if (_isActive)
     {
       _isActive = !getInput(event);
-      _text.setString(getString());
-      _cursor.update();
-      _cursor.setCursorPos(_text);
+      _textContent.setString(getString());
+      setDrawableText();
       for (auto &func : _updates)
 	{
 	  if ((retVal = func.second(*this, event, ref)) != 0)
 	    return retVal;
 	}
+      _cursor.update();
+      _cursor.setCursorPos(_text);
     }
   return catched;
 }
 
+void		TextWidget::setDrawableText()
+{
+  sf::FloatRect	bounds;
+  sf::String	str;
+  std::size_t	size;
+  int		charSize;
+
+  bounds = _textContent.getGlobalBounds();
+  _text = _textContent;
+  if (bounds.width + _cursor.getWidth() > _zone.width)
+    {
+      str = _textContent.getString();
+      size = str.getSize() + _cursor.getSize();
+      charSize = (bounds.width + _cursor.getWidth()) / size;
+      str.erase(0, (bounds.width + _cursor.getWidth() - _zone.width) / charSize);
+      _text.setString(str);
+    }
+}
 
 void	TextWidget::draw(sf::RenderWindow &window) const
 {
