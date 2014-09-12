@@ -49,7 +49,6 @@ void	Cursor::draw(sf::RenderWindow &window) const
     window.draw(_cursor);
 }
 
-
 std::size_t	Cursor::getWidth() const
 {
   return _cursor.getGlobalBounds().width;
@@ -58,4 +57,9 @@ std::size_t	Cursor::getWidth() const
 unsigned int	Cursor::getSize() const
 {
   return _cursor.getString().getSize();
+}
+
+void	Cursor::setColor(const sf::Color &color)
+{
+  _cursor.setColor(color);
 }

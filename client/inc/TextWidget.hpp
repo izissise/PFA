@@ -13,6 +13,8 @@ public:
 
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		draw(sf::RenderWindow &window) const;
+  void		setColor(const sf::Color &color);
+  Cursor	&getCursor();
 
 private:
   void	setDrawableText();

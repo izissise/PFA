@@ -17,7 +17,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 {
   Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730});
   Widget	*wCheckBox = new Widget("checkBox", {450, 200, 50, 50});
-  TextWidget	*wTextWidget = new TextWidget("nameText", {450, 300, 300, 50},
+  TextWidget	*wTextWidget = new TextWidget("nameText", {450, 300, 300, 40},
 					      sf::Text("", _font, 20), 30);
 
   createOptPanel(texture, wPanOption);
@@ -75,9 +75,11 @@ void	OptionGamePanel::createTextWidget(const sf::Texture &texture UNUSED, TextWi
   updateFunc = [](AWidget &widget, const sf::Event &event UNUSED, sf::RenderWindow &ref UNUSED)
     -> int
     {
-      widget.alignText({450,300}, {300, 50}, 50, 50);
+      widget.alignText({450,300}, {300, 40}, 50, 50);
       return 0;
     };
-  addSpriteForWidget(wTextWidget, sf::Color(125, 125, 125, 200), {300, 50});
+  wTextWidget->addSprite(texture, sf::IntRect(670, 1080, 300, 40));
   wTextWidget->setFunction("main", updateFunc);
+  wTextWidget->setColor(sf::Color(0,0,0));
+  wTextWidget->getCursor().setColor(sf::Color(0,0,0));
 }

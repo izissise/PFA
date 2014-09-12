@@ -41,6 +41,16 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   return catched;
 }
 
+void		TextWidget::setColor(const sf::Color &color)
+{
+  _text.setColor(color);
+}
+
+Cursor		&TextWidget::getCursor()
+{
+  return _cursor;
+}
+
 void		TextWidget::setDrawableText()
 {
   sf::FloatRect	bounds;
@@ -49,13 +59,13 @@ void		TextWidget::setDrawableText()
   int		charSize;
 
   bounds = _textContent.getGlobalBounds();
-  _text = _textContent;
-  if (bounds.width + _cursor.getWidth() > _zone.width)
+  _text.setString(_textContent.getString());
+  str = _textContent.getString();
+  size = str.getSize() + _cursor.getSize();
+  charSize = (bounds.width + _cursor.getWidth()) / size;
+  if (bounds.width + _cursor.getWidth() + charSize > _zone.width)
     {
-      str = _textContent.getString();
-      size = str.getSize() + _cursor.getSize();
-      charSize = (bounds.width + _cursor.getWidth()) / size;
-      str.erase(0, (bounds.width + _cursor.getWidth() - _zone.width) / charSize);
+      str.erase(0, std::ceil((bounds.width + _cursor.getWidth() + charSize - _zone.width) / charSize));
       _text.setString(str);
     }
 }

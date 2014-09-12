@@ -16,6 +16,7 @@ public:
   void		draw(sf::RenderWindow &window) const;
   std::size_t	getWidth() const;
   unsigned int	getSize() const;
+  void		setColor(const sf::Color &color);
 
 private:
   sf::Text	_cursor;
