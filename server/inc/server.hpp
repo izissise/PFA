@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <list>
+#include <algorithm>
 #include <enet/enet.h>
 #include "NetworkException.hpp"
 #include "client.hpp"
