@@ -3,8 +3,10 @@
 #include "Unused.hpp"
 
 TextWidget::TextWidget(const std::string &id, const sf::FloatRect &zone,
-		       const sf::Text &text, int maxSize) :
-  AWidget(id, zone, text), UserInput(maxSize), _isActive(false), _textContent(text)
+		       const sf::Text &text, const sf::Text &def,
+		       int maxSize) :
+  AWidget(id, zone, text), UserInput(maxSize), _isActive(false),
+  _textContent(text), _default(def)
 {
   sf::Text	curText(text);
 
@@ -23,6 +25,21 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   if (isClicked(event, sf::Mouse::Left))
     {
       _isActive = isOver(ref);
+      if (!_isActive)
+	{
+	  if (_text.getString().getSize() == 0)
+	    {
+	      _text.setString(_default.getString());
+	      _text.setColor(_default.getColor());
+	      for (auto &func : _updates)
+		{
+		  if ((retVal = func.second(*this, event, ref)) != 0)
+		    return retVal;
+		}
+	    }
+	}
+      else
+	_text.setColor(_textContent.getColor());
       catched = _isActive;
     }
   if (_isActive)
@@ -43,7 +60,12 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 
 void		TextWidget::setColor(const sf::Color &color)
 {
-  _text.setColor(color);
+  _textContent.setColor(color);
+}
+
+void		TextWidget::setDefaultColor(const sf::Color &color)
+{
+  _default.setColor(color);
 }
 
 Cursor		&TextWidget::getCursor()
@@ -65,7 +87,8 @@ void		TextWidget::setDrawableText()
   charSize = (bounds.width + _cursor.getWidth()) / size;
   if (bounds.width + _cursor.getWidth() + charSize > _zone.width)
     {
-      str.erase(0, std::ceil((bounds.width + _cursor.getWidth() + charSize - _zone.width) / charSize));
+      str.erase(0, std::ceil((bounds.width + _cursor.getWidth()
+			      + charSize - _zone.width) / charSize));
       _text.setString(str);
     }
 }
