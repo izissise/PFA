@@ -20,16 +20,21 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   TextWidget	*wTextWidget = new TextWidget("nameText", {450, 300, 300, 40},
 					      sf::Text("", _font, 20),
 					      sf::Text("Name", _font, 20), 30);
+  BarWidget	*wBarWidget = new BarWidget("bar", {450, 400, 550, 10});
 
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
   createTextWidget(texture, wTextWidget);
+  wBarWidget->addSprite(texture, sf::IntRect(970, 1080, 549, 5));
+  wBarWidget->resize(0.5, 1.0);
+  wBarWidget->addSprite(texture, sf::IntRect(990, 1085, 20, 21));
 
   _widgets.push_back(wPanOption);
   _widgets.push_back(wCheckBox);
   _widgets.push_back(wTextWidget);
+  _widgets.push_back(wBarWidget);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
-	std::stof(set.getCvarList().getCvar("r_height"))});
+  	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
 void	OptionGamePanel::createOptPanel(const sf::Texture &texture UNUSED, Widget *wPanOption)
@@ -76,7 +81,9 @@ void	OptionGamePanel::createTextWidget(const sf::Texture &texture UNUSED, TextWi
   updateFunc = [](AWidget &widget, const sf::Event &event UNUSED, sf::RenderWindow &ref UNUSED)
     -> int
     {
-      widget.alignText({450,300}, {300, 40}, 50, 50);
+      sf::FloatRect zone = widget.getZone();
+
+      widget.alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
       return 0;
     };
   wTextWidget->addSprite(texture, sf::IntRect(670, 1080, 300, 40));

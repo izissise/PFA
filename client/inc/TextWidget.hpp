@@ -14,12 +14,14 @@ public:
 
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		draw(sf::RenderWindow &window) const;
+  void		scale(const sf::Vector2f &size);
   void		setColor(const sf::Color &color);
   void		setDefaultColor(const sf::Color &color);
   Cursor	&getCursor();
 
 private:
   void	setDrawableText();
+  void	scaleText(sf::Text &text, float ratioX, float ratioY);
 
 private:
   Cursor	_cursor;

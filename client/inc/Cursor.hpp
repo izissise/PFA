@@ -17,6 +17,7 @@ public:
   std::size_t	getWidth() const;
   unsigned int	getSize() const;
   void		setColor(const sf::Color &color);
+  void		scale(float ratioX, float ratioY);
 
 private:
   sf::Text	_cursor;

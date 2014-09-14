@@ -76,7 +76,7 @@ public:
    * \param[in] elem: the sprite to store
    *
    */
-  void		addSprite(t_sprite &elem);
+  virtual void		addSprite(t_sprite &elem);
 
   /**
    * \fn void addSprite(const sf::Texture &texture, const sf::IntRect &rect);
@@ -85,7 +85,8 @@ public:
    *
    * This method is used to not create a local sf::Sprite
    */
-  void		addSprite(const sf::Texture &texture, const sf::IntRect &rect, bool draw = true);
+  virtual void		addSprite(const sf::Texture &texture,
+				  const sf::IntRect &rect, bool draw = true);
 
   /**
    * \fn void alignText(const sf::Vector2f &pos, const sf::Vector2f &size, float xPercent, float yPercent);
@@ -156,7 +157,7 @@ public:
    * This method will resize all the widget's attributes
    */
 
-  void		scale(const sf::Vector2f &size);
+  virtual void		scale(const sf::Vector2f &size);
 
   /**
    * \fn void resize(const sf::Vector2f &size)
@@ -187,7 +188,7 @@ public:		// public so the lambda can call it
    * \return A boolean indicating if the mouse if over
    *
    */
-  bool		isOver(const sf::RenderWindow &ref) const;
+  virtual bool		isOver(const sf::RenderWindow &ref) const;
 
   /**
    * \fn bool isClicked(const sf::Event &event, sf::Mouse::Button button)
@@ -200,7 +201,8 @@ public:		// public so the lambda can call it
   bool		isClicked(const sf::Event &event, sf::Mouse::Button button) const;
   void		setSpriteAttr(unsigned int spritePos, bool draw);
   void		toggleSpriteAttr(unsigned int spritePos);
-
+  t_sprite	&getSprite(unsigned int spritePos);
+  const sf::FloatRect	&getZone() const;
 protected:
   bool				_hide;
   const std::string		_id;

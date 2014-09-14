@@ -16,7 +16,7 @@ void	Cursor::setCursorPos(float x, float y)
 
 void		Cursor::setCursorPos(const sf::Text &text)
 {
-  sf::FloatRect	textSize = text.getLocalBounds();
+  sf::FloatRect	textSize = text.getGlobalBounds();
   sf::Vector2f	textPos = text.getPosition();
 
   _cursor.setPosition(textSize.width + textPos.x, textPos.y);
@@ -62,4 +62,14 @@ unsigned int	Cursor::getSize() const
 void	Cursor::setColor(const sf::Color &color)
 {
   _cursor.setColor(color);
+}
+
+void	Cursor::scale(float ratioX, float ratioY)
+{
+  sf::Vector2f	cursorPos(_cursor.getPosition());
+
+  _cursor.scale(ratioX, ratioY);
+  cursorPos.x *= ratioX;
+  cursorPos.y *= ratioY;
+  _cursor.setPosition(cursorPos);
 }
