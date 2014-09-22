@@ -27,7 +27,6 @@ public:
 
   void loadFromFile(int x, int y, const TileCodex& codex);
   void draw(sf::RenderWindow& window,
-	    const sf::Rect<float>& winBox,
 	    sf::Vector2<int>& windowCoord,
 	    const TileCodex& codex) const;
 

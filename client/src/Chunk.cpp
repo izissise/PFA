@@ -37,11 +37,12 @@ void Chunk::loadFromFile(int xId, int yId, const TileCodex& codex)
   (void)xId, (void)yId;
   unsigned limit{Chunk::height * Chunk::width};
   unsigned i{0};
-  for (; i < limit / 2; ++i) {
-    _tiles[i] = TileType::Empty;
-  }
-  for (; i < limit; ++i) {
-    _tiles[i] = TileType::Ground;
+  for (unsigned b = 0; b < Chunk::height; ++b) {
+    for (unsigned a = 0; a < Chunk::width; ++a) {
+      if (a == 0 || b == 0) {
+	_tiles[b * Chunk::width + a] = TileType::Ground;
+      }
+    }
   }
   for (auto& tile : _bgTiles) {
     tile = TileType::Ground;
@@ -87,42 +88,9 @@ void Chunk::loadFromFile(int xId, int yId, const TileCodex& codex)
 }
 
 void Chunk::draw(sf::RenderWindow& window,
-		 const sf::Rect<float>& winBox,
 		 sf::Vector2<int>& windowCoord,
 		 const TileCodex& codex) const
 {
-  (void)winBox;
-  // sf::Vector2<unsigned>	origin;
-  // sf::Vector2<unsigned> dest;
-  // sf::Vector2<unsigned> cursor;
-  // pair<const vector<TileType> *, const sf::Shader *> layers[] = {
-  //   make_pair(&_bgTiles, &codex.getBgShader()),
-  //   make_pair(&_tiles, nullptr)
-  // };
-  // TileType		tile;
-
-  // origin.x = max(static_cast<int>(ceil((winBox.left - _boundingBox.left)
-  // 				       / _boundingBox.width * Chunk::width)), 0);
-  // origin.y = max(static_cast<int>(ceil((winBox.top - _boundingBox.top)
-  // 				       / _boundingBox.height * Chunk::height)), 0);
-  // dest.x = min(static_cast<unsigned>(ceil((winBox.left + winBox.width - _boundingBox.left)
-  // 					  / _boundingBox.width * Chunk::width)), Chunk::width - 1);
-  // dest.y = min(static_cast<unsigned>(ceil((winBox.top + winBox.height - _boundingBox.top)
-  // 					  / _boundingBox.height * Chunk::height)), Chunk::height - 1);
-  // for (auto layer : layers) {
-  //   sf::RenderStates	rStates(layer.second);
-
-  //   rStates.transform.translate(windowCoord.x, windowCoord.y);
-  //   for (cursor = origin; cursor.y <= dest.y; ++cursor.y) {
-  //     for (cursor.x = origin.x; cursor.x <= dest.x; ++cursor.x) {
-  // 	if ((tile = (*layer.first)[cursor.y * Chunk::width + cursor.x]) != TileType::Empty) {
-  // 	  window.draw(codex.getSprite(static_cast<unsigned>(tile)), rStates);
-  // 	}
-  // 	rStates.transform.translate(16.0f, 0.0f);
-  //     }
-  //     rStates.transform.translate(-16.0f * cursor.x, 16.0f);
-  //   }
-  // }
   sf::RenderStates states(&codex.getTexture());
 
   states.transform.translate(windowCoord.x, windowCoord.y);

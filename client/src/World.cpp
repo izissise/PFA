@@ -5,11 +5,10 @@
 
 World::World(Settings& set) :
   _set(set),
-  _box(0.0f, 0.0f,
-       std::stoi(set.getCvarList().getCvar("r_width")) / Chunk::width,
-       std::stoi(set.getCvarList().getCvar("r_height")) / Chunk::height),
   _center(0.0f, 0.0f)
 {
+  _box.width = std::stof(set.getCvarList().getCvar("r_width")) / (Chunk::width * TileCodex::tileSize);
+  _box.height = std::stof(set.getCvarList().getCvar("r_height")) / (Chunk::height * TileCodex::tileSize);
   _box.left = -(_box.width / 2.0f);
   _box.top = -(_box.height / 2.0f);
 
@@ -39,12 +38,18 @@ void World::draw(sf::RenderWindow& window) const
   sf::Vector2<int>	windowOrigin(0, 0);
   sf::Vector2<int>	windowCoord(0, 0);
 
-  // TODO appropriate calculations to initialize windowCoord
+  //TODO appropriate calculations to initialize windowCoord
+  double intpart;
+  //std::cout << _box.left << std::endl << _box.top << _box.width << std::endl << _box.height << std::endl << std::endl;
+  windowOrigin.x = (modf(_box.left, &intpart) ? _box.left - ceil(_box.left) : 0) * Chunk::width * TileCodex::tileSize;
+  windowOrigin.y = (modf(_box.top, &intpart) ? _box.top - ceil(_box.top) : 0) * Chunk::height * TileCodex::tileSize;
+  windowCoord = windowOrigin;
+  //std::cout << windowOrigin.x << std::endl << windowOrigin.y << std::endl << _box.left << std::endl << _box.top << std::endl;
   firstChunk.first = roundf(_box.left);
   firstChunk.second = roundf(_box.top);
   lastChunk.first = roundf(_box.left + _box.width);
   lastChunk.second = roundf(_box.top + _box.height);
-  //  std::cout << firstChunk.first << std::endl << firstChunk.second << std::endl << lastChunk.first << std::endl << lastChunk.second << std::endl;
+  //std::cout << firstChunk.first << std::endl << firstChunk.second << std::endl << lastChunk.first << std::endl << lastChunk.second << std::endl;
   for (auto chunkCursor = firstChunk;
        chunkCursor.second <= lastChunk.second;
        ++chunkCursor.second) {
@@ -96,5 +101,5 @@ void World::_drawChunk(sf::RenderWindow& window,
     // this means the chunk isn't loaded so we do nothing and skip it
     return ;
   }
-  chunk->draw(window, _box, windowCoord, _codex);
+  chunk->draw(window, windowCoord, _codex);
 }
