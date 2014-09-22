@@ -49,7 +49,8 @@ private:
   std::vector<TileType>	_tiles;
   std::vector<TileType> _bgTiles;
   bool			_loaded;
-  sf::Rect<float>	_boundingBox;
+  sf::Font		_font;
+  sf::Text		_id;
   sf::VertexArray	_fgVertices;
   sf::VertexArray	_bgVertices;
 };

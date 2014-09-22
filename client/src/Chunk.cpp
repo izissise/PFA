@@ -3,6 +3,7 @@
 #include <string>
 // <TESTING ZONE>
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
 // </TESTING ZONE>
 
@@ -47,11 +48,6 @@ void Chunk::loadFromFile(int xId, int yId, const TileCodex& codex)
   for (auto& tile : _bgTiles) {
     tile = TileType::Ground;
   }
-  _boundingBox.left = xId - 0.5f;
-  _boundingBox.top = yId - 0.5f;
-  _boundingBox.width = 1.0f;
-  _boundingBox.height = 1.0f;
-
   float x;
 
   std::pair<std::vector<TileType>&, sf::VertexArray&>	layers[] =
@@ -84,6 +80,12 @@ void Chunk::loadFromFile(int xId, int yId, const TileCodex& codex)
       }
     }
   }
+  _font.loadFromFile("../client/assets/font.otf");
+  std::stringstream ss;
+  ss << "(" << xId << "," << yId << ")";
+  _id.setString(ss.str());
+  _id.setCharacterSize(30);
+  _id.setFont(_font);
   _loaded = true;
 }
 
@@ -98,4 +100,5 @@ void Chunk::draw(sf::RenderWindow& window,
   window.draw(_bgVertices, states);
   states.shader = nullptr;
   window.draw(_fgVertices, states);
+  window.draw(_id, states);
 }

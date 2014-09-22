@@ -21,15 +21,13 @@
 
 int	main(UNUSED int ac, UNUSED char *av[])
 {
-
     Settings	set;
     Console	con(&set);
-    std::cout << std::stoi(set.getCvarList().getCvar("r_width")) << std::endl;
     Menu       	menu(set);
 
     printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
     //testBoost();
     //testSfml();
     menu.run(set, con);
-return 0;
+    return 0;
 }

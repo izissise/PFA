@@ -25,16 +25,23 @@ public:
 
 protected:
 private:
-  Chunk			*_getChunk(int x, int y);
+  typedef sf::Vector2f worldPos;
+  typedef sf::Vector2i screenPos;
+
+  worldPos		_sToWPos(screenPos pos) const;
+  screenPos		_wToSPos(worldPos pos) const;
+
   void			_drawChunk(sf::RenderWindow& window,
 				   const std::pair<int, int>& chunkCursor,
 				   sf::Vector2<int>& windowCoord) const;
 
   std::map<std::pair<int, int>, Chunk *>	_chunks;
-  Settings&		_set;
-  sf::Rect<float>	_box;
-  sf::Vector2<float>	_center;
-  TileCodex		_codex;
+  Settings&			_set;
+  screenPos			_screenSize;
+  worldPos			_camPos;
+  worldPos			_camSize;
+  worldPos			_camCenter;
+  TileCodex			_codex;
 };
 
 #endif /* WORLD_H */
