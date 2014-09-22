@@ -16,7 +16,7 @@ public:
   World(Settings& set);
   virtual ~World(void) = default;
   World(const World& other) = delete;
-  World&	operator=(const World& other) = delete;
+  World&		operator=(const World& other) = delete;
 
   void			draw(sf::RenderWindow& window) const;
 

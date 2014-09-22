@@ -36,6 +36,7 @@ void World::draw(sf::RenderWindow& window) const
 {
   std::pair<int, int>	firstChunk;
   std::pair<int, int>	lastChunk;
+  sf::Vector2<int>	windowOrigin(0, 0);
   sf::Vector2<int>	windowCoord(0, 0);
 
   // TODO appropriate calculations to initialize windowCoord
@@ -43,6 +44,7 @@ void World::draw(sf::RenderWindow& window) const
   firstChunk.second = roundf(_box.top);
   lastChunk.first = roundf(_box.left + _box.width);
   lastChunk.second = roundf(_box.top + _box.height);
+  //  std::cout << firstChunk.first << std::endl << firstChunk.second << std::endl << lastChunk.first << std::endl << lastChunk.second << std::endl;
   for (auto chunkCursor = firstChunk;
        chunkCursor.second <= lastChunk.second;
        ++chunkCursor.second) {
@@ -50,7 +52,10 @@ void World::draw(sf::RenderWindow& window) const
 	 chunkCursor.first <= lastChunk.first;
 	 ++chunkCursor.first) {
       _drawChunk(window, chunkCursor, windowCoord);
+      windowCoord.x += Chunk::width * TileCodex::tileSize;
     }
+    windowCoord.x = windowOrigin.x;
+    windowCoord.y += Chunk::height * TileCodex::tileSize;
   }
 }
 

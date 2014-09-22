@@ -92,7 +92,6 @@ void Chunk::draw(sf::RenderWindow& window,
 		 const TileCodex& codex) const
 {
   (void)winBox;
-  (void)windowCoord;
   // sf::Vector2<unsigned>	origin;
   // sf::Vector2<unsigned> dest;
   // sf::Vector2<unsigned> cursor;
@@ -126,6 +125,7 @@ void Chunk::draw(sf::RenderWindow& window,
   // }
   sf::RenderStates states(&codex.getTexture());
 
+  states.transform.translate(windowCoord.x, windowCoord.y);
   states.shader = &codex.getBgShader();
   window.draw(_bgVertices, states);
   states.shader = nullptr;
