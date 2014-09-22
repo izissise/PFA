@@ -20,12 +20,12 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   int	catched = 0;
   int	retVal;
 
-
   if (_hide)
     return 0;
   if (isClicked(event, sf::Mouse::Left))
     {
       _isActive = isOver(ref);
+      catched = _isActive;
       if (!_isActive)
 	{
 	  if (_text.getString().getSize() == 0)
@@ -41,7 +41,6 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 	}
       else
 	_text.setColor(_textContent.getColor());
-      catched = _isActive;
     }
   if (_isActive)
     {
@@ -83,6 +82,8 @@ void		TextWidget::setDrawableText()
 
   bounds = _textContent.getGlobalBounds();
   _text.setString(_textContent.getString());
+  if (_text.getString().getSize() <= 1)
+    return ;
   str = _textContent.getString();
   size = str.getSize() + _cursor.getSize();
   charSize = (bounds.width + _cursor.getWidth()) / size;
@@ -143,3 +144,12 @@ void	TextWidget::scale(const sf::Vector2f &size)
   _cursor.scale(ratioX, ratioY);
 }
 
+void	TextWidget::resize(float pX, float pY)
+{
+  _zone.width *= pX;
+  _zone.height *= pY;
+  for (auto &elem : _sprites)
+    {
+      elem.sprite.scale(pX, pY);
+    }
+}

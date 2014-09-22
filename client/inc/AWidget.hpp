@@ -7,6 +7,7 @@
 #include <list>
 #include "Observer.hpp"
 #include "Settings.hpp"
+#include "Unused.hpp"
 
 #define SIZEX 1600.0
 #define SIZEY 900.0
@@ -166,8 +167,9 @@ public:
    *
    * This method will adapt the widget's size by x/y percent
    */
-  void		resize(float pX, float pY);
+  virtual void		resize(float pX, float pY);
 
+  void		toSize(sf::Sprite &sprite, float pX, float pY) const;
   void		setSpriteSize(unsigned int spritePos, float x, float y);
 
   /**

@@ -143,6 +143,15 @@ void	AWidget::resize(float pX, float pY)
   _text.scale(pX, pY);
 }
 
+void	AWidget::toSize(sf::Sprite &sprite, float pX, float pY) const
+{
+  sf::FloatRect rec = sprite.getLocalBounds();
+  float		rX = pX / rec.width;
+  float		rY = pY / rec.height;
+
+  sprite.setScale(rX, rY);
+}
+
 void		AWidget::setSpriteSize(unsigned int spritePos, float x, float y)
 {
   t_sprite	&elem = _sprites[spritePos];

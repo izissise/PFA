@@ -5,6 +5,7 @@
 #include "Widget.hpp"
 #include "TextWidget.hpp"
 #include "BarWidget.hpp"
+#include "ScrollWidget.hpp"
 
 class OptionGamePanel : public APanelScreen
 {

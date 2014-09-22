@@ -15,6 +15,7 @@ public:
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		draw(sf::RenderWindow &window) const;
   void		scale(const sf::Vector2f &size);
+  void		resize(float pX, float pY);
   void		setColor(const sf::Color &color);
   void		setDefaultColor(const sf::Color &color);
   Cursor	&getCursor();

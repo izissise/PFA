@@ -21,18 +21,26 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 					      sf::Text("", _font, 20),
 					      sf::Text("Name", _font, 20), 30);
   BarWidget	*wBarWidget = new BarWidget("bar", {450, 400, 550, 10});
+  ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 20, 730},
+						  Scroll::Vertical);
 
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
   createTextWidget(texture, wTextWidget);
+
   wBarWidget->addSprite(texture, sf::IntRect(970, 1080, 549, 5));
   wBarWidget->resize(0.5, 1.0);
   wBarWidget->addSprite(texture, sf::IntRect(990, 1085, 20, 21));
+
+  wScrollWidget->addSprite(texture, sf::IntRect(670, 1120, 800, 20));
+  wScrollWidget->toSize(wScrollWidget->getSprite(0).sprite, 730, 20);
+  wScrollWidget->addSprite(texture, sf::IntRect(1011, 1085, 18, 18));
 
   _widgets.push_back(wPanOption);
   _widgets.push_back(wCheckBox);
   _widgets.push_back(wTextWidget);
   _widgets.push_back(wBarWidget);
+  _widgets.push_back(wScrollWidget);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
   	std::stof(set.getCvarList().getCvar("r_height"))});
 }
