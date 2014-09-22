@@ -7,6 +7,10 @@
 #include "Exception.hpp"
 #include "TimeHandling.hpp"
 
+/* <TEST SECTION> */
+#include "World.hpp"
+/* </TEST SECTION> */
+
 Menu::Menu(Settings &set) :
   _window(sf::VideoMode(std::stoi(set.getCvarList().getCvar("r_width")),
                         std::stoi(set.getCvarList().getCvar("r_height"))), "Name")
@@ -24,7 +28,8 @@ void		Menu::run(Settings &set, Console &con)
   sf::Event	event;
   sf::Sprite	sprite(_background);
   Controls	&ctrl = set.getControls();
-  TimeHandling time(std::chrono::milliseconds(1000 / std::stoi(set.getCvarList().getCvar("com_gameFps"))));
+  TimeHandling	time(std::chrono::milliseconds(1000 / std::stoi(set.getCvarList().getCvar("com_gameFps"))));
+  World		world(set);
 
   time.start();
   while (_window.isOpen())
@@ -66,6 +71,7 @@ void		Menu::run(Settings &set, Console &con)
 
       _window.clear();
       _window.draw(sprite);
+      world.draw(_window);
       if (console)
         con.draw(_window);
       _window.display();
