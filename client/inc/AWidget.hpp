@@ -21,6 +21,13 @@ enum class	wEvent
     SetSprite = 16
     };
 
+enum class	wFlag
+{
+  None = 0,
+    Movable = 1,
+    Resizable = 2
+    };
+
 typedef struct	s_event
 {
   wEvent	e;
@@ -42,6 +49,16 @@ typedef struct	s_sprite
   }
 }		t_sprite;
 
+inline int	operator&(wFlag a, wFlag b)
+{
+  return (static_cast<int>(a) & static_cast<int>(b));
+};
+
+inline wFlag	operator|(wFlag a, wFlag b)
+{
+  return (static_cast<wFlag>(static_cast<int>(a) | static_cast<int>(b)));
+}
+
 class AWidget : public IObserver, public Observable
 {
 public:
@@ -51,6 +68,7 @@ public:
       Handled = 1,
       ChangePanel = 2
     };
+
 inline int	operator()(AWidget::wAction a)
 {
   return static_cast<int>(a);
@@ -58,7 +76,7 @@ inline int	operator()(AWidget::wAction a)
 
 public:
   AWidget(const std::string &id, const sf::FloatRect &zone,
-	  const sf::Text &text);
+	  const sf::Text &text, wFlag flg = wFlag::Movable | wFlag::Resizable);
   virtual ~AWidget();
 
   virtual int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set) = 0;
@@ -169,7 +187,8 @@ public:
    */
   virtual void		resize(float pX, float pY);
 
-  void		toSize(sf::Sprite &sprite, float pX, float pY) const;
+  virtual void		toSize(unsigned int spritePos, float pX, float pY);
+  virtual void		move(float pX, float pY);
   void		setSpriteSize(unsigned int spritePos, float x, float y);
 
   /**
@@ -205,12 +224,15 @@ public:		// public so the lambda can call it
   void		toggleSpriteAttr(unsigned int spritePos);
   t_sprite	&getSprite(unsigned int spritePos);
   const sf::FloatRect	&getZone() const;
+  wFlag		getFlag() const;
+
 protected:
   bool				_hide;
   const std::string		_id;
   sf::FloatRect			_zone;
   std::vector<t_sprite>		_sprites;
   sf::Text			_text;
+  wFlag				_flag;
   std::map<std::string, std::function
 	   <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>>
     _updates;

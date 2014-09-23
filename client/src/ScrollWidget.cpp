@@ -1,15 +1,32 @@
 #include "ScrollWidget.hpp"
 
 ScrollWidget::ScrollWidget(const std::string &id, const sf::FloatRect &zone,
-			   Scroll dir, const sf::Text &text) :
-  AWidget(id, zone, text), _active(false), _dir(dir)
+			   Scroll dir, APanelScreen *panel,
+			   const sf::Text &text, wFlag flg) :
+  AWidget(id, zone, text, flg), _active(false), _dir(dir), _panel(panel)
 {
+}
+
+void		ScrollWidget::moveWidgets(sf::Vector2f moveSize)
+{
+  auto		vec = _panel->getWidgets();
+
+  if (_dir == Scroll::Horizontal)
+    moveSize.y = 0;
+  else
+    moveSize.x = 0;
+  for (auto &it : vec)
+    {
+      if (it->getFlag() & wFlag::Movable)
+      	it->move(-moveSize.x, -moveSize.y);
+    }
 }
 
 void		ScrollWidget::movePicker(sf::Sprite &sprite, float x, float y)
 {
   sf::FloatRect	barRect = getSprite(0).sprite.getGlobalBounds();
   sf::FloatRect pickerRect = sprite.getGlobalBounds();
+  sf::Vector2f	spritePos = sprite.getPosition();
 
   if (_dir == Scroll::Horizontal)
     {
@@ -20,12 +37,39 @@ void		ScrollWidget::movePicker(sf::Sprite &sprite, float x, float y)
     }
   else
     {
-      y = (y > (barRect.top + barRect.height - pickerRect.height) ?
+      y = ((y + pickerRect.height) > (barRect.top + barRect.height) ?
 	   (barRect.top + barRect.height - pickerRect.height) :
        	   y < (barRect.top) ? (barRect.top) : y);
       x = barRect.left + barRect.width / 2.0 - pickerRect.width / 2.0;
     }
   sprite.setPosition(x, y);
+  moveWidgets(sf::Vector2f(x, y) - spritePos);
+}
+
+void		ScrollWidget::updateScrollSize()
+{
+  auto		vec = _panel->getWidgets();
+  sf::FloatRect	zone;
+  sf::FloatRect selfZone;
+  sf::FloatRect	barZone;
+  unsigned int	biggest;
+  sf::Sprite	&sprite = getSprite(1).sprite;
+  sf::Vector2f	scaleVec = sprite.getScale();
+  float		diff;
+
+  barZone = sprite.getGlobalBounds();
+  selfZone = _panel->getWidgets().front()->getZone();
+  biggest = selfZone.height;
+  diff = barZone.top - selfZone.top;
+  for (auto &it : vec)
+    {
+      zone = it->getZone();
+      std::cout << zone.top + zone.height - selfZone.top << std::endl;
+      if (zone.top + zone.height - selfZone.top + diff > biggest)
+	biggest = zone.top + zone.height - selfZone.top + diff;
+    }
+  biggest = selfZone.height - (biggest - selfZone.height);
+  toSize(1, -1, biggest);
 }
 
 int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
@@ -40,32 +84,33 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
       _active = isOver(ref);
       if (_active)
 	{
-	  t_sprite	&sprite = getSprite(1);
-	  sf::Vector2f	pos = sprite.sprite.getPosition();
+	  sf::Sprite	&sprite = getSprite(1).sprite;
+	  sf::Vector2f	pos = sprite.getPosition();
 
 	  if (_dir == Scroll::Horizontal)
-	    movePicker(sprite.sprite, event.mouseButton.x, pos.y);
+	    movePicker(sprite, event.mouseButton.x, pos.y);
 	  else
-	    movePicker(sprite.sprite, pos.x, event.mouseButton.y);
+	    movePicker(sprite, pos.x, event.mouseButton.y);
 	}
     }
   else if (event.type == sf::Event::MouseMoved
 	   && _active
 	   && sf::Mouse::isButtonPressed(sf::Mouse::Left))
     {
-      t_sprite	&sprite = getSprite(1);
-      sf::Vector2f	pos = sprite.sprite.getPosition();
+      sf::Sprite	&sprite = getSprite(1).sprite;
+      sf::Vector2f	pos = sprite.getPosition();
 
       if (_dir == Scroll::Horizontal)
-	movePicker(sprite.sprite, event.mouseMove.x, pos.y);
+	movePicker(sprite, event.mouseMove.x, pos.y);
       else
-	movePicker(sprite.sprite, pos.x, event.mouseMove.y);
+	movePicker(sprite, pos.x, event.mouseMove.y);
     }
   for (auto &func : _updates)
     {
       if ((retVal = func.second(*this, event, ref)) != 0)
 	return retVal;
     }
+  updateScrollSize();
   return 0;
 }
 
@@ -82,8 +127,6 @@ bool	ScrollWidget::isOver(const sf::RenderWindow &ref) const
 
 void	ScrollWidget::addSprite(t_sprite &elem)
 {
-  if (_dir == Scroll::Vertical && _sprites.empty())
-    elem.sprite.rotate(90);
   if (_sprites.size() == 1)
     {
       sf::Vector2f	pos = elem.sprite.getPosition();
@@ -101,4 +144,21 @@ void	ScrollWidget::addSprite(const sf::Texture &texture, const sf::IntRect &rect
   t_sprite	sprite(sf::Sprite(texture, rect), display);
 
   addSprite(sprite);
+}
+
+void	ScrollWidget::toSize(unsigned int spritePos, float pX, float pY)
+{
+  sf::Sprite	&sprite = getSprite(spritePos).sprite;
+  sf::FloatRect rec = sprite.getGlobalBounds();
+  float		rX = (pX == -1 ? 1 : (pX / rec.width));
+  float		rY = (pY == -1 ? 1 : (pY / rec.height));
+
+  sprite.scale(rX, rY);
+  if (spritePos == 1)
+    {
+      sf::Vector2f	pos = sprite.getPosition();
+
+      movePicker(sprite, pos.x, pos.y);
+    }
+  rec = sprite.getGlobalBounds();
 }
