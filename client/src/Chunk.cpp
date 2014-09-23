@@ -36,7 +36,6 @@ void Chunk::loadFromFile(int xId, int yId, const TileCodex& codex)
   // ia >> _tiles;
   // ia >> _bgTiles;
   (void)xId, (void)yId;
-  unsigned limit{Chunk::height * Chunk::width};
   unsigned i{0};
   for (unsigned b = 0; b < Chunk::height; ++b) {
     for (unsigned a = 0; a < Chunk::width; ++a) {

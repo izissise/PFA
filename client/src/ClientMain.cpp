@@ -4,7 +4,9 @@ ClientMain::ClientMain()
   : _window(sf::VideoMode(std::stoi(_settings.getCvarList().getCvar("r_width")),
                           std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
   _menu(_settings),
-  _updateThread(std::bind(&ClientMain::update, this))
+  _showMenu(false),
+  _updateThread(std::bind(&ClientMain::update, this)),
+  _world(_settings)
 {
   _window.setVerticalSyncEnabled(true);
 }
@@ -23,8 +25,9 @@ void ClientMain::update()
   time.start();
   while (_window.isOpen())
     {
+      _world.update();
 
-//update object here
+      //update object here
       time.endFrame();
     }
 }
@@ -68,7 +71,10 @@ void ClientMain::run()
             }
         }
       // draw stuff here
-      _menu.draw(_window);
+      _world.draw(_window);
+      if (_showMenu) {
+	_menu.draw(_window);
+      }
       _window.display();
     }
 }

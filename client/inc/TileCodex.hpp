@@ -18,8 +18,8 @@ public:
   const sf::Sprite& getSprite(const unsigned id) const	{ return _sprites[id]; }
   const sf::Texture& getTexture(void) const		{ return _spriteSheet; }
   const sf::Shader& getBgShader(void) const		{ return _bgShader; }
-  const unsigned& getWidth(void) const			{ return _texSize.x; }
-  const unsigned& getHeight(void) const			{ return _texSize.y; }
+  unsigned getWidth(void) const				{ return _texSize.x; }
+  unsigned getHeight(void) const			{ return _texSize.y; }
 
 protected:
 private:
@@ -28,7 +28,7 @@ private:
   sf::Texture			_spriteSheet;
   std::vector<sf::Sprite>	_sprites;
   sf::Shader			_bgShader;
-  sf::Vector2u			_texSize;
+  sf::Vector2i			_texSize;
 };
 
 #endif /* TILECODEX_H */

@@ -13,7 +13,8 @@ TileCodex::TileCodex(const std::string& path)
 
   // generate sprites
   sf::IntRect	rect(0, 0, TileCodex::tileSize, TileCodex::tileSize);
-  _texSize = _spriteSheet.getSize();
+  _texSize.x = _spriteSheet.getSize().x;
+  _texSize.y = _spriteSheet.getSize().y;
 
   for (rect.top = 0; rect.top < _texSize.y; rect.top += rect.width) {
     for (rect.left = 0; rect.left < _texSize.x; rect.left += rect.height) {

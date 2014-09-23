@@ -3,10 +3,10 @@
 
 #include "World.hpp"
 
-World::World(Settings& set) :
-  _set(set),
-  _screenSize(std::stoi(set.getCvarList().getCvar("r_width")),
-	      std::stoi(set.getCvarList().getCvar("r_height")))
+World::World(Settings& settings) :
+  _settings(settings),
+  _screenSize(std::stoi(_settings.getCvarList().getCvar("r_width")),
+	      std::stoi(_settings.getCvarList().getCvar("r_height")))
 {
   chunkId	first;
   chunkId	last;
@@ -20,6 +20,23 @@ World::World(Settings& set) :
     for (cursor.first = first.first; cursor.first <= last.first; ++cursor.first) {
       _chunks[cursor] = new Chunk();
       _chunks[cursor]->loadFromFile(cursor.first, cursor.second, _codex);
+    }
+  }
+}
+
+void World::update(void)
+{
+  static std::pair<Action, sf::Vector2f> moveControls[] =
+    {
+      {Action::Forward, {.0f, -.025f}},
+      {Action::Left, {-.025f, .0f}},
+      {Action::Back, {.0f, .025f}},
+      {Action::Right, {.025f, .0f}}
+    };
+
+  for (auto control : moveControls) {
+    if (_settings.getControls().getActionState(control.first)) {
+      camera.translate(control.second);
     }
   }
 }
@@ -62,7 +79,7 @@ auto World::_wToSPos(worldPos pos) const -> screenPos
 
 float World::_getGridOffset(float w) const
 {
-    return -(w - floor(w));
+  return -(w - floor(w));
 }
 
 void World::_drawChunk(sf::RenderWindow& window,

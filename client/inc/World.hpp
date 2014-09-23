@@ -13,11 +13,12 @@
 class World
 {
 public:
-  World(Settings& set);
+  World(Settings& settings);
   ~World(void) = default;
   World(const World& other) = delete;
   World&		operator=(const World& other) = delete;
 
+  void			update(void);
   void			draw(sf::RenderWindow& window) const;
 
 protected:
@@ -66,7 +67,7 @@ public:
 
 private:
   std::map<chunkId, Chunk *>	_chunks;
-  Settings&			_set;
+  Settings&			_settings;
   screenPos			_screenSize;
   TileCodex			_codex;
 };

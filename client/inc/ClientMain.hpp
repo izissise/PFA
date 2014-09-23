@@ -9,7 +9,7 @@
 # include "Exception.hpp"
 # include "Settings.hpp"
 # include "Console.hpp"
-
+# include "World.hpp"
 
 class ClientMain
 {
@@ -29,7 +29,9 @@ private:
   Settings _settings;
   sf::RenderWindow _window;
   Menu _menu;
+  bool _showMenu;
   std::thread _updateThread;
+  World _world;
 };
 
 #endif // CLIENTMAIN_H
