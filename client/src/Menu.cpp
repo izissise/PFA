@@ -1,79 +1,70 @@
 #include <thread>
 #include <chrono>
 #include <ctime>
-#include <ratio>
+#include <thread>
 
 #include "Menu.hpp"
 #include "Exception.hpp"
-#include "TimeHandling.hpp"
+#include "MainMenu.hpp"
+#include "OptionTabPanel.hpp"
+#include "OptionGamePanel.hpp"
+#include "OptionKeyPanel.hpp"
 
-/* <TEST SECTION> */
-#include "World.hpp"
-/* </TEST SECTION> */
-
-Menu::Menu(Settings &set) :
-  _window(sf::VideoMode(std::stoi(set.getCvarList().getCvar("r_width")),
-                        std::stoi(set.getCvarList().getCvar("r_height"))), "Name")
+Menu::Menu(Settings& settings) :
+    _consoleActive(false),
+    _console(&settings),
+    _panelPos(0)
 {
-  if (!_background.loadFromFile("../client/assets/background.jpg"))
-    throw (Exception("Cant load background file"));
+  if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
+    throw (Exception("Can't load Menu texture"));
+
+  MainMenu		*mainMenu = new MainMenu;
+  OptionTabPanel	*optTabPanel = new OptionTabPanel;
+  OptionGamePanel	*optGamePanel = new OptionGamePanel;
+  OptionKeyPanel	*optKeyPanel = new OptionKeyPanel;
+
+  _panels.push_back(mainMenu);
+  _panels.push_back(optTabPanel);
+  optTabPanel->addPanels({optGamePanel, optKeyPanel});
+
+  mainMenu->construct(_menuTexture, settings, {optTabPanel});
+  optTabPanel->construct(_menuTexture, settings, {optGamePanel, optKeyPanel});
+  optGamePanel->construct(_menuTexture, settings, {});
+  optKeyPanel->construct(_menuTexture, settings, {});
 }
 
 Menu::~Menu()
 {
 }
 
-void		Menu::run(Settings &set, Console &con)
+bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
 {
-  sf::Event	event;
-  sf::Sprite	sprite(_background);
-  Controls	&ctrl = set.getControls();
-  TimeHandling	time(std::chrono::milliseconds(1000 / std::stoi(set.getCvarList().getCvar("com_gameFps"))));
-  World		world(set);
+  bool	handled = false;
 
-  time.start();
-  while (_window.isOpen())
+  _consoleActive = set.getControls().getActionState(Action::ToggleConsole);
+  if (_consoleActive)
     {
-      bool console = ctrl.getActionState(Action::ToggleConsole);
-      while (_window.pollEvent(event))
-        {
-          if (event.type == sf::Event::Closed)
-            {
-              _window.close();
-              break ;
-            }
-          if (console)
-            con.run(_window, event);
-          else
-            {
-              if (event.type == sf::Event::KeyPressed)
-                {
-                  std::cout << "keypress" << std::endl;
-                  ctrl.pressKey(event.key.code);
-                  try {
-                      std::cout << "Action for key " << ctrl.getCodeFromKey(event.key.code) << " is: ";
-                    }
-                  catch (const Exception &e) {
-                      std::cout << "Action for key " << "Unknown" << " is: ";
-                    }
-                  try {
-                      std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(event.key.code)) << std::endl;
-                    }
-                  catch (const std::out_of_range &oor) {
-                      std::cout << "Unknown" << std::endl;
-                    }
-                }
-              else if (event.type == sf::Event::KeyReleased)
-                ctrl.releaseKey(event.key.code);
-            }
-          time.endFrame();
-        }
-
-      _window.clear();
-      _window.draw(sprite);
-      world.draw(_window);
-      if (console)
-        con.draw(_window);
-      _window.display();
+      _console.run(event);
+      handled = true;
     }
+  else
+    {
+      for (auto &panel : _panels)
+	{
+	  if (!panel->isHidden())
+	    handled = panel->run(event, window, set);
+	}
+    }
+  return handled;
+}
+
+void	Menu::draw(sf::RenderWindow& window)
+{
+  for (auto &panel : _panels)
+    {
+      if (!panel->isHidden())
+	panel->draw(window);
+    }
+  if (_consoleActive)
+    _console.draw(window);
 }

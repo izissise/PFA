@@ -125,15 +125,17 @@ Controls::~Controls()
 {
 }
 
-bool	Controls::isPressed(key k) const
+bool	Controls::isPressed(ctrl::key k) const
 {
   auto	it = _keyState.find(k);
 
   return ((it == _keyState.end()) ? false : it->second);
 }
 
-Action	Controls::getActionFromKey(key k) const
+Action	Controls::getActionFromKey(ctrl::key k) const
 {
+  if (k == sf::Keyboard::Unknown)
+    return Action::Unknown;
   for (auto &it : _actionKeys)
     {
       for (auto &elem : it.second)
@@ -166,14 +168,14 @@ bool	Controls::getActionState(Action act) const
   return (_actions[static_cast<unsigned int>(act)].state);
 }
 
-key	Controls::getKeyFromCode(const std::string &code) const
+ctrl::key	Controls::getKeyFromCode(const std::string &code) const
 {
   auto	it = _keycode.find(code);
 
   return ((it == _keycode.end()) ? sf::Keyboard::Unknown : it->second);
 }
 
-const std::string	&Controls::getCodeFromKey(key k) const
+const std::string	&Controls::getCodeFromKey(ctrl::key k) const
 {
   for (auto &it : _keycode)
     {
@@ -183,23 +185,24 @@ const std::string	&Controls::getCodeFromKey(key k) const
   throw (Exception("Key not bound"));
 }
 
-void	Controls::bindActionOnKey(key k, Action act)
+void	Controls::bindActionOnKey(ctrl::key k, Action act)
 {
   auto			it = _actionKeys.find(act);
 
   if (it == _actionKeys.end())
     {
-      _actionKeys.insert(std::pair<Action, std::array<key, 5>> (act,
-	{sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Keyboard::Unknown}));
+      _actionKeys.insert(std::pair<Action, std::array<ctrl::key, 5>> (act,
+	{sf::Keyboard::Unknown, sf::Keyboard::Unknown, sf::Keyboard::Unknown,
+	    sf::Keyboard::Unknown, sf::Keyboard::Unknown}));
       _actionKeys[act].front() = k;
       return ;
     }
 
-  std::array<key, 5>	&keys = it->second;
-  for (auto &key : keys)
-    if (key == sf::Keyboard::Unknown)
+  std::array<ctrl::key, 5>	&keys = it->second;
+  for (auto &keyboardKey : keys)
+    if (keyboardKey == sf::Keyboard::Unknown)
       {
-	key = k;
+	keyboardKey = k;
 	return ;
       }
   for (unsigned int i = 0; i < keys.size() - 1; ++i)
@@ -207,7 +210,7 @@ void	Controls::bindActionOnKey(key k, Action act)
   keys.back() = k;
 }
 
-void		Controls::pressKey(key k)
+void		Controls::pressKey(ctrl::key k)
 {
   Action	act;
 
@@ -223,7 +226,7 @@ void		Controls::pressKey(key k)
     action.state = true;
 }
 
-void		Controls::releaseKey(key k)
+void		Controls::releaseKey(ctrl::key k)
 {
   Action	act;
 

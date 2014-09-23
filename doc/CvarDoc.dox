@@ -1,3 +1,5 @@
+/*
+\page Cvar Naming convention
 info_		Informations, like game version, build date, etc..
 sys_ 	 	Detected hardware info, like cpu, gpu, ram, etc..
 si_ 	 	General server information
@@ -24,3 +26,4 @@ r_width		Defines the window's width
 r_height	Defines the window's height
 
 com_fps		Set the number of frames per second
+*/

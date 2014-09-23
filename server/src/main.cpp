@@ -11,14 +11,15 @@
 
 #include <iostream>
 #include <boost/program_options.hpp>
-#include <boost/asio.hpp>
 
-#include "server.h"
+#include "server.hpp"
 #include "Config.h"
 #include "Unused.hpp"
 #include "printv.hpp"
 
 namespace po = boost::program_options;
+
+int parse_argument(int ac, char *av[], t_arg &arg);
 
 int parse_argument(int ac, char *av[], t_arg &arg)
 {
@@ -53,23 +54,20 @@ int parse_argument(int ac, char *av[], t_arg &arg)
 
 int	main(int ac, char *av[])
 {
-    t_arg arg;
-    printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
+    try
+    {
+        t_arg arg;
+        printv(std::cout, "Program version: % %\n", xstr(PROJECT_VERSION), xstr(CURRENT_DATE));
 
-    if (parse_argument(ac, av, arg) == 1)
-        return (1);
-    std::cout << "Actual port => " << arg.port << std::endl;
-    std::cout << "Quiet => " << arg.quiet << std::endl;
-    std::cout << "Debug => " << arg.debug << std::endl;
+        if (parse_argument(ac, av, arg) == 1)
+            return (1);
+        Server serv(arg);
+        serv.run();
 
-    try {
-        boost::asio::io_service io_service;
-        Server server(arg, io_service);
-        io_service.run();
+        return (0);
     }
     catch (std::exception &e)
     {
         std::cout << e.what() << std::endl;
     }
-    return (0);
 }

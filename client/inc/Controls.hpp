@@ -6,7 +6,10 @@
 # include <array>
 # include <vector>
 
-typedef int	key;
+namespace ctrl
+{
+  typedef int	key;
+}
 
 enum class	Action
 {
@@ -45,23 +48,23 @@ public:
   Controls();
   virtual ~Controls();
 
-  bool		isPressed(key k) const;
-  Action	getActionFromKey(key k) const;
+  bool		isPressed(ctrl::key k) const;
+  Action	getActionFromKey(ctrl::key k) const;
   Action	getActionFromCode(const std::string &code) const;
   bool		getActionState(Action act) const;
-  key		getKeyFromCode(const std::string &code) const;
-  const std::string	&getCodeFromKey(key k) const;
+  ctrl::key		getKeyFromCode(const std::string &code) const;
+  const std::string	&getCodeFromKey(ctrl::key k) const;
   const std::string	&getCodeFromAction(Action act) const;
 
-  void		bindActionOnKey(key k, Action act);
-  void		pressKey(key k);
-  void		releaseKey(key k);
+  void		bindActionOnKey(ctrl::key k, Action act);
+  void		pressKey(ctrl::key k);
+  void		releaseKey(ctrl::key k);
 
 private:
-  std::map<key, bool>			_keyState;
-  std::map<Action, std::array<key, 5>>	_actionKeys;
-  std::map<std::string, key>		_keycode;
-  std::vector<t_action>			_actions;
+  std::map<ctrl::key, bool>			_keyState;
+  std::map<Action, std::array<ctrl::key, 5>>	_actionKeys;
+  std::map<std::string, ctrl::key>		_keycode;
+  std::vector<t_action>				_actions;
 };
 
 #endif /* _CONTROLS_H_ */
