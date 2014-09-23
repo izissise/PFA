@@ -1,7 +1,7 @@
 #include "server.hpp"
 
 Server::Server(t_arg &arg)
-: _arg(arg), _clients()
+: _arg(arg), _set(), _clients()
 {
     if (enet_initialize() != 0)
         throw (NetworkException("An error occurred while initializing ENet."));
@@ -12,6 +12,7 @@ Server::Server(t_arg &arg)
 
     if (_server == NULL)
         throw (NetworkException("An error occurred while trying to create an ENet server host."));
+    _set.addObserver(this);
 }
 
 Server::~Server()
@@ -38,9 +39,9 @@ void Server::run()
                 event.peer->data = (char *)"Client";
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
-                for (auto it = _clients.begin();it != _clients.end();it++)
-                    (*it)->sendPacket(0, std::string(reinterpret_cast<char *>(event.packet->data)));
-               std::cout << "A packet of length " << event.packet->dataLength << " containing [" << event.packet->data
+              for (auto it = _clients.begin();it != _clients.end();it++)
+                (*it)->sendPacket(0, std::string(reinterpret_cast<char *>(event.packet->data)));
+                std::cout << "A packet of length " << event.packet->dataLength << " containing [" << event.packet->data
                           << "] was received from " << event.peer->data << " on channel " << (int)event.channelID << std::endl;
                 enet_packet_destroy (event.packet);
                 break;
@@ -52,5 +53,11 @@ void Server::run()
             default:
                 break;
         }
+      _set.setCvar("com_displayFps", "60");
     }
+}
+
+void  Server::trigger(const t_event &event)
+{
+  std::cout << event.change << " Change" << std::endl;
 }

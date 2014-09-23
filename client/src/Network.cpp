@@ -1,7 +1,7 @@
 #include "Network.hpp"
 
 Network::Network()
-: _host(nullptr), _peer(nullptr)
+: _host(NULL), _peer(NULL)
 {
 	if (enet_initialize () != 0)
     throw NetworkException("An error occurred while initializing ENet.");
@@ -49,5 +49,7 @@ void Network::sendPacket(const std::string &packet, int channel)
 
 int Network::pollEvent(ENetEvent *event, int timeout)
 {
-	return (enet_host_service(_host, event, timeout));
+	if (_host && _peer)
+		return (enet_host_service(_host, event, timeout));
+	return (-1);
 }

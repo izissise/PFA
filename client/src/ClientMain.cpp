@@ -19,14 +19,47 @@ void ClientMain::update()
   int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
   TimeHandling time((std::chrono::milliseconds(gfps)));
 
-  // the updating loop
-  time.start();
-  while (_window.isOpen())
-    {
+	ENetEvent	event;
+	Network		socket;
 
-//update object here
+	try
+	{
+		socket.connect("127.0.0.1", "6060", 2);
+			// the updating loop
+		time.start();
+		while (_window.isOpen())
+    {
+      if (socket.pollEvent(&event, 1) < 0)
+        throw NetworkException("Connection problem");
+
+      switch (event.type)
+      {
+        case ENET_EVENT_TYPE_CONNECT:
+          event.peer->data = (char *)("Server");
+          break;
+
+        case ENET_EVENT_TYPE_RECEIVE:
+          printf ("A packet of length %lu containing %s was received from %s on channel %u.\n",
+                  event.packet->dataLength,
+                  event.packet->data,
+                  event.peer->data,
+                  event.channelID);
+          enet_packet_destroy (event.packet);
+          break;
+
+        default:
+          break;
+      }
+      socket.sendPacket("Salut", 0);
+        //update object here
       time.endFrame();
     }
+		socket.disconnect();
+	}
+	catch (NetworkException &e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
 }
 
 void ClientMain::run()

@@ -34,7 +34,7 @@ public:
   void			setCvar(const std::string &name, const std::string &value);
   bool			addCvar(const std::string &name, t_cvar *cvar);
 
-private:
+protected:
   std::map<std::string, t_cvar *>		_cvars;
 };
 

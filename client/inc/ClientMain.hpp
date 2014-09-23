@@ -2,14 +2,16 @@
 # define CLIENTMAIN_H
 
 # include <thread>
+# include <enet/enet.h>
 
+# include "Network.hpp"
+# include "NetworkException.hpp"
 # include "Config.h"
 # include "Menu.hpp"
 # include "TimeHandling.hpp"
 # include "Exception.hpp"
 # include "Settings.hpp"
 # include "Console.hpp"
-
 
 class ClientMain
 {
