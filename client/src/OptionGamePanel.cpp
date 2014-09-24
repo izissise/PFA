@@ -25,8 +25,6 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 20, 730},
 						  Scroll::Vertical, this,
 						  sf::Text(), wFlag::None);
-  Widget	*wTest = new Widget("checkBox", {450, 5000, 50, 50});
-  createCheckBox(texture, wTest);
 
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
@@ -43,11 +41,10 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   wScrollWidget->getSprite(0).sprite.rotate(90);
 
   _widgets.push_back(wPanOption);
+  _widgets.push_back(wScrollWidget);
   _widgets.push_back(wCheckBox);
   _widgets.push_back(wTextWidget);
   _widgets.push_back(wBarWidget);
-  _widgets.push_back(wScrollWidget);
-  _widgets.push_back(wTest);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
   	std::stof(set.getCvarList().getCvar("r_height"))});
 }

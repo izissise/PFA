@@ -32,9 +32,9 @@ void		ScrollWidget::movePicker(sf::Sprite &sprite, float x, float y)
 
   if (_dir == Scroll::Horizontal)
     {
-      x = (x > (barRect.left + barRect.width) ? (barRect.left + barRect.width) :
-	   x < (barRect.left) ? barRect.left : x);
-      x -= pickerRect.width / 2.0;
+      x = ((x + pickerRect.width) > (barRect.left + barRect.width) ?
+	   (barRect.left + barRect.width - pickerRect.width) :
+	   x < (barRect.left) ? (barRect.left) : x);
       y = barRect.top + barRect.height / 2.0 - pickerRect.height / 2.0;
     }
   else
@@ -57,19 +57,31 @@ void		ScrollWidget::updateScrollSize()
   unsigned int	biggest;
   float		diff;
 
-  biggest = barZone.height;
-  diff = (picZone.top - barZone.top) * _ratio;
+  biggest = barZone.width;
+  if (_dir == Scroll::Vertical)
+    diff = (picZone.top - barZone.top) * _ratio;
+  else
+    diff = (picZone.left - barZone.left) * _ratio;
   for (auto &it : vec)
     {
       zone = it->getZone();
-      if (zone.top + zone.height - barZone.top + diff > biggest)
-	biggest = zone.top + zone.height - barZone.top + diff;
+      if (_dir == Scroll::Vertical)
+	{
+	  if (zone.top + zone.height - barZone.top + diff > biggest)
+	    biggest = zone.top + zone.height - barZone.top + diff;
+	}
+      else
+	{
+	  if (zone.left + zone.width - barZone.left + diff > biggest)
+	    biggest = zone.left + zone.width - barZone.left + diff;
+	}
     }
-  if (biggest <=  barZone.height)
+  if (biggest <= (_dir == Scroll::Vertical ? barZone.height : barZone.width))
     _ratio = 1;
   else
-    _ratio = biggest / barZone.height;
-  toSize(1, -1, barZone.height / _ratio);
+    _ratio = biggest / (_dir == Scroll::Vertical ? barZone.height : barZone.width);
+  toSize(1, _dir == Scroll::Vertical ? -1 : barZone.width / _ratio,
+	 _dir == Scroll::Vertical ? barZone.height / _ratio : -1);
 }
 
 int		ScrollWidget::handleMouse(float pX, float pY)
