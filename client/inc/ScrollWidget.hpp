@@ -3,6 +3,9 @@
 
 #include "AWidget.hpp"
 #include "APanelScreen.hpp"
+
+#define PADDINGBOTTOM 50
+
 enum class Scroll
 {
   Vertical = 0,
@@ -28,11 +31,13 @@ public:
 private:
   void	movePicker(sf::Sprite &sprite, float x, float y);
   void	moveWidgets(sf::Vector2f moveSize);
+  int	handleMouse(float pX, float pY);
 
 private:
   bool		_active;
   Scroll	_dir;
   APanelScreen	*_panel;
+  float		_ratio;
 };
 
 #endif /* _SCROLLWIDGET_H_ */

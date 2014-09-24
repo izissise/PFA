@@ -25,7 +25,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 20, 730},
 						  Scroll::Vertical, this,
 						  sf::Text(), wFlag::None);
-  Widget	*wTest = new Widget("checkBox", {450, 1400, 50, 50});
+  Widget	*wTest = new Widget("checkBox", {450, 5000, 50, 50});
   createCheckBox(texture, wTest);
 
   createOptPanel(texture, wPanOption);

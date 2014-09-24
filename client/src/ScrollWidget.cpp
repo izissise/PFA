@@ -3,7 +3,7 @@
 ScrollWidget::ScrollWidget(const std::string &id, const sf::FloatRect &zone,
 			   Scroll dir, APanelScreen *panel,
 			   const sf::Text &text, wFlag flg) :
-  AWidget(id, zone, text, flg), _active(false), _dir(dir), _panel(panel)
+  AWidget(id, zone, text, flg), _active(false), _dir(dir), _panel(panel), _ratio(1)
 {
 }
 
@@ -11,6 +11,8 @@ void		ScrollWidget::moveWidgets(sf::Vector2f moveSize)
 {
   auto		vec = _panel->getWidgets();
 
+  moveSize.y *= _ratio;
+  moveSize.x *= _ratio;
   if (_dir == Scroll::Horizontal)
     moveSize.y = 0;
   else
@@ -50,26 +52,41 @@ void		ScrollWidget::updateScrollSize()
 {
   auto		vec = _panel->getWidgets();
   sf::FloatRect	zone;
-  sf::FloatRect selfZone;
-  sf::FloatRect	barZone;
+  sf::FloatRect	barZone = getSprite(0).sprite.getGlobalBounds();
+  sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
   unsigned int	biggest;
-  sf::Sprite	&sprite = getSprite(1).sprite;
-  sf::Vector2f	scaleVec = sprite.getScale();
   float		diff;
 
-  barZone = sprite.getGlobalBounds();
-  selfZone = _panel->getWidgets().front()->getZone();
-  biggest = selfZone.height;
-  diff = barZone.top - selfZone.top;
+  biggest = barZone.height;
+  diff = (picZone.top - barZone.top) * _ratio;
   for (auto &it : vec)
     {
       zone = it->getZone();
-      std::cout << zone.top + zone.height - selfZone.top << std::endl;
-      if (zone.top + zone.height - selfZone.top + diff > biggest)
-	biggest = zone.top + zone.height - selfZone.top + diff;
+      if (zone.top + zone.height - barZone.top + diff > biggest)
+	biggest = zone.top + zone.height - barZone.top + diff;
     }
-  biggest = selfZone.height - (biggest - selfZone.height);
-  toSize(1, -1, biggest);
+  if (biggest <=  barZone.height)
+    _ratio = 1;
+  else
+    _ratio = biggest / barZone.height;
+  toSize(1, -1, barZone.height / _ratio);
+}
+
+int		ScrollWidget::handleMouse(float pX, float pY)
+{
+  int		retVal = 0;
+  sf::Sprite	&sprite = getSprite(1).sprite;
+  sf::Vector2f	pos = sprite.getPosition();
+
+  if (_active)
+    {
+      if (_dir == Scroll::Horizontal)
+	movePicker(sprite, pX, pos.y);
+      else
+	movePicker(sprite, pos.x, pY);
+      retVal = 1;
+    }
+  return retVal;
 }
 
 int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
@@ -82,36 +99,29 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   if (isClicked(event, sf::Mouse::Left))
     {
       _active = isOver(ref);
-      if (_active)
-	{
-	  sf::Sprite	&sprite = getSprite(1).sprite;
-	  sf::Vector2f	pos = sprite.getPosition();
-
-	  if (_dir == Scroll::Horizontal)
-	    movePicker(sprite, event.mouseButton.x, pos.y);
-	  else
-	    movePicker(sprite, pos.x, event.mouseButton.y);
-	}
+      retVal = handleMouse(event.mouseButton.x, event.mouseButton.y);
     }
   else if (event.type == sf::Event::MouseMoved
-	   && _active
 	   && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    retVal = handleMouse(event.mouseMove.x, event.mouseMove.y);
+  else if (event.type == sf::Event::MouseWheelMoved)
     {
       sf::Sprite	&sprite = getSprite(1).sprite;
       sf::Vector2f	pos = sprite.getPosition();
 
-      if (_dir == Scroll::Horizontal)
-	movePicker(sprite, event.mouseMove.x, pos.y);
-      else
-	movePicker(sprite, pos.x, event.mouseMove.y);
+      movePicker(sprite, pos.x, pos.y - _ratio * event.mouseWheel.delta);
+      retVal = 1;
     }
   for (auto &func : _updates)
     {
-      if ((retVal = func.second(*this, event, ref)) != 0)
-	return retVal;
+      if (func.second(*this, event, ref) != 0)
+	{
+	  retVal = 1;
+	  break ;
+	}
     }
   updateScrollSize();
-  return 0;
+  return retVal;
 }
 
 bool	ScrollWidget::isOver(const sf::RenderWindow &ref) const
