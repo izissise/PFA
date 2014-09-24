@@ -1,8 +1,8 @@
 #include "AWidget.hpp"
 
 AWidget::AWidget(const std::string &id, const sf::FloatRect &zone,
-		 const sf::Text &text) :
-  _hide(false), _id(id), _zone(zone), _text(text)
+		 const sf::Text &text, wFlag flg) :
+  _hide(false), _id(id), _zone(zone), _text(text), _flag(flg)
 {
   _text.setPosition(zone.left, zone.top);
 }
@@ -39,10 +39,10 @@ void	AWidget::alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
 {
   sf::Vector2f	npos(pos.x + (xPercent / 100.0) * size.x,
 		     pos.y + (yPercent / 100.0) * size.y);
-  sf::FloatRect	textSize = _text.getLocalBounds();
+  sf::FloatRect	textSize = _text.getGlobalBounds();
 
   npos.x -= textSize.width / 2.0;
-  npos.y -= (textSize.height);
+  npos.y -= _text.getCharacterSize() / 1.5;
   _text.setPosition(npos.x, npos.y);
 }
 
@@ -51,9 +51,8 @@ void	AWidget::alignTextLeft(const sf::Vector2f &pos, const sf::Vector2f &size,
 {
   sf::Vector2f	npos(pos.x + (xPercent / 100.0) * size.x,
 		     pos.y + (yPercent / 100.0) * size.y);
-  sf::FloatRect	textSize = _text.getLocalBounds();
 
-  npos.y -= (textSize.height);
+  npos.y -= (_text.getCharacterSize() / 1.5);
   _text.setPosition(npos.x, npos.y);
 }
 
@@ -65,6 +64,11 @@ void	AWidget::setTextPosition(int x, int y)
 void	AWidget::setTextAttr(unsigned int style)
 {
   _text.setStyle(style);
+}
+
+void	AWidget::setColor(const sf::Color &color)
+{
+  _text.setColor(color);
 }
 
 void	AWidget::setHidden(bool state)
@@ -144,6 +148,35 @@ void	AWidget::resize(float pX, float pY)
   _text.scale(pX, pY);
 }
 
+void	AWidget::toSize(unsigned int spritePos, float pX, float pY)
+{
+  sf::Sprite	&sprite = getSprite(spritePos).sprite;
+  sf::FloatRect rec = sprite.getLocalBounds();
+  float		rX = pX / rec.width;
+  float		rY = pY / rec.height;
+
+  sprite.setScale(rX, rY);
+}
+
+void	AWidget::move(float pX, float pY)
+{
+  sf::Vector2f textPos(_text.getPosition());
+  sf::Vector2f spritePos;
+
+  _zone.left += pX;
+  _zone.top += pY;
+  for (auto &elem : _sprites)
+    {
+      spritePos = elem.sprite.getPosition();
+      spritePos.x += pX;
+      spritePos.y += pY;
+      elem.sprite.setPosition(spritePos);
+    }
+  textPos.x += pX;
+  textPos.y += pY;
+  _text.setPosition(textPos);
+}
+
 void		AWidget::setSpriteSize(unsigned int spritePos, float x, float y)
 {
   t_sprite	&elem = _sprites[spritePos];
@@ -152,6 +185,23 @@ void		AWidget::setSpriteSize(unsigned int spritePos, float x, float y)
   float		ratioY = y / rect.height;
 
   elem.sprite.scale(ratioX, ratioY);
+}
+
+t_sprite	&AWidget::getSprite(unsigned int spritePos)
+{
+  if (_sprites.size() <= spritePos)
+    throw (std::out_of_range("Sprite out of range"));
+  return _sprites[spritePos];
+}
+
+const sf::FloatRect	&AWidget::getZone() const
+{
+  return _zone;
+}
+
+wFlag	AWidget::getFlag() const
+{
+  return _flag;
 }
 
 void	AWidget::trigger(const t_event &event)

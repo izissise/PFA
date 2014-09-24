@@ -2,8 +2,8 @@
 #include "Unused.hpp"
 
 Widget::Widget(const std::string &id, const sf::FloatRect &zone,
-	       const sf::Text &text) :
-  AWidget(id, zone, text)
+	       const sf::Text &text, wFlag flg) :
+  AWidget(id, zone, text, flg)
 {
   _updates["main"] = [](AWidget &widget UNUSED,
 			const sf::Event &event UNUSED,

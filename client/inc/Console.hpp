@@ -5,6 +5,7 @@
 #include <deque>
 #include "Settings.hpp"
 #include "UserInput.hpp"
+#include "Cursor.hpp"
 
 #define FONTSIZE 20
 #define LINESPACING 4
@@ -32,6 +33,7 @@ public:
 private:
   Settings		*_set;
   UserInput		_input;
+  Cursor		_cursor;
   t_history		_history;
   sf::RectangleShape	_rectangle;
   sf::Font		_font;

@@ -106,3 +106,8 @@ void	APanelScreen::trigger(const t_event &event)
 	}
     }
 }
+
+const std::vector<AWidget *>	&APanelScreen::getWidgets() const
+{
+  return _widgets;
+}

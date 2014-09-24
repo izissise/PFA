@@ -1,7 +1,7 @@
 #include "Console.hpp"
 #include "Exception.hpp"
 
-Console::Console(Settings* set) : _set(set), _history()
+Console::Console(Settings* set) : _set(set), _cursor(), _history()
 {
   sf::Color	color(20, 20, 20);
   int		width = std::stoi(set->getCvarList().getCvar("r_width"));
@@ -19,6 +19,7 @@ Console::Console(Settings* set) : _set(set), _history()
   _text.setStyle(sf::Text::Regular);
   _text.setColor(sf::Color::White);
   _text.setCharacterSize(FONTSIZE);
+  _cursor.setText(sf::Text("|", _font, FONTSIZE));
 }
 
 Console::~Console()
@@ -43,6 +44,9 @@ void		Console::run(const sf::Event& event)
         _history.content.pop_back();
       _input.clear();
     }
+  _text.setString("]" + _input.getString());
+  _cursor.update();
+  _cursor.setCursorPos(_text);
   switch (event.type)
     {
     case sf::Event::KeyPressed:
@@ -82,4 +86,5 @@ void		Console::draw(sf::RenderWindow &window)
   _text.setPosition(0, cSize);
   _text.setString("]" + _input.getString());
   window.draw(_text);
+  _cursor.draw(window);
 }

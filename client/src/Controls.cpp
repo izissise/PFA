@@ -175,6 +175,16 @@ ctrl::key	Controls::getKeyFromCode(const std::string &code) const
   return ((it == _keycode.end()) ? sf::Keyboard::Unknown : it->second);
 }
 
+ctrl::key	Controls::getKeyFromAction(Action act) const
+{
+  for (auto &it : _actionKeys)
+    {
+      if (it.first == act)
+	return it.second[0];
+    }
+  return sf::Keyboard::Unknown;
+}
+
 const std::string	&Controls::getCodeFromKey(ctrl::key k) const
 {
   for (auto &it : _keycode)
@@ -185,9 +195,25 @@ const std::string	&Controls::getCodeFromKey(ctrl::key k) const
   throw (Exception("Key not bound"));
 }
 
+ctrl::key	Controls::getLastKey(Action act) const
+{
+  auto		it = _actionKeys.find(act);
+  ctrl::key	last = sf::Keyboard::Unknown;
+
+  if (it == _actionKeys.end())
+    return sf::Keyboard::Unknown;
+  for (auto ait = it->second.begin(); ait != it->second.end(); ++ait)
+    {
+      if (*ait == sf::Keyboard::Unknown)
+	return last;
+      last = *ait;
+    }
+  return last;
+}
+
 void	Controls::bindActionOnKey(ctrl::key k, Action act)
 {
-  auto			it = _actionKeys.find(act);
+  auto	it = _actionKeys.find(act);
 
   if (it == _actionKeys.end())
     {

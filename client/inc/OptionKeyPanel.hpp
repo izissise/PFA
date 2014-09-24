@@ -3,6 +3,8 @@
 
 #include "APanelScreen.hpp"
 #include "Widget.hpp"
+#include "TextWidget.hpp"
+#include "KeyWidget.hpp"
 
 class OptionKeyPanel : public APanelScreen
 {
@@ -15,6 +17,7 @@ public:
 
 private:
   void		createOptPanel(const sf::Texture &texture, Widget *);
+  void		createKeyWidget(const sf::Texture &texture, KeyWidget *wKey);
 };
 
 

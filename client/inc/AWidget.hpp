@@ -7,6 +7,7 @@
 #include <list>
 #include "Observer.hpp"
 #include "Settings.hpp"
+#include "Unused.hpp"
 
 #define SIZEX 1600.0
 #define SIZEY 900.0
@@ -18,6 +19,13 @@ enum class	wEvent
     Hide = 2,
     Show = 4,
     SetSprite = 16
+    };
+
+enum class	wFlag
+{
+  None = 0,
+    Movable = 1,
+    Resizable = 2
     };
 
 typedef struct	s_event
@@ -41,6 +49,16 @@ typedef struct	s_sprite
   }
 }		t_sprite;
 
+inline int	operator&(wFlag a, wFlag b)
+{
+  return (static_cast<int>(a) & static_cast<int>(b));
+};
+
+inline wFlag	operator|(wFlag a, wFlag b)
+{
+  return (static_cast<wFlag>(static_cast<int>(a) | static_cast<int>(b)));
+}
+
 class AWidget : public IObserver, public Observable
 {
 public:
@@ -50,6 +68,7 @@ public:
       Handled = 1,
       ChangePanel = 2
     };
+
 inline int	operator()(AWidget::wAction a)
 {
   return static_cast<int>(a);
@@ -57,7 +76,7 @@ inline int	operator()(AWidget::wAction a)
 
 public:
   AWidget(const std::string &id, const sf::FloatRect &zone,
-	  const sf::Text &text);
+	  const sf::Text &text, wFlag flg = wFlag::Movable | wFlag::Resizable);
   virtual ~AWidget();
 
   virtual int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set) = 0;
@@ -76,7 +95,7 @@ public:
    * \param[in] elem: the sprite to store
    *
    */
-  void		addSprite(t_sprite &elem);
+  virtual void		addSprite(t_sprite &elem);
 
   /**
    * \fn void addSprite(const sf::Texture &texture, const sf::IntRect &rect);
@@ -85,7 +104,8 @@ public:
    *
    * This method is used to not create a local sf::Sprite
    */
-  void		addSprite(const sf::Texture &texture, const sf::IntRect &rect, bool draw = true);
+  virtual void		addSprite(const sf::Texture &texture,
+				  const sf::IntRect &rect, bool draw = true);
 
   /**
    * \fn void alignText(const sf::Vector2f &pos, const sf::Vector2f &size, float xPercent, float yPercent);
@@ -126,6 +146,7 @@ public:
    * This method calls sf::Text.setStyle(style)
    */
   void		setTextAttr(unsigned int style);
+  virtual void		setColor(const sf::Color &color);
 
   /**
    * \fn void setHidden(bool state)
@@ -156,7 +177,7 @@ public:
    * This method will resize all the widget's attributes
    */
 
-  void		scale(const sf::Vector2f &size);
+  virtual void		scale(const sf::Vector2f &size);
 
   /**
    * \fn void resize(const sf::Vector2f &size)
@@ -165,8 +186,10 @@ public:
    *
    * This method will adapt the widget's size by x/y percent
    */
-  void		resize(float pX, float pY);
+  virtual void		resize(float pX, float pY);
 
+  virtual void		toSize(unsigned int spritePos, float pX, float pY);
+  virtual void		move(float pX, float pY);
   void		setSpriteSize(unsigned int spritePos, float x, float y);
 
   /**
@@ -187,7 +210,7 @@ public:		// public so the lambda can call it
    * \return A boolean indicating if the mouse if over
    *
    */
-  bool		isOver(const sf::RenderWindow &ref) const;
+  virtual bool		isOver(const sf::RenderWindow &ref) const;
 
   /**
    * \fn bool isClicked(const sf::Event &event, sf::Mouse::Button button)
@@ -200,6 +223,9 @@ public:		// public so the lambda can call it
   bool		isClicked(const sf::Event &event, sf::Mouse::Button button) const;
   void		setSpriteAttr(unsigned int spritePos, bool draw);
   void		toggleSpriteAttr(unsigned int spritePos);
+  t_sprite	&getSprite(unsigned int spritePos);
+  const sf::FloatRect	&getZone() const;
+  wFlag		getFlag() const;
 
 protected:
   bool				_hide;
@@ -207,6 +233,7 @@ protected:
   sf::FloatRect			_zone;
   std::vector<t_sprite>		_sprites;
   sf::Text			_text;
+  wFlag				_flag;
   std::map<std::string, std::function
 	   <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>>
     _updates;
