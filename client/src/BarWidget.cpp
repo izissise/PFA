@@ -21,6 +21,7 @@ void		BarWidget::movePicker(sf::Sprite &sprite, float x, float y)
   sprite.setPosition(x, y);
 }
 
+#include <iostream>
 int	BarWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 			  Settings &set UNUSED)
 {

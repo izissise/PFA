@@ -14,6 +14,21 @@ TextWidget::TextWidget(const std::string &id, const sf::FloatRect &zone,
   _cursor.setText(curText);
 }
 
+int	TextWidget::setToDefault(const sf::Event &event, sf::RenderWindow &ref)
+{
+  if (_text.getString().getSize() == 0)
+    {
+      _text.setString(_default.getString());
+      _text.setColor(_default.getColor());
+      for (auto &func : _updates)
+	{
+	  if (func.second(*this, event, ref) != 0)
+	    return 1;
+	}
+    }
+  return 0;
+}
+
 int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 			   Settings &set UNUSED)
 {
@@ -27,33 +42,27 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
       _isActive = isOver(ref);
       catched = _isActive;
       if (!_isActive)
-	{
-	  if (_text.getString().getSize() == 0)
-	    {
-	      _text.setString(_default.getString());
-	      _text.setColor(_default.getColor());
-	      for (auto &func : _updates)
-		{
-		  if ((retVal = func.second(*this, event, ref)) != 0)
-		    return retVal;
-		}
-	    }
-	}
+	retVal = setToDefault(event, ref);
       else
 	_text.setColor(_textContent.getColor());
     }
   if (_isActive)
     {
       _isActive = !getInput(event);
-      _textContent.setString(getString());
-      setDrawableText();
-      for (auto &func : _updates)
+      if (!_isActive)
+	setToDefault(event, ref);
+      else
 	{
-	  if ((retVal = func.second(*this, event, ref)) != 0)
-	    return retVal;
+	  _textContent.setString(getString());
+	  setDrawableText();
+	  for (auto &func : _updates)
+	    {
+	      if ((retVal = func.second(*this, event, ref)) != 0)
+		return retVal;
+	    }
+	  _cursor.update();
+	  _cursor.setCursorPos(_text);
 	}
-      _cursor.update();
-      _cursor.setCursorPos(_text);
     }
   return catched;
 }

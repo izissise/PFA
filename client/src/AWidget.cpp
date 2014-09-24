@@ -66,6 +66,11 @@ void	AWidget::setTextAttr(unsigned int style)
   _text.setStyle(style);
 }
 
+void	AWidget::setColor(const sf::Color &color)
+{
+  _text.setColor(color);
+}
+
 void	AWidget::setHidden(bool state)
 {
   _hide = state;

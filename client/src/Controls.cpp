@@ -175,6 +175,16 @@ ctrl::key	Controls::getKeyFromCode(const std::string &code) const
   return ((it == _keycode.end()) ? sf::Keyboard::Unknown : it->second);
 }
 
+ctrl::key	Controls::getKeyFromAction(Action act) const
+{
+  for (auto &it : _actionKeys)
+    {
+      if (it.first == act)
+	return it.second[0];
+    }
+  return sf::Keyboard::Unknown;
+}
+
 const std::string	&Controls::getCodeFromKey(ctrl::key k) const
 {
   for (auto &it : _keycode)

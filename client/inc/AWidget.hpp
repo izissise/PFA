@@ -146,6 +146,7 @@ public:
    * This method calls sf::Text.setStyle(style)
    */
   void		setTextAttr(unsigned int style);
+  virtual void		setColor(const sf::Color &color);
 
   /**
    * \fn void setHidden(bool state)
