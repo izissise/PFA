@@ -5,7 +5,7 @@ KeyWidget::KeyWidget(const std::string &id, const sf::FloatRect &zone,
 		     Action act, const Controls &ctrl, const sf::Text &text):
   AWidget(id, zone, text), _isActive(false), _action(act)
 {
-  _k = ctrl.getKeyFromAction(act);
+  _k = ctrl.getLastKey(act);
   try
     {
       _text.setString(ctrl.getCodeFromKey(_k));

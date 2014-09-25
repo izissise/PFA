@@ -77,8 +77,9 @@ int	APanelScreen::run(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
-      if ((retVal = (*rit)->run(event, ref, set)) != 0)
-	return retVal;
+      if ((*rit)->isHidden() == false)
+	if ((retVal = (*rit)->run(event, ref, set)) != 0)
+	  return retVal;
     }
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
     {

@@ -54,9 +54,9 @@ public:
   bool		getActionState(Action act) const;
   ctrl::key		getKeyFromCode(const std::string &code) const;
   ctrl::key		getKeyFromAction(Action act) const;
+  ctrl::key		getLastKey(Action act) const;
   const std::string	&getCodeFromKey(ctrl::key k) const;
   const std::string	&getCodeFromAction(Action act) const;
-  ctrl::key		getLastKey(Action act) const;
 
   void		bindActionOnKey(ctrl::key k, Action act);
   void		pressKey(ctrl::key k);
