@@ -21,7 +21,6 @@ void		BarWidget::movePicker(sf::Sprite &sprite, float x, float y)
   sprite.setPosition(x, y);
 }
 
-#include <iostream>
 int	BarWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 			  Settings &set UNUSED)
 {
@@ -37,6 +36,7 @@ int	BarWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 	  t_sprite	&sprite = getSprite(1);
 	  sf::Vector2f	pos = sprite.sprite.getPosition();
 
+	  retVal = 1;
 	  movePicker(sprite.sprite, event.mouseButton.x, pos.y);
 	}
     }
@@ -47,14 +47,15 @@ int	BarWidget::update(const sf::Event &event, sf::RenderWindow &ref,
       t_sprite	&sprite = getSprite(1);
       sf::Vector2f	pos = sprite.sprite.getPosition();
 
+      retVal = 1;
       movePicker(sprite.sprite, event.mouseMove.x, pos.y);
     }
   for (auto &func : _updates)
     {
-      if ((retVal = func.second(*this, event, ref)) != 0)
-	return retVal;
+      if (func.second(*this, event, ref) != 0)
+	return 1;
     }
-  return 0;
+  return retVal;
 }
 
 bool	BarWidget::isOver(const sf::RenderWindow &ref) const

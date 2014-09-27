@@ -9,6 +9,18 @@
 namespace ctrl
 {
   typedef int	key;
+
+  enum class	type
+  {
+    Keyboard = 0,
+      Mouse,
+      MouseWheel,
+      TypeCount
+      };
+  enum class	state
+  {
+    Unset = 0
+      };
 }
 
 enum class	Action
@@ -19,6 +31,8 @@ enum class	Action
     Right,
     Left,
     Use,
+    MoveUp,
+    MoveDown,
     ToggleConsole,
     Last
     };
@@ -28,6 +42,60 @@ enum class	actionType
   Default = 0,
     Toggle
     };
+
+typedef struct	s_entry	t_entry;
+
+struct		s_entry
+{
+  ctrl::key	key;
+  ctrl::type	type;
+  s_entry(ctrl::key k = sf::Keyboard::Unknown,
+	  ctrl::type t = ctrl::type::Keyboard) :
+    key(k), type(t)
+  {
+  }
+  bool	operator==(const t_entry &e) const
+  {
+    return (key == e.key && type == e.type);
+  }
+  bool	operator==(ctrl::state e) const
+  {
+    if (e == ctrl::state::Unset)
+      return (key == sf::Keyboard::Unknown && type != ctrl::type::MouseWheel);
+    return false;
+  }
+  void	operator=(t_entry e)
+  {
+    key = e.key;
+    type = e.type;
+  }
+  void	operator=(ctrl::state e)
+  {
+    if (e == ctrl::state::Unset)
+      {
+	key = sf::Keyboard::Unknown;
+	type = ctrl::type::Keyboard;
+      }
+  }
+  void	fill(const sf::Event &event)
+  {
+    if (event.type == sf::Event::KeyPressed)
+      {
+	key = event.key.code;
+	type = ctrl::type::Keyboard;
+      }
+    else if (event.type == sf::Event::MouseButtonPressed)
+      {
+	key = event.mouseButton.button;
+	type = ctrl::type::Mouse;
+      }
+    else if (event.type == sf::Event::MouseWheelMoved)
+      {
+	key = event.mouseWheel.delta;
+	type = ctrl::type::MouseWheel;
+      }
+  };
+};
 
 typedef struct	s_action
 {
@@ -48,25 +116,26 @@ public:
   Controls();
   virtual ~Controls();
 
-  bool		isPressed(ctrl::key k) const;
-  Action	getActionFromKey(ctrl::key k) const;
+  bool		isPressed(const t_entry &entry);
+  Action	getActionFromKey(const t_entry &entry) const;
   Action	getActionFromCode(const std::string &code) const;
   bool		getActionState(Action act) const;
-  ctrl::key		getKeyFromCode(const std::string &code) const;
-  ctrl::key		getKeyFromAction(Action act) const;
-  const std::string	&getCodeFromKey(ctrl::key k) const;
+  t_entry		getKeyFromCode(const std::string &code) const;
+  t_entry		getKeyFromAction(Action act) const;
+  t_entry		getLastKey(Action act) const;
+  const std::string	&getCodeFromKey(const t_entry &entry) const;
   const std::string	&getCodeFromAction(Action act) const;
-  ctrl::key		getLastKey(Action act) const;
 
-  void		bindActionOnKey(ctrl::key k, Action act);
-  void		pressKey(ctrl::key k);
-  void		releaseKey(ctrl::key k);
+  void		bindActionOnKey(const t_entry &entry, Action act);
+  void		pressKey(const t_entry &entry);
+  void		releaseKey(const t_entry &entry);
 
 private:
-  std::map<ctrl::key, bool>			_keyState;
-  std::map<Action, std::array<ctrl::key, 5>>	_actionKeys;
-  std::map<std::string, ctrl::key>		_keycode;
-  std::vector<t_action>				_actions;
+  std::array<std::map<ctrl::key, bool>,
+	     static_cast<size_t>(ctrl::type::TypeCount)>	_keyState;
+  std::map<Action, std::array<t_entry, 5>>		_actionKeys;
+  std::map<std::string, t_entry>			_keycode;
+  std::vector<t_action>					_actions;
 };
 
 #endif /* _CONTROLS_H_ */

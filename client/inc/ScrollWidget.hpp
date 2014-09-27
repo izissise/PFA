@@ -6,6 +6,11 @@
 
 #define PADDINGBOTTOM 50
 
+/*
+** No unit for this, the highest the fastest
+*/
+#define SLIDESPEED 8
+
 enum class Scroll
 {
   Vertical = 0,
