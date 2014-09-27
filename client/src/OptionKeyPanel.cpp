@@ -18,7 +18,8 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 {
   sf::Text	txt = sf::Text("", _font, 20);
   Controls	&ctrl = set.getControls();
-  Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730});
+  Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730},
+					 sf::Text(), wFlag::Resizable);
   ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, 120, 20, 730},
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
@@ -27,7 +28,10 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
   KeyWidget	*wRight = new KeyWidget("Right", {450, 500, 150, 40}, Action::Right, ctrl, txt);
   KeyWidget	*wLeft = new KeyWidget("Left", {450, 600, 150, 40}, Action::Left, ctrl, txt);
   KeyWidget	*wUse = new KeyWidget("Use", {450, 700, 150, 40}, Action::Use, ctrl, txt);
-  KeyWidget	*wConsole = new KeyWidget("ToggleConsole", {450, 800, 150, 40},
+  KeyWidget	*wMoveUp = new KeyWidget("moveup", {450, 800, 150, 40}, Action::MoveUp, ctrl, txt);
+  KeyWidget	*wMoveDown = new KeyWidget("movedown", {450, 900, 150, 40},
+					   Action::MoveDown, ctrl, txt);
+  KeyWidget	*wConsole = new KeyWidget("ToggleConsole", {450, 1000, 150, 40},
 						Action::ToggleConsole, ctrl, txt);
   Widget	*wTforward = new Widget("Tforward", {600, 300, 150, 40},
 					sf::Text("Forward", _font, 20));
@@ -50,6 +54,8 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
   createKeyWidget(texture, wRight);
   createKeyWidget(texture, wLeft);
   createKeyWidget(texture, wUse);
+  createKeyWidget(texture, wMoveUp);
+  createKeyWidget(texture, wMoveDown);
   createKeyWidget(texture, wConsole);
   createTextWidget(wTforward);
   createTextWidget(wTback);
@@ -65,6 +71,8 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
   _widgets.push_back(wRight);
   _widgets.push_back(wLeft);
   _widgets.push_back(wUse);
+  _widgets.push_back(wMoveUp);
+  _widgets.push_back(wMoveDown);
   _widgets.push_back(wConsole);
   _widgets.push_back(wTforward);
   _widgets.push_back(wTback);

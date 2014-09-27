@@ -31,6 +31,8 @@ enum class	Action
     Right,
     Left,
     Use,
+    MoveUp,
+    MoveDown,
     ToggleConsole,
     Last
     };

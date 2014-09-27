@@ -121,7 +121,7 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
       sf::Sprite	&sprite = getSprite(1).sprite;
       sf::Vector2f	pos = sprite.getPosition();
 
-      movePicker(sprite, pos.x, pos.y - _ratio * event.mouseWheel.delta);
+      movePicker(sprite, pos.x, pos.y - SLIDESPEED * event.mouseWheel.delta);
       retVal = 1;
     }
   for (auto &func : _updates)

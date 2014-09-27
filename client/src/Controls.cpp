@@ -119,6 +119,8 @@ Controls::Controls()
   _actions.push_back(t_action("right"));
   _actions.push_back(t_action("left"));
   _actions.push_back(t_action("use"));
+  _actions.push_back(t_action("moveup"));
+  _actions.push_back(t_action("movedown"));
   _actions.push_back(t_action("console", actionType::Toggle));
 }
 
