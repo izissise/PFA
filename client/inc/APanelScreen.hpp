@@ -7,7 +7,7 @@
 class APanelScreen : public IObserver, public Observable
 {
 public:
-  APanelScreen();
+  APanelScreen(const sf::FloatRect &zone = sf::FloatRect(0,0,0,0));
   virtual ~APanelScreen() = 0;
 
   /**
@@ -56,6 +56,7 @@ public:
   void		setHide(bool hide);
   void	       	addPanels(const std::vector<APanelScreen *> &panels);
   const std::vector<AWidget *>	&getWidgets() const;
+  const std::vector<APanelScreen *> &getSubPanels() const;
 
 protected:
   /**
@@ -129,6 +130,7 @@ protected:
 
 protected:
   bool					_hide;
+  sf::FloatRect				_zone;
   sf::Font				_font;
   std::vector<const sf::Texture *>	_textures;
   std::vector<APanelScreen *>		_panels;

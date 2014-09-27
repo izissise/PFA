@@ -10,6 +10,7 @@ ScrollWidget::ScrollWidget(const std::string &id, const sf::FloatRect &zone,
 void		ScrollWidget::moveWidgets(sf::Vector2f moveSize)
 {
   auto		vec = _panel->getWidgets();
+  auto		panels = _panel->getSubPanels();
 
   moveSize.y *= _ratio;
   moveSize.x *= _ratio;
@@ -17,6 +18,14 @@ void		ScrollWidget::moveWidgets(sf::Vector2f moveSize)
     moveSize.y = 0;
   else
     moveSize.x = 0;
+  for (auto &pit : panels)
+    {
+      for (auto &pWit : pit->getWidgets())
+	{
+	  if (pWit->getFlag() & wFlag::Movable)
+	    pWit->move(-moveSize.x, -moveSize.y);
+	}
+    }
   for (auto &it : vec)
     {
       if (it->getFlag() & wFlag::Movable)
@@ -48,22 +57,17 @@ void		ScrollWidget::movePicker(sf::Sprite &sprite, float x, float y)
   moveWidgets(sf::Vector2f(x, y) - spritePos);
 }
 
-void		ScrollWidget::updateScrollSize()
+unsigned int	ScrollWidget::getBiggest(const sf::FloatRect &barZone,
+					 float diff,
+					 const std::vector<AWidget *> &widgetList)
 {
-  auto		vec = _panel->getWidgets();
+  unsigned int	biggest = 0;
   sf::FloatRect	zone;
-  sf::FloatRect	barZone = getSprite(0).sprite.getGlobalBounds();
-  sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
-  unsigned int	biggest;
-  float		diff;
 
-  biggest = barZone.width;
-  if (_dir == Scroll::Vertical)
-    diff = (picZone.top - barZone.top) * _ratio;
-  else
-    diff = (picZone.left - barZone.left) * _ratio;
-  for (auto &it : vec)
+  for (auto &it : widgetList)
     {
+      if (it->isHidden())
+	continue ;
       zone = it->getZone();
       if (_dir == Scroll::Vertical)
 	{
@@ -76,6 +80,31 @@ void		ScrollWidget::updateScrollSize()
 	    biggest = zone.left + zone.width - barZone.left + diff;
 	}
     }
+  return biggest;
+}
+
+void		ScrollWidget::updateScrollSize()
+{
+  sf::FloatRect	barZone = getSprite(0).sprite.getGlobalBounds();
+  sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
+  unsigned int	biggest;
+  unsigned int	tmp;
+  float		diff;
+
+  biggest = barZone.width;
+  if (_dir == Scroll::Vertical)
+    diff = (picZone.top - barZone.top) * _ratio;
+  else
+    diff = (picZone.left - barZone.left) * _ratio;
+  for (auto &panel : _panel->getSubPanels())
+    {
+      if (panel->isHidden())
+	continue ;
+      tmp = getBiggest(barZone, diff, panel->getWidgets());
+      biggest = BIGGEST(biggest, tmp);
+    }
+  tmp = getBiggest(barZone, diff, _panel->getWidgets());
+  biggest = BIGGEST(biggest, tmp);
   if (biggest <= (_dir == Scroll::Vertical ? barZone.height : barZone.width))
     _ratio = 1;
   else

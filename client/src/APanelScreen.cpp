@@ -1,7 +1,7 @@
 #include "APanelScreen.hpp"
 
-APanelScreen::APanelScreen() :
-  _hide(false)
+APanelScreen::APanelScreen(const sf::FloatRect &zone) :
+  _hide(false), _zone(zone)
 {
 }
 
@@ -13,10 +13,10 @@ void		APanelScreen::draw(sf::RenderWindow &window)
 {
   if (_hide)
     return ;
-  for (auto &panel : _panels)
-    panel->draw(window);
   for (auto &widget : _widgets)
     widget->draw(window);
+  for (auto &panel : _panels)
+    panel->draw(window);
 }
 
 sf::Vector2f	APanelScreen::toPixel(const sf::Vector2f &perCent,
@@ -111,4 +111,9 @@ void	APanelScreen::trigger(const t_event &event)
 const std::vector<AWidget *>	&APanelScreen::getWidgets() const
 {
   return _widgets;
+}
+
+const std::vector<APanelScreen *>	&APanelScreen::getSubPanels() const
+{
+  return _panels;
 }

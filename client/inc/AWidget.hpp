@@ -156,6 +156,7 @@ public:
    * This method sets _hide to state
    */
   void		setHidden(bool state);
+  bool		isHidden() const;
 
   /**
    * \fn void setFunction(const std::string &key, const std::function

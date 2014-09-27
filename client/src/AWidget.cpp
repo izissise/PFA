@@ -76,6 +76,11 @@ void	AWidget::setHidden(bool state)
   _hide = state;
 }
 
+bool	AWidget::isHidden() const
+{
+  return _hide;
+}
+
 void		AWidget::setFunction(const std::string &key, const std::function
 				     <int (AWidget &widget, const sf::Event &event,
 					   sf::RenderWindow &ref)> &func)

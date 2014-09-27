@@ -10,6 +10,7 @@
 ** No unit for this, the highest the fastest
 */
 #define SLIDESPEED 8
+#define BIGGEST(x, y) ((x) > (y) ? (x) : (y))
 
 enum class Scroll
 {
@@ -37,6 +38,9 @@ private:
   void	movePicker(sf::Sprite &sprite, float x, float y);
   void	moveWidgets(sf::Vector2f moveSize);
   int	handleMouse(float pX, float pY);
+  unsigned int	getBiggest(const sf::FloatRect &barZone,
+			   float diff,
+			   const std::vector<AWidget *> &widgetList);
 
 private:
   bool		_active;
