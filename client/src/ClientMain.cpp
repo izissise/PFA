@@ -32,7 +32,8 @@ void ClientMain::update()
 void ClientMain::run()
 {
   Controls &ctrl = _settings.getControls();
-  sf::Event event;
+  sf::Event	event;
+  t_entry	entry;
 
   while (_window.isOpen())
     {
@@ -46,25 +47,31 @@ void ClientMain::run()
             }
           if (!_menu.run(event, _window, _settings))
             {
-              if (event.type == sf::Event::KeyPressed)
+	      if (event.type == sf::Event::KeyPressed ||
+		  event.type == sf::Event::MouseButtonPressed ||
+		  event.type == sf::Event::MouseWheelMoved)
                 {
+		  entry.fill(event);
                   std::cout << "keypress" << std::endl;
-                  ctrl.pressKey(event.key.code);
+		  if (event.type == sf::Event::KeyPressed ||
+		      event.type == sf::Event::MouseButtonPressed)
+		    ctrl.pressKey(entry);
                   try {
-                      std::cout << "Action for key " << ctrl.getCodeFromKey(event.key.code) << " is: ";
+                      std::cout << "Action for key " << ctrl.getCodeFromKey(entry) << " is: ";
                     }
                   catch (const Exception &e) {
                       std::cout << "Action for key " << "Unknown" << " is: ";
                     }
                   try {
-                      std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(event.key.code)) << std::endl;
+                      std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(entry)) << std::endl;
                     }
                   catch (const std::out_of_range &oor) {
                       std::cout << "Unknown" << std::endl;
                     }
                 }
-              else if (event.type == sf::Event::KeyReleased)
-                ctrl.releaseKey(event.key.code);
+              else if (event.type == sf::Event::KeyReleased ||
+		       event.type == sf::Event::MouseButtonReleased)
+                ctrl.releaseKey(entry);
             }
         }
       // draw stuff here

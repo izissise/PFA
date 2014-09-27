@@ -5,14 +5,14 @@ KeyWidget::KeyWidget(const std::string &id, const sf::FloatRect &zone,
 		     Action act, const Controls &ctrl, const sf::Text &text):
   AWidget(id, zone, text), _isActive(false), _action(act)
 {
-  _k = ctrl.getLastKey(act);
+  _entry = ctrl.getLastKey(act);
   try
     {
-      _text.setString(ctrl.getCodeFromKey(_k));
+      _text.setString(ctrl.getCodeFromKey(_entry));
     }
   catch (Exception &e)
     {
-      _text.setString("");
+      _text.setString("Unknown");
     }
 }
 
@@ -22,28 +22,33 @@ int	KeyWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 
   if (_hide)
     return 0;
-  if (isClicked(event, sf::Mouse::Left))
+  if (isClicked(event, sf::Mouse::Left) && !_isActive)
     {
       _isActive = isOver(ref);
       if (_isActive)
 	{
 	  retVal = _isActive;
-	  _k = sf::Keyboard::Unknown;
+	  _entry.key = sf::Keyboard::Unknown;
 	  _text.setString("");
 	}
     }
-  if (event.type == sf::Event::KeyPressed && _isActive)
+  else if (_isActive)
     {
-      retVal = 1;
-      _isActive = false;
-      _k = event.key.code;
-      try
+      if (event.type == sf::Event::KeyPressed ||
+	  event.type == sf::Event::MouseButtonPressed ||
+	  event.type == sf::Event::MouseWheelMoved)
 	{
-	  _text.setString(set.getControls().getCodeFromKey(event.key.code));
-	}
-      catch (Exception &e)
-	{
-	  _text.setString("");
+	  _entry.fill(event);
+	  retVal = 1;
+	  _isActive = false;
+	  try
+	    {
+	      _text.setString(set.getControls().getCodeFromKey(_entry));
+	    }
+	  catch (Exception &e)
+	    {
+	      _text.setString("Unknown");
+	    }
 	}
     }
   for (auto &func : _updates)

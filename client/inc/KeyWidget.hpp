@@ -15,7 +15,7 @@ public:
 private:
   bool		_isActive;
   Action	_action;
-  ctrl::key	_k;
+  t_entry	_entry;
 };
 
 #endif /* _KEYWIDGET_H_ */

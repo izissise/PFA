@@ -34,18 +34,19 @@ void	Settings::setKeyword(const std::vector<std::string> &tokens)
 
 void		Settings::bindKeyword(const std::vector<std::string> &tokens)
 {
-  ctrl::key	k;
+  t_entry	entry;
   Action	act;
 
   if (tokens.size() < 3)
     throw (Exception("Missing parameters for bind command"));
-  k = _ctrl.getKeyFromCode(tokens[1]);
-  if (k == sf::Keyboard::Unknown)
+  entry = _ctrl.getKeyFromCode(tokens[1]);
+  // MouseWheelDown is -1 same as sf::Keyboard::Unknown
+  if (entry == ctrl::state::Unset)
     throw (Exception("Unknown key ["+ tokens[1] +"]"));
   act = _ctrl.getActionFromCode(tokens[2]);
   if (act == Action::Unknown)
     throw (Exception("Unknown Action ["+ tokens[2] +"] for key ["+ tokens[1] +"]"));
-  _ctrl.bindActionOnKey(k, act);
+  _ctrl.bindActionOnKey(entry, act);
 }
 
 void	Settings::parseCommandLine(const std::string &cmd)
