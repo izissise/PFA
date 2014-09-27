@@ -10,6 +10,10 @@ public:
 
   void	construct(const sf::Texture &texture, Settings &set,
 		  const std::vector<APanelScreen *> &panels);
+
+private:
+  void	createHeader(const sf::Texture &texture, Widget *w);
+  void	createButton(const sf::Texture &texture, Widget *w);
 };
 
 #endif /* _SELECTLIST_H_ */

@@ -14,6 +14,12 @@ void	Observable::addObserver(IObserver * const observer)
   _observers.push_back(observer);
 }
 
+void	Observable::addObserver(const std::initializer_list<IObserver * const> observers)
+{
+  for (auto &observer : observers)
+    _observers.push_back(observer);
+}
+
 void	Observable::removeObserver(IObserver * const observer)
 {
   auto	it = std::find(_observers.begin(), _observers.end(), observer);

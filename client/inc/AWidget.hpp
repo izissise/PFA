@@ -190,6 +190,7 @@ public:
   virtual void		resize(float pX, float pY);
 
   virtual void		toSize(unsigned int spritePos, float pX, float pY);
+  virtual void		toSize(float pX, float pY);
   virtual void		move(float pX, float pY);
   void		setSpriteSize(unsigned int spritePos, float x, float y);
 
@@ -223,6 +224,7 @@ public:		// public so the lambda can call it
    */
   bool		isClicked(const sf::Event &event, sf::Mouse::Button button) const;
   void		setSpriteAttr(unsigned int spritePos, bool draw);
+  const t_sprite	&getSpriteAttr(unsigned int spritePos) const;
   void		toggleSpriteAttr(unsigned int spritePos);
   t_sprite	&getSprite(unsigned int spritePos);
   const sf::FloatRect	&getZone() const;

@@ -112,6 +112,11 @@ void	AWidget::setSpriteAttr(unsigned int spritePos, bool display)
   _sprites[spritePos].draw = display;
 }
 
+const t_sprite	&AWidget::getSpriteAttr(unsigned int spritePos) const
+{
+  return _sprites[spritePos];
+}
+
 void	AWidget::toggleSpriteAttr(unsigned int spritePos)
 {
   _sprites[spritePos].draw = !_sprites[spritePos].draw;
@@ -151,6 +156,19 @@ void	AWidget::resize(float pX, float pY)
       elem.sprite.scale(pX, pY);
     }
   _text.scale(pX, pY);
+}
+
+void		AWidget::toSize(float pX, float pY)
+{
+  float		rX = pX / _zone.width;
+  float		rY = pY / _zone.height;
+  sf::FloatRect	rec;
+
+  for (auto &sprite : _sprites)
+    {
+      rec = sprite.sprite.getLocalBounds();
+      sprite.sprite.setScale(rX, rY);
+    }
 }
 
 void	AWidget::toSize(unsigned int spritePos, float pX, float pY)

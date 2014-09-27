@@ -25,7 +25,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 20, 730},
 						  Scroll::Vertical, this,
 						  sf::Text(), wFlag::None);
-  SelectList	*wSelectList = new SelectList({600, 1000, 200, 600});
+  SelectList	*wSelectList = new SelectList({600, 1000, 260, 600});
 
   wSelectList->construct(texture, set, {});
   createOptPanel(texture, wPanOption);
