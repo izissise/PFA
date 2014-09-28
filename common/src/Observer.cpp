@@ -14,7 +14,7 @@ void	Observable::addObserver(IObserver * const observer)
   _observers.push_back(observer);
 }
 
-void	Observable::addObserver(const std::initializer_list<IObserver * const> observers)
+void	Observable::addObserver(const std::initializer_list<IObserver * const> &observers)
 {
   for (auto &observer : observers)
     _observers.push_back(observer);

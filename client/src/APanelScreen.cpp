@@ -108,6 +108,17 @@ void	APanelScreen::trigger(const t_event &event)
     }
 }
 
+void	APanelScreen::addWidget(AWidget * const widget)
+{
+  _widgets.push_back(widget);
+}
+
+void	APanelScreen::addWidget(const std::initializer_list<AWidget * const> &widgets)
+{
+  for (auto widget : widgets)
+    _widgets.push_back(widget);
+}
+
 const std::vector<AWidget *>	&APanelScreen::getWidgets() const
 {
   return _widgets;

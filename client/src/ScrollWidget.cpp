@@ -159,7 +159,6 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 {
   int	retVal = 0;
 
-  sf::FloatRect rec = getSprite(1).sprite.getGlobalBounds();
   if (_hide)
     return 0;
   if (isClicked(event, sf::Mouse::Left))

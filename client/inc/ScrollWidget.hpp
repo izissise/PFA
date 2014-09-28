@@ -28,10 +28,10 @@ public:
 
   int   update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   bool	isOver(const sf::RenderWindow &ref) const;
-  void		addSprite(t_sprite &elem);
-  void		addSprite(const sf::Texture &texture, const sf::IntRect &rect,
-			  bool display = true);
-  void		toSize(unsigned int spritePos, float pX, float pY);
+  void	addSprite(t_sprite &elem);
+  void	addSprite(const sf::Texture &texture, const sf::IntRect &rect,
+		  bool display = true);
+  void	toSize(unsigned int spritePos, float pX, float pY);
 
 private:
   void	movePicker(sf::Sprite &sprite, float x, float y);
