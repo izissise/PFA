@@ -5,8 +5,8 @@ ClientMain::ClientMain()
                           std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
   _menu(_settings),
   _showMenu(false),
-  _updateThread(std::bind(&ClientMain::update, this)),
-  _world(_settings)
+  _world(_settings),
+  _updateThread(std::bind(&ClientMain::update, this))
 {
   _window.setVerticalSyncEnabled(true);
 }

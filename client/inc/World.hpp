@@ -2,16 +2,23 @@
 # define WORLD_H
 
 # include <map>
+# include <memory>
 
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
 # include "Chunk.hpp"
+# include "Range2.hpp"
 # include "Settings.hpp"
 # include "TileCodex.hpp"
+# include "Vector2.hpp"
+
+class WorldTester;
 
 class World
 {
+  friend class WorldTester;
+
 public:
   World(Settings& settings);
   ~World(void) = default;
@@ -21,11 +28,14 @@ public:
   void			update(void);
   void			draw(sf::RenderWindow& window) const;
 
+  void			translateCam(const sf::Vector2<float>& v);
+  void			moveCam(const sf::Vector2<float>& pos);
+
 protected:
 private:
-  typedef sf::Vector2f worldPos;
-  typedef sf::Vector2i screenPos;
-  typedef std::pair<int, int> chunkId;
+  typedef Vector2f	worldPos;
+  typedef Vector2i	screenPos;
+  typedef Vector2i	chunkId;
 
   class Camera
   {
@@ -35,18 +45,18 @@ private:
     Camera(const Camera& other) = default;
     Camera&	operator=(const Camera& other) = default;
 
-    void	translate(const sf::Vector2<float>& v) noexcept;
-    void	move(const sf::Vector2<float>& pos) noexcept;
+    void	translate(const worldPos& v) noexcept;
+    void	move(const worldPos& pos) noexcept;
 
-    void	scale(const sf::Vector2<float>& s) noexcept;
-    void	resize(const sf::Vector2<float>& s) noexcept;
+    void	scale(const worldPos& s) noexcept;
+    void	resize(const worldPos& s) noexcept;
 
     float	left(void) const noexcept	{ return _topLeft.x; }
-    float	right(void) const noexcept	{ return _topLeft.x + _size.x; }
+    float	right(void) const noexcept	{ return _topLeft.x + _size.w; }
     float	top(void) const noexcept	{ return _topLeft.y; }
-    float	bottom(void) const noexcept	{ return _topLeft.y + _size.y; }
-    float	width(void) const noexcept	{ return _size.x; }
-    float	height(void) const noexcept	{ return _size.y; }
+    float	bottom(void) const noexcept	{ return _topLeft.y + _size.h; }
+    float	width(void) const noexcept	{ return _size.w; }
+    float	height(void) const noexcept	{ return _size.h; }
     worldPos	center(void) const noexcept	{ return _center; }
 
   private:
@@ -55,21 +65,23 @@ private:
     worldPos	_center;
   };
 
-  worldPos		_sToWPos(screenPos pos) const;
-  screenPos		_wToSPos(worldPos pos) const;
-  float			_getGridOffset(float w) const;
+  worldPos	_sToWPos(screenPos pos) const;
+  screenPos	_wToSPos(worldPos pos) const;
+  float		_getGridOffset(float w) const;
 
-  void			_drawChunk(sf::RenderWindow& window,
-				   const chunkId& chunkCursor,
-				   sf::Vector2<int>& windowCoord) const;
-public:
-  Camera			camera;
+  void		_calculateVisibleRange(void);
 
+  void		_drawChunk(sf::RenderWindow& window,
+			   const chunkId& cursor,
+			   screenPos& windowCoord) const;
+  void		_loadChunks(void);
 private:
-  std::map<chunkId, Chunk *>	_chunks;
-  Settings&			_settings;
-  screenPos			_screenSize;
-  TileCodex			_codex;
+  std::map<chunkId, std::unique_ptr<Chunk>>	_chunks;
+  Settings&	_settings;
+  TileCodex	_codex;
+  Camera	_camera;
+  Range2i	_loadedRange;
+  Range2i	_visibleRange;
 };
 
 #endif /* WORLD_H */

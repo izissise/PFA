@@ -30,8 +30,8 @@ private:
   sf::RenderWindow _window;
   Menu _menu;
   bool _showMenu;
-  std::thread _updateThread;
   World _world;
+  std::thread _updateThread;
 };
 
 #endif // CLIENTMAIN_H

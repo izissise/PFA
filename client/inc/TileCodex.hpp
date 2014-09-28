@@ -4,6 +4,8 @@
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
+# include <Vector2.hpp>
+
 class TileCodex
 {
 public:
@@ -15,7 +17,8 @@ public:
   TileCodex(const TileCodex&) = delete;
   TileCodex&	operator=(const TileCodex&) = delete;
 
-  const sf::Sprite& getSprite(const unsigned id) const	{ return _sprites[id]; }
+  void applySpriteUV(const unsigned id, sf::Vertex *quad) const;
+
   const sf::Texture& getTexture(void) const		{ return _spriteSheet; }
   const sf::Shader& getBgShader(void) const		{ return _bgShader; }
   unsigned getWidth(void) const				{ return _texSize.x; }
@@ -25,8 +28,8 @@ protected:
 private:
   void		_initBgShader(void);
 
+  std::vector<sf::Vector2f>	_spriteUVs;
   sf::Texture			_spriteSheet;
-  std::vector<sf::Sprite>	_sprites;
   sf::Shader			_bgShader;
   sf::Vector2i			_texSize;
 };

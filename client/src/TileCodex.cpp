@@ -1,5 +1,9 @@
 #include <stdexcept>
 
+// <TESTING ZONE>
+#include <iostream>
+// </TESTING ZONE>
+
 #include "TileCodex.hpp"
 
 const unsigned TileCodex::tileSize;
@@ -12,14 +16,16 @@ TileCodex::TileCodex(const std::string& path)
   }
 
   // generate sprites
-  sf::IntRect	rect(0, 0, TileCodex::tileSize, TileCodex::tileSize);
+  Vector2f	tile(0.0f, 0.0f);
   _texSize.x = _spriteSheet.getSize().x;
   _texSize.y = _spriteSheet.getSize().y;
 
-  for (rect.top = 0; rect.top < _texSize.y; rect.top += rect.width) {
-    for (rect.left = 0; rect.left < _texSize.x; rect.left += rect.height) {
-      _sprites.push_back(sf::Sprite(_spriteSheet, rect));
-      _sprites.back().setPosition(0.0f, 0.0f);
+  for (; tile.y < _texSize.y; tile.y += tileSize) {
+    for (tile.x = 0.0f; tile.x < _texSize.x; tile.x += tileSize) {
+      _spriteUVs.emplace_back(tile.x, tile.y);
+      _spriteUVs.emplace_back((tile.x + tileSize), tile.y);
+      _spriteUVs.emplace_back((tile.x + tileSize), (tile.y + tileSize));
+      _spriteUVs.emplace_back(tile.x, (tile.y + tileSize));
     }
   }
 
@@ -38,4 +44,12 @@ TileCodex::TileCodex(const std::string& path)
 			  "}",
 			  sf::Shader::Fragment);
   _bgShader.setParameter("texture", _spriteSheet);
+}
+
+void TileCodex::applySpriteUV(const unsigned id, sf::Vertex *quad) const
+{
+  for (int i = 0; i < 4; ++i) {
+    const sf::Vector2f& a = _spriteUVs.at(id * 4 + i);
+    quad[i].texCoords = {a.x, a.y};
+  }
 }

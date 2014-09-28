@@ -10,12 +10,13 @@
 
 # include "TileCodex.hpp"
 # include "TileType.hpp"
+# include "Vector2.hpp"
 
 class Chunk
 {
 public:
-  static const unsigned width = 64;
-  static const unsigned height = 32;
+  static const unsigned width = 128;
+  static const unsigned height = 128;
 
   typedef TileType (Chunk::*Getter)(unsigned) const;
 
@@ -27,7 +28,7 @@ public:
 
   void loadFromFile(int x, int y, const TileCodex& codex);
   void draw(sf::RenderWindow& window,
-	    sf::Vector2<int>& windowCoord,
+	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;
 
   TileType getTile(unsigned index) const	{ return _tiles[index]; }

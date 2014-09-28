@@ -4,64 +4,65 @@
 #include "World.hpp"
 
 World::World(Settings& settings) :
-  _settings(settings),
-  _screenSize(std::stoi(_settings.getCvarList().getCvar("r_width")),
-	      std::stoi(_settings.getCvarList().getCvar("r_height")))
+  _settings(settings)
 {
+  screenPos	screenSize(std::stoi(_settings.getCvarList().getCvar("r_width")),
+			   std::stoi(_settings.getCvarList().getCvar("r_height")));
   chunkId	first;
   chunkId	last;
 
-  camera.resize(_sToWPos(_screenSize));
-  camera.move({0.5f, 0.5f});
+  _camera.resize(_sToWPos(screenSize));
+  _camera.move({0.5f, 0.5f});
 
-  first = {floor(camera.left()), floor(camera.top())};
-  last = {floor(camera.right()), floor(camera.bottom())};
-  for (auto cursor = first; cursor.second <= last.second; ++cursor.second) {
-    for (cursor.first = first.first; cursor.first <= last.first; ++cursor.first) {
-      _chunks[cursor] = new Chunk();
-      _chunks[cursor]->loadFromFile(cursor.first, cursor.second, _codex);
-    }
+  _calculateVisibleRange();
+  for (auto cursor : _visibleRange) {
+    _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
+    _chunks[cursor]->loadFromFile(cursor.x, cursor.y, _codex);
   }
+  _loadedRange = _visibleRange;
 }
 
 void World::update(void)
 {
-  static std::pair<Action, sf::Vector2f> moveControls[] =
+  static std::pair<Action, Vector2f> moveControls[] =
     {
-      {Action::Forward, {.0f, -.025f}},
-      {Action::Left, {-.025f, .0f}},
-      {Action::Back, {.0f, .025f}},
-      {Action::Right, {.025f, .0f}}
+      {Action::Forward, {.0f, -.0025f}},
+      {Action::Left, {-.0025f, .0f}},
+      {Action::Back, {.0f, .0025f}},
+      {Action::Right, {.0025f, .0f}}
     };
 
   for (auto control : moveControls) {
     if (_settings.getControls().getActionState(control.first)) {
-      camera.translate(control.second);
+      _camera.translate(control.second);
     }
+  }
+  if (_camera.left() < _visibleRange.left()
+      or _camera.top() < _visibleRange.top()
+      or _camera.right() > _visibleRange.right()
+      or _camera.bottom() > _visibleRange.bottom()) {
+    _calculateVisibleRange();
+    _loadChunks();
   }
 }
 
 void World::draw(sf::RenderWindow& window) const
 {
-  chunkId	first;
-  chunkId	last;
   worldPos	worldOrigin;
   screenPos	screenOrigin;
   screenPos	screenCoord;
 
-  worldOrigin.x = _getGridOffset(camera.left());
-  worldOrigin.y = _getGridOffset(camera.top());
+  worldOrigin.x = _getGridOffset(_camera.left());
+  worldOrigin.y = _getGridOffset(_camera.top());
   screenOrigin = _wToSPos(worldOrigin);
   screenCoord = screenOrigin;
-  first = {floor(camera.left()), floor(camera.top())};
-  last = {floor(camera.right()), floor(camera.bottom())};
-  for (auto cursor = first; cursor.second <= last.second; ++cursor.second) {
-    for (cursor.first = first.first; cursor.first <= last.first; ++cursor.first) {
-      _drawChunk(window, cursor, screenCoord);
-      screenCoord.x += Chunk::width * TileCodex::tileSize;
+  for (auto cursor : _visibleRange) {
+    if (cursor.x == _visibleRange.origin().x and cursor.y != _visibleRange.origin().y) {
+      screenCoord.x = screenOrigin.x;
+      screenCoord.y += Chunk::height * TileCodex::tileSize;
     }
-    screenCoord.x = screenOrigin.x;
-    screenCoord.y += Chunk::height * TileCodex::tileSize;
+    _drawChunk(window, cursor, screenCoord);
+    screenCoord.x += Chunk::width * TileCodex::tileSize;
   }
 }
 
@@ -82,17 +83,36 @@ float World::_getGridOffset(float w) const
   return -(w - floor(w));
 }
 
-void World::_drawChunk(sf::RenderWindow& window,
-		       const chunkId& chunkCursor,
-		       sf::Vector2<int>& windowCoord) const
+void World::_calculateVisibleRange(void)
 {
-  Chunk	*chunk;
+  _visibleRange = {Vector2i(floor(_camera.left()), floor(_camera.top())),
+		   Vector2i(floor(_camera.right()), floor(_camera.bottom()))};
+}
 
+void World::_drawChunk(sf::RenderWindow& window,
+		       const chunkId& cursor,
+		       screenPos& windowCoord) const
+{
   try {
-    chunk = _chunks.at(chunkCursor);
+    _chunks.at(cursor)->draw(window, windowCoord, _codex);
   } catch (const std::out_of_range& e) {
     // this means the chunk isn't loaded so we do nothing and skip it
     return ;
   }
-  chunk->draw(window, windowCoord, _codex);
+}
+
+void World::_loadChunks(void)
+{
+  Range2i	bufferRange({_visibleRange.left() - 1, _visibleRange.top() - 1},
+			    {_visibleRange.right() + 1, _visibleRange.bottom() + 1});
+
+  for (auto cursor : bufferRange) {
+    try {
+      _chunks.at(cursor);
+    } catch (const std::out_of_range& e) {
+      _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
+      _chunks[cursor]->loadFromFile(cursor.x, cursor.y, _codex);
+    }
+  }
+  _loadedRange = bufferRange;
 }
