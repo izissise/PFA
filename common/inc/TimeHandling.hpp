@@ -11,7 +11,7 @@ public:
   TimeHandling(const std::chrono::milliseconds& targetFrameDuration = std::chrono::milliseconds(16));
 
   /** Default destructor */
-  virtual ~TimeHandling();
+  virtual ~TimeHandling() = default;
 
   /** Access _totalElapsed
    * \return The total time since the first call of startFrame

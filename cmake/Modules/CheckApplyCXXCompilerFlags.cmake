@@ -21,6 +21,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 INCLUDE(CheckCXXCompilerFlag)
+INCLUDE(ParseArguments)
 
 FUNCTION(COMPILER_CXX_FLAGS)
 	PARSE_ARGUMENTS(ARG "FLAGS" "" ${ARGN})
