@@ -32,12 +32,13 @@ public:
   void		addSprite(const sf::Texture &texture, const sf::IntRect &rect,
 			  bool display = true);
   void		toSize(unsigned int spritePos, float pX, float pY);
-  void		updateScrollSize();
 
 private:
   void	movePicker(sf::Sprite &sprite, float x, float y);
   void	moveWidgets(sf::Vector2f moveSize);
   int	handleMouse(float pX, float pY);
+  void		updateScrollSize();
+  void		updateButtonPos();
   unsigned int	getBiggest(const sf::FloatRect &barZone,
 			   float diff,
 			   const std::vector<AWidget *> &widgetList);

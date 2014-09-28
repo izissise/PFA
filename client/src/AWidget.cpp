@@ -166,7 +166,7 @@ void		AWidget::toSize(float pX, float pY)
 
   for (auto &sprite : _sprites)
     {
-      rec = sprite.sprite.getLocalBounds();
+      rec = sprite.sprite.getGlobalBounds();
       sprite.sprite.setScale(rX, rY);
     }
 }
@@ -174,7 +174,7 @@ void		AWidget::toSize(float pX, float pY)
 void	AWidget::toSize(unsigned int spritePos, float pX, float pY)
 {
   sf::Sprite	&sprite = getSprite(spritePos).sprite;
-  sf::FloatRect rec = sprite.getLocalBounds();
+  sf::FloatRect rec = sprite.getGlobalBounds();
   float		rX = pX / rec.width;
   float		rY = pY / rec.height;
 

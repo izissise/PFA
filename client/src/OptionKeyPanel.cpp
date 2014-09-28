@@ -20,7 +20,7 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
   Controls	&ctrl = set.getControls();
   Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730},
 					 sf::Text(), wFlag::Resizable);
-  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, 120, 20, 730},
+  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, 120, 13, 730},
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
   KeyWidget	*wForward = new KeyWidget("Forward", {450, 300, 150, 40}, Action::Forward, ctrl, txt);
@@ -111,11 +111,10 @@ void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidge
 
 void	OptionKeyPanel::createScrollBar(const sf::Texture &texture UNUSED, ScrollWidget *wScroll)
 {
-  wScroll->addSprite(texture, sf::IntRect(670, 1120, 800, 20));
-  wScroll->addSprite(texture, sf::IntRect(1011, 1085, 18, 18));
-  wScroll->toSize(1, 15, 15);
-  wScroll->toSize(0, 730, 17);
-  wScroll->getSprite(0).sprite.rotate(90);
+  wScroll->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
+  wScroll->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
+  wScroll->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
+  wScroll->toSize(0, 13, 730);
 }
 
 void	OptionKeyPanel::createTextWidget(Widget *widget)

@@ -83,6 +83,29 @@ unsigned int	ScrollWidget::getBiggest(const sf::FloatRect &barZone,
   return biggest;
 }
 
+void		ScrollWidget::updateButtonPos()
+{
+  if (_sprites.size() < 3)
+    return ;
+
+  sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
+  t_sprite	&button = getSprite(2);
+  sf::FloatRect	buttonZone = button.sprite.getGlobalBounds();
+
+  if (_dir == Scroll::Vertical)
+    {
+      button.draw = (picZone.height >= buttonZone.height);
+      button.sprite.setPosition(picZone.left, picZone.top + picZone.height / 2.0
+				- buttonZone.height / 2.0);
+    }
+  else
+    {
+      button.draw = (picZone.width >= buttonZone.width);
+      button.sprite.setPosition(picZone.left + picZone.width / 2.0 - buttonZone.width / 2.0,
+				picZone.top);
+    }
+}
+
 void		ScrollWidget::updateScrollSize()
 {
   sf::FloatRect	barZone = getSprite(0).sprite.getGlobalBounds();
@@ -111,6 +134,7 @@ void		ScrollWidget::updateScrollSize()
     _ratio = biggest / (_dir == Scroll::Vertical ? barZone.height : barZone.width);
   toSize(1, _dir == Scroll::Vertical ? -1 : barZone.width / _ratio,
 	 _dir == Scroll::Vertical ? barZone.height / _ratio : -1);
+  updateButtonPos();
 }
 
 int		ScrollWidget::handleMouse(float pX, float pY)
@@ -135,6 +159,7 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 {
   int	retVal = 0;
 
+  sf::FloatRect rec = getSprite(1).sprite.getGlobalBounds();
   if (_hide)
     return 0;
   if (isClicked(event, sf::Mouse::Left))
@@ -211,5 +236,4 @@ void	ScrollWidget::toSize(unsigned int spritePos, float pX, float pY)
 
       movePicker(sprite, pos.x, pos.y);
     }
-  rec = sprite.getGlobalBounds();
 }

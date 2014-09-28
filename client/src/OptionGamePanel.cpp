@@ -22,7 +22,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 					      sf::Text("", _font, 20),
 					      sf::Text("Name", _font, 20), 30);
   BarWidget	*wBarWidget = new BarWidget("bar", {450, 400, 550, 10});
-  ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 20, 730},
+  ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 13, 730},
 						  Scroll::Vertical, this,
 						  sf::Text(), wFlag::None);
   SelectList	*wSelectList = new SelectList({600, 1000, 260, 600});
@@ -36,11 +36,10 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   wBarWidget->resize(0.5, 1.0);
   wBarWidget->addSprite(texture, sf::IntRect(990, 1085, 20, 21));
 
-  wScrollWidget->addSprite(texture, sf::IntRect(670, 1120, 800, 20));
-  wScrollWidget->addSprite(texture, sf::IntRect(1011, 1085, 18, 18));
-  wScrollWidget->toSize(1, 15, 15);
-  wScrollWidget->toSize(0, 730, 17);
-  wScrollWidget->getSprite(0).sprite.rotate(90);
+  wScrollWidget->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
+  wScrollWidget->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
+  wScrollWidget->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
+  wScrollWidget->toSize(0, 13, 730);
 
   _widgets.push_back(wPanOption);
   _widgets.push_back(wScrollWidget);
