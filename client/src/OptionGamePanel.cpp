@@ -25,7 +25,9 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 20, 730},
 						  Scroll::Vertical, this,
 						  sf::Text(), wFlag::None);
+  SelectList	*wSelectList = new SelectList({600, 1000, 260, 600});
 
+  wSelectList->construct(texture, set, {});
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
   createTextWidget(texture, wTextWidget);
@@ -45,6 +47,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   _widgets.push_back(wCheckBox);
   _widgets.push_back(wTextWidget);
   _widgets.push_back(wBarWidget);
+  addPanels({wSelectList});
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
   	std::stof(set.getCvarList().getCvar("r_height"))});
 }

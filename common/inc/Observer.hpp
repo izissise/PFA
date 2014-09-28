@@ -19,6 +19,7 @@ public:
 
   void	notify(const t_event &event) const;
   void	addObserver(IObserver * const observer);
+  void	addObserver(const std::initializer_list<IObserver * const> observers);
   void	removeObserver(IObserver * const observer);
   IObserver	*getObserver(unsigned int idx);
 
