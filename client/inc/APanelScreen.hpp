@@ -54,7 +54,7 @@ public:
    *
    */
   void		setHide(bool hide);
-  void	       	addPanels(const std::vector<APanelScreen *> &panels);
+  void	       	addPanels(const std::initializer_list<APanelScreen * const> &panels);
   void		addWidget(AWidget * const widget);
   void		addWidget(const std::initializer_list<AWidget * const> &widgets);
   const std::vector<AWidget *>	&getWidgets() const;

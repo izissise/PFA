@@ -35,10 +35,13 @@ public:
 
 private:
   void	movePicker(sf::Sprite &sprite, float x, float y);
-  void	moveWidgets(sf::Vector2f moveSize);
+  void	moveSubPanels(APanelScreen * const pan, const sf::Vector2f &moveSize);
+  void	moveWidgets(APanelScreen * const pan, const sf::Vector2f &moveSize);
   int	handleMouse(float pX, float pY);
   void		updateScrollSize();
   void		updateButtonPos();
+  unsigned int	calcPanelSize(APanelScreen * const pan, float diff,
+			      const sf::FloatRect &barZone);
   unsigned int	getBiggest(const sf::FloatRect &barZone,
 			   float diff,
 			   const std::vector<AWidget *> &widgetList);

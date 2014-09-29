@@ -10,6 +10,7 @@ SelectList::SelectList(const sf::FloatRect &zone) :
 void	SelectList::construct(const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels UNUSED)
 {
+  Panel		*container = new Panel();
   Widget	*wHeader = new Widget("header", {_zone.left, _zone.top, _zone.width, 60},
 				      sf::Text("Select", _font, 25));
   Widget	*wFirst = new Widget("first", {_zone.left, _zone.top + 57, _zone.width, 60},
@@ -18,7 +19,6 @@ void	SelectList::construct(const sf::Texture &texture, Settings &set,
 				      sf::Text("second", _font, 22));
   Widget	*wThird = new Widget("third", {_zone.left, _zone.top + 171, _zone.width, 60},
 				      sf::Text("third", _font, 22));
-
 
   createHeader(texture, wHeader);
   createButton(texture, wFirst);
@@ -29,10 +29,11 @@ void	SelectList::construct(const sf::Texture &texture, Settings &set,
   wFirst->addObserver({wSecond, wThird});
   wSecond->addObserver({wFirst, wThird});
   wThird->addObserver({wSecond, wFirst});
+
   _widgets.push_back(wHeader);
-  _widgets.push_back(wFirst);
-  _widgets.push_back(wSecond);
-  _widgets.push_back(wThird);
+  container->addWidget({wFirst, wSecond, wThird});
+  container->construct(texture, set, panels);
+  addPanels({container});
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
@@ -92,5 +93,4 @@ void	SelectList::createButton(const sf::Texture &texture, Widget *w)
   w->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
   w->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
   w->alignText({wZone.left,wZone.top}, {wZone.width,wZone.height}, 50, 50);
-  w->setHidden(true);
 }

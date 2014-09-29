@@ -1,7 +1,7 @@
 #ifndef _ASELECTLIST_H_
 #define _ASELECTLIST_H_
 
-#include "APanelScreen.hpp"
+#include "Panel.hpp"
 #include "Widget.hpp"
 
 class ASelectList : public APanelScreen

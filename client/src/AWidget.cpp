@@ -17,7 +17,7 @@ void	AWidget::draw(sf::RenderWindow &window) const
     return ;
   for (auto &elem : _sprites)
     if (elem.draw)
-    window.draw(elem.sprite);
+      window.draw(elem.sprite);
   window.draw(_text);
 }
 
@@ -229,6 +229,7 @@ wFlag	AWidget::getFlag() const
 
 void	AWidget::trigger(const t_event &event)
 {
+  std::cout << "Get notified" << std::endl;
   if (event.e & wEvent::SetSprite)
     {
       setSpriteAttr(event.idx, event.value);

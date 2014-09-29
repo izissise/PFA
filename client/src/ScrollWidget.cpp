@@ -7,25 +7,11 @@ ScrollWidget::ScrollWidget(const std::string &id, const sf::FloatRect &zone,
 {
 }
 
-void		ScrollWidget::moveWidgets(sf::Vector2f moveSize)
+void		ScrollWidget::moveWidgets(APanelScreen * const pan,
+					  const sf::Vector2f &moveSize)
 {
-  auto		vec = _panel->getWidgets();
-  auto		panels = _panel->getSubPanels();
+  auto		vec = pan->getWidgets();
 
-  moveSize.y *= _ratio;
-  moveSize.x *= _ratio;
-  if (_dir == Scroll::Horizontal)
-    moveSize.y = 0;
-  else
-    moveSize.x = 0;
-  for (auto &pit : panels)
-    {
-      for (auto &pWit : pit->getWidgets())
-	{
-	  if (pWit->getFlag() & wFlag::Movable)
-	    pWit->move(-moveSize.x, -moveSize.y);
-	}
-    }
   for (auto &it : vec)
     {
       if (it->getFlag() & wFlag::Movable)
@@ -33,11 +19,27 @@ void		ScrollWidget::moveWidgets(sf::Vector2f moveSize)
     }
 }
 
+void		ScrollWidget::moveSubPanels(APanelScreen * const pan,
+					    const sf::Vector2f &moveSize)
+{
+  auto		panels = pan->getSubPanels();
+
+  for (auto &pit : panels)
+    {
+      if (!pit->getSubPanels().empty())
+	moveSubPanels(pit, moveSize);
+      else
+	moveWidgets(pit, moveSize);
+    }
+  moveWidgets(pan, moveSize);
+}
+
 void		ScrollWidget::movePicker(sf::Sprite &sprite, float x, float y)
 {
   sf::FloatRect	barRect = getSprite(0).sprite.getGlobalBounds();
   sf::FloatRect pickerRect = sprite.getGlobalBounds();
   sf::Vector2f	spritePos = sprite.getPosition();
+  sf::Vector2f	moveSize;
 
   if (_dir == Scroll::Horizontal)
     {
@@ -54,7 +56,37 @@ void		ScrollWidget::movePicker(sf::Sprite &sprite, float x, float y)
       x = barRect.left + barRect.width / 2.0 - pickerRect.width / 2.0;
     }
   sprite.setPosition(x, y);
-  moveWidgets(sf::Vector2f(x, y) - spritePos);
+  moveSize = sf::Vector2f(x, y) - spritePos;
+  moveSize.y *= _ratio;
+  moveSize.x *= _ratio;
+  if (_dir == Scroll::Horizontal)
+    moveSize.y = 0;
+  else
+    moveSize.x = 0;
+  moveSubPanels(_panel, moveSize);
+}
+
+void		ScrollWidget::updateButtonPos()
+{
+  if (_sprites.size() < 3)
+    return ;
+
+  sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
+  t_sprite	&button = getSprite(2);
+  sf::FloatRect	buttonZone = button.sprite.getGlobalBounds();
+
+  if (_dir == Scroll::Vertical)
+    {
+      button.draw = (picZone.height >= buttonZone.height);
+      button.sprite.setPosition(picZone.left, picZone.top + picZone.height / 2.0
+				- buttonZone.height / 2.0);
+    }
+  else
+    {
+      button.draw = (picZone.width >= buttonZone.width);
+      button.sprite.setPosition(picZone.left + picZone.width / 2.0 - buttonZone.width / 2.0,
+				picZone.top);
+    }
 }
 
 unsigned int	ScrollWidget::getBiggest(const sf::FloatRect &barZone,
@@ -83,27 +115,30 @@ unsigned int	ScrollWidget::getBiggest(const sf::FloatRect &barZone,
   return biggest;
 }
 
-void		ScrollWidget::updateButtonPos()
+unsigned int	ScrollWidget::calcPanelSize(APanelScreen * const pan, float diff,
+					    const sf::FloatRect &barZone)
 {
-  if (_sprites.size() < 3)
-    return ;
+  unsigned int	tmp;
+  unsigned int	biggest = 0;
 
-  sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
-  t_sprite	&button = getSprite(2);
-  sf::FloatRect	buttonZone = button.sprite.getGlobalBounds();
-
-  if (_dir == Scroll::Vertical)
+  for (auto &panel : pan->getSubPanels())
     {
-      button.draw = (picZone.height >= buttonZone.height);
-      button.sprite.setPosition(picZone.left, picZone.top + picZone.height / 2.0
-				- buttonZone.height / 2.0);
+      if (panel->isHidden())
+	continue ;
+      if (!panel->getSubPanels().empty())
+	{
+	  tmp = calcPanelSize(panel, diff, barZone);
+	  biggest = BIGGEST(biggest, tmp);
+	}
+      else
+	{
+	  tmp = getBiggest(barZone, diff, panel->getWidgets());
+	  biggest = BIGGEST(biggest, tmp);
+	}
     }
-  else
-    {
-      button.draw = (picZone.width >= buttonZone.width);
-      button.sprite.setPosition(picZone.left + picZone.width / 2.0 - buttonZone.width / 2.0,
-				picZone.top);
-    }
+  tmp = getBiggest(barZone, diff, pan->getWidgets());
+  biggest = BIGGEST(biggest, tmp);
+  return biggest;
 }
 
 void		ScrollWidget::updateScrollSize()
@@ -111,7 +146,6 @@ void		ScrollWidget::updateScrollSize()
   sf::FloatRect	barZone = getSprite(0).sprite.getGlobalBounds();
   sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
   unsigned int	biggest;
-  unsigned int	tmp;
   float		diff;
 
   biggest = barZone.width;
@@ -119,15 +153,7 @@ void		ScrollWidget::updateScrollSize()
     diff = (picZone.top - barZone.top) * _ratio;
   else
     diff = (picZone.left - barZone.left) * _ratio;
-  for (auto &panel : _panel->getSubPanels())
-    {
-      if (panel->isHidden())
-	continue ;
-      tmp = getBiggest(barZone, diff, panel->getWidgets());
-      biggest = BIGGEST(biggest, tmp);
-    }
-  tmp = getBiggest(barZone, diff, _panel->getWidgets());
-  biggest = BIGGEST(biggest, tmp);
+  biggest = calcPanelSize(_panel, diff, barZone);
   if (biggest <= (_dir == Scroll::Vertical ? barZone.height : barZone.width))
     _ratio = 1;
   else

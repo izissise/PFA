@@ -89,7 +89,7 @@ int	APanelScreen::run(const sf::Event &event, sf::RenderWindow &ref, Settings &s
   return retVal;
 }
 
-void	APanelScreen::addPanels(const std::vector<APanelScreen *> &panels)
+void	APanelScreen::addPanels(const std::initializer_list<APanelScreen * const>  &panels)
 {
   for (auto &panel : panels)
     _panels.push_back(panel);
