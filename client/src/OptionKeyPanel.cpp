@@ -104,7 +104,7 @@ void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidge
     };
   wKey->addSprite(texture, sf::IntRect(670, 1080, 300, 40));
   wKey->toSize(0, 150, 40);
-  wKey->setFunction("main", updateFunc);
+  wKey->setUpdate(updateFunc);
   wKey->setColor(sf::Color(0,0,0));
   //  wKey->setTextAttr(sf::Text::Bold);
 }

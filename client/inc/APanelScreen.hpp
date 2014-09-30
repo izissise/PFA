@@ -54,6 +54,7 @@ public:
    *
    */
   void		setHide(bool hide);
+  void		setTrigger(const std::function<void (const t_event &event)> &func);
   void	       	addPanels(const std::initializer_list<APanelScreen * const> &panels);
   void		addWidget(AWidget * const widget);
   void		addWidget(const std::initializer_list<AWidget * const> &widgets);
@@ -134,6 +135,7 @@ protected:
   bool					_hide;
   sf::FloatRect				_zone;
   sf::Font				_font;
+  std::function<void (const t_event &event)>	_trigger;
   std::vector<const sf::Texture *>	_textures;
   std::vector<APanelScreen *>		_panels;
   std::vector<AWidget *>		_widgets;

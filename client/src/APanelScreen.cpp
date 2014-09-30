@@ -89,6 +89,11 @@ int	APanelScreen::run(const sf::Event &event, sf::RenderWindow &ref, Settings &s
   return retVal;
 }
 
+void	APanelScreen::setTrigger(const std::function<void (const t_event &event)> &func)
+{
+  _trigger = func;
+}
+
 void	APanelScreen::addPanels(const std::initializer_list<APanelScreen * const>  &panels)
 {
   for (auto &panel : panels)
@@ -102,9 +107,7 @@ void	APanelScreen::trigger(const t_event &event)
       if (event.e & wEvent::Toggle)
 	_hide = !_hide;
       else
-	{
-	  _hide = event.value;
-	}
+	_hide = true;
     }
 }
 

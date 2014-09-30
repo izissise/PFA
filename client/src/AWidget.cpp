@@ -66,6 +66,16 @@ void	AWidget::setTextAttr(unsigned int style)
   _text.setStyle(style);
 }
 
+void	AWidget::setTextContent(const std::string &text)
+{
+  _text.setString(text);
+}
+
+const std::string	AWidget::getTextContent() const
+{
+  return _text.getString().toAnsiString();
+}
+
 void	AWidget::setColor(const sf::Color &color)
 {
   _text.setColor(color);
@@ -81,11 +91,17 @@ bool	AWidget::isHidden() const
   return _hide;
 }
 
-void		AWidget::setFunction(const std::string &key, const std::function
-				     <int (AWidget &widget, const sf::Event &event,
-					   sf::RenderWindow &ref)> &func)
+void		AWidget::setUpdate(const std::function
+				   <int (AWidget &widget, const sf::Event &event,
+					 sf::RenderWindow &ref)> &func)
 {
-  _updates[key] = func;
+  _update = func;
+}
+
+void		AWidget::setTrigger(const std::function
+				    <void (const t_event &event)> &func)
+{
+  _event = func;
 }
 
 bool		AWidget::isOver(const sf::RenderWindow &ref) const
@@ -229,7 +245,6 @@ wFlag	AWidget::getFlag() const
 
 void	AWidget::trigger(const t_event &event)
 {
-  std::cout << "Get notified" << std::endl;
   if (event.e & wEvent::SetSprite)
     {
       setSpriteAttr(event.idx, event.value);

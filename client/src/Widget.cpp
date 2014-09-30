@@ -5,9 +5,9 @@ Widget::Widget(const std::string &id, const sf::FloatRect &zone,
 	       const sf::Text &text, wFlag flg) :
   AWidget(id, zone, text, flg)
 {
-  _updates["main"] = [](AWidget &widget UNUSED,
-			const sf::Event &event UNUSED,
-			sf::RenderWindow &ref UNUSED)
+  _update = [](AWidget &widget UNUSED,
+	       const sf::Event &event UNUSED,
+	       sf::RenderWindow &ref UNUSED)
     -> int
     {
       return 0;
@@ -16,14 +16,15 @@ Widget::Widget(const std::string &id, const sf::FloatRect &zone,
 
 int		Widget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set UNUSED)
 {
-  int	retVal = 0;
-
-  if (_hide)
+  if (_hide || !_update)
     return 0;
-  for (auto &func : _updates)
-    {
-      if ((retVal = func.second(*this, event, ref)) != 0)
-	return retVal;
-    }
-  return retVal;
+  return _update(*this, event, ref);
+}
+
+void		Widget::trigger(const t_event &event)
+{
+  if (_event)
+    _event(event);
+  else
+    AWidget::trigger(event);
 }

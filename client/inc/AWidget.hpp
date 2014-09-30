@@ -18,7 +18,8 @@ enum class	wEvent
     Toggle = 1,
     Hide = 2,
     Show = 4,
-    SetSprite = 16
+    SetSprite = 16,
+    UpdateText = 32
     };
 
 enum class	wFlag
@@ -33,10 +34,18 @@ typedef struct	s_event
   wEvent	e;
   int		idx;
   int		value;
-  s_event(wEvent event = wEvent::None, int add = 0, int v = 0) :
-    e(event), idx(add), value(v)
+  const std::string	&strText;
+
+  s_event(wEvent event = wEvent::None, int add = 0, int v = 0,
+	  const std::string &s = "") :
+    e(event), idx(add), value(v), strText(s)
   {
   }
+
+  // s_event(wEvent event = wEvent::None, const std::string &s) :
+  //   e(event), idx(0), value(0), strText(s)
+  // {
+  // }
 }		t_event;
 
 typedef struct	s_sprite
@@ -146,6 +155,8 @@ public:
    * This method calls sf::Text.setStyle(style)
    */
   void		setTextAttr(unsigned int style);
+  void		setTextContent(const std::string &text);
+  const std::string	getTextContent() const;
   virtual void		setColor(const sf::Color &color);
 
   /**
@@ -166,9 +177,10 @@ public:
    * \param[in] The function to assign
    *
    */
-  void		setFunction(const std::string &key, const std::function
-			    <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-			    &func);
+  void		setUpdate(const std::function
+			  <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+			  &func);
+  void		setTrigger(const std::function  <void (const t_event &event)> &func);
 
   /**
    * \fn void scale(const sf::Vector2f &size)
@@ -237,9 +249,10 @@ protected:
   std::vector<t_sprite>		_sprites;
   sf::Text			_text;
   wFlag				_flag;
-  std::map<std::string, std::function
-	   <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>>
-    _updates;
+  std::function
+  <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)> _update;
+  std::function
+  <void (const t_event &event)>	_event;
 };
 
 inline int	operator&(wEvent a, wEvent b)

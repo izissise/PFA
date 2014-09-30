@@ -203,13 +203,10 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
       movePicker(sprite, pos.x, pos.y - SLIDESPEED * event.mouseWheel.delta);
       retVal = 1;
     }
-  for (auto &func : _updates)
+  if (_update)
     {
-      if (func.second(*this, event, ref) != 0)
-	{
-	  retVal = 1;
-	  break ;
-	}
+      if (_update(*this, event, ref) != 0)
+	retVal = 1;
     }
   updateScrollSize();
   return retVal;

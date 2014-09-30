@@ -14,16 +14,14 @@ APanelScreen	*TabWidget::getPanel() const
 
 int	TabWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set UNUSED)
 {
-  int	retVal = 0;
-
   if (_hide)
     return 0;
-  for (auto &func : _updates)
+  if (_update)
     {
-      if ((retVal = func.second(*this, event, ref)) != 0)
-	return retVal;
+      if (_update(*this, event, ref) != 0)
+	return 1;
     }
-  return retVal;
+  return 0;
 }
 
 void	TabWidget::trigger(const t_event &event)
