@@ -1,7 +1,7 @@
 #include "Network.hpp"
 
 Network::Network()
-: _host(NULL), _peer(NULL)
+: _host(nullptr), _peer(nullptr)
 {
 	if (enet_initialize () != 0)
     throw NetworkException("An error occurred while initializing ENet.");

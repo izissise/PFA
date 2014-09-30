@@ -39,12 +39,12 @@ void Server::run()
                 event.peer->data = (char *)"Client";
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
-              for (auto it = _clients.begin();it != _clients.end();it++)
-                (*it)->sendPacket(0, std::string(reinterpret_cast<char *>(event.packet->data)));
-                std::cout << "A packet of length " << event.packet->dataLength << " containing [" << event.packet->data
-                          << "] was received from " << event.peer->data << " on channel " << (int)event.channelID << std::endl;
-                enet_packet_destroy (event.packet);
-                break;
+              for (auto it : _clients)
+                it->sendPacket(0, std::string(reinterpret_cast<char *>(event.packet->data)));
+              std::cout << "A packet of length " << event.packet->dataLength << " containing [" << event.packet->data
+                        << "] was received from " << event.peer->data << " on channel " << (int)event.channelID << std::endl;
+              enet_packet_destroy (event.packet);
+              break;
             case ENET_EVENT_TYPE_DISCONNECT:
                 std::cout << "Client disconnected" << std::endl;
                 _clients.erase(std::find_if(_clients.begin(), _clients.end(),
