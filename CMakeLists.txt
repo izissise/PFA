@@ -6,6 +6,9 @@ set(NAME_LIB "common")
 set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
 set(TEST_EXEC "UnitTester")
+set(PROTO_DIR "message")
+set(PROTO_SRCS "")
+set(PROTO_HDRS "")
 
 set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/"
 					  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/"
@@ -24,6 +27,7 @@ find_package(Threads)
 find_package(SFML 2.1 COMPONENTS system window graphics audio)
 find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
 find_package(ENet)
+find_package(Protobuf)
 
 INCLUDE(CMakeDependentOption)
 INCLUDE(CheckIncludeFile)
@@ -106,12 +110,22 @@ file(
   ${NAME_SERVER}/inc/*
 )
 
+file(
+  GLOB_RECURSE
+  proto_files
+  ${PROTO_DIR}/*.proto
+)
+
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
   "${NAME_LIB}/inc/Config.h.in"
   "${NAME_LIB}/inc/Config.h"
 )
+
+if(PROTOBUF_FOUND)
+  PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${proto_files})
+endif()
 
 include_directories("${INCLUDE_DIRECTORY}")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
@@ -122,6 +136,8 @@ add_library(
 # source files
   ${lib_source_files}
   ${lib_include_files}
+  ${PROTO_SRCS}
+  ${PROTO_HDRS}
 )
 
 add_executable(
@@ -167,6 +183,11 @@ if (ENET_FOUND)
    include_directories(${ENet_INCLUDE_DIRS})
    target_link_libraries(${NAME_SERVER} ${ENet_LIBRARIES})
    target_link_libraries(${NAME_CLIENT} ${ENet_LIBRARIES})
+endif()
+
+if (PROTOBUF_FOUND)
+   include_directories(${PROTOBUF_INCLUDE_DIRS})
+   target_link_libraries(${NAME_LIB} ${PROTOBUF_LIBRARIES})
 endif()
 
 # --- enable unit tests if desired ---

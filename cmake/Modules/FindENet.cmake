@@ -16,7 +16,7 @@
 
 FIND_PATH(ENet_INCLUDE_DIRS enet/enet.h
 			    PATHS
-			    $ENV{ENET_ROOT}
+			    ${ENV}${ENET_ROOT}
 			    /usr/local
 			    /usr
 			    PATH_SUFFIXES include
@@ -25,7 +25,7 @@ FIND_PATH(ENet_INCLUDE_DIRS enet/enet.h
 FIND_LIBRARY(ENet_LIBRARY
 	NAMES enet
 	PATHS
-	$ENV{ENET_ROOT}
+	${ENV}${ENET_ROOT}
 	/usr/local
 	/usr
 	PATH_SUFFIXES lib
