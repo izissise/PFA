@@ -40,11 +40,10 @@ void World::update(void)
       _camera.translate(control.second);
     }
   }
-  if (_camera.left() < _visibleRange.left()
-      or _camera.top() < _visibleRange.top()
-      or _camera.right() > _visibleRange.right() + 1
-      or _camera.bottom() > _visibleRange.bottom() + 1) {
-    _calculateVisibleRange();
+  Range2i oldRange = _visibleRange;
+
+  _calculateVisibleRange();
+  if (_visibleRange != oldRange) {
     _loadChunks();
   }
 }
@@ -107,6 +106,10 @@ void World::_drawChunk(sf::RenderWindow& window,
   }
 }
 
+/*
+** This method probably needs refactoring. It doesn't seem very optimal
+** even though for now it works and that currently good enough.
+*/
 void World::_loadChunks(void)
 {
   Range2i	bufferRange({_visibleRange.left() - 1, _visibleRange.top() - 1},
@@ -135,33 +138,14 @@ void World::_loadChunks(void)
   added.erase(std::remove_if(added.begin(), added.end(), predicate), added.end());
   removed.erase(std::remove_if(removed.begin(), removed.end(), predicate), removed.end());
 
-  // std::cout << std::endl
-  // 	    << "CAMERA" << std::endl
-  // 	    << "-------" << std::endl
-  // 	    << "left: " << _camera.left() << std::endl
-  // 	    << "top: " << _camera.top() << std::endl
-  // 	    << "right: " << _camera.right() << std::endl
-  // 	    << "bottom: " << _camera.bottom() << std::endl
-  // 	    << std::endl
-  // 	    << "VISIBLE" << std::endl
-  // 	    << "-------" << std::endl
-  // 	    << "left: " << _visibleRange.left() << std::endl
-  // 	    << "top: " << _visibleRange.top() << std::endl
-  // 	    << "right: " << _visibleRange.right() << std::endl
-  // 	    << "bottom: " << _visibleRange.bottom() << std::endl;
-
   for (auto cursor : added) {
-    try {
-      _chunks.at(cursor);
-    } catch (const std::out_of_range& e) {
+    if (_chunks.find(cursor) == _chunks.end()) {
       _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk()));
       _chunks[cursor]->loadFromFile(cursor.x, cursor.y, _codex);
     }
   }
   for (auto cursor : removed) {
-    auto chunk = _chunks.find(cursor);
-    if (chunk != _chunks.end()) {
-      _chunks.erase(chunk);
-    }
+    _chunks.erase(cursor);
   }
+  _loadedRange = bufferRange;
 }

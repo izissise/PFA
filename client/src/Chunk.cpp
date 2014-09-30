@@ -23,13 +23,10 @@ Chunk::Chunk(void) :
 
 Chunk::~Chunk(void)
 {
-  std::cout << "Unloading chunk " << std::string(_id.getString()) << std::endl;
 }
 
 void Chunk::loadFromFile(int xId, int yId, const TileCodex& codex) {
   unsigned      i{0};
-
-  std::cout << "Loading chunk " << xId << "/" << yId << std::endl;
 
   for (unsigned b = 0; b < Chunk::height; ++b) {
     for (unsigned a = 0; a < Chunk::width; ++a) {
