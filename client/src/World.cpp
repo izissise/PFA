@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <ctgmath>
 #include <stdexcept>
 
@@ -15,11 +16,13 @@ World::World(Settings& settings) :
   _camera.move({0.5f, 0.5f});
 
   _calculateVisibleRange();
-  for (auto cursor : _visibleRange) {
+  Range2i bufferRange = {{_visibleRange.left() - 1, _visibleRange.top() - 1},
+			 {_visibleRange.right() + 1, _visibleRange.bottom() + 1}};
+  for (auto cursor : bufferRange) {
     _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
     _chunks[cursor]->loadFromFile(cursor.x, cursor.y, _codex);
   }
-  _loadedRange = _visibleRange;
+  _loadedRange = bufferRange;
 }
 
 void World::update(void)
@@ -39,8 +42,8 @@ void World::update(void)
   }
   if (_camera.left() < _visibleRange.left()
       or _camera.top() < _visibleRange.top()
-      or _camera.right() > _visibleRange.right()
-      or _camera.bottom() > _visibleRange.bottom()) {
+      or _camera.right() > _visibleRange.right() + 1
+      or _camera.bottom() > _visibleRange.bottom() + 1) {
     _calculateVisibleRange();
     _loadChunks();
   }
@@ -94,7 +97,10 @@ void World::_drawChunk(sf::RenderWindow& window,
 		       screenPos& windowCoord) const
 {
   try {
-    _chunks.at(cursor)->draw(window, windowCoord, _codex);
+    const Chunk& target = *_chunks.at(cursor);
+    if (target.isLoaded()) {
+      target.draw(window, windowCoord, _codex);
+    }
   } catch (const std::out_of_range& e) {
     // this means the chunk isn't loaded so we do nothing and skip it
     return ;
@@ -106,13 +112,56 @@ void World::_loadChunks(void)
   Range2i	bufferRange({_visibleRange.left() - 1, _visibleRange.top() - 1},
 			    {_visibleRange.right() + 1, _visibleRange.bottom() + 1});
 
-  for (auto cursor : bufferRange) {
+  std::vector<Vector2i>	added;
+  std::vector<Vector2i> removed;
+
+  for (auto br : bufferRange) {
+    added.push_back(br);
+  }
+  for (auto lr : _loadedRange) {
+    removed.push_back(lr);
+  }
+
+  Range2i	intersection =
+    {
+      {std::max(bufferRange.left(), _loadedRange.left()),
+       std::max(bufferRange.top(), _loadedRange.top())},
+      {std::min(bufferRange.right(), _loadedRange.right()),
+       std::min(bufferRange.bottom(), _loadedRange.bottom())}
+    };
+  auto		predicate = [intersection](Vector2i& v) {
+    return (std::find(intersection.begin(), intersection.end(), v) != intersection.end());
+  };
+  added.erase(std::remove_if(added.begin(), added.end(), predicate), added.end());
+  removed.erase(std::remove_if(removed.begin(), removed.end(), predicate), removed.end());
+
+  // std::cout << std::endl
+  // 	    << "CAMERA" << std::endl
+  // 	    << "-------" << std::endl
+  // 	    << "left: " << _camera.left() << std::endl
+  // 	    << "top: " << _camera.top() << std::endl
+  // 	    << "right: " << _camera.right() << std::endl
+  // 	    << "bottom: " << _camera.bottom() << std::endl
+  // 	    << std::endl
+  // 	    << "VISIBLE" << std::endl
+  // 	    << "-------" << std::endl
+  // 	    << "left: " << _visibleRange.left() << std::endl
+  // 	    << "top: " << _visibleRange.top() << std::endl
+  // 	    << "right: " << _visibleRange.right() << std::endl
+  // 	    << "bottom: " << _visibleRange.bottom() << std::endl;
+
+  for (auto cursor : added) {
     try {
       _chunks.at(cursor);
     } catch (const std::out_of_range& e) {
-      _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
+      _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk()));
       _chunks[cursor]->loadFromFile(cursor.x, cursor.y, _codex);
     }
   }
-  _loadedRange = bufferRange;
+  for (auto cursor : removed) {
+    auto chunk = _chunks.find(cursor);
+    if (chunk != _chunks.end()) {
+      _chunks.erase(chunk);
+    }
+  }
 }

@@ -5,31 +5,19 @@ ClientMain::ClientMain()
                           std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
   _menu(_settings),
   _showMenu(false),
-  _world(_settings),
-  _updateThread(std::bind(&ClientMain::update, this))
+  _world(_settings)//,
+    //_updateThread(std::bind(&ClientMain::update, this))
 {
   _window.setVerticalSyncEnabled(true);
 }
 
 ClientMain::~ClientMain()
 {
-  _updateThread.join();
+  //  _updateThread.join();
 }
 
 void ClientMain::update()
 {
-  int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
-  TimeHandling time((std::chrono::milliseconds(gfps)));
-
-  // the updating loop
-  time.start();
-  while (_window.isOpen())
-    {
-      _world.update();
-
-      //update object here
-      time.endFrame();
-    }
 }
 
 void ClientMain::run()
@@ -37,6 +25,10 @@ void ClientMain::run()
   Controls &ctrl = _settings.getControls();
   sf::Event event;
 
+  int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
+  TimeHandling time((std::chrono::milliseconds(gfps)));
+
+  time.start();
   while (_window.isOpen())
     {
       _window.clear();
@@ -51,25 +43,28 @@ void ClientMain::run()
             {
               if (event.type == sf::Event::KeyPressed)
                 {
-                  std::cout << "keypress" << std::endl;
+                  //std::cout << "keypress" << std::endl;
                   ctrl.pressKey(event.key.code);
-                  try {
-                      std::cout << "Action for key " << ctrl.getCodeFromKey(event.key.code) << " is: ";
-                    }
-                  catch (const Exception &e) {
-                      std::cout << "Action for key " << "Unknown" << " is: ";
-                    }
-                  try {
-                      std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(event.key.code)) << std::endl;
-                    }
-                  catch (const std::out_of_range &oor) {
-                      std::cout << "Unknown" << std::endl;
-                    }
+                  // try {
+                  //     std::cout << "Action for key " << ctrl.getCodeFromKey(event.key.code) << " is: ";
+                  //   }
+                  // catch (const Exception &e) {
+                  //     std::cout << "Action for key " << "Unknown" << " is: ";
+                  //   }
+                  // try {
+                  //     std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(event.key.code)) << std::endl;
+                  //   }
+                  // catch (const std::out_of_range &oor) {
+                  //     std::cout << "Unknown" << std::endl;
+                  //   }
                 }
               else if (event.type == sf::Event::KeyReleased)
                 ctrl.releaseKey(event.key.code);
             }
         }
+      //update object here
+      _world.update();
+      time.endFrame();
       // draw stuff here
       _world.draw(_window);
       if (_showMenu) {

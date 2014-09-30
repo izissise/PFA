@@ -18,10 +18,8 @@ public:
   static const unsigned width = 128;
   static const unsigned height = 128;
 
-  typedef TileType (Chunk::*Getter)(unsigned) const;
-
   Chunk(void);
-  virtual ~Chunk() = default;
+  virtual ~Chunk();
 
   Chunk(const Chunk& other) = delete;
   Chunk&	operator=(const Chunk& other) = delete;

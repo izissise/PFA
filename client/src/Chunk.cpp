@@ -14,16 +14,23 @@ const unsigned Chunk::height;
 
 using namespace std;
 
-Chunk::Chunk() :
+Chunk::Chunk(void) :
   _tiles(width * height, TileType::Empty),
   _bgTiles(width * height, TileType::Empty),
   _loaded(false) {
 
 }
 
+Chunk::~Chunk(void)
+{
+  std::cout << "Unloading chunk " << std::string(_id.getString()) << std::endl;
+}
+
 void Chunk::loadFromFile(int xId, int yId, const TileCodex& codex) {
-  (void) xId, (void) yId;
   unsigned      i{0};
+
+  std::cout << "Loading chunk " << xId << "/" << yId << std::endl;
+
   for (unsigned b = 0; b < Chunk::height; ++b) {
     for (unsigned a = 0; a < Chunk::width; ++a) {
       if (a == 0 || b == 0) {
@@ -56,7 +63,7 @@ void Chunk::loadFromFile(int xId, int yId, const TileCodex& codex) {
           quad[2].position = {(x + 1.f) * TileCodex::tileSize, (y + 1.f) * TileCodex::tileSize};
           quad[3].position = {x * TileCodex::tileSize, (y + 1.f) * TileCodex::tileSize};
 
-	  codex.applySpriteUV(static_cast<int>(layer.first[i]), quad);
+	  codex.applySpriteUV(static_cast<unsigned>(layer.first[i]), quad);
         }
         ++i;
       }

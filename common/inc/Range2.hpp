@@ -33,8 +33,9 @@ public:
   T	right(void) const	{ return _dest.x; }
   T	top(void) const		{ return _origin.y; }
   T	bottom(void) const	{ return _dest.y; }
-  T	width(void) const	{ return _dest.x - origin.x; }
-  T	height(void) const	{ return _dest.y - origin.y; }
+  T	width(void) const	{ return _dest.x - _origin.x + 1; }
+  T	height(void) const	{ return _dest.y - _origin.y + 1; }
+  unsigned size(void) const	{ return this->width() * this->height(); }
 
   bool			operator==(const Range2& rhs) const {
     return (_origin == rhs._origin and _dest == rhs._dest);
