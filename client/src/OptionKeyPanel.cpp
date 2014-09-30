@@ -91,6 +91,7 @@ void	OptionKeyPanel::createOptPanel(const sf::Texture &texture UNUSED, Widget *w
 
 void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidget *wKey)
 {
+  sf::FloatRect wzone = wKey->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
 
@@ -102,6 +103,7 @@ void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidge
       widget.alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
       return 0;
     };
+  wKey->alignText({wzone.left,wzone.top}, {wzone.width, wzone.height}, 50, 50);
   wKey->addSprite(texture, sf::IntRect(670, 1080, 300, 40));
   wKey->toSize(0, 150, 40);
   wKey->setUpdate(updateFunc);
