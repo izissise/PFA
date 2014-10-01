@@ -1,0 +1,104 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\begin{document}
+\title{Cahier des charges - PFA}
+\author{Christopher Steel\\
+\\
+passé en revue par :\\
+Adrien Della Maggiora\\
+Hugues Morisset\\
+Luc Sinet}
+\date{Mercredi 1er octobre}
+\maketitle
+\begin{abstract}
+  Ce document a pour but de servir de cahier des charges pour
+  le projet libre de 3e année du cursus Epitech. Son objectif
+  est de poser le cadre du projet et décrire le travail à
+  accomplir. Il informera les responsables pédagogiques mais
+  servira également de spécification fonctionnelle pour l'équipe
+  de développement. Il est susceptible d'évoluer au delà de sa
+  première version --- celle fournie à l'équipe pedagogique ---
+  afin de documenter les nouvelles décisions fonctionelles des
+  développeurs sur la durée de réalisation du projet.
+\end{abstract}
+\section{Introduction}
+Nous souhaitons réaliser un jeu multijoueur de type bac à sable
+dans la lignée de Minecraft, Terraria et Starbound. Le joueur évolue
+dans un univers 2D sans but précis, sans missions, sans scénario.
+Cette absence de cadre procure une liberté totale et avec les actions
+et activités fournies par le jeu elle laisse naître une expérience
+unique au joueur.
+
+Notre différence avec les jeux sus-cités sera de mettre l'emphase
+sur des affrontements entre les joueurs. Pour cela nous créerons
+des fonctionnalités encourageant le combat et le rendant amusant.
+
+Notre jeu sera disponible sur Windows et Linux et permettra d'explorer
+des paysages générés de façon aléatoire dans lequel ils pourront
+construire et detruire au gré de leurs envies et ambitions.
+\section{Contexte}
+Notre projet est né suite à notre expérience avec les différents jeux
+mentionnés plus haut dans ce document. Nous avons analysé les forces
+de ces concurrents et avons constaté un manque de variation dans les
+activités proposées par ces jeux. Cette lacune entraine une perte
+d'interêt rapide une fois les possibilités du jeu explorées, la source
+principale d'amusement étant la découverte. Nous souhaitions donc
+tenter une approche différent du concept.
+\section{Equipe}
+L'equipe de développement sera constituée de 4 membres :
+\begin{itemize}
+  \item Luc Sinet \textit{chef de projet, analyste, développeur}
+  \item Adrien Della Maggiora \textit{analyste, développeur}
+  \item Christopher Steel \textit{analyste, développeur}
+  \item Hugues Morisset \textit{analyste, développeur}
+\end{itemize}
+Nous souhaitons également intégrer à l'équipe un graphiste 2D pour
+créer les ressources artistiques nécessaires.
+\section{Partenaires éventuels}
+Nous n'avons pas de partenaires. Nous comptons distribuer notre jeu
+par un site internet simple. Le code de notre jeu étant voulu libre
+sous licence GPLv3, il est disponible sur GitHub à l'adresse suivante :
+\url{https://github.com/izissise/PFA/}. Il sera mis à jour tout au long
+du projet. De par cette ouverture il est possible que des contributeurs
+externes se manifestent et proposent des améliorations. Ces propositions
+seront étudiées par l'équipe de développement et intégrées si jugées
+bénéfiques.
+\section{Objectifs}
+Produire une version jouable du jeu.
+Produire un site internet simple de presentation et téléchargement du jeu.
+\section{Planning général}
+\begin{description}
+\item[05/10/14] Menus, Moteur graphique fondamental
+\item[22/11/14] Generation et stockage des espaces de jeu, gestion d'entités
+\item[31/12/14] Serveur, site web
+\item[01/03/15] Systeme de combat, system de bac a sable, de mouvement, moteur physique
+\end{description}
+\section{Fonctionnalités}
+\subsection{Un jeu multi-plateformes et multi-joueurs}
+Le jeu doit être compatible Windows et Linux.
+Il doit pouvoir accueillir plusieurs joueurs au sein d'une même partie.
+Une implementation manuelle des communications réseau pourrait être
+integrée selon les lignes du projet R-Type.
+\subsection{Mondes aléatoires persistants}
+L'espace dans lequel évoluent les joueurs doit être généré de façon aléatoire.
+Lorsqu'une session de jeu termine, cet espace doit être enregistré afin de le
+restaurer lors d'une future session.
+\subsection{Aspect bac à sable}
+L'espace de jeu doit être modifiable par les joueurs au moyen de
+mécaniques de jeu dédiées. Ces mécaniques pourraient prendre la forme
+d'une pioche permettant de détruire des blocs de roche ou encore
+d'une grenade qui détruirait des blocs jusqu'à une certaine distance.
+Dans certains cas, les blocs détruits sont placés dans l'inventaire
+du joueur qui a provoqué leur destruction. Les joueurs doivent pouvoir
+placer des blocs dans le monde depuis leur inventaire.
+\subsection{Combat}
+Les joueurs doivent avoir la possibilité de s'entretuer et doivent
+être récompensés pour leurs victimes. Dans sa forme la plus basique
+le système de combat doit permettre des attaques et des esquives.
+\subsection{Communication}
+Un système de communication par messages textuels doit être présent.
+Celui-ci doit permettre l'envoi de messages contenant des accents.
+Un système de messagerie vocale adapté du projet Babel pourrait être
+intégré.
+\end{document}
