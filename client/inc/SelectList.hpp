@@ -10,6 +10,7 @@ public:
 
   void	construct(const sf::Texture &texture, Settings &set,
 		  const std::vector<APanelScreen *> &panels);
+  void	trigger(const t_event &event);
 
 private:
   void	createHeader(const sf::Texture &texture, Widget *w);

@@ -89,7 +89,12 @@ int	APanelScreen::run(const sf::Event &event, sf::RenderWindow &ref, Settings &s
   return retVal;
 }
 
-void	APanelScreen::addPanels(const std::vector<APanelScreen *> &panels)
+void	APanelScreen::setTrigger(const std::function<void (const t_event &event)> &func)
+{
+  _trigger = func;
+}
+
+void	APanelScreen::addPanels(const std::initializer_list<APanelScreen * const>  &panels)
 {
   for (auto &panel : panels)
     _panels.push_back(panel);
@@ -102,10 +107,19 @@ void	APanelScreen::trigger(const t_event &event)
       if (event.e & wEvent::Toggle)
 	_hide = !_hide;
       else
-	{
-	  _hide = event.value;
-	}
+	_hide = true;
     }
+}
+
+void	APanelScreen::addWidget(AWidget * const widget)
+{
+  _widgets.push_back(widget);
+}
+
+void	APanelScreen::addWidget(const std::initializer_list<AWidget * const> &widgets)
+{
+  for (auto widget : widgets)
+    _widgets.push_back(widget);
 }
 
 const std::vector<AWidget *>	&APanelScreen::getWidgets() const

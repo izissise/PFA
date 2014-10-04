@@ -10,6 +10,7 @@ SelectList::SelectList(const sf::FloatRect &zone) :
 void	SelectList::construct(const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels UNUSED)
 {
+  Panel		*container = new Panel();
   Widget	*wHeader = new Widget("header", {_zone.left, _zone.top, _zone.width, 60},
 				      sf::Text("Select", _font, 25));
   Widget	*wFirst = new Widget("first", {_zone.left, _zone.top + 57, _zone.width, 60},
@@ -19,22 +20,39 @@ void	SelectList::construct(const sf::Texture &texture, Settings &set,
   Widget	*wThird = new Widget("third", {_zone.left, _zone.top + 171, _zone.width, 60},
 				      sf::Text("third", _font, 22));
 
-
   createHeader(texture, wHeader);
   createButton(texture, wFirst);
   createButton(texture, wSecond);
   createButton(texture, wThird);
 
-  wHeader->addObserver({wFirst, wSecond, wThird});
-  wFirst->addObserver({wSecond, wThird});
-  wSecond->addObserver({wFirst, wThird});
-  wThird->addObserver({wSecond, wFirst});
+  wHeader->addObserver(container);
+  addObserver(container);
+
   _widgets.push_back(wHeader);
-  _widgets.push_back(wFirst);
-  _widgets.push_back(wSecond);
-  _widgets.push_back(wThird);
+  container->addWidget({wFirst, wSecond, wThird});
+  container->construct(texture, set, panels);
+  container->setHide(true);
+  addPanels({container});
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
+}
+
+void	SelectList::trigger(const t_event &event)
+{
+  if (event.e & wEvent::Hide)
+    {
+      if (event.e & wEvent::Toggle)
+	_hide = !_hide;
+      else
+	{
+	  _hide = event.value;
+	}
+    }
+  else if (event.e & wEvent::UpdateText)
+    {
+      _widgets[0]->setTextContent(event.strText); // widget[0] is the Header
+      notify(t_event(wEvent::Hide));
+    }
 }
 
 void	SelectList::createHeader(const sf::Texture &texture UNUSED, Widget *w)
@@ -56,7 +74,7 @@ void	SelectList::createHeader(const sf::Texture &texture UNUSED, Widget *w)
 	}
       return 0;
     };
-  w->setFunction("main", updateFunc);
+  w->setUpdate(updateFunc);
   addSpriteForWidget(w, sf::Color(10, 06, 12, 255), {_zone.width, 60});
   w->alignText({wZone.left,wZone.top}, {wZone.width,wZone.height}, 30, 50);
 }
@@ -71,26 +89,24 @@ void	SelectList::createButton(const sf::Texture &texture, Widget *w)
     -> int
     {
       bool	isOver;
-      bool	active;
 
       isOver = widget.isOver(ref);
-      if (isOver && widget.isClicked(event, sf::Mouse::Left))
+      widget.setSpriteAttr(0, !isOver);
+      widget.setSpriteAttr(1, isOver);
+      if (isOver)
 	{
-	  active = widget.getSpriteAttr(1).draw;
-	  if (!active)
+	  if (widget.isClicked(event, sf::Mouse::Left))
 	    {
-	      widget.notify(t_event(wEvent::SetSprite, 0, 1));
-	      widget.notify(t_event(wEvent::SetSprite, 1, 0));
+	      widget.notify(t_event(wEvent::UpdateText, 0, 0,
+				    widget.getTextContent().toAnsiString()));
+	      return 1;
 	    }
-	  widget.toggleSpriteAttr(0);
-	  widget.toggleSpriteAttr(1);
-	  return 1;
 	}
       return 0;
     };
-  w->setFunction("main", updateFunc);
+  w->setUpdate(updateFunc);
+  w->addObserver(this);
   w->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
   w->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
   w->alignText({wZone.left,wZone.top}, {wZone.width,wZone.height}, 50, 50);
-  w->setHidden(true);
 }

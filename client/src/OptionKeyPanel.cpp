@@ -20,7 +20,7 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
   Controls	&ctrl = set.getControls();
   Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730},
 					 sf::Text(), wFlag::Resizable);
-  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, 120, 20, 730},
+  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, 120, 13, 730},
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
   KeyWidget	*wForward = new KeyWidget("Forward", {450, 300, 150, 40}, Action::Forward, ctrl, txt);
@@ -91,6 +91,7 @@ void	OptionKeyPanel::createOptPanel(const sf::Texture &texture UNUSED, Widget *w
 
 void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidget *wKey)
 {
+  sf::FloatRect wzone = wKey->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
 
@@ -102,20 +103,20 @@ void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidge
       widget.alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
       return 0;
     };
+  wKey->alignText({wzone.left,wzone.top}, {wzone.width, wzone.height}, 50, 50);
   wKey->addSprite(texture, sf::IntRect(670, 1080, 300, 40));
-  wKey->toSize(0, 150, 40);
-  wKey->setFunction("main", updateFunc);
+  wKey->setSpriteSize(0, 150, 40);
+  wKey->setUpdate(updateFunc);
   wKey->setColor(sf::Color(0,0,0));
   //  wKey->setTextAttr(sf::Text::Bold);
 }
 
 void	OptionKeyPanel::createScrollBar(const sf::Texture &texture UNUSED, ScrollWidget *wScroll)
 {
-  wScroll->addSprite(texture, sf::IntRect(670, 1120, 800, 20));
-  wScroll->addSprite(texture, sf::IntRect(1011, 1085, 18, 18));
-  wScroll->toSize(1, 15, 15);
-  wScroll->toSize(0, 730, 17);
-  wScroll->getSprite(0).sprite.rotate(90);
+  wScroll->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
+  wScroll->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
+  wScroll->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
+  wScroll->setSpriteSize(0, 13, 730);
 }
 
 void	OptionKeyPanel::createTextWidget(Widget *widget)

@@ -50,9 +50,9 @@ int	BarWidget::update(const sf::Event &event, sf::RenderWindow &ref,
       retVal = 1;
       movePicker(sprite.sprite, event.mouseMove.x, pos.y);
     }
-  for (auto &func : _updates)
+  if (_update)
     {
-      if (func.second(*this, event, ref) != 0)
+      if (_update(*this, event, ref) != 0)
 	return 1;
     }
   return retVal;

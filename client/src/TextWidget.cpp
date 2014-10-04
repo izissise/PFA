@@ -20,11 +20,9 @@ int	TextWidget::setToDefault(const sf::Event &event, sf::RenderWindow &ref)
     {
       _text.setString(_default.getString());
       _text.setColor(_default.getColor());
-      for (auto &func : _updates)
-	{
-	  if (func.second(*this, event, ref) != 0)
-	    return 1;
-	}
+      if (_update)
+	if (_update(*this, event, ref) != 0)
+	  return 1;
     }
   return 0;
 }
@@ -55,11 +53,9 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 	{
 	  _textContent.setString(getString());
 	  setDrawableText();
-	  for (auto &func : _updates)
-	    {
-	      if ((retVal = func.second(*this, event, ref)) != 0)
-		return retVal;
-	    }
+	  if (_update)
+	    if ((retVal = _update(*this, event, ref)) != 0)
+	      return retVal;
 	  _cursor.update();
 	  _cursor.setCursorPos(_text);
 	}
