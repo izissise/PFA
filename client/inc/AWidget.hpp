@@ -156,7 +156,7 @@ public:
    */
   void		setTextAttr(unsigned int style);
   void		setTextContent(const std::string &text);
-  const std::string	getTextContent() const;
+  const sf::String	&getTextContent() const;
   virtual void		setColor(const sf::Color &color);
 
   /**
@@ -201,10 +201,9 @@ public:
    */
   virtual void		resize(float pX, float pY);
 
-  virtual void		toSize(unsigned int spritePos, float pX, float pY);
-  virtual void		toSize(float pX, float pY);
+  virtual void		setSize(float pX, float pY);
+  virtual void		setSpriteSize(unsigned int spritePos, float x, float y);
   virtual void		move(float pX, float pY);
-  void		setSpriteSize(unsigned int spritePos, float x, float y);
 
   /**
    * \fn void trigger(const t_event &event)
@@ -240,7 +239,8 @@ public:		// public so the lambda can call it
   void		toggleSpriteAttr(unsigned int spritePos);
   t_sprite	&getSprite(unsigned int spritePos);
   const sf::FloatRect	&getZone() const;
-  wFlag		getFlag() const;
+  wFlag			getFlag() const;
+  virtual const sf::String	&getValue() const;
 
 protected:
   bool				_hide;

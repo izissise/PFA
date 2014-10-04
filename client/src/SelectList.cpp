@@ -97,7 +97,8 @@ void	SelectList::createButton(const sf::Texture &texture, Widget *w)
 	{
 	  if (widget.isClicked(event, sf::Mouse::Left))
 	    {
-	      widget.notify(t_event(wEvent::UpdateText, 0, 0, widget.getTextContent()));
+	      widget.notify(t_event(wEvent::UpdateText, 0, 0,
+				    widget.getTextContent().toAnsiString()));
 	      return 1;
 	    }
 	}

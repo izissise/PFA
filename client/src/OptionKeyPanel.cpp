@@ -105,7 +105,7 @@ void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidge
     };
   wKey->alignText({wzone.left,wzone.top}, {wzone.width, wzone.height}, 50, 50);
   wKey->addSprite(texture, sf::IntRect(670, 1080, 300, 40));
-  wKey->toSize(0, 150, 40);
+  wKey->setSpriteSize(0, 150, 40);
   wKey->setUpdate(updateFunc);
   wKey->setColor(sf::Color(0,0,0));
   //  wKey->setTextAttr(sf::Text::Bold);
@@ -116,7 +116,7 @@ void	OptionKeyPanel::createScrollBar(const sf::Texture &texture UNUSED, ScrollWi
   wScroll->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
   wScroll->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
   wScroll->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
-  wScroll->toSize(0, 13, 730);
+  wScroll->setSpriteSize(0, 13, 730);
 }
 
 void	OptionKeyPanel::createTextWidget(Widget *widget)

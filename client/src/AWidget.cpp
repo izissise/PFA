@@ -71,9 +71,9 @@ void	AWidget::setTextContent(const std::string &text)
   _text.setString(text);
 }
 
-const std::string	AWidget::getTextContent() const
+const sf::String	&AWidget::getTextContent() const
 {
-  return _text.getString().toAnsiString();
+  return _text.getString();
 }
 
 void	AWidget::setColor(const sf::Color &color)
@@ -174,20 +174,18 @@ void	AWidget::resize(float pX, float pY)
   _text.scale(pX, pY);
 }
 
-void		AWidget::toSize(float pX, float pY)
+void		AWidget::setSize(float pX, float pY)
 {
   float		rX = pX / _zone.width;
   float		rY = pY / _zone.height;
-  sf::FloatRect	rec;
 
   for (auto &sprite : _sprites)
     {
-      rec = sprite.sprite.getGlobalBounds();
       sprite.sprite.setScale(rX, rY);
     }
 }
 
-void	AWidget::toSize(unsigned int spritePos, float pX, float pY)
+void	AWidget::setSpriteSize(unsigned int spritePos, float pX, float pY)
 {
   sf::Sprite	&sprite = getSprite(spritePos).sprite;
   sf::FloatRect rec = sprite.getGlobalBounds();
@@ -216,16 +214,6 @@ void	AWidget::move(float pX, float pY)
   _text.setPosition(textPos);
 }
 
-void		AWidget::setSpriteSize(unsigned int spritePos, float x, float y)
-{
-  t_sprite	&elem = _sprites[spritePos];
-  sf::FloatRect	rect = elem.sprite.getGlobalBounds();
-  float		ratioX = x / rect.width;
-  float		ratioY = y / rect.height;
-
-  elem.sprite.scale(ratioX, ratioY);
-}
-
 t_sprite	&AWidget::getSprite(unsigned int spritePos)
 {
   if (_sprites.size() <= spritePos)
@@ -241,6 +229,11 @@ const sf::FloatRect	&AWidget::getZone() const
 wFlag	AWidget::getFlag() const
 {
   return _flag;
+}
+
+const sf::String	&AWidget::getValue() const
+{
+  return _text.getString();
 }
 
 void	AWidget::trigger(const t_event &event)
