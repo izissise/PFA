@@ -6,10 +6,6 @@ TimeHandling::TimeHandling(const std::chrono::milliseconds& targetFrameDuration)
 {
 }
 
-TimeHandling::~TimeHandling()
-{
-}
-
 void TimeHandling::start()
 {
   _startTime = std::chrono::system_clock::now();
