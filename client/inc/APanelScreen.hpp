@@ -7,7 +7,7 @@
 class APanelScreen : public IObserver, public Observable
 {
 public:
-  APanelScreen(const sf::FloatRect &zone = sf::FloatRect(0,0,0,0));
+  APanelScreen(const sf::FloatRect &zone);
   virtual ~APanelScreen() = 0;
 
   /**

@@ -10,7 +10,7 @@
 class OptionKeyPanel : public APanelScreen
 {
 public:
-  OptionKeyPanel();
+  OptionKeyPanel(const sf::FloatRect &zone);
   virtual ~OptionKeyPanel();
 
   void		construct(const sf::Texture &texture, Settings &set,

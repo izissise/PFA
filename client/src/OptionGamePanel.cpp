@@ -1,8 +1,8 @@
 #include "OptionGamePanel.hpp"
 #include "Unused.hpp"
 
-OptionGamePanel::OptionGamePanel() :
-  APanelScreen()
+OptionGamePanel::OptionGamePanel(const sf::FloatRect &zone) :
+  APanelScreen(zone)
 {
   if (!_font.loadFromFile("../client/assets/font.otf"))
     std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources

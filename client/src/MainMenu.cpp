@@ -1,8 +1,8 @@
 #include <iostream>
 #include "MainMenu.hpp"
 
-MainMenu::MainMenu() :
-  APanelScreen()
+MainMenu::MainMenu(const sf::FloatRect &zone) :
+  APanelScreen(zone)
 {
   if (!_font.loadFromFile("../client/assets/font.otf"))
     std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources

@@ -1,8 +1,8 @@
 #include "OptionKeyPanel.hpp"
 #include "Unused.hpp"
 
-OptionKeyPanel::OptionKeyPanel() :
-  APanelScreen()
+OptionKeyPanel::OptionKeyPanel(const sf::FloatRect &zone) :
+  APanelScreen(zone)
 {
   if (!_font.loadFromFile("../client/assets/font.otf"))
     std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources

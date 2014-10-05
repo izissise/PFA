@@ -6,7 +6,7 @@
 class Panel : public APanelScreen
 {
 public:
-  Panel();
+  Panel(const sf::FloatRect &zone);
   virtual ~Panel();
 
   void		construct(const sf::Texture &texture, Settings &set,
