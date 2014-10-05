@@ -18,7 +18,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730},
 					 sf::Text(), wFlag::None);
   Widget	*wCheckBox = new Widget("checkBox", {450, 200, 50, 50});
-  TextWidget	*wTextWidget = new TextWidget("nameText", {450, 300, 300, 40},
+  TextWidget	*wTextWidget = new TextWidget("nameText", {450, 700, 300, 40},
 					      sf::Text("", _font, 20),
 					      sf::Text("Name", _font, 20), 30);
   BarWidget	*wBarWidget = new BarWidget("bar", {450, 400, 550, 10});

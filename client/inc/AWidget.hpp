@@ -96,7 +96,7 @@ public:
    * \param[in] window The render window
    *
    */
-  virtual void		draw(sf::RenderWindow &window) const;
+  virtual void		draw(sf::RenderTexture &window) const;
 
   /**
    * \fn void addSprite(sf::Sprite &sprite)

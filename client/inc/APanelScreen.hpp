@@ -27,7 +27,7 @@ public:
    *
    * The panel's draw method will call every widget's draw method
    */
-  virtual void	draw(sf::RenderWindow &window);
+  virtual void	draw(sf::RenderWindow &window, bool toWin);
 
   /**
    * \fn void construct(const sf::Texture &texture, Settings &set, const std::vector<APanelScreen *> &panels) = 0;
@@ -131,10 +131,15 @@ protected:
    */
   virtual void		trigger(const t_event &event);
 
+private:
+  const sf::RenderTexture	&getRT() const;
+  const sf::FloatRect		&getZone() const;
+
 protected:
   bool					_hide;
   sf::FloatRect				_zone;
   sf::Font				_font;
+  sf::RenderTexture			_rt;
   std::function<void (const t_event &event)>	_trigger;
   std::vector<const sf::Texture *>	_textures;
   std::vector<APanelScreen *>		_panels;
