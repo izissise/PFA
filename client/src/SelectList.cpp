@@ -10,7 +10,8 @@ SelectList::SelectList(const sf::FloatRect &zone) :
 void	SelectList::construct(const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels UNUSED)
 {
-  Panel		*container = new Panel(sf::FloatRect(0,0,1600,900));
+  Panel		*container = new Panel(sf::FloatRect(_zone.left,_zone.top,
+						     _zone.width,_zone.height));
   Widget	*wHeader = new Widget("header", {_zone.left, _zone.top, _zone.width, 60},
 				      sf::Text("Select", _font, 25));
   Widget	*wFirst = new Widget("first", {_zone.left, _zone.top + 57, _zone.width, 60},

@@ -21,22 +21,34 @@ void		APanelScreen::draw(sf::RenderWindow &window, bool toWin)
       widget->draw(_rt);
   for (auto &panel : _panels)
     if (!panel->isHidden())
-      {
-	panel->draw(window, false);
-	tmpZone = static_cast<sf::IntRect>(panel->getZone());
-	tmp.setPosition(tmpZone.left, tmpZone.top);
-	tmp.setTexture(panel->getRT().getTexture());
-	tmp.setTextureRect(tmpZone);
-	_rt.draw(tmp);
-      }
+      panel->draw(window, false);
   _rt.display();
   if (toWin)
     {
+      print(_rt);
+      _rt.display();
       tmp.setPosition(_zone.left, _zone.top);
       tmp.setTexture(_rt.getTexture());
       tmp.setTextureRect(static_cast<sf::IntRect>(_zone));
       window.draw(tmp);
     }
+}
+
+void	APanelScreen::print(sf::RenderTexture &rt) const
+{
+  sf::Sprite	tmp;
+  sf::IntRect	tmpZone;
+
+  for (auto &panel : _panels)
+    if (!panel->isHidden())
+      {
+	tmpZone = static_cast<sf::IntRect>(panel->getZone());
+	tmp.setPosition(tmpZone.left, tmpZone.top);
+	tmp.setTexture(panel->getRT().getTexture());
+	tmp.setTextureRect(tmpZone);
+	rt.draw(tmp);
+	panel->print(rt);
+      }
 }
 
 sf::Vector2f	APanelScreen::toPixel(const sf::Vector2f &perCent,

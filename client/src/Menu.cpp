@@ -19,8 +19,8 @@ Menu::Menu(Settings& settings) :
     throw (Exception("Can't load Menu texture"));
 
   MainMenu		*mainMenu = new MainMenu(sf::FloatRect(0,0,1600,900));
-  OptionTabPanel	*optTabPanel = new OptionTabPanel(sf::FloatRect(0,0,1600,900));
-  OptionGamePanel	*optGamePanel = new OptionGamePanel(sf::FloatRect(380,120,1123,730));
+  OptionTabPanel	*optTabPanel = new OptionTabPanel(sf::FloatRect(380,50,1115,800));
+  OptionGamePanel	*optGamePanel = new OptionGamePanel(sf::FloatRect(380,120,1115,730));
   OptionKeyPanel	*optKeyPanel = new OptionKeyPanel(sf::FloatRect(380,120,1123,730));
 
   _panels.push_back(mainMenu);

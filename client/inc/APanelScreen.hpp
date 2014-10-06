@@ -28,6 +28,7 @@ public:
    * The panel's draw method will call every widget's draw method
    */
   virtual void	draw(sf::RenderWindow &window, bool toWin);
+  void	print(sf::RenderTexture &rt) const;
 
   /**
    * \fn void construct(const sf::Texture &texture, Settings &set, const std::vector<APanelScreen *> &panels) = 0;
