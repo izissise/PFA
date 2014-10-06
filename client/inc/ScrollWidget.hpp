@@ -28,16 +28,20 @@ public:
 
   int   update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   bool	isOver(const sf::RenderWindow &ref) const;
-  void		addSprite(t_sprite &elem);
-  void		addSprite(const sf::Texture &texture, const sf::IntRect &rect,
-			  bool display = true);
-  void		toSize(unsigned int spritePos, float pX, float pY);
-  void		updateScrollSize();
+  void	addSprite(t_sprite &elem);
+  void	addSprite(const sf::Texture &texture, const sf::IntRect &rect,
+		  bool display = true);
+  void	toSize(unsigned int spritePos, float pX, float pY);
 
 private:
   void	movePicker(sf::Sprite &sprite, float x, float y);
-  void	moveWidgets(sf::Vector2f moveSize);
+  void	moveSubPanels(APanelScreen * const pan, const sf::Vector2f &moveSize);
+  void	moveWidgets(APanelScreen * const pan, const sf::Vector2f &moveSize);
   int	handleMouse(float pX, float pY);
+  void		updateScrollSize();
+  void		updateButtonPos();
+  unsigned int	calcPanelSize(APanelScreen * const pan, float diff,
+			      const sf::FloatRect &barZone);
   unsigned int	getBiggest(const sf::FloatRect &barZone,
 			   float diff,
 			   const std::vector<AWidget *> &widgetList);

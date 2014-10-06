@@ -7,7 +7,7 @@
 class OptionTabPanel : public APanelScreen
 {
 public:
-  OptionTabPanel();
+  OptionTabPanel(const sf::FloatRect &zone);
   virtual ~OptionTabPanel();
 
   void		construct(const sf::Texture &texture, Settings &set,

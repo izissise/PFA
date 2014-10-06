@@ -7,7 +7,7 @@
 class MainMenu : public APanelScreen
 {
 public:
-  MainMenu();
+  MainMenu(const sf::FloatRect &zone);
   virtual ~MainMenu();
 
   void		construct(const sf::Texture &texture, Settings &set,

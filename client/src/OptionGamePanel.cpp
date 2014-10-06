@@ -1,8 +1,8 @@
 #include "OptionGamePanel.hpp"
 #include "Unused.hpp"
 
-OptionGamePanel::OptionGamePanel() :
-  APanelScreen()
+OptionGamePanel::OptionGamePanel(const sf::FloatRect &zone) :
+  APanelScreen(zone)
 {
   if (!_font.loadFromFile("../client/assets/font.otf"))
     std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
@@ -18,14 +18,14 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730},
 					 sf::Text(), wFlag::None);
   Widget	*wCheckBox = new Widget("checkBox", {450, 200, 50, 50});
-  TextWidget	*wTextWidget = new TextWidget("nameText", {450, 300, 300, 40},
+  TextWidget	*wTextWidget = new TextWidget("nameText", {450, 700, 300, 40},
 					      sf::Text("", _font, 20),
 					      sf::Text("Name", _font, 20), 30);
   BarWidget	*wBarWidget = new BarWidget("bar", {450, 400, 550, 10});
-  ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 20, 730},
+  ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 13, 730},
 						  Scroll::Vertical, this,
 						  sf::Text(), wFlag::None);
-  SelectList	*wSelectList = new SelectList({600, 1000, 260, 600});
+  SelectList	*wSelectList = new SelectList({1000, 200, 260, 600});
 
   wSelectList->construct(texture, set, {});
   createOptPanel(texture, wPanOption);
@@ -36,11 +36,10 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   wBarWidget->resize(0.5, 1.0);
   wBarWidget->addSprite(texture, sf::IntRect(990, 1085, 20, 21));
 
-  wScrollWidget->addSprite(texture, sf::IntRect(670, 1120, 800, 20));
-  wScrollWidget->addSprite(texture, sf::IntRect(1011, 1085, 18, 18));
-  wScrollWidget->toSize(1, 15, 15);
-  wScrollWidget->toSize(0, 730, 17);
-  wScrollWidget->getSprite(0).sprite.rotate(90);
+  wScrollWidget->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
+  wScrollWidget->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
+  wScrollWidget->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
+  wScrollWidget->toSize(0, 13, 730);
 
   _widgets.push_back(wPanOption);
   _widgets.push_back(wScrollWidget);
@@ -84,7 +83,7 @@ void	OptionGamePanel::createCheckBox(const sf::Texture &texture, Widget *wCheckB
   wCheckBox->addSprite(texture, sf::IntRect(570, 1080, 50, 50), false);
   wCheckBox->addSprite(texture, sf::IntRect(620, 1080, 50, 50), false);
   // wCheckBox->setSpriteSize(2, 50, 50);
-  wCheckBox->setFunction("main", updateFunc);
+  wCheckBox->setUpdate(updateFunc);
   wCheckBox->resize(0.5, 0.5);
 }
 
@@ -102,7 +101,7 @@ void	OptionGamePanel::createTextWidget(const sf::Texture &texture UNUSED, TextWi
       return 0;
     };
   wTextWidget->addSprite(texture, sf::IntRect(670, 1080, 300, 40));
-  wTextWidget->setFunction("main", updateFunc);
+  wTextWidget->setUpdate(updateFunc);
   wTextWidget->setColor(sf::Color(0,0,0));
   wTextWidget->setDefaultColor(sf::Color(60,60,60));
   wTextWidget->getCursor().setColor(sf::Color(0,0,0));

@@ -11,13 +11,13 @@ AWidget::~AWidget()
 {
 }
 
-void	AWidget::draw(sf::RenderWindow &window) const
+void	AWidget::draw(sf::RenderTexture &window) const
 {
   if (_hide)
     return ;
   for (auto &elem : _sprites)
     if (elem.draw)
-    window.draw(elem.sprite);
+      window.draw(elem.sprite);
   window.draw(_text);
 }
 
@@ -66,6 +66,16 @@ void	AWidget::setTextAttr(unsigned int style)
   _text.setStyle(style);
 }
 
+void	AWidget::setTextContent(const std::string &text)
+{
+  _text.setString(text);
+}
+
+const sf::String	&AWidget::getTextContent() const
+{
+  return _text.getString();
+}
+
 void	AWidget::setColor(const sf::Color &color)
 {
   _text.setColor(color);
@@ -81,11 +91,17 @@ bool	AWidget::isHidden() const
   return _hide;
 }
 
-void		AWidget::setFunction(const std::string &key, const std::function
-				     <int (AWidget &widget, const sf::Event &event,
-					   sf::RenderWindow &ref)> &func)
+void		AWidget::setUpdate(const std::function
+				   <int (AWidget &widget, const sf::Event &event,
+					 sf::RenderWindow &ref)> &func)
 {
-  _updates[key] = func;
+  _update = func;
+}
+
+void		AWidget::setTrigger(const std::function
+				    <void (const t_event &event)> &func)
+{
+  _event = func;
 }
 
 bool		AWidget::isOver(const sf::RenderWindow &ref) const
@@ -158,23 +174,21 @@ void	AWidget::resize(float pX, float pY)
   _text.scale(pX, pY);
 }
 
-void		AWidget::toSize(float pX, float pY)
+void		AWidget::setSize(float pX, float pY)
 {
   float		rX = pX / _zone.width;
   float		rY = pY / _zone.height;
-  sf::FloatRect	rec;
 
   for (auto &sprite : _sprites)
     {
-      rec = sprite.sprite.getLocalBounds();
       sprite.sprite.setScale(rX, rY);
     }
 }
 
-void	AWidget::toSize(unsigned int spritePos, float pX, float pY)
+void	AWidget::setSpriteSize(unsigned int spritePos, float pX, float pY)
 {
   sf::Sprite	&sprite = getSprite(spritePos).sprite;
-  sf::FloatRect rec = sprite.getLocalBounds();
+  sf::FloatRect rec = sprite.getGlobalBounds();
   float		rX = pX / rec.width;
   float		rY = pY / rec.height;
 
@@ -200,16 +214,6 @@ void	AWidget::move(float pX, float pY)
   _text.setPosition(textPos);
 }
 
-void		AWidget::setSpriteSize(unsigned int spritePos, float x, float y)
-{
-  t_sprite	&elem = _sprites[spritePos];
-  sf::FloatRect	rect = elem.sprite.getGlobalBounds();
-  float		ratioX = x / rect.width;
-  float		ratioY = y / rect.height;
-
-  elem.sprite.scale(ratioX, ratioY);
-}
-
 t_sprite	&AWidget::getSprite(unsigned int spritePos)
 {
   if (_sprites.size() <= spritePos)
@@ -225,6 +229,11 @@ const sf::FloatRect	&AWidget::getZone() const
 wFlag	AWidget::getFlag() const
 {
   return _flag;
+}
+
+const sf::String	&AWidget::getValue() const
+{
+  return _text.getString();
 }
 
 void	AWidget::trigger(const t_event &event)

@@ -18,10 +18,10 @@ Menu::Menu(Settings& settings) :
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
     throw (Exception("Can't load Menu texture"));
 
-  MainMenu		*mainMenu = new MainMenu;
-  OptionTabPanel	*optTabPanel = new OptionTabPanel;
-  OptionGamePanel	*optGamePanel = new OptionGamePanel;
-  OptionKeyPanel	*optKeyPanel = new OptionKeyPanel;
+  MainMenu		*mainMenu = new MainMenu(sf::FloatRect(0,0,1600,900));
+  OptionTabPanel	*optTabPanel = new OptionTabPanel(sf::FloatRect(380,50,1115,800));
+  OptionGamePanel	*optGamePanel = new OptionGamePanel(sf::FloatRect(380,120,1115,730));
+  OptionKeyPanel	*optKeyPanel = new OptionKeyPanel(sf::FloatRect(380,120,1123,730));
 
   _panels.push_back(mainMenu);
   _panels.push_back(optTabPanel);
@@ -51,7 +51,7 @@ bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
     {
       for (auto &panel : _panels)
 	{
-	  if (panel->isHidden() == false)
+	  if (!panel->isHidden())
 	    panel->run(event, window, set);
 	}
     }
@@ -63,7 +63,7 @@ void	Menu::draw(sf::RenderWindow& window)
   for (auto &panel : _panels)
     {
       if (!panel->isHidden())
-	panel->draw(window);
+	panel->draw(window, true);
     }
   if (_consoleActive)
     _console.draw(window);
