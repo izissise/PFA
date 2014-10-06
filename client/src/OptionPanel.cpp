@@ -1,8 +1,8 @@
 #include "OptionPanel.hpp"
 #include "Unused.hpp"
 
-OptionPanel::OptionPanel() :
-  APanelScreen()
+OptionPanel::OptionPanel(const sf::FloatRect &zone) :
+  APanelScreen(zone)
 {
 }
 

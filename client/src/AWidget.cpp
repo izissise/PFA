@@ -11,7 +11,7 @@ AWidget::~AWidget()
 {
 }
 
-void	AWidget::draw(sf::RenderWindow &window) const
+void	AWidget::draw(sf::RenderTexture &window) const
 {
   if (_hide)
     return ;

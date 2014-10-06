@@ -11,7 +11,7 @@
 class OptionGamePanel : public APanelScreen
 {
 public:
-  OptionGamePanel();
+  OptionGamePanel(const sf::FloatRect &zone);
   virtual ~OptionGamePanel();
 
   void		construct(const sf::Texture &texture, Settings &set,

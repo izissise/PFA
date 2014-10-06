@@ -7,13 +7,15 @@
 class APanelScreen : public IObserver, public Observable
 {
 public:
-  APanelScreen(const sf::FloatRect &zone = sf::FloatRect(0,0,0,0));
+  APanelScreen(const sf::FloatRect &zone);
   virtual ~APanelScreen() = 0;
 
   /**
    * \fn int run(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
    * \brief Update the state of the panel
-   * \param[in] The event, the reffered window and the settings
+   * \param[in] event The event
+   * \param[in] ref The reffered window
+   * \param[in] set The game's settings
    * \return Return a code indicating if the event has been treated
    *
    * This function will call every widget's update method
@@ -23,16 +25,28 @@ public:
   /**
    * \fn void draw(sf::RenderWindow &window)
    * \brief Draw the Panel
-   * \param[in] The render window
+   * \param[in] window The render window
+   * \param[in] toWin boolean indicating where to draw
    *
    * The panel's draw method will call every widget's draw method
    */
-  virtual void	draw(sf::RenderWindow &window);
+  virtual void	draw(sf::RenderWindow &window, bool toWin);
+
+  /**
+   * \fn void print(sf::RenderTexture &rt)
+   * \brief Draw the Panel's content
+   * \param[in] rt The main renderTexture
+   *
+   * print cut a sprite out of the panel texture to apply it on the main texture
+   */
+  void	print(sf::RenderTexture &rt) const;
 
   /**
    * \fn void construct(const sf::Texture &texture, Settings &set, const std::vector<APanelScreen *> &panels) = 0;
    * \brief Implements the widgets in the panel
-   * \param[in] The main texture, the settings and a reference to some panels
+   * \param[in] texture The main texture,
+   * \param[in] set The game's settings
+   * \param[in] panels A list of panels
    *
    * Construct method creates the widgets contained in the panel
    * panels are passed as parameters so a widget can trigger it
@@ -51,6 +65,7 @@ public:
   /**
    * \fn bool setHide(bool hide)
    * \brief Sets the _hide panel's attribute
+   * \param[in] hide The hide state
    *
    */
   void		setHide(bool hide);
@@ -58,14 +73,29 @@ public:
   void	       	addPanels(const std::initializer_list<APanelScreen * const> &panels);
   void		addWidget(AWidget * const widget);
   void		addWidget(const std::initializer_list<AWidget * const> &widgets);
+
+  /**
+   * \fn const std::vector<AWidget *> &getWidgets() const;
+   * \brief Getter on the panel's widgets
+   * \return Return a const reference to a vector containing the panel's widgets
+   *
+   */
   const std::vector<AWidget *>	&getWidgets() const;
+
+  /**
+   * \fn const std::vector<APanelScreen *> &getSubPanels() const;
+   * \brief Getter on the panel's subPanels
+   * \return Return a const reference to the panel's subPanels
+   *
+   */
   const std::vector<APanelScreen *> &getSubPanels() const;
 
 protected:
   /**
    * \fn void toPixel(const sf::Vector2f &perCent, const sf::Vector2f &size)
    * \brief Resize 2dVector by x/y percent
-   * \param[in] The resizing percentage, the vector to resize
+   * \param[in] perCent The resizing percentage
+   * \param[in] size The vector to resize
    * \return Return the resized vector
    *
    * return sf::Vector2f(perCent.x * size.x, perCent.y * size.y)
@@ -78,7 +108,8 @@ protected:
   /**
    * \fn void toPixel(const sf::FloatRect &percent, const sf::Vector2f &size)
    * \brief Resize a rect by x/y percent
-   * \param[in] The resizing percentage, the rectangle to resize
+   * \param[in] percent The resizing percentage
+   * \param[in] rect The rectangle to resize
    * \return Return the resized rectangle
    *
    * return sf::FloatRect(rect.left * perCent.x, rect.top * perCent.y, rect.width * perCent.x, rect.height * perCent.y);
@@ -91,7 +122,7 @@ protected:
   /**
    * \fn void resizeWidgets(const sf::Vector2f &size);
    * \brief Resizes the contained widgets
-   * \param[in] A vector containing the window's size
+   * \param[in] size A vector containing the window's size
    *
    * This calls the widget's resize method
    */
@@ -100,7 +131,7 @@ protected:
   /**
    * \fn void saveTexture(sf::Texture * const texture)
    * \brief Save a texture used by the panel
-   * \param[in] The texture to save
+   * \param[in] texture The texture to save
    *
    */
   void			saveTexture(sf::Texture * const texture);
@@ -108,7 +139,10 @@ protected:
   /**
    * \fn const sf::Texture *addSpriteForWidget(AWidget * const widget, const sf::Color &color, const sf::Vector2f &size)
    * \brief Add a sprite to a widget
-   * \param[in] widget: The widget, color: the color of the sprite, size: the size of the sprite, draw: specify if by default the sprite is displayed
+   * \param[in] widget The widget
+   * \param[in] color Sprite's color
+   * \param[in] size Sprite's size
+   * \param[in] draw Specify if by default the sprite is displayed
    * \return Return the texture
    *
    * This method create the needed texture, store it inside the panel.
@@ -123,7 +157,7 @@ protected:
   /**
    * \fn void trigger(const t_event &event)
    * \brief Trigger the panel from an event
-   * \param[in] event: A structure containing a flag and an int
+   * \param[in] event A structure containing the event's informations
    *
    * This allow a widget to update a status of a panel.
    * Example: click on a button -> display the panel
@@ -131,10 +165,28 @@ protected:
    */
   virtual void		trigger(const t_event &event);
 
+private:
+  /**
+   * \fn const sf::RenderTexture &getRT() const
+   * \brief Getter on the panel's renderTexture
+   * \return Return a const reference to the panel's renderTexture
+   *
+   */
+  const sf::RenderTexture	&getRT() const;
+
+  /**
+   * \fn const sf::FloatRect &getZone() const;
+   * \brief Getter on the panel's zone
+   * \return Return a const reference to the panel's zone (it's size and position)
+   *
+   */
+  const sf::FloatRect		&getZone() const;
+
 protected:
   bool					_hide;
   sf::FloatRect				_zone;
   sf::Font				_font;
+  sf::RenderTexture			_rt;
   std::function<void (const t_event &event)>	_trigger;
   std::vector<const sf::Texture *>	_textures;
   std::vector<APanelScreen *>		_panels;

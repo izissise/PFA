@@ -1,6 +1,7 @@
 #include "Panel.hpp"
 
-Panel::Panel() : APanelScreen()
+Panel::Panel(const sf::FloatRect &zone) :
+  APanelScreen(zone)
 {
 }
 
