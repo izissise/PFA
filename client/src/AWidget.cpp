@@ -13,8 +13,6 @@ AWidget::~AWidget()
 
 void	AWidget::draw(sf::RenderTexture &window) const
 {
-  if (_hide)
-    return ;
   for (auto &elem : _sprites)
     if (elem.draw)
       window.draw(elem.sprite);
