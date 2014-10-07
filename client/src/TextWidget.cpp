@@ -100,10 +100,8 @@ void		TextWidget::setDrawableText()
     }
 }
 
-void	TextWidget::draw(sf::RenderWindow &window) const
+void	TextWidget::draw(sf::RenderTexture &window) const
 {
-  if (_hide)
-    return ;
   for (auto &elem : _sprites)
     if (elem.draw)
       window.draw(elem.sprite);
