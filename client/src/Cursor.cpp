@@ -49,6 +49,12 @@ void	Cursor::draw(sf::RenderWindow &window) const
     window.draw(_cursor);
 }
 
+void	Cursor::draw(sf::RenderTexture &window) const
+{
+  if (_display)
+    window.draw(_cursor);
+}
+
 std::size_t	Cursor::getWidth() const
 {
   return _cursor.getGlobalBounds().width;

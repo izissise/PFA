@@ -13,6 +13,7 @@ public:
   void		setCursorPos(const sf::Text &text);
   void		setText(const sf::Text &text);
   void		update();
+  void		draw(sf::RenderTexture &window) const;
   void		draw(sf::RenderWindow &window) const;
   std::size_t	getWidth() const;
   unsigned int	getSize() const;
