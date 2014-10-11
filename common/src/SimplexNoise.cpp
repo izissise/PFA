@@ -82,12 +82,10 @@ float scaled_raw_noise_3d(float loBound, float hiBound,
 float raw_noise_2d(float x, float y)
 {
   float n0, n1, n2;
-  float F2 = 0.5 * (sqrtf(3.0) - 1.0);
   float s = (x + y) * F2;
-  int i = fastfloor(x + s);
-  int j = fastfloor(y + s);
+  int i = FASTFLOOR(x + s);
+  int j = FASTFLOOR(y + s);
 
-  float G2 = (3.0 - sqrtf(3.0)) / 6.0;
   float t = (i + j) * G2;
   float X0 = i-t;
   float Y0 = j-t;
@@ -105,29 +103,26 @@ float raw_noise_2d(float x, float y)
 
   int ii = i & 255;
   int jj = j & 255;
-  int gi0 = perm[ii+perm[jj]] % 12;
-  int gi1 = perm[ii+i1+perm[jj+j1]] % 12;
-  int gi2 = perm[ii+1+perm[jj+1]] % 12;
 
   float t0 = 0.5 - x0*x0-y0*y0;
   if (t0<0) n0 = 0.0;
   else {
     t0 *= t0;
-    n0 = t0 * t0 * dot2(grad3[gi0], x0, y0);
+    n0 = t0 * t0 * dot2(grad3[perm[ii+perm[jj]] % 12], x0, y0);
   }
 
   float t1 = 0.5 - x1*x1-y1*y1;
   if (t1<0) n1 = 0.0;
   else {
     t1 *= t1;
-    n1 = t1 * t1 * dot2(grad3[gi1], x1, y1);
+    n1 = t1 * t1 * dot2(grad3[perm[ii+i1+perm[jj+j1]] % 12], x1, y1);
   }
 
   float t2 = 0.5 - x2*x2-y2*y2;
   if (t2<0) n2 = 0.0;
   else {
     t2 *= t2;
-    n2 = t2 * t2 * dot2(grad3[gi2], x2, y2);
+    n2 = t2 * t2 * dot2(grad3[perm[ii+1+perm[jj+1]] % 12], x2, y2);
   }
   return 70.0 * (n0 + n1 + n2);
 }
@@ -137,9 +132,9 @@ float raw_noise_3d(float x, float y, float z)
   float n0, n1, n2, n3;
   float F3 = 1.0/3.0;
   float s = (x+y+z)*F3;
-  int i = fastfloor(x+s);
-  int j = fastfloor(y+s);
-  int k = fastfloor(z+s);
+  int i = FASTFLOOR(x+s);
+  int j = FASTFLOOR(y+s);
+  int k = FASTFLOOR(z+s);
 
   float G3 = 1.0/6.0;
   float t = (i+j+k)*G3;

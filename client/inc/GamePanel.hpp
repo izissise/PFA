@@ -5,7 +5,7 @@
 #include "Lines.hpp"
 
 #define ITERATIONS 5
-#define MHEIGHT 400
+#define MHEIGHT 500
 
 class GamePanel : public APanelScreen
 {
@@ -17,11 +17,12 @@ public:
 			  const std::vector<APanelScreen *> &panels);
 
   void		draw(sf::RenderWindow &window, bool toWin);
+  int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 private:
-  int		fastPow(int x, int it) const;
   void		constructLine();
   void		drawHud(sf::RenderWindow &window, bool toWin);
 
+  int		_pad;
   Lines		_line;
 };
 

@@ -29,3 +29,9 @@ const sf::Vertex	&Lines::getPoint(unsigned int idx)
   std::advance(it, idx);
   return *it;
 }
+
+void	Lines::clear()
+{
+  points.clear();
+  _line.clear();
+}

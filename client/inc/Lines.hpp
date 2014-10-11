@@ -14,6 +14,7 @@ public:
   std::list<sf::Vertex>	&getPoints();
   void			update();
   void			draw(sf::RenderWindow &win) const;
+  void			clear();
   const sf::Vertex	&getPoint(unsigned int idx);
 
   std::list<sf::Vertex>	points;
