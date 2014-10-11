@@ -31,7 +31,7 @@ void	GamePanel::draw(sf::RenderWindow &window, bool toWin)
 
 void	GamePanel::constructLine()
 {
-  std::list<sf::Vertex>::const_iterator	beg;
+  std::list<sf::Vertex>::iterator	beg;
   sf::Vertex prev;
   sf::Vertex next;
   int	cutPoints;
@@ -49,7 +49,7 @@ void	GamePanel::constructLine()
       cutPoints = fastPow(2, i);
       for (int j = 0; j < cutPoints; ++j)
 	{
-	  beg = _line.points.cbegin();
+	  beg = _line.points.begin();
 	  prev = _line.getPoint(j * 2);
 	  next = _line.getPoint(j * 2 + 1);
 	  x = next.position.x / 2 + prev.position.x / 2;
