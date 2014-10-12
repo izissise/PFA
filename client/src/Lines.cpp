@@ -22,7 +22,7 @@ void	Lines::draw(sf::RenderWindow &win) const
   win.draw(_line);
 }
 
-const sf::Vertex	&Lines::getPoint(unsigned int idx)
+const sf::Vertex	&Lines::getPointFromList(unsigned int idx)
 {
   auto it = points.begin();
 
@@ -30,8 +30,18 @@ const sf::Vertex	&Lines::getPoint(unsigned int idx)
   return *it;
 }
 
+const sf::Vertex	&Lines::getPoint(unsigned int idx)
+{
+  return _line[idx];
+}
+
 void	Lines::clear()
 {
   points.clear();
   _line.clear();
+}
+
+unsigned int	Lines::size() const
+{
+  return _line.getVertexCount();
 }

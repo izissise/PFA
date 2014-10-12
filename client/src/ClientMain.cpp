@@ -35,6 +35,7 @@ void ClientMain::run()
   sf::Event	event;
   t_entry	entry;
 
+  _window.setKeyRepeatEnabled(false);
   while (_window.isOpen())
     {
       _window.clear();

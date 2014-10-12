@@ -5,7 +5,8 @@
 #include "Lines.hpp"
 
 #define ITERATIONS 5
-#define MHEIGHT 500
+#define MHEIGHT 300
+#define SHEIGHT 500.f
 
 class GamePanel : public APanelScreen
 {
@@ -20,9 +21,15 @@ public:
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 private:
   void		constructLine();
+  void		completeField(sf::RenderWindow &window);
+  void		fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
   void		drawHud(sf::RenderWindow &window, bool toWin);
 
+  std::array<sf::Sprite, 2>	_sprites;
   int		_pad;
+  int		_padup;
+  int		_oldY;
+  bool		_dir;
   Lines		_line;
 };
 
