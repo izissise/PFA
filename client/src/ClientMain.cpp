@@ -4,29 +4,20 @@ ClientMain::ClientMain()
   : _window(sf::VideoMode(std::stoi(_settings.getCvarList().getCvar("r_width")),
                           std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
   _menu(_settings),
-  _updateThread(std::bind(&ClientMain::update, this))
+  _showMenu(false),
+  _world(_settings)//,
+    //_updateThread(std::bind(&ClientMain::update, this))
 {
   _window.setVerticalSyncEnabled(true);
 }
 
 ClientMain::~ClientMain()
 {
-  _updateThread.join();
+  //  _updateThread.join();
 }
 
 void ClientMain::update()
 {
-  int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
-  TimeHandling time((std::chrono::milliseconds(gfps)));
-
-  // the updating loop
-  time.start();
-  while (_window.isOpen())
-    {
-
-//update object here
-      time.endFrame();
-    }
 }
 
 void ClientMain::run()
@@ -35,6 +26,10 @@ void ClientMain::run()
   sf::Event	event;
   t_entry	entry;
 
+  int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
+  TimeHandling time((std::chrono::milliseconds(gfps)));
+
+  time.start();
   while (_window.isOpen())
     {
       _window.clear();
@@ -52,29 +47,33 @@ void ClientMain::run()
 		  event.type == sf::Event::MouseWheelMoved)
                 {
 		  entry.fill(event);
-                  std::cout << "keypress" << std::endl;
+		  //std::cout << "keypress" << std::endl;
 		  if (event.type == sf::Event::KeyPressed ||
 		      event.type == sf::Event::MouseButtonPressed)
 		    ctrl.pressKey(entry);
-                  try {
-                      std::cout << "Action for key " << ctrl.getCodeFromKey(entry) << " is: ";
-                    }
-                  catch (const Exception &e) {
-                      std::cout << "Action for key " << "Unknown" << " is: ";
-                    }
-                  try {
-                      std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(entry)) << std::endl;
-                    }
-                  catch (const std::out_of_range &oor) {
-                      std::cout << "Unknown" << std::endl;
-                    }
+                  // try {
+		  //   std::cout << "Action for key " << ctrl.getCodeFromKey(entry) << " is: ";
+		  //   }
+                  // catch (const Exception &e) {
+		  //   std::cout << "Action for key " << "Unknown" << " is: ";
+                  //   }
+                  // try {
+		  //   std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(entry)) << std::endl;
+                  //   }
+                  // catch (const std::out_of_range &oor) {
+		  //    std::cout << "Unknown" << std::endl;
+                  //   }
                 }
               else if (event.type == sf::Event::KeyReleased ||
 		       event.type == sf::Event::MouseButtonReleased)
                 ctrl.releaseKey(entry);
             }
         }
+      //update object here
+      _world.update();
+      time.endFrame();
       // draw stuff here
+      _world.draw(_window);
       _menu.draw(_window);
       _window.display();
     }

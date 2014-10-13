@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include <enet/enet.h>
+#include <SFML/Window.hpp>
 
 #include "ClientMain.hpp"
 #include "demangle.hpp"
