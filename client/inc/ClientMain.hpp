@@ -30,7 +30,6 @@ private:
   sf::RenderWindow _window;
   Menu _menu;
   bool _showMenu;
-  World _world;
   std::thread _updateThread;
 };
 

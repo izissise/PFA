@@ -20,7 +20,7 @@ World::World(Settings& settings) :
 			 {_visibleRange.right() + 1, _visibleRange.bottom() + 1}};
   for (auto cursor : bufferRange) {
     _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
-    _chunks[cursor]->loadFromFile(cursor.x, cursor.y, _codex);
+    _chunks[cursor]->load(cursor.x, cursor.y, _codex);
   }
   _loadedRange = bufferRange;
 }
@@ -141,7 +141,7 @@ void World::_loadChunks(void)
   for (auto cursor : added) {
     if (_chunks.find(cursor) == _chunks.end()) {
       _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk()));
-      _chunks[cursor]->loadFromFile(cursor.x, cursor.y, _codex);
+      _chunks[cursor]->load(cursor.x, cursor.y, _codex);
     }
   }
   for (auto cursor : removed) {

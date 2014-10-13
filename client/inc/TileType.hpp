@@ -9,7 +9,8 @@
 enum class TileType : std::int8_t
 {
   Empty,
-    Ground
+    Ground,
+    Vine
     };
 
 #endif /* TILETYPE_H */

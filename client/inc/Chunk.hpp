@@ -8,23 +8,30 @@
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
+# include "Lines.hpp"
 # include "TileCodex.hpp"
 # include "TileType.hpp"
 # include "Vector2.hpp"
+
+# define PERSISTANCE 1.0f
+# define SCALE 0.05f
+
 
 class Chunk
 {
 public:
   static const unsigned width = 128;
   static const unsigned height = 128;
+  static const unsigned octaves = 2;
+  static const unsigned iterations = 5;
 
   Chunk(void);
-  virtual ~Chunk();
+  virtual ~Chunk(void);
 
   Chunk(const Chunk& other) = delete;
   Chunk&	operator=(const Chunk& other) = delete;
 
-  void loadFromFile(int x, int y, const TileCodex& codex);
+  void load(int x, int y, const TileCodex& codex);
   void draw(sf::RenderWindow& window,
 	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;
@@ -45,13 +52,22 @@ public:
 
 protected:
 private:
+  void _generate(void);
+  void _loadFromFile(void);
+  void _generateVBO(const TileCodex& codex);
+  void _fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
+  void _constructLine(void);
+  void _completeField(void);
+
   std::vector<TileType>	_tiles;
   std::vector<TileType> _bgTiles;
   bool			_loaded;
   sf::Font		_font;
   sf::Text		_id;
+  Vector2i		_pos;
   sf::VertexArray	_fgVertices;
   sf::VertexArray	_bgVertices;
+  Lines			_line;
 };
 
 #endif		/* CHUNK_H */
