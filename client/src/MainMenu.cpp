@@ -37,6 +37,8 @@ void	MainMenu::construct(const sf::Texture &texture, Settings &set,
   createOptButton(texture, wOpt);
   createQuitButton(texture, wQuit);
 
+  wPlay->addObserver(this);
+  wPlay->addObserver(panels[1]);
   wOpt->addObserver(panels[0]);
 
   _widgets.push_back(wBackground);
@@ -66,6 +68,7 @@ void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
 	{
 	  if (widget.isClicked(event, sf::Mouse::Left))
 	    {
+	      widget.notify(t_event(wEvent::Hide | wEvent::Toggle));
 	      return 0;
 	    }
 	}

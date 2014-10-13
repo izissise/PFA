@@ -103,14 +103,14 @@ void	APanelScreen::setHide(bool hide)
   _hide = hide;
 }
 
-int	APanelScreen::run(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
+int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
 
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
       if ((*rit)->isHidden() == false)
-	if ((retVal = (*rit)->run(event, ref, set)) != 0)
+	if ((retVal = (*rit)->update(event, ref, set)) != 0)
 	  return retVal;
     }
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)

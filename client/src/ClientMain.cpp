@@ -30,6 +30,7 @@ void ClientMain::run()
   TimeHandling time((std::chrono::milliseconds(gfps)));
 
   time.start();
+  _window.setKeyRepeatEnabled(false);
   while (_window.isOpen())
     {
       _window.clear();

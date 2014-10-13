@@ -20,7 +20,7 @@ public:
    *
    * This function will call every widget's update method
    */
-  virtual int	run(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  virtual int	update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 
   /**
    * \fn void draw(sf::RenderWindow &window)
