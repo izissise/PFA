@@ -15,13 +15,13 @@
 
 # define PERSISTANCE 1.0f
 # define SCALE 0.05f
-
+# define MAXHEIGHT 247
 
 class Chunk
 {
 public:
-  static const unsigned width = 128;
-  static const unsigned height = 128;
+  static const unsigned width = 256;
+  static const unsigned height = 256;
   static const unsigned octaves = 2;
   static const unsigned iterations = 5;
 

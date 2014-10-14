@@ -119,16 +119,18 @@ void Chunk::draw(sf::RenderWindow& window,
   states.shader = nullptr;
   window.draw(_fgVertices, states);
   window.draw(_id, states);
+  _line.draw(window);
 }
 
 void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 {
   int		points = pow(2, iterations);
-  int		pos = x / (1600.f / points);
+  int		s = TileCodex::tileSize;
+  int		pos = x * s / ((Chunk::width * s) / points);
 
-  prev = sf::Vector2f(_line.getPoint(pos).position.x, _line.getPoint(pos).position.y);
+  prev = sf::Vector2f(_line.getPoint(pos).position.x / s, _line.getPoint(pos).position.y / s);
   pos += 1;
-  next = sf::Vector2f(_line.getPoint(pos).position.x, _line.getPoint(pos).position.y);
+  next = sf::Vector2f(_line.getPoint(pos).position.x / s, _line.getPoint(pos).position.y / s);
 }
 
 void		Chunk::_completeField(void)
@@ -165,16 +167,16 @@ void	Chunk::_constructLine(void)
   int	x;
   int	y;
   int	j;
-  int	xOffset = Chunk::width * _pos.x;
+  int	xOffset = static_cast<int>(Chunk::width) * _pos.x;
+  int	tileSize = static_cast<int>(TileCodex::tileSize);
+  int	w = static_cast<int>(Chunk::width);
 
   cutPoints = 1;
-  if (_line.points.empty()) {
-    _line.points.push_back(sf::Vertex(sf::Vector2f(0.0f, Chunk::height
-						   * raw_noise_2d(_pos.x, _pos.y))));
-    _line.points.push_back(sf::Vertex(sf::Vector2f(Chunk::width * TileCodex::tileSize,
-						   Chunk::height * TileCodex::tileSize
-						   * raw_noise_2d(_pos.x + 1, _pos.y))));
-  }
+  _line.points.push_back(sf::Vertex(sf::Vector2f(0.0f, (MAXHEIGHT * tileSize) - (MAXHEIGHT * tileSize)
+						 * raw_noise_2d(_pos.x * tileSize, _pos.y))));
+  _line.points.push_back(sf::Vertex(sf::Vector2f(w * tileSize,
+						 (MAXHEIGHT * tileSize) - (MAXHEIGHT * tileSize)
+						 * raw_noise_2d((_pos.x + 1) * tileSize, _pos.y))));
   for (unsigned i = 0; i < iterations; ++i) {
     for (j = 0; j < cutPoints; ++j) {
       beg = _line.points.begin();
@@ -182,7 +184,7 @@ void	Chunk::_constructLine(void)
       next = _line.getPointFromList(j * 2 + 1);
       x = next.position.x / 2 + prev.position.x / 2;
       y = next.position.y / 2 + prev.position.y / 2;
-      height = (Chunk::height /
+      height = (300 /
 		(static_cast<float>(i) * 2.f + 1.f)) * raw_noise_2d(x + xOffset, y);
       advance(beg, j * 2 + 1);
       _line.points.insert(beg, sf::Vertex(sf::Vector2f(x, y + height)));

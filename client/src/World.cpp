@@ -29,10 +29,10 @@ void World::update(void)
 {
   static std::pair<Action, Vector2f> moveControls[] =
     {
-      {Action::Forward, {.0f, -.0025f}},
-      {Action::Left, {-.0025f, .0f}},
-      {Action::Back, {.0f, .0025f}},
-      {Action::Right, {.0025f, .0f}}
+      {Action::Forward, {.0f, -.025f}},
+      {Action::Left, {-.025f, .0f}},
+      {Action::Back, {.0f, .025f}},
+      {Action::Right, {.025f, .0f}}
     };
 
   for (auto control : moveControls) {
