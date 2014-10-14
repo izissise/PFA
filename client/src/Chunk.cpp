@@ -8,9 +8,6 @@
 #include "Chunk.hpp"
 #include "SimplexNoise.h"
 
-const unsigned Chunk::width;
-const unsigned Chunk::height;
-
 using namespace std;
 
 Chunk::Chunk(void) :
@@ -34,34 +31,37 @@ void Chunk::load(int xId, int yId, const TileCodex& codex)
 
 void Chunk::_generate(void)
 {
-  unsigned i{0};
-  float x;
-  Vector2f offset = {static_cast<float>(Chunk::width) * _pos.x,
+  unsigned int	i{0};
+  float		x;
+  float		p;
+  Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 		     static_cast<float>(Chunk::height) * _pos.y};
-  float p;
 
-  if (_pos.y == 0) {
-    _constructLine();
-    _completeField();
-  } else if (_pos.y > 0) {
-    for (float y = 0; y < Chunk::height; ++y) {
-      for (x = 0; x < Chunk::width; ++x) {
-	p = octave_noise_2d(octaves, PERSISTANCE, SCALE,
-			    x + offset.x, y + offset.y);
-	if (p >= 0) {
-	  if (p < 0.1) {
-	    _tiles[i] = TileType::Vine;
-	  } else {
-	    _tiles[i] = TileType::Ground;
-	  }
+  if (_pos.y == 0)
+    {
+      _constructLine();
+      _completeField();
+    }
+  else if (_pos.y > 0)
+    {
+      for (float y = 0; y < Chunk::height; ++y)
+	{
+	  for (x = 0; x < Chunk::width; ++x)
+	    {
+	      p = octave_noise_2d(octaves, PERSISTANCE, SCALE,
+				  x + offset.x, y + offset.y);
+	      if (p >= 0)
+		{
+		  if (p < 0.1)
+		    _tiles[i] = TileType::Vine;
+		  else
+		    _tiles[i] = TileType::Ground;
+		}
+	      ++i;
+	    }
 	}
-	++i;
-      }
+      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Empty);
     }
-    for (TileType& tile : _bgTiles) {
-      tile = TileType::Empty;
-    }
-  }
 }
 
 void Chunk::_loadFromFile(void)
@@ -107,9 +107,9 @@ void Chunk::_generateVBO(const TileCodex& codex)
   _id.setFont(_font);
 }
 
-void Chunk::draw(sf::RenderWindow& window,
-                 Vector2i& windowCoord,
-                 const TileCodex& codex) const
+void	Chunk::draw(sf::RenderWindow& window,
+		    Vector2i& windowCoord,
+		    const TileCodex& codex) const
 {
   sf::RenderStates states(&codex.getTexture());
 
@@ -119,18 +119,19 @@ void Chunk::draw(sf::RenderWindow& window,
   states.shader = nullptr;
   window.draw(_fgVertices, states);
   window.draw(_id, states);
-  _line.draw(window);
 }
 
 void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 {
   int		points = pow(2, iterations);
   int		s = TileCodex::tileSize;
-  int		pos = x * s / ((Chunk::width * s) / points);
+  int		pos = (x * s) / ((Chunk::width * s) / points);
 
-  prev = sf::Vector2f(_line.getPoint(pos).position.x / s, _line.getPoint(pos).position.y / s);
+  prev = sf::Vector2f(_line.getPoint(pos).position.x / s,
+		      _line.getPoint(pos).position.y / s);
   pos += 1;
-  next = sf::Vector2f(_line.getPoint(pos).position.x / s, _line.getPoint(pos).position.y / s);
+  next = sf::Vector2f(_line.getPoint(pos).position.x / s,
+		      _line.getPoint(pos).position.y / s);
 }
 
 void		Chunk::_completeField(void)
@@ -139,22 +140,24 @@ void		Chunk::_completeField(void)
   sf::Vector2f	next;
   float		a;
   float		b;
-  unsigned	x;
+  unsigned int	x;
 
-  for (int y = static_cast<int>(Chunk::height) - 1; y >= 0; --y) {
-    for (x = 0; x < Chunk::width; ++x) {
-      _fillVertex(prev, next, x);
-      if (y > prev.y && y > next.y) {
-	_tiles[y * Chunk::width + x] = TileType::Ground;
-      } else {
-	a = (next.y - prev.y) / (next.x - prev.x);
-	b = next.y - a * next.x;
-	if (y > a * x + b) {
-	  _tiles[y * Chunk::width + x] = TileType::Ground;
+  for (int y = Chunk::height - 1; y >= 0; --y)
+    {
+      for (x = 0; x < Chunk::width; ++x)
+	{
+	  _fillVertex(prev, next, x);
+	  if (y > prev.y && y > next.y)
+	    _tiles[y * Chunk::width + x] = TileType::Ground;
+	  else if (y > prev.y || y > next.y)
+	    {
+	      a = (next.y - prev.y) / (next.x - prev.x);
+	      b = next.y - a * next.x;
+	      if (y > a * x + b)
+		_tiles[y * Chunk::width + x] = TileType::Ground;
+	    }
 	}
-      }
     }
-  }
 }
 
 void	Chunk::_constructLine(void)
@@ -162,30 +165,32 @@ void	Chunk::_constructLine(void)
   list<sf::Vertex>::iterator	beg;
   sf::Vertex prev;
   sf::Vertex next;
+  int	xOffset = Chunk::width * _pos.x;
+  int	chunkHeight = Chunk::height * TileCodex::tileSize;
   int	cutPoints;
   int	height;
   int	x;
   int	y;
   int	j;
-  int	xOffset = static_cast<int>(Chunk::width) * _pos.x;
-  int	tileSize = static_cast<int>(TileCodex::tileSize);
-  int	w = static_cast<int>(Chunk::width);
 
   cutPoints = 1;
-  _line.points.push_back(sf::Vertex(sf::Vector2f(0.0f, (MAXHEIGHT * tileSize) - (MAXHEIGHT * tileSize)
-						 * raw_noise_2d(_pos.x * tileSize, _pos.y))));
-  _line.points.push_back(sf::Vertex(sf::Vector2f(w * tileSize,
-						 (MAXHEIGHT * tileSize) - (MAXHEIGHT * tileSize)
-						 * raw_noise_2d((_pos.x + 1) * tileSize, _pos.y))));
-  for (unsigned i = 0; i < iterations; ++i) {
+  _line.points.push_back(sf::Vertex(sf::Vector2f
+				    (0.f, (chunkHeight / 2)
+				     - ((chunkHeight / 2)
+					* raw_noise_2d(_pos.x * TileCodex::tileSize, _pos.y)))));
+  _line.points.push_back(sf::Vertex(sf::Vector2f
+				    (Chunk::width * TileCodex::tileSize,
+				     (chunkHeight / 2)
+				     - ((chunkHeight / 2)
+					* raw_noise_2d((_pos.x + 1) * TileCodex::tileSize, _pos.y)))));
+  for (unsigned int i = 0; i < iterations; ++i) {
     for (j = 0; j < cutPoints; ++j) {
       beg = _line.points.begin();
       prev = _line.getPointFromList(j * 2);
       next = _line.getPointFromList(j * 2 + 1);
       x = next.position.x / 2 + prev.position.x / 2;
       y = next.position.y / 2 + prev.position.y / 2;
-      height = (300 /
-		(static_cast<float>(i) * 2.f + 1.f)) * raw_noise_2d(x + xOffset, y);
+      height = (MAXHEIGHT / (static_cast<float>(i) * 2.f + 1.f)) * raw_noise_2d(x + xOffset, y);
       advance(beg, j * 2 + 1);
       _line.points.insert(beg, sf::Vertex(sf::Vector2f(x, y + height)));
     }

@@ -15,15 +15,15 @@
 
 # define PERSISTANCE 1.0f
 # define SCALE 0.05f
-# define MAXHEIGHT 247
+# define MAXHEIGHT 500.f
 
 class Chunk
 {
 public:
-  static const unsigned width = 256;
-  static const unsigned height = 256;
-  static const unsigned octaves = 2;
-  static const unsigned iterations = 5;
+  static const int width = 256;
+  static const int height = 256;
+  static const int octaves = 2;
+  static const int iterations = 5;
 
   Chunk(void);
   virtual ~Chunk(void);
