@@ -121,6 +121,7 @@ void	Chunk::draw(sf::RenderWindow& window,
   states.shader = nullptr;
   window.draw(_fgVertices, states);
   window.draw(_id, states);
+  _line.draw(window);
 }
 
 void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
@@ -171,6 +172,7 @@ void	Chunk::_constructLine(void)
   int	chunkHeight = Chunk::height * TileCodex::tileSize;
   int	cutPoints;
   int	height;
+  float	mheight = MAXHEIGHT;
   int	x;
   int	y;
   int	j;
@@ -178,13 +180,13 @@ void	Chunk::_constructLine(void)
   cutPoints = 1;
   _line.points.push_back(sf::Vertex(sf::Vector2f
 				    (0.f, (chunkHeight / 2)
-				     - ((chunkHeight / 2)
-					* raw_noise_2d(_pos.x * TileCodex::tileSize, _pos.y)))));
+				     - MAXHEIGHT
+				     * raw_noise_2d(_pos.x * TileCodex::tileSize, _pos.y))));
   _line.points.push_back(sf::Vertex(sf::Vector2f
 				    (Chunk::width * TileCodex::tileSize,
 				     (chunkHeight / 2)
-				     - ((chunkHeight / 2)
-					* raw_noise_2d((_pos.x + 1) * TileCodex::tileSize, _pos.y)))));
+				     - MAXHEIGHT
+				     * raw_noise_2d((_pos.x + 1) * TileCodex::tileSize, _pos.y))));
   for (unsigned int i = 0; i < iterations; ++i) {
     for (j = 0; j < cutPoints; ++j) {
       beg = _line.points.begin();
@@ -192,10 +194,11 @@ void	Chunk::_constructLine(void)
       next = _line.getPointFromList(j * 2 + 1);
       x = next.position.x / 2 + prev.position.x / 2;
       y = next.position.y / 2 + prev.position.y / 2;
-      height = (MAXHEIGHT / (static_cast<float>(i) * 2.f + 1.f)) * raw_noise_2d(x + xOffset, y);
+      height = mheight * raw_noise_2d(x + xOffset, y);
       advance(beg, j * 2 + 1);
       _line.points.insert(beg, sf::Vertex(sf::Vector2f(x, y + height)));
     }
+    mheight *= ROUGHNESS;
     cutPoints *= 2;
   }
   _line.update();
