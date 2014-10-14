@@ -15,7 +15,7 @@
 
 # define PERSISTANCE 1.0f
 # define SCALE 0.05f
-# define MAXHEIGHT 600.f
+# define MAXHEIGHT 300.f
 # define ROUGHNESS 0.5f // [0 - 1]
 
 class Chunk

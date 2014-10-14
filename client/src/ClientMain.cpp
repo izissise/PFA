@@ -42,11 +42,11 @@ void ClientMain::run()
             }
           if (!_menu.run(event, _window, _settings))
             {
+	      entry.fill(event);
 	      if (event.type == sf::Event::KeyPressed ||
 		  event.type == sf::Event::MouseButtonPressed ||
 		  event.type == sf::Event::MouseWheelMoved)
                 {
-		  entry.fill(event);
 		  //std::cout << "keypress" << std::endl;
 		  if (event.type == sf::Event::KeyPressed ||
 		      event.type == sf::Event::MouseButtonPressed)

@@ -128,7 +128,9 @@ void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 {
   int		points = pow(2, iterations);
   int		s = TileCodex::tileSize;
-  int		pos = (x * s) / ((Chunk::width * s) / points);
+  int		pos = (x * s) / ((static_cast<float>(Chunk::width) *
+				  static_cast<float>(s)) /
+				 static_cast<float>(points));
 
   prev = sf::Vector2f(_line.getPoint(pos).position.x / s,
 		      _line.getPoint(pos).position.y / s);

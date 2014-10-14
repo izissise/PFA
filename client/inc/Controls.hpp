@@ -79,12 +79,14 @@ struct		s_entry
   }
   void	fill(const sf::Event &event)
   {
-    if (event.type == sf::Event::KeyPressed)
+    if (event.type == sf::Event::KeyPressed ||
+	event.type == sf::Event::KeyReleased)
       {
 	key = event.key.code;
 	type = ctrl::type::Keyboard;
       }
-    else if (event.type == sf::Event::MouseButtonPressed)
+    else if (event.type == sf::Event::MouseButtonPressed ||
+	     event.type == sf::Event::MouseButtonReleased)
       {
 	key = event.mouseButton.button;
 	type = ctrl::type::Mouse;
