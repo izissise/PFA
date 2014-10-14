@@ -16,18 +16,18 @@
 // Larger values produce rougher noise.
 
 
-float octave_noise_2d(float octaves, float persistence,
-		      float scale, float x, float y)
+float	octave_noise_2d(float octaves, float persistence,
+			float scale, float x, float y)
 {
   float total = 0;
-  float frequency = scale;
   float amplitude = 1;
   float maxAmplitude = 0;
+  int	i;
 
-  for (int i = 0; i < octaves; i++)
+  for (i = 0; i < octaves; ++i)
     {
-      total += raw_noise_2d(x * frequency, y * frequency) * amplitude;
-      frequency *= 2;
+      total += raw_noise_2d(x * scale, y * scale) * amplitude;
+      scale *= 2;
       maxAmplitude += amplitude;
       amplitude *= persistence;
     }
@@ -105,25 +105,31 @@ float raw_noise_2d(float x, float y)
   int jj = j & 255;
 
   float t0 = 0.5 - x0*x0-y0*y0;
-  if (t0<0) n0 = 0.0;
-  else {
-    t0 *= t0;
-    n0 = t0 * t0 * dot2(grad3[perm[ii+perm[jj]] % 12], x0, y0);
-  }
+  if (t0 < 0)
+    n0 = 0.0;
+  else
+    {
+      t0 *= t0;
+      n0 = t0 * t0 * dot2(grad3[perm[ii+perm[jj]] % 12], x0, y0);
+    }
 
   float t1 = 0.5 - x1*x1-y1*y1;
-  if (t1<0) n1 = 0.0;
-  else {
-    t1 *= t1;
-    n1 = t1 * t1 * dot2(grad3[perm[ii+i1+perm[jj+j1]] % 12], x1, y1);
-  }
+  if (t1 < 0)
+    n1 = 0.0;
+  else
+    {
+      t1 *= t1;
+      n1 = t1 * t1 * dot2(grad3[perm[ii+i1+perm[jj+j1]] % 12], x1, y1);
+    }
 
   float t2 = 0.5 - x2*x2-y2*y2;
-  if (t2<0) n2 = 0.0;
-  else {
-    t2 *= t2;
-    n2 = t2 * t2 * dot2(grad3[perm[ii+1+perm[jj+1]] % 12], x2, y2);
-  }
+  if (t2 < 0)
+    n2 = 0.0;
+  else
+    {
+      t2 *= t2;
+      n2 = t2 * t2 * dot2(grad3[perm[ii+1+perm[jj+1]] % 12], x2, y2);
+    }
   return 70.0 * (n0 + n1 + n2);
 }
 

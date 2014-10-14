@@ -50,7 +50,9 @@ if (UNIX)
 			   "-Wmissing-declarations"
 			   "-Wdocumentation"
 			   "-Wno-switch-enum"
+			   "-march=native"
 			   )
+
 elseif (MSVC)
   COMPILER_CXX_FLAGS(FLAGS "/wd4251" # needs to have dll-interface to be used by clients
 			   "/wd4275" # exported class derived from non-exported class
@@ -229,3 +231,5 @@ if(GENERATE_DOC)
                         "${PROJECT_SOURCE_DIR}/test" ${DOC_PATH}
                         VERSION "${PROJECTVERSION}")
 endif()
+
+#SET_TARGET_PROPERTIES(${NAME_CLIENT} PROPERTIES COMPILE_FLAGS "-pg" LINK_FLAGS "-pg")

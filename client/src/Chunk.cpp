@@ -79,26 +79,28 @@ void Chunk::_generateVBO(const TileCodex& codex)
       {_tiles,   _fgVertices}
     };
 
-  for (auto layer : layers) {
-    i = 0;
-    layer.second.setPrimitiveType(sf::Quads);
-    layer.second.resize(Chunk::width * Chunk::height * 4);
-    for (float y = 0.f; y < Chunk::height; ++y) {
-      for (x = 0.f; x < Chunk::width; ++x) {
-        if (layer.first[i] != TileType::Empty) {
-          sf::Vertex *quad = &layer.second[i * 4];
-
-          quad[0].position = {x * TileCodex::tileSize, y * TileCodex::tileSize};
-          quad[1].position = {(x + 1.f) * TileCodex::tileSize, y * TileCodex::tileSize};
-          quad[2].position = {(x + 1.f) * TileCodex::tileSize, (y + 1.f) * TileCodex::tileSize};
-          quad[3].position = {x * TileCodex::tileSize, (y + 1.f) * TileCodex::tileSize};
-
-	  codex.applySpriteUV(static_cast<unsigned>(layer.first[i]), quad);
-        }
-        ++i;
-      }
+  for (auto layer : layers)
+    {
+      i = 0;
+      layer.second.setPrimitiveType(sf::Quads);
+      layer.second.resize(Chunk::width * Chunk::height * 4);
+      for (float y = 0.f; y < Chunk::height; ++y)
+	{
+	  for (x = 0.f; x < Chunk::width; ++x)
+	    {
+	      if (layer.first[i] != TileType::Empty)
+		{
+		  sf::Vertex *quad = &layer.second[i * 4];
+		  quad[0].position = {x * TileCodex::tileSize, y * TileCodex::tileSize};
+		  quad[1].position = {(x + 1.f) * TileCodex::tileSize, y * TileCodex::tileSize};
+		  quad[2].position = {(x + 1.f) * TileCodex::tileSize, (y + 1.f) * TileCodex::tileSize};
+		  quad[3].position = {x * TileCodex::tileSize, (y + 1.f) * TileCodex::tileSize};
+		  codex.applySpriteUV(static_cast<unsigned>(layer.first[i]), quad);
+		}
+	      ++i;
+	    }
+	}
     }
-  }
   _font.loadFromFile("../client/assets/font.otf");
   std::stringstream ss;
   ss << "(" << _pos.x << "," << _pos.y << ")";
