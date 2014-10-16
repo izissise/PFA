@@ -1,0 +1,29 @@
+/*
+\page Cvar Naming convention
+info_		Informations, like game version, build date, etc..
+sys_ 	 	Detected hardware info, like cpu, gpu, ram, etc..
+si_ 	 	General server information
+dev_ 	 	Developer settings
+
+com_ 	 	Engine CVars, but not one of the following:
+r_ 	 	Renderer settings, except image settings
+s_ 	 	Audio/Sound settings
+cl_ 		Client/User settings
+gui_ 		Graphical User Interface
+hud_ 		Heads Up Display
+in_ 	 	Input settings
+net_ 	 	Network settings
+
+ns_ 	 	Synced over network instantly
+sv_ 	 	Server settings
+phys_ 	 	Physics settings
+
+
+________________________________________________________________________
+
+
+r_width		Defines the window's width
+r_height	Defines the window's height
+
+com_fps		Set the number of frames per second
+*/

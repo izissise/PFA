@@ -1,11 +1,4 @@
-# - Try to find the VALGRIND utility
-# Will define:
-#
-# VALGRIND_EXECUTABLE - VALGRIND executable
-# VALGRIND_VERSION - version of VALGRIND
-#
-# Possible hints:
-# VALGRIND_ROOT - root directory of valgrind installation
+# Set DEMANGLE_ABI with the ABI you should use to demangle symbols
 #
 # Copyright (C) 2011 by Johannes Wienke <jwienke at techfak dot uni-bielefeld dot de>
 #
@@ -27,21 +20,15 @@
 #   CoR-Lab, Research Institute for Cognition and Robotics
 #     Bielefeld University
 
-INCLUDE(FindPackageHandleStandardArgs)
+INCLUDE(CheckIncludeFileCXX)
 
-# find server executable
-FIND_PROGRAM(VALGRIND_EXECUTABLE valgrind
-             HINTS ${VALGRIND_ROOT}/bin
-                   ${VALGRIND_ROOT})
-
-# get the version
-SET(VALGRIND_VERSION "")
-IF(VALGRIND_EXECUTABLE)
-    EXECUTE_PROCESS(COMMAND ${VALGRIND_EXECUTABLE} --version OUTPUT_VARIABLE VALGRIND_VERSION_OUT)
-    STRING(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" VALGRIND_VERSION "${VALGRIND_VERSION_OUT}")
+# decide how to do name demangling
+CHECK_INCLUDE_FILE_CXX("cxxabi.h" HAVE_CXXABI_H)
+IF(HAVE_CXXABI_H)
+  SET(DEMANGLE_ABI "GCC")
+ELSEIF(MSVC)
+  SET(DEMANGLE_ABI "MSVC")
+ELSE()
+  SET(DEMANGLE_ABI "NONE")
+  MESSAGE(WARNING "No demangling solution found for the system.")
 ENDIF()
-
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(VALGRIND DEFAULT_MSG VALGRIND_EXECUTABLE VALGRIND_VERSION)
-
-# only visible in advanced view
-MARK_AS_ADVANCED(VALGRIND_EXECUTABLE VALGRIND_VERSION)
