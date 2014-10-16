@@ -117,14 +117,6 @@ void World::_loadChunks(void)
 
   std::vector<Vector2i>	added;
   std::vector<Vector2i> removed;
-
-  for (auto br : bufferRange) {
-    added.push_back(br);
-  }
-  for (auto lr : _loadedRange) {
-    removed.push_back(lr);
-  }
-
   Range2i	intersection =
     {
       {std::max(bufferRange.left(), _loadedRange.left()),
@@ -135,6 +127,9 @@ void World::_loadChunks(void)
   auto		predicate = [intersection](Vector2i& v) {
     return (std::find(intersection.begin(), intersection.end(), v) != intersection.end());
   };
+
+  added.assign(bufferRange.begin(), bufferRange.end());
+  removed.assign(_loadedRange.begin(), _loadedRange.end());
   added.erase(std::remove_if(added.begin(), added.end(), predicate), added.end());
   removed.erase(std::remove_if(removed.begin(), removed.end(), predicate), removed.end());
 

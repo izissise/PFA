@@ -15,7 +15,7 @@
 
 # define PERSISTANCE 1.0f
 # define SCALE 0.05f
-# define MAXHEIGHT 300.f
+# define MAXHEIGHT 100.f
 # define ROUGHNESS 0.5f // [0 - 1]
 
 class Chunk
@@ -24,7 +24,7 @@ public:
   static const int width = 256;
   static const int height = 256;
   static const int octaves = 2;
-  static const int iterations = 6;
+  static const int iterations = 5;
 
   Chunk(void);
   virtual ~Chunk(void);
