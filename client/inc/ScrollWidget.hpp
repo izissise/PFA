@@ -34,10 +34,11 @@ public:
   void	toSize(unsigned int spritePos, float pX, float pY);
 
 private:
+  bool	isOver(const sf::RenderWindow &ref, unsigned int spritePos) const;
   void	movePicker(sf::Sprite &sprite, float x, float y);
   void	moveSubPanels(APanelScreen * const pan, const sf::Vector2f &moveSize);
   void	moveWidgets(APanelScreen * const pan, const sf::Vector2f &moveSize);
-  int	handleMouse(float pX, float pY);
+  int	handleMouse(int pX, int pY);
   void		updateScrollSize();
   void		updateButtonPos();
   unsigned int	calcPanelSize(APanelScreen * const pan, float diff,
@@ -51,6 +52,7 @@ private:
   Scroll	_dir;
   APanelScreen	*_panel;
   float		_ratio;
+  sf::Vector2i	_mousePos;
 };
 
 #endif /* _SCROLLWIDGET_H_ */

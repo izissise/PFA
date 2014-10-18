@@ -43,16 +43,16 @@ void		ScrollWidget::movePicker(sf::Sprite &sprite, float x, float y)
 
   if (_dir == Scroll::Horizontal)
     {
-      x = ((x + pickerRect.width) > (barRect.left + barRect.width) ?
+      x = ((x + pickerRect.left + pickerRect.width) > (barRect.left + barRect.width) ?
 	   (barRect.left + barRect.width - pickerRect.width) :
-	   x < (barRect.left) ? (barRect.left) : x);
+	   (x + pickerRect.left) < (barRect.left) ? (barRect.left) : x + pickerRect.left);
       y = barRect.top + barRect.height / 2.0 - pickerRect.height / 2.0;
     }
   else
     {
-      y = ((y + pickerRect.height) > (barRect.top + barRect.height) ?
+      y = ((y + pickerRect.top + pickerRect.height) > (barRect.top + barRect.height) ?
 	   (barRect.top + barRect.height - pickerRect.height) :
-       	   y < (barRect.top) ? (barRect.top) : y);
+       	   (y + pickerRect.top) < (barRect.top) ? (barRect.top) : y + pickerRect.top);
       x = barRect.left + barRect.width / 2.0 - pickerRect.width / 2.0;
     }
   sprite.setPosition(x, y);
@@ -163,20 +163,20 @@ void		ScrollWidget::updateScrollSize()
   updateButtonPos();
 }
 
-int		ScrollWidget::handleMouse(float pX, float pY)
+int		ScrollWidget::handleMouse(int pX, int pY)
 {
   int		retVal = 0;
   sf::Sprite	&sprite = getSprite(1).sprite;
-  sf::Vector2f	pos = sprite.getPosition();
 
   if (_active)
     {
       if (_dir == Scroll::Horizontal)
-	movePicker(sprite, pX, pos.y);
+	movePicker(sprite, pX - _mousePos.x, 0);
       else
-	movePicker(sprite, pos.x, pY);
+	movePicker(sprite, 0, pY - _mousePos.y);
       retVal = 1;
     }
+  _mousePos = {pX, pY};
   return retVal;
 }
 
@@ -185,12 +185,22 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 {
   int	retVal = 0;
 
-  if (_hide)
-    return 0;
   if (isClicked(event, sf::Mouse::Left))
     {
       _active = isOver(ref);
-      retVal = handleMouse(event.mouseButton.x, event.mouseButton.y);
+      retVal = _active;
+      if (_active)
+	{
+	  if (!isOver(ref, 1))
+	    {
+	      sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
+	      _mousePos = {static_cast<int>(picZone.left + picZone.width / 2),
+			   static_cast<int>(picZone.top + picZone.height / 2)};
+	      handleMouse(event.mouseButton.x, event.mouseButton.y);
+	    }
+	  else
+	    _mousePos = sf::Mouse::getPosition(ref);
+	}
     }
   else if (event.type == sf::Event::MouseMoved
 	   && sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -198,9 +208,8 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   else if (event.type == sf::Event::MouseWheelMoved)
     {
       sf::Sprite	&sprite = getSprite(1).sprite;
-      sf::Vector2f	pos = sprite.getPosition();
 
-      movePicker(sprite, pos.x, pos.y - SLIDESPEED * event.mouseWheel.delta);
+      movePicker(sprite, 0, -SLIDESPEED * event.mouseWheel.delta);
       retVal = 1;
     }
   if (_update)
@@ -210,6 +219,12 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
     }
   updateScrollSize();
   return retVal;
+}
+
+bool	ScrollWidget::isOver(const sf::RenderWindow &ref, unsigned int spritePos) const
+{
+  return _sprites[spritePos].sprite.getGlobalBounds().contains(static_cast<sf::Vector2f>
+							       (sf::Mouse::getPosition(ref)));
 }
 
 bool	ScrollWidget::isOver(const sf::RenderWindow &ref) const
@@ -226,11 +241,7 @@ bool	ScrollWidget::isOver(const sf::RenderWindow &ref) const
 void	ScrollWidget::addSprite(t_sprite &elem)
 {
   if (_sprites.size() == 1)
-    {
-      sf::Vector2f	pos = elem.sprite.getPosition();
-
-      movePicker(elem.sprite, pos.x, pos.y);
-    }
+    movePicker(elem.sprite, 0, 0);
   else
     elem.sprite.setPosition(_zone.left, _zone.top);
   _sprites.push_back(elem);
@@ -253,9 +264,5 @@ void	ScrollWidget::toSize(unsigned int spritePos, float pX, float pY)
 
   sprite.scale(rX, rY);
   if (spritePos == 1)
-    {
-      sf::Vector2f	pos = sprite.getPosition();
-
-      movePicker(sprite, pos.x, pos.y);
-    }
+    movePicker(sprite, 0, 0);
 }

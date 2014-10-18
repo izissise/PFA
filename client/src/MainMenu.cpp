@@ -26,13 +26,7 @@ void	MainMenu::construct(const sf::Texture &texture, Settings &set,
   Widget	*wOpt = new Widget("opt", {50, 230, 260, 60}, sf::Text("OPTION", _font, 30));
   Widget	*wQuit = new Widget("quit", {50, 310, 260, 60}, sf::Text("QUIT", _font, 30));
 
-  wBackground->addSprite(texture, sf::IntRect(0, 0, 1920, 1080));
-  addSpriteForWidget(wMback, sf::Color(125, 125, 125, 150), {300, 600});
-  addSpriteForWidget(wMenuTitle, sf::Color(10, 06, 12, 255), {300, 70});
-
-  wMenuTitle->setTextAttr(sf::Text::Bold);
-  wMenuTitle->alignText({30,50}, {300, 70}, 25, 50);
-
+  createBgPanel(texture, wBackground, wMback, wMenuTitle);
   createPlayButton(texture, wPlay);
   createOptButton(texture, wOpt);
   createQuitButton(texture, wQuit);
@@ -49,6 +43,16 @@ void	MainMenu::construct(const sf::Texture &texture, Settings &set,
   _widgets.push_back(wQuit);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
+}
+
+void	MainMenu::createBgPanel(const sf::Texture &texture, Widget *wBackground,
+				Widget *wMback, Widget *wMenuTitle)
+{
+  wBackground->addSprite(texture, sf::IntRect(0, 0, 1920, 1080));
+  addSpriteForWidget(wMback, sf::Color(125, 125, 125, 150), {300, 600});
+  addSpriteForWidget(wMenuTitle, sf::Color(10, 06, 12, 255), {300, 70});
+  wMenuTitle->setTextAttr(sf::Text::Bold);
+  wMenuTitle->alignText({30,50}, {300, 70}, 25, 50);
 }
 
 void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)

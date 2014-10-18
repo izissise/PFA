@@ -2,6 +2,7 @@
 #define _SELECTLIST_H_
 
 #include "ASelectList.hpp"
+#include "ScrollWidget.hpp"
 
 class SelectList : public ASelectList
 {
@@ -15,6 +16,7 @@ public:
 private:
   void	createHeader(const sf::Texture &texture, Widget *w);
   void	createButton(const sf::Texture &texture, Widget *w);
+  void	createScroll(const sf::Texture &texture, ScrollWidget *wScroll);
 };
 
 #endif /* _SELECTLIST_H_ */

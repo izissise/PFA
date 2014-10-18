@@ -21,7 +21,7 @@ private:
   void		createOptPanel(const sf::Texture &texture, Widget *);
   void		createCheckBox(const sf::Texture &texture, Widget *);
   void		createTextWidget(const sf::Texture &texture, TextWidget *);
-
+  void		createScrollWidget(const sf::Texture &texture, ScrollWidget *wScroll);
 };
 
 #endif /* _OPTIONGAMEPANEL_H_ */

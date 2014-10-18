@@ -22,27 +22,23 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 					      sf::Text("", _font, 20),
 					      sf::Text("Name", _font, 20), 30);
   BarWidget	*wBarWidget = new BarWidget("bar", {450, 400, 550, 10});
-  ScrollWidget	*wScrollWidget = new ScrollWidget("scroll", {1480, 120, 13, 730},
-						  Scroll::Vertical, this,
-						  sf::Text(), wFlag::None);
-  SelectList	*wSelectList = new SelectList({1000, 200, 260, 600});
+  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, 120, 13, 730},
+					    Scroll::Vertical, this,
+					    sf::Text(), wFlag::None);
+  SelectList	*wSelectList = new SelectList({1000, 200, 260, 231});
 
   wSelectList->construct(texture, set, {});
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
   createTextWidget(texture, wTextWidget);
+  createScrollWidget(texture, wScroll);
 
   wBarWidget->addSprite(texture, sf::IntRect(970, 1080, 549, 5));
   wBarWidget->resize(0.5, 1.0);
   wBarWidget->addSprite(texture, sf::IntRect(990, 1085, 20, 21));
 
-  wScrollWidget->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
-  wScrollWidget->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
-  wScrollWidget->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
-  wScrollWidget->toSize(0, 13, 730);
-
   _widgets.push_back(wPanOption);
-  _widgets.push_back(wScrollWidget);
+  _widgets.push_back(wScroll);
   _widgets.push_back(wCheckBox);
   _widgets.push_back(wTextWidget);
   _widgets.push_back(wBarWidget);
@@ -105,4 +101,12 @@ void	OptionGamePanel::createTextWidget(const sf::Texture &texture UNUSED, TextWi
   wTextWidget->setColor(sf::Color(0,0,0));
   wTextWidget->setDefaultColor(sf::Color(60,60,60));
   wTextWidget->getCursor().setColor(sf::Color(0,0,0));
+}
+
+void	OptionGamePanel::createScrollWidget(const sf::Texture &texture, ScrollWidget *wScroll)
+{
+  wScroll->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
+  wScroll->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
+  wScroll->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
+  wScroll->toSize(0, 13, 730);
 }
