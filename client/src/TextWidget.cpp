@@ -33,8 +33,6 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   int	catched = 0;
   int	retVal;
 
-  if (_hide)
-    return 0;
   if (isClicked(event, sf::Mouse::Left))
     {
       _isActive = isOver(ref);
@@ -60,6 +58,8 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 	  _cursor.setCursorPos(_text);
 	}
     }
+  else
+    setToDefault(event, ref);
   return catched;
 }
 

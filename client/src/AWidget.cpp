@@ -38,9 +38,11 @@ void	AWidget::alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
   sf::Vector2f	npos(pos.x + (xPercent / 100.0) * size.x,
 		     pos.y + (yPercent / 100.0) * size.y);
   sf::FloatRect	textSize = _text.getGlobalBounds();
+  sf::Vector2f	textScale = _text.getScale();
 
   npos.x -= textSize.width / 2.0;
-  npos.y -= _text.getCharacterSize() / 1.5;
+  // get the true size of the font, then remove the blank spaces
+  npos.y -= _text.getCharacterSize() * 0.68 * textScale.y;
   _text.setPosition(npos.x, npos.y);
 }
 
