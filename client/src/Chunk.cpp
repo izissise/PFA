@@ -42,7 +42,7 @@ void Chunk::_generate(void)
       _constructLine();
       _completeField();
     }
-  else if (_pos.y > 0)
+  else if (_pos.y < 0)
     {
       for (float y = 0; y < Chunk::height; ++y)
 	{
@@ -60,7 +60,7 @@ void Chunk::_generate(void)
 	      ++i;
 	    }
 	}
-      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Empty);
+      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Ground);
     }
 }
 
@@ -84,7 +84,7 @@ void Chunk::_generateVBO(const TileCodex& codex)
       i = 0;
       layer.second.setPrimitiveType(sf::Quads);
       layer.second.resize(Chunk::width * Chunk::height * 4);
-      for (float y = 0.f; y < Chunk::height; ++y)
+      for (float y = Chunk::height - 1; y >= 0; --y)
 	{
 	  for (x = 0.f; x < Chunk::width; ++x)
 	    {
@@ -147,19 +147,19 @@ void		Chunk::_completeField(void)
   float		b;
   unsigned int	x;
 
-  for (int y = Chunk::height - 1; y >= 0; --y)
+  for (int y = 0; y < Chunk::height; ++y)
     {
       for (x = 0; x < Chunk::width; ++x)
 	{
 	  _fillVertex(prev, next, x);
-	  if (y > prev.y && y > next.y)
+	  if (y < prev.y && y < next.y)
 	    _tiles[y * Chunk::width + x] = TileType::Ground;
-	  else if (y > prev.y || y > next.y)
+	  else if (y < prev.y || y < next.y)
 	    {
 	      a = (next.y - prev.y) / (next.x - prev.x);
 	      b = next.y - a * next.x;
 	      if (y > a * x + b)
-		_tiles[y * Chunk::width + x] = TileType::Ground;
+		_tiles[y * Chunk::width + x] = TileType::Empty;
 	    }
 	}
     }
