@@ -34,6 +34,7 @@ enum class	Action
     MoveUp,
     MoveDown,
     ToggleConsole,
+    ToggleQuickMenu,
     Last
     };
 

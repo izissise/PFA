@@ -122,6 +122,7 @@ Controls::Controls()
   _actions.push_back(t_action("moveup"));
   _actions.push_back(t_action("movedown"));
   _actions.push_back(t_action("console", actionType::Toggle));
+  _actions.push_back(t_action("quickMenu", actionType::Toggle));
 }
 
 Controls::~Controls()

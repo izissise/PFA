@@ -362,6 +362,7 @@ public:		// public so the lambda can call it
    */
   wFlag			getFlag() const;
   virtual const sf::String	&getValue() const;
+  const std::string	&getId() const;
 
 protected:
   bool				_hide;

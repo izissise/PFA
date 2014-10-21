@@ -1,7 +1,8 @@
 #ifndef _GAMEPANEL_H_
 #define _GAMEPANEL_H_
 
-#include "APanelScreen.hpp"
+#include "Panel.hpp"
+#include "Widget.hpp"
 #include "World.hpp"
 
 #define ITERATIONS 5
@@ -20,6 +21,9 @@ public:
   void		draw(sf::RenderWindow &window, bool toWin);
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 private:
+  void		createButton(const sf::Texture &texture, Widget *w);
+  void		createVoiceButton(const sf::Texture &texture, Widget *w,
+				  Controls &controls, int idx);
   void		constructLine();
   void		completeField(sf::RenderWindow &window);
   void		fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);

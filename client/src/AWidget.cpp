@@ -236,6 +236,11 @@ const sf::String	&AWidget::getValue() const
   return _text.getString();
 }
 
+const std::string	&AWidget::getId() const
+{
+  return _id;
+}
+
 void	AWidget::trigger(const t_event &event)
 {
   if (event.e & wEvent::SetSprite)

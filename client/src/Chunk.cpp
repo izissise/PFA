@@ -35,7 +35,7 @@ void Chunk::_generate(void)
   float		x;
   float		p;
   Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
-		     static_cast<float>(Chunk::height) * _pos.y};
+			  static_cast<float>(Chunk::height) * _pos.y};
 
   if (_pos.y == 0)
     {
@@ -44,6 +44,8 @@ void Chunk::_generate(void)
     }
   else if (_pos.y > 0)
     {
+      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Empty);
+      std::fill(_tiles.begin(), _tiles.end(), TileType::Empty);
       for (float y = 0; y < Chunk::height; ++y)
 	{
 	  for (x = 0; x < Chunk::width; ++x)
@@ -60,7 +62,6 @@ void Chunk::_generate(void)
 	      ++i;
 	    }
 	}
-      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Empty);
     }
 }
 
