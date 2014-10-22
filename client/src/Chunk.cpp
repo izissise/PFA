@@ -158,8 +158,8 @@ void		Chunk::_completeField(void)
 	    {
 	      a = (next.y - prev.y) / (next.x - prev.x);
 	      b = next.y - a * next.x;
-	      if (y > a * x + b)
-		_tiles[y * Chunk::width + x] = TileType::Empty;
+	      if (y < a * x + b)
+	  	_tiles[y * Chunk::width + x] = TileType::Ground;
 	    }
 	}
     }
