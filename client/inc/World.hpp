@@ -51,26 +51,27 @@ private:
     void	scale(const worldPos& s) noexcept;
     void	resize(const worldPos& s) noexcept;
 
-    float	left(void) const noexcept	{ return _topLeft.x; }
-    float	right(void) const noexcept	{ return _topLeft.x + _size.w; }
-    float	top(void) const noexcept	{ return _topLeft.y; }
-    float	bottom(void) const noexcept	{ return _topLeft.y + _size.h; }
+    float	left(void) const noexcept	{ return _botLeft.x; }
+    float	right(void) const noexcept	{ return _botLeft.x + _size.w; }
+    float	top(void) const noexcept	{ return _botLeft.y + _size.h; }
+    float	bottom(void) const noexcept	{ return _botLeft.y; }
     float	width(void) const noexcept	{ return _size.w; }
     float	height(void) const noexcept	{ return _size.h; }
     worldPos	center(void) const noexcept	{ return _center; }
 
   private:
-    worldPos	_topLeft;
+    worldPos	_botLeft;
     worldPos	_size;
     worldPos	_center;
   };
 
-  worldPos	_sToWPos(screenPos pos) const;
-  screenPos	_wToSPos(worldPos pos) const;
+  worldPos	_sToWPos(screenPos pos, bool noOffsets = false) const;
+  screenPos	_wToSPos(worldPos pos, bool noOffsets = false) const;
   float		_getGridOffset(float w) const;
 
   void		_calculateVisibleRange(void);
 
+  screenPos	_getScreenOrigin(void) const;
   void		_drawChunk(sf::RenderWindow& window,
 			   const chunkId& cursor,
 			   screenPos& windowCoord) const;
@@ -78,6 +79,7 @@ private:
 private:
   std::map<chunkId, std::unique_ptr<Chunk>>	_chunks;
   Settings&	_settings;
+  screenPos	_screenSize;
   TileCodex	_codex;
   Camera	_camera;
   Range2i	_loadedRange;
