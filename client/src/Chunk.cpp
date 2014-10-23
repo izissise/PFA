@@ -1,5 +1,6 @@
 #include <cmath>
 #include <fstream>
+#include <cstdio>
 // <TESTING ZONE>
 #include <iostream>
 #include <sstream>
@@ -186,11 +187,13 @@ void	Chunk::_constructLine(void)
   int	chunkHeight = Chunk::height * TileCodex::tileSize;
   int	cutPoints;
   int	height;
-  float	mheight = VARIATION;
+  float	mheight;
   int	x;
   int	y;
   int	j;
 
+  mheight = VARIATION * scaled_raw_noise_2d(0, 1.0, static_cast<float>(_pos.x) / 10.f, 0);
+  std::cout << mheight << std::endl;
   cutPoints = 1;
   _line.points.push_back(sf::Vertex(sf::Vector2f
 				    (0.f, MIDDLEHEIGHT + VARIATION
