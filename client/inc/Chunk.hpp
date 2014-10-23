@@ -14,9 +14,11 @@
 # include "Vector2.hpp"
 
 # define PERSISTANCE 1.0f
-# define SCALE 0.05f
-# define MAXHEIGHT 100.f
+# define SCALE 0.04f
+# define MIDDLEHEIGHT 2000
+# define VARIATION 1800.f
 # define ROUGHNESS 0.5f // [0 - 1]
+# define FADEH 300.0f
 
 class Chunk
 {
@@ -24,7 +26,7 @@ public:
   static const int width = 256;
   static const int height = 256;
   static const int octaves = 2;
-  static const int iterations = 5;
+  static const int iterations = 6;
 
   Chunk(void);
   virtual ~Chunk(void);

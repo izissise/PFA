@@ -17,6 +17,14 @@ void	Lines::update()
     _line.append(p);
 }
 
+void	Lines::update(const sf::Vector2f &padding)
+{
+  if (_line.getVertexCount() > 0)
+    _line.clear();
+  for (auto &p : points)
+    _line.append(sf::Vertex(p.position + padding));
+}
+
 void	Lines::draw(sf::RenderWindow &win) const
 {
   win.draw(_line);

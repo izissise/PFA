@@ -75,7 +75,6 @@ void World::draw(sf::RenderWindow& window) const
     screenCoord.x = screenOrigin.x;
     screenCoord.y += Chunk::height * TileCodex::tileSize;
   }
-  std::cout << std::endl;
 }
 
 auto World::_sToWPos(screenPos pos, bool noOffsets) const -> worldPos

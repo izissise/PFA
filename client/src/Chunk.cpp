@@ -35,9 +35,9 @@ void Chunk::_generate(void)
   float		x;
   float		p;
   Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
-		     static_cast<float>(Chunk::height) * _pos.y};
+			  static_cast<float>(Chunk::height) * _pos.y};
 
-  if (_pos.y == 0)
+  if (_pos.y >= 0)
     {
       _constructLine();
       _completeField();
@@ -121,7 +121,6 @@ void	Chunk::draw(sf::RenderWindow& window,
   states.shader = nullptr;
   window.draw(_fgVertices, states);
   window.draw(_id, states);
-  _line.draw(window);
 }
 
 void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
@@ -145,21 +144,34 @@ void		Chunk::_completeField(void)
   sf::Vector2f	next;
   float		a;
   float		b;
+  float		p;
   unsigned int	x;
+  int		lineY;
+
+  Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
+			  static_cast<float>(Chunk::height) * _pos.y};
 
   for (int y = 0; y < Chunk::height; ++y)
     {
       for (x = 0; x < Chunk::width; ++x)
 	{
 	  _fillVertex(prev, next, x);
-	  if (y < prev.y && y < next.y)
-	    _tiles[y * Chunk::width + x] = TileType::Ground;
-	  else if (y < prev.y || y < next.y)
+	  if (y < prev.y || y < next.y)
 	    {
 	      a = (next.y - prev.y) / (next.x - prev.x);
 	      b = next.y - a * next.x;
-	      if (y < a * x + b)
-	  	_tiles[y * Chunk::width + x] = TileType::Ground;
+	      lineY = a * x + b;
+	      if (y < lineY)
+		{
+		  p = octave_noise_2d(Chunk::octaves, PERSISTANCE, SCALE,
+				      x + offset.x, y + offset.y);
+		  if (p >= 0 - ((FADEH - ((lineY * TileCodex::tileSize + FADEH / 4
+					   - y * TileCodex::tileSize >= FADEH)
+					  ? FADEH : (lineY * TileCodex::tileSize + FADEH / 4
+						     - y * TileCodex::tileSize)))
+				/ FADEH))
+		    _tiles[y * Chunk::width + x] = TileType::Ground;
+		}
 	    }
 	}
     }
@@ -174,21 +186,19 @@ void	Chunk::_constructLine(void)
   int	chunkHeight = Chunk::height * TileCodex::tileSize;
   int	cutPoints;
   int	height;
-  float	mheight = MAXHEIGHT;
+  float	mheight = VARIATION;
   int	x;
   int	y;
   int	j;
 
   cutPoints = 1;
   _line.points.push_back(sf::Vertex(sf::Vector2f
-				    (0.f, (chunkHeight / 2)
-				     - MAXHEIGHT
-				     * raw_noise_2d(_pos.x * TileCodex::tileSize, _pos.y))));
+				    (0.f, MIDDLEHEIGHT + VARIATION
+				     * raw_noise_2d(_pos.x * TileCodex::tileSize, 0))));
   _line.points.push_back(sf::Vertex(sf::Vector2f
 				    (Chunk::width * TileCodex::tileSize,
-				     (chunkHeight / 2)
-				     - MAXHEIGHT
-				     * raw_noise_2d((_pos.x + 1) * TileCodex::tileSize, _pos.y))));
+				     MIDDLEHEIGHT + VARIATION
+				     * raw_noise_2d((_pos.x + 1) * TileCodex::tileSize, 0))));
   for (unsigned int i = 0; i < iterations; ++i) {
     for (j = 0; j < cutPoints; ++j) {
       beg = _line.points.begin();
@@ -203,5 +213,5 @@ void	Chunk::_constructLine(void)
     mheight *= ROUGHNESS;
     cutPoints *= 2;
   }
-  _line.update();
+  _line.update({0, static_cast<float>(chunkHeight * -_pos.y)});
 }
