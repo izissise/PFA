@@ -31,8 +31,8 @@ public:
 
   T	left(void) const	{ return _origin.x; }
   T	right(void) const	{ return _dest.x; }
-  T	top(void) const		{ return _origin.y; }
-  T	bottom(void) const	{ return _dest.y; }
+  T	top(void) const		{ return _dest.y; }
+  T	bottom(void) const	{ return _origin.y; }
   T	width(void) const	{ return _dest.x - _origin.x + 1; }
   T	height(void) const	{ return _dest.y - _origin.y + 1; }
   unsigned size(void) const	{ return this->width() * this->height(); }

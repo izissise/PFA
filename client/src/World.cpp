@@ -7,17 +7,20 @@
 World::World(Settings& settings) :
   _settings(settings)
 {
-  screenPos	screenSize(std::stoi(_settings.getCvarList().getCvar("r_width")),
-			   std::stoi(_settings.getCvarList().getCvar("r_height")));
   chunkId	first;
   chunkId	last;
 
-  _camera.resize(_sToWPos(screenSize));
+  _screenSize =	{std::stoi(_settings.getCvarList().getCvar("r_width")),
+		 std::stoi(_settings.getCvarList().getCvar("r_height"))};
+  _camera.resize(_sToWPos(_screenSize, true));
   _camera.move({0.5f, 0.5f});
 
   _calculateVisibleRange();
-  Range2i bufferRange = {{_visibleRange.left() - 1, _visibleRange.top() - 1},
-			 {_visibleRange.right() + 1, _visibleRange.bottom() + 1}};
+  Range2i bufferRange =
+    {
+      {_visibleRange.left() - 1, _visibleRange.bottom() - 1},
+      {_visibleRange.right() + 1, _visibleRange.top() + 1}
+    };
   for (auto cursor : bufferRange) {
     _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
     _chunks[cursor]->load(cursor.x, cursor.y, _codex);
@@ -29,9 +32,9 @@ void World::update(void)
 {
   static std::pair<Action, Vector2f> moveControls[] =
     {
-      {Action::Forward, {.0f, -.025f}},
+      {Action::Forward, {.0f, .025f}},
       {Action::Left, {-.025f, .0f}},
-      {Action::Back, {.0f, .025f}},
+      {Action::Back, {.0f, -.025f}},
       {Action::Right, {.025f, .0f}}
     };
 
@@ -48,36 +51,46 @@ void World::update(void)
   }
 }
 
+auto World::_getScreenOrigin(void) const -> screenPos
+{
+  worldPos worldOrigin;
+
+  worldOrigin.x = -(_camera.left() - floor(_camera.left()));
+  worldOrigin.y = -(1 - (_camera.top() - floor(_camera.top())));
+  return _wToSPos(worldOrigin, true);
+}
+
 void World::draw(sf::RenderWindow& window) const
 {
-  worldPos	worldOrigin;
-  screenPos	screenOrigin;
-  screenPos	screenCoord;
+  screenPos	screenOrigin = _getScreenOrigin();
+  screenPos	screenCoord = screenOrigin;
+  auto&		range = _visibleRange;
+  int		x;
 
-  worldOrigin.x = _getGridOffset(_camera.left());
-  worldOrigin.y = _getGridOffset(_camera.top());
-  screenOrigin = _wToSPos(worldOrigin);
-  screenCoord = screenOrigin;
-  for (auto cursor : _visibleRange) {
-    if (cursor.x == _visibleRange.origin().x and cursor.y != _visibleRange.origin().y) {
-      screenCoord.x = screenOrigin.x;
-      screenCoord.y += Chunk::height * TileCodex::tileSize;
+  for (int y = range.top(); y >= range.bottom(); --y) {
+    for (x = range.left(); x <= range.right(); ++x) {
+      _drawChunk(window, {x, y}, screenCoord);
+      screenCoord.x += Chunk::width * TileCodex::tileSize;
     }
-    _drawChunk(window, cursor, screenCoord);
-    screenCoord.x += Chunk::width * TileCodex::tileSize;
+    screenCoord.x = screenOrigin.x;
+    screenCoord.y += Chunk::height * TileCodex::tileSize;
   }
 }
 
-auto World::_sToWPos(screenPos pos) const -> worldPos
+auto World::_sToWPos(screenPos pos, bool noOffsets) const -> worldPos
 {
-  return {static_cast<float>(pos.x) / (Chunk::width * TileCodex::tileSize),
-      static_cast<float>(pos.y) / (Chunk::height * TileCodex::tileSize)};
+  float sy = (noOffsets ? pos.y : _screenSize.y - pos.y);
+  float wy = sy / (Chunk::height * TileCodex::tileSize);
+
+  return {static_cast<float>(pos.x) / (Chunk::width * TileCodex::tileSize), wy};
 }
 
-auto World::_wToSPos(worldPos pos) const -> screenPos
+auto World::_wToSPos(worldPos pos, bool noOffsets) const -> screenPos
 {
-  return {static_cast<int>(pos.x * (Chunk::width * TileCodex::tileSize)),
-      static_cast<int>(pos.y * (Chunk::height * TileCodex::tileSize))};
+  float wy = pos.y * (Chunk::height * TileCodex::tileSize);
+  int sy = (noOffsets ? wy : _screenSize.y - wy);
+
+  return {static_cast<int>(pos.x * (Chunk::width * TileCodex::tileSize)), sy};
 }
 
 float World::_getGridOffset(float w) const
@@ -87,8 +100,8 @@ float World::_getGridOffset(float w) const
 
 void World::_calculateVisibleRange(void)
 {
-  _visibleRange = {Vector2i(floor(_camera.left()), floor(_camera.top())),
-		   Vector2i(floor(_camera.right()), floor(_camera.bottom()))};
+  _visibleRange = {Vector2i(floor(_camera.left()), floor(_camera.bottom())),
+		   Vector2i(floor(_camera.right()), floor(_camera.top()))};
 }
 
 void World::_drawChunk(sf::RenderWindow& window,
@@ -108,21 +121,21 @@ void World::_drawChunk(sf::RenderWindow& window,
 
 /*
 ** This method probably needs refactoring. It doesn't seem very optimal
-** even though for now it works and that currently good enough.
+** even though for now it works and that's currently good enough.
 */
 void World::_loadChunks(void)
 {
-  Range2i	bufferRange({_visibleRange.left() - 1, _visibleRange.top() - 1},
-			    {_visibleRange.right() + 1, _visibleRange.bottom() + 1});
+  Range2i	bufferRange({_visibleRange.left() - 1, _visibleRange.bottom() - 1},
+			    {_visibleRange.right() + 1, _visibleRange.top() + 1});
 
   std::vector<Vector2i>	added;
   std::vector<Vector2i> removed;
   Range2i	intersection =
     {
       {std::max(bufferRange.left(), _loadedRange.left()),
-       std::max(bufferRange.top(), _loadedRange.top())},
+       std::max(bufferRange.bottom(), _loadedRange.bottom())},
       {std::min(bufferRange.right(), _loadedRange.right()),
-       std::min(bufferRange.bottom(), _loadedRange.bottom())}
+       std::min(bufferRange.top(), _loadedRange.top())}
     };
   auto		predicate = [intersection](Vector2i& v) {
     return (std::find(intersection.begin(), intersection.end(), v) != intersection.end());

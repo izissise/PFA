@@ -13,6 +13,7 @@ public:
 
   std::list<sf::Vertex>	&getPoints();
   void			update();
+  void			update(const sf::Vector2f &padding);
   void			draw(sf::RenderWindow &win) const;
   void			clear();
   const sf::Vertex	&getPointFromList(unsigned int idx);
