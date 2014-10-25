@@ -1,6 +1,7 @@
 #include <cmath>
 #include <fstream>
 #include <cstdio>
+#include <random>
 // <TESTING ZONE>
 #include <iostream>
 #include <sstream>
@@ -45,6 +46,7 @@ void Chunk::_generate(void)
     }
   else if (_pos.y < 0)
     {
+      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Ground);
       for (float y = 0; y < Chunk::height; ++y)
 	{
 	  for (x = 0; x < Chunk::width; ++x)
@@ -61,7 +63,6 @@ void Chunk::_generate(void)
 	      ++i;
 	    }
 	}
-      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Ground);
     }
 }
 
@@ -139,6 +140,89 @@ void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 		      _line.getPoint(pos).position.y / s);
 }
 
+void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
+					int size, int cuSize, int thickness)
+{
+  if (cuSize > 0)
+    {
+      char	side = 1;
+      for (unsigned char branchSize = 0; branchSize < thickness; ++branchSize)
+	{
+	  if (std::abs(dir.x) < std::abs(dir.y))
+	    _tiles[static_cast<int>(pos.y) * Chunk::width
+		   + static_cast<int>(pos.x) + branchSize - thickness / 2] = TileType::Vine;
+	  else
+	    _tiles[(static_cast<int>(pos.y) + branchSize - thickness / 2) * Chunk::width
+		   + static_cast<int>(pos.x)] = TileType::Vine;
+	  side = -side;
+	}
+      pos.x += dir.x;
+      pos.y += dir.y;
+      _constructBranch(pos, dir, size, cuSize - 1, thickness);
+    }
+  else if ((thickness > 1 || cuSize == -1) && size >= 2)
+    {
+      bool	first = cuSize == -1;
+
+      cuSize = size;
+      size /= 1.5;
+      dir.y = _scaleNumber(std::rand(), 0, RAND_MAX,
+			   (first) ? -200: -1000, 1000) / 1000.0;
+      _constructBranch(pos, dir, size, cuSize, thickness - 1 * !first);
+      if (!first)
+	{
+	  dir.y = ((dir.y >= 0) ? 1 - dir.y : 1 + dir.y);
+	  _constructBranch(pos, dir, size, cuSize, thickness / 2);
+	}
+    }
+}
+
+void		Chunk::_constructBranches(float x, float y, int size, int thickness)
+{
+  int		ty;
+  int		branchSize;
+
+  for (char side = -1; side <= 1; side += 2)
+    {
+      ty = static_cast<float>(size) / 3.0;
+      while (ty < size)
+      	{
+	  branchSize = std::round(_scaleNumber(std::rand(), 0, RAND_MAX,
+					       1,
+					       (thickness - ty / (size / 2.0) < 1) ?
+					       1 : thickness - ty / (size / 2.0)));
+      	  if (_scaleNumber(std::rand(), 0, RAND_MAX, 0, 100) < 30)
+      	    {
+      	      sf::Vector2f t1(x + side * (thickness / 2 + 1)
+			      - (side > 0 && thickness % 2 == 0), y + ty);
+      	      sf::Vector2f t2(side, 0);
+      	      _constructBranch(t1, t2, size / 4, -1, branchSize);
+	      ty += 1 + branchSize * 2;
+	    }
+	  else
+	    ty += 2;
+
+      	}
+      sf::Vector2f t1(x + 1, y + size - 1);
+      sf::Vector2f t2(0.5 * side, 1);
+      if (_scaleNumber(std::rand(), 0, RAND_MAX, 0, 10) < 8)
+      _constructBranch(t1, t2, size / 4, -1, (thickness == 1) ? 1 : thickness - 1);
+    }
+}
+
+void		Chunk::_generateTree(float x, float y)
+{
+  int		size = _scaleNumber(std::rand(), 0, RAND_MAX, 15, 100);
+  unsigned char	thickness = size / 15;
+
+  for (int ty = 0; ty < size; ++ty)
+    {
+      for (int tx = 0; tx < thickness; ++tx)
+	_tiles[(y + ty) * Chunk::width + (x + tx - thickness / 2)] = TileType::Vine;
+    }
+  _constructBranches(x, y, size, thickness);
+}
+
 void		Chunk::_completeField(void)
 {
   sf::Vector2f	prev;
@@ -149,7 +233,7 @@ void		Chunk::_completeField(void)
   unsigned int	x;
   int		lineY;
 
-  Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
+  sf::Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
 
   for (int y = 0; y < Chunk::height; ++y)
@@ -162,7 +246,9 @@ void		Chunk::_completeField(void)
 	      a = (next.y - prev.y) / (next.x - prev.x);
 	      b = next.y - a * next.x;
 	      lineY = a * x + b;
-	      if (y < lineY)
+	      if (x == Chunk::width / 2.0 && y + 1 >= lineY && y < lineY)
+		_generateTree(x, y);
+	      else if (y < lineY)
 		{
 		  p = octave_noise_2d(Chunk::octaves, PERSISTANCE, SCALE,
 				      x + offset.x, y + offset.y);
@@ -193,7 +279,6 @@ void	Chunk::_constructLine(void)
   int	j;
 
   mheight = VARIATION * scaled_raw_noise_2d(0, 1.0, static_cast<float>(_pos.x) / 10.f, 0);
-  std::cout << mheight << std::endl;
   cutPoints = 1;
   _line.points.push_back(sf::Vertex(sf::Vector2f
 				    (0.f, MIDDLEHEIGHT + VARIATION

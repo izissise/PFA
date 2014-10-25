@@ -16,7 +16,7 @@
 # define PERSISTANCE 1.0f
 # define SCALE 0.04f
 # define MIDDLEHEIGHT 2000
-# define VARIATION 1800.f
+# define VARIATION 1500.f
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 300.0f
 
@@ -56,6 +56,14 @@ public:
 protected:
 private:
   void _generate(void);
+  void _generateTree(float x, float y);
+  void _constructBranches(float x, float y, int size, int thickness);
+  void _constructBranch(sf::Vector2f pos, sf::Vector2f dir,
+			int size, int cuSize, int thickness);
+  float _scaleNumber(float nb, float flb, float fhb,
+		     float lb, float hb) { return (((hb - lb) * (nb - flb)) / (fhb - flb) + lb); }
+  int	_roundUpToMult(int nb, int mult) { return (nb + (mult - (nb % mult)) % mult); }
+
   void _loadFromFile(void);
   void _generateVBO(const TileCodex& codex);
   void _fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
