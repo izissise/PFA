@@ -145,7 +145,6 @@ void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
 {
   if (cuSize > 0)
     {
-      char	side = 1;
       for (unsigned char branchSize = 0; branchSize < thickness; ++branchSize)
 	{
 	  if (std::abs(dir.x) < std::abs(dir.y))
@@ -154,7 +153,6 @@ void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
 	  else
 	    _tiles[(static_cast<int>(pos.y) + branchSize - thickness / 2) * Chunk::width
 		   + static_cast<int>(pos.x)] = TileType::Vine;
-	  side = -side;
 	}
       pos.x += dir.x;
       pos.y += dir.y;
@@ -167,7 +165,7 @@ void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
       cuSize = size;
       size /= 1.5;
       dir.y = _scaleNumber(std::rand(), 0, RAND_MAX,
-			   (first) ? -200: -1000, 1000) / 1000.0;
+			   (first) ? 0 : -1000, 1000) / 1000.0;
       _constructBranch(pos, dir, size, cuSize, thickness - 1 * !first);
       if (!first)
 	{
@@ -179,18 +177,24 @@ void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
 
 void		Chunk::_constructBranches(float x, float y, int size, int thickness)
 {
-  int		ty;
+  float		ty;
   int		branchSize;
+  unsigned char	v;
 
   for (char side = -1; side <= 1; side += 2)
     {
       ty = static_cast<float>(size) / 3.0;
       while (ty < size)
       	{
-	  branchSize = std::round(_scaleNumber(std::rand(), 0, RAND_MAX,
-					       1,
-					       (thickness - ty / (size / 2.0) < 1) ?
-					       1 : thickness - ty / (size / 2.0)));
+	  v = std::ceil((ty - static_cast<float>(size) / 3.f)
+			/ ((static_cast<float>(size) - static_cast<float>(size) / 3.f) / (size / 15)));
+
+	  v = ((v <= 0) ? 0 : (v - 1));
+	  branchSize = _scaleNumber(std::rand(), 0, RAND_MAX, 1,
+				    (thickness - ((v >= thickness) ? 1 : v)));
+	  // std::cout << size << " " << ty << " | "
+	  // 	    << (int)v << " " << (int)(thickness - (v >= thickness) ? (thickness - 1) : v)
+	  // 	    << " | " << thickness << " " << branchSize << std::endl;
       	  if (_scaleNumber(std::rand(), 0, RAND_MAX, 0, 100) < 30)
       	    {
       	      sf::Vector2f t1(x + side * (thickness / 2 + 1)
@@ -201,18 +205,16 @@ void		Chunk::_constructBranches(float x, float y, int size, int thickness)
 	    }
 	  else
 	    ty += 2;
-
       	}
-      sf::Vector2f t1(x + 1, y + size - 1);
+      sf::Vector2f t1(x, y + size - 3);
       sf::Vector2f t2(0.5 * side, 1);
-      if (_scaleNumber(std::rand(), 0, RAND_MAX, 0, 10) < 8)
-      _constructBranch(t1, t2, size / 4, -1, (thickness == 1) ? 1 : thickness - 1);
+      _constructBranch(t1, t2, size / 4, size / 4, (thickness == 1) ? 1 : thickness - 1);
     }
 }
 
 void		Chunk::_generateTree(float x, float y)
 {
-  int		size = _scaleNumber(std::rand(), 0, RAND_MAX, 15, 100);
+  int		size = _scaleNumber(std::rand(), 0, RAND_MAX, 20, 65);
   unsigned char	thickness = size / 15;
 
   for (int ty = 0; ty < size; ++ty)

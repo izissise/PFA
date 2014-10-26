@@ -19,7 +19,7 @@
 # define VARIATION 1500.f
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 300.0f
-
+#include <iostream>
 class Chunk
 {
 public:
@@ -63,6 +63,8 @@ private:
   float _scaleNumber(float nb, float flb, float fhb,
 		     float lb, float hb) { return (((hb - lb) * (nb - flb)) / (fhb - flb) + lb); }
   int	_roundUpToMult(int nb, int mult) { return (nb + (mult - (nb % mult)) % mult); }
+  int	_roundNearToMult(int nb, int mult) { return (mult * std::round(nb / mult)); }
+  int	_roundDownToMult(int nb, int mult) { printf("%d\n", mult); return (mult * (nb / mult)); }
 
   void _loadFromFile(void);
   void _generateVBO(const TileCodex& codex);
