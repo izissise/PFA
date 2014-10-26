@@ -39,6 +39,7 @@ void Chunk::_generate(void)
   Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
 
+  std::fill(_tiles.begin(), _tiles.end(), TileType::Empty);
   if (_pos.y >= 0)
     {
       _constructLine();
@@ -149,10 +150,10 @@ void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
 	{
 	  if (std::abs(dir.x) < std::abs(dir.y))
 	    _tiles[static_cast<int>(pos.y) * Chunk::width
-		   + static_cast<int>(pos.x) + branchSize - thickness / 2] = TileType::Vine;
+		   + static_cast<int>(pos.x) + branchSize - thickness / 2] = TileType::Wood;
 	  else
 	    _tiles[(static_cast<int>(pos.y) + branchSize - thickness / 2) * Chunk::width
-		   + static_cast<int>(pos.x)] = TileType::Vine;
+		   + static_cast<int>(pos.x)] = TileType::Wood;
 	}
       pos.x += dir.x;
       pos.y += dir.y;
@@ -214,13 +215,24 @@ void		Chunk::_constructBranches(float x, float y, int size, int thickness)
 
 void		Chunk::_generateTree(float x, float y)
 {
-  int		size = _scaleNumber(std::rand(), 0, RAND_MAX, 20, 65);
+  int		size = _scaleNumber(std::rand(), 0, RAND_MAX, 25, 65);
+  int		down;
   unsigned char	thickness = size / 15;
 
   for (int ty = 0; ty < size; ++ty)
     {
       for (int tx = 0; tx < thickness; ++tx)
-	_tiles[(y + ty) * Chunk::width + (x + tx - thickness / 2)] = TileType::Vine;
+	{
+	  _tiles[(y + ty) * Chunk::width + (x + tx - thickness / 2)] = TileType::Wood;
+	  if (ty == 0)
+	    {
+	      for (down = 1; _tiles[(y - down) * Chunk::width
+				    + (x + tx - thickness / 2)] == TileType::Empty; ++down)
+		_tiles[(y - down) * Chunk::width + (x + tx - thickness / 2)] = TileType::Wood;
+	      if (_tiles[(y - down) * Chunk::width + (x + tx - thickness / 2)] == TileType::Grass)
+		_tiles[(y - down) * Chunk::width + (x + tx - thickness / 2)] = TileType::Vine;
+	    }
+	}
     }
   _constructBranches(x, y, size, thickness);
 }
@@ -248,9 +260,9 @@ void		Chunk::_completeField(void)
 	      a = (next.y - prev.y) / (next.x - prev.x);
 	      b = next.y - a * next.x;
 	      lineY = a * x + b;
-	      if (x == Chunk::width / 2.0 && y + 1 >= lineY && y < lineY)
+	      if (x == Chunk::width / 2.0 && y >= lineY && y - 1 < lineY)
 		_generateTree(x, y);
-	      else if (y < lineY)
+	      else if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
 		  p = octave_noise_2d(Chunk::octaves, PERSISTANCE, SCALE,
 				      x + offset.x, y + offset.y);
@@ -259,7 +271,12 @@ void		Chunk::_completeField(void)
 					  ? FADEH : (lineY * TileCodex::tileSize + FADEH / 4
 						     - y * TileCodex::tileSize)))
 				/ FADEH))
-		    _tiles[y * Chunk::width + x] = TileType::Ground;
+		    {
+		      if (y + 1 >= lineY)
+			_tiles[y * Chunk::width + x] = TileType::Grass;
+		      else
+			_tiles[y * Chunk::width + x] = TileType::Vine;
+		    }
 		}
 	    }
 	}
