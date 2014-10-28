@@ -17,7 +17,7 @@ MainMenu::~MainMenu()
 void	MainMenu::construct(const sf::Texture &texture, Settings &set,
 			    const std::vector<APanelScreen *> &panels)
 {
-  Widget	*wBackground = new Widget("background", {0, 0, 1920, 1080});
+  Widget	*wBackground = new Widget("background", {0, 0, SIZEX, SIZEY});
   Widget	*wMback = new Widget("menuback", {30, 50, 300, 600});
   Widget	*wMenuTitle = new Widget("menu-title", {30, 50, 300, 70},
   					 sf::Text("MAIN", _font, 40));

@@ -3,7 +3,6 @@
 APanelScreen::APanelScreen(const sf::FloatRect &zone) :
   _hide(false), _zone(zone)
 {
-  _rt.create(1600, 900);
 }
 
 APanelScreen::~APanelScreen()
@@ -66,6 +65,14 @@ sf::FloatRect	APanelScreen::toPixel(const sf::Vector2f &perCent,
 
 void		APanelScreen::resizeWidgets(const sf::Vector2f &size)
 {
+  float	ratioX = size.x / SIZEX;
+  float	ratioY = size.y / SIZEY;
+
+  _rt.create(size.x, size.y);
+  _zone.left *= ratioX;
+  _zone.top *= ratioY;
+  _zone.width *= ratioX;
+  _zone.height *= ratioY;
   for (auto &elem : _widgets)
     elem->scale(size);
 }
