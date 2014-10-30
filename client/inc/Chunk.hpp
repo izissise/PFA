@@ -15,11 +15,14 @@
 # include "Biomes.hpp"
 
 # define PERSISTANCE 1.0f
-# define SCALE 0.04f
-# define MIDDLEHEIGHT 1500
-# define VARIATION 1500.f
+# define SCALE 0.06f
+# define LINELENGHT 3
+# define MIDDLEHEIGHT 5000
+# define VARIATION 2000.f
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 300.0f
+# define LOD 3
+# define LS 1000.f
 
 typedef struct	s_ChunkInfo
 {
@@ -40,7 +43,7 @@ public:
   static const int width = 256;
   static const int height = 256;
   static const int octaves = 2;
-  static const int iterations = 6;
+  static const int iterations = 8;
 
   Chunk(void);
   virtual ~Chunk(void);
@@ -70,8 +73,9 @@ public:
 protected:
 private:
   void _generate(void);
-  void _determineBiome();
+  void _determineBiome(unsigned int id);
   void _fillChunkInfo();
+  void _fillHeightMap();
   void _generateTree(float x, float y);
   void _constructBranches(float x, float y, int size, int thickness);
   void _constructBranch(sf::Vector2f pos, sf::Vector2f dir,
@@ -80,13 +84,15 @@ private:
 		     float lb, float hb) { return (((hb - lb) * (nb - flb)) / (fhb - flb) + lb); }
   int	_roundUpToMult(int nb, int mult) { return (nb + (mult - (nb % mult)) % mult); }
   int	_roundNearToMult(int nb, int mult) { return (mult * std::round(nb / mult)); }
-  int	_roundDownToMult(int nb, int mult) { return (mult * (nb / mult)); }
+  int	_roundDownToMult(int nb, int mult) { return (nb >= 0 ?
+						     mult * (nb / mult) :
+						     -_roundUpToMult(-nb, mult)); }
 
   void _loadFromFile(void);
   void _generateVBO(const TileCodex& codex);
   void _fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
   void _constructLine(void);
-  void _getBiomeTile(t_tileType &tile);
+  void _getBiomeTile(unsigned int id, t_tileType &tile);
   void _completeField(void);
 
   std::vector<TileType>	_tiles;
@@ -98,7 +104,7 @@ private:
   sf::VertexArray	_fgVertices;
   sf::VertexArray	_bgVertices;
   Lines			_line;
-  t_ChunkInfo		_info;
+  std::array<t_ChunkInfo, LOD>	_info;
 };
 
 #endif		/* CHUNK_H */

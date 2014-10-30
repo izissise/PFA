@@ -5,6 +5,7 @@ enum class	Biome
 {
   Ice,
     Forest,
+    Tundra,
     Desert,
     Prairie,
     Dry,

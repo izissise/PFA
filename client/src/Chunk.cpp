@@ -31,44 +31,6 @@ void Chunk::load(int xId, int yId, const TileCodex& codex)
   _loaded = true;
 }
 
-void	Chunk::_determineBiome()
-{
-  int		minH = 0;
-  int		biomeId = 1;
-  unsigned int	i;
-  t_BiomeInfo	biomes[] =
-    {{Biome::Dry, 0, 0, 20},
-     {Biome::Prairie, 0, 20, 80},
-     {Biome::Swamp, 0, 80, 100},
-     {Biome::Desert, 200, 0, 50},
-     {Biome::Prairie, 200, 50, 100},
-     {Biome::Forest, 400, 0, 100},
-     {Biome::Ice, 600, 0, 100}};
-
-  for (i = 0; i < sizeof(biomes) / sizeof(t_BiomeInfo); ++i)
-    {
-      if ((_info.avHeight > biomes[i].minHeight + MIDDLEHEIGHT ||
-	   biomes[i].minHeight == minH) &&
-	  _info.avHumidity >= biomes[i].minHumidity &&
-	  _info.avHumidity <= biomes[i].maxHumidity)
-	biomeId = i;
-    }
-  _info.biome = biomes[biomeId].name;
-}
-
-void	Chunk::_fillChunkInfo()
-{
-  float	moistL;
-  float moistR;
-
-  moistL = _scaleNumber(raw_noise_2d(static_cast<float>(_pos.x) / 50.f, 0),
-			-1, 1, 0, 100);
-  moistR = _scaleNumber(raw_noise_2d(static_cast<float>(_pos.x + 1) / 50.f, 0),
-			-1, 1, 0, 100);
-  _info.avHumidity = (moistL + moistR) / 2.f;
-}
-
-
 void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
 					int size, int cuSize, int thickness)
 {
@@ -162,26 +124,31 @@ void		Chunk::_generateTree(float x, float y)
   _constructBranches(x, y, size, thickness);
 }
 
-void	Chunk::_getBiomeTile(t_tileType &tile)
+void	Chunk::_getBiomeTile(unsigned int id, t_tileType &tile)
 {
-  if (_info.biome == Biome::Prairie)
+  if (_info[id].biome == Biome::Prairie)
     {
       tile.surface = TileType::Grass;
       tile.ground = TileType::Vine;
     }
-  else if (_info.biome == Biome::Dry)
+  else if (_info[id].biome == Biome::Dry)
     {
       tile.surface = TileType::DryBlock;
       tile.ground = TileType::DryBlock;
     }
-  else if (_info.biome == Biome::Desert)
+  else if (_info[id].biome == Biome::Desert)
     {
       tile.surface = TileType::Sand;
       tile.ground = TileType::Sand;
     }
-  else if (_info.biome == Biome::Forest || _info.biome == Biome::Swamp)
+  else if (_info[id].biome == Biome::Forest || _info[id].biome == Biome::Swamp)
     {
       tile.surface = TileType::ForestGrass;
+      tile.ground = TileType::Vine;
+    }
+  else if (_info[id].biome == Biome::Tundra)
+    {
+      tile.surface = TileType::TundraGrass;
       tile.ground = TileType::Vine;
     }
   else
@@ -189,6 +156,25 @@ void	Chunk::_getBiomeTile(t_tileType &tile)
       tile.surface = TileType::Snow;
       tile.ground = TileType::Vine;
     }
+}
+
+void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
+{
+  int		points = pow(2, iterations);
+  int		s = TileCodex::tileSize;
+  int		pos = (x * s) / ((static_cast<float>(LINELENGHT)
+				  * static_cast<float>(Chunk::width)
+				  * static_cast<float>(s))
+				 / static_cast<float>(points));
+
+  // if (_pos.x >= 0 && _pos.y == 0)
+  //   std::cout << _pos.x << " " << x * s << " pos: " << pos << " "
+  // 	      << _line.getPoint(pos).position.y  << " " <<  _line.getPoint(pos + 1).position.y  << std::endl;
+  prev = sf::Vector2f(_line.getPoint(pos).position.x / s,
+		      _line.getPoint(pos).position.y / s);
+  pos += 1;
+  next = sf::Vector2f(_line.getPoint(pos).position.x / s,
+		      _line.getPoint(pos).position.y / s);
 }
 
 void		Chunk::_completeField(void)
@@ -199,39 +185,47 @@ void		Chunk::_completeField(void)
   float		b;
   float		p;
   float		biome;
-  unsigned int	x;
-  int		lineY;
+  int		x;
+  float		lineY;
   t_tileType	tile;
-
+  float		part;
+  float		scaledPosX;
+  int		id = 0;
+  int		oldId = -1;
 
   sf::Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
 
-  _determineBiome();
-  _getBiomeTile(tile);
+  part = static_cast<float>(Chunk::width * LINELENGHT) / static_cast<float>(LOD);
+  scaledPosX = (_pos.x >= 0 ? _pos.x : _pos.x + (_roundUpToMult(-_pos.x, LINELENGHT))) % LINELENGHT;
   for (int y = 0; y < Chunk::height; ++y)
     {
       for (x = 0; x < Chunk::width; ++x)
 	{
-	  _fillVertex(prev, next, x);
+	  oldId = -1;
+	  id = static_cast<float>(x) / part;
+	  if (id > oldId)
+	    {
+	      _getBiomeTile(id, tile);
+	      oldId = id;
+	    }
+	  _fillVertex(prev, next, x + scaledPosX * Chunk::width);
 	  if (y < prev.y || y < next.y)
 	    {
 	      a = (next.y - prev.y) / (next.x - prev.x);
 	      b = next.y - a * next.x;
-	      lineY = a * x + b;
+	      lineY = a * (x + scaledPosX * Chunk::width) + b;
 	      if (x == Chunk::width / 2.0 && y >= lineY && y - 1 < lineY)
-		_generateTree(x, y);
+		1;//_generateTree(x, y);
 	      else if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
 		  p = octave_noise_2d(Chunk::octaves, PERSISTANCE, SCALE,
-				      x + offset.x, y + offset.y);
-		  biome = octave_noise_2d(1, 1, SCALE, (x + offset.x) / 50.0, 1);
-		  biome = std::round(_scaleNumber(biome, -1, 1, 0.5, 3.5));
+		  		      x + offset.x, y + offset.y);
 		  if (p >= 0 - ((FADEH - ((lineY * TileCodex::tileSize + FADEH / 4
-					   - y * TileCodex::tileSize >= FADEH)
-					  ? FADEH : (lineY * TileCodex::tileSize + FADEH / 4
-						     - y * TileCodex::tileSize)))
-				/ FADEH))
+		  			   - y * TileCodex::tileSize >= FADEH)
+		  			  ? FADEH : (lineY * TileCodex::tileSize + FADEH / 4
+		  				     - y * TileCodex::tileSize)))
+		  		/ FADEH))
 		    {
 		      if (y + 1 >= lineY)
 			_tiles[y * Chunk::width + x] = tile.surface;
@@ -244,6 +238,140 @@ void		Chunk::_completeField(void)
     }
 }
 
+void	Chunk::_determineBiome(unsigned int id)
+{
+  int		minH = 0;
+  int		biomeId = 1;
+  unsigned int	i;
+  std::array<t_BiomeInfo, 9>	biomes =
+    {{
+      {Biome::Dry, 0, 0, 20},
+      {Biome::Desert, 0, 20, 50},
+      {Biome::Prairie, 0, 50, 80},
+      {Biome::Swamp, 0, 80, 100},
+      {Biome::Desert, 250, 0, 50},
+      {Biome::Prairie, 250, 50, 100},
+      {Biome::Tundra, 500, 0, 50},
+      {Biome::Forest, 500, 50, 100},
+      {Biome::Ice, 750, 0, 100}
+    }};
+
+  for (i = 0; i < biomes.size(); ++i)
+    {
+      if ((_info[id].avHeight > biomes[i].minHeight ||
+	   biomes[i].minHeight == minH) &&
+	  _info[id].avHumidity >= biomes[i].minHumidity &&
+	  _info[id].avHumidity <= biomes[i].maxHumidity)
+	biomeId = i;
+    }
+  _info[id].biome = biomes[biomeId].name;
+}
+
+void	Chunk::_fillChunkInfo()
+{
+  float	moistL;
+  float moistR;
+  float	paddingX = 1.f / static_cast<float>(LOD);
+
+  for (unsigned int id = 0; id < LOD; ++id)
+    {
+      moistL = _scaleNumber(raw_noise_2d(static_cast<float>(_pos.x) / 50.f, 0),
+			    -1, 1, 0, 100);
+      moistR = _scaleNumber(raw_noise_2d((static_cast<float>(_pos.x) + paddingX) / 50.f, 0),
+			    -1, 1, 0, 100);
+      _info[id].avHumidity = (moistL + moistR) / 2.f;
+      _determineBiome(id);
+    }
+}
+
+void		Chunk::_fillHeightMap()
+{
+  unsigned int	size = _line.size();
+  float		part = static_cast<float>(size) / static_cast<float>(LOD);
+  unsigned int	oldId = 0;
+  unsigned int	id = 0;
+  int		tHeight = 0;
+  sf::Vertex	vertex;
+
+  for (unsigned int i = 0; i < size; ++i)
+    {
+      id = static_cast<float>(i) / part;
+      if (id > oldId)
+	{
+	  _info[oldId].avHeight = static_cast<float>(tHeight) / part;
+	  oldId = id;
+	  tHeight = 0;
+	}
+      vertex = _line.getPoint(i);
+      tHeight += (vertex.position.y - MIDDLEHEIGHT
+		  + (Chunk::height * TileCodex::tileSize * _pos.y));
+    }
+  _info[oldId].avHeight = static_cast<float>(tHeight) / part;
+}
+
+void	Chunk::_constructLine(void)
+{
+  list<sf::Vertex>::iterator	beg;
+  sf::Vertex	prev;
+  sf::Vertex	next;
+  float		xOffset = Chunk::width * _pos.x;
+  int		cutPoints = 1;
+  float		mHeight;
+  float		leftHeight;
+  float		rightHeight;
+  int		x;
+  int		y;
+  int		j;
+
+  int	leftPoint = _roundDownToMult(_pos.x, LINELENGHT);
+  int	rightPoint =  _roundUpToMult(_pos.x + 1, LINELENGHT);
+  float	chunkWidth = Chunk::width * TileCodex::tileSize;
+  float chunkHeight = Chunk::height * TileCodex::tileSize;
+
+  leftHeight = VARIATION * raw_noise_2d(leftPoint, 0);
+  rightHeight = VARIATION * raw_noise_2d(rightPoint, 0);
+  mHeight = VARIATION * scaled_raw_noise_2d((leftPoint + rightPoint) / 2.f, 0, 0, 1);
+
+  // Scale the line between [0, LINELENGHT]
+
+  // if (_pos.x < 0 && _pos.y == 0)
+  //   std::cout << "First: pos.x " <<  _pos.x << " pos.y " << _pos.y
+  // 	      << " HEIGHT: " <<  (MIDDLEHEIGHT + leftHeight) << " "
+  // 	      << (rightHeight + MIDDLEHEIGHT)  << " mHeight: " << mHeight << " "
+  // 	      << leftPoint << " " << rightPoint
+  // 	      << std::endl << std::endl;
+
+  _line.points.push_back(sf::Vertex(sf::Vector2f
+				    (0,
+				     MIDDLEHEIGHT + leftHeight)));
+  _line.points.push_back(sf::Vertex(sf::Vector2f
+				    (LINELENGHT * chunkWidth,
+				     MIDDLEHEIGHT + rightHeight)));
+
+  for (unsigned int i = 0; i < iterations; ++i)
+    {
+      for (j = 0; j < cutPoints; ++j)
+	{
+	  beg = _line.points.begin();
+	  prev = _line.getPointFromList(j * 2);
+	  next = _line.getPointFromList(j * 2 + 1);
+	  x = next.position.x / 2 + prev.position.x / 2;
+	  y = next.position.y / 2 + prev.position.y / 2;
+	  advance(beg, j * 2 + 1);
+	  _line.points.insert(beg, sf::Vertex
+			      (sf::Vector2f(x, y + mHeight
+					    * raw_noise_2d(x + leftPoint * Chunk::width, 0))));
+	}
+      mHeight *= ROUGHNESS;
+      cutPoints *= 2;
+    }
+  _line.update({0, static_cast<float>(chunkHeight * -_pos.y)});
+  if (_pos.x < 0 && _pos.y == 0)
+    for (unsigned int i = 0; i < _line.size(); ++i)
+      {
+  	std::cout << "dump: " <<_line.getPoint(i).position.x << " " << _line.getPoint(i).position.y << std::endl;
+      }
+}
 
 void Chunk::_generate(void)
 {
@@ -257,6 +385,7 @@ void Chunk::_generate(void)
   if (_pos.y >= 0)
     {
       _constructLine();
+      _fillHeightMap();
       _fillChunkInfo();
       _completeField();
     }
@@ -339,64 +468,5 @@ void	Chunk::draw(sf::RenderWindow& window,
   states.shader = nullptr;
   window.draw(_fgVertices, states);
   window.draw(_id, states);
-  //  _line.draw(window);
-}
-
-void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
-{
-  int		points = pow(2, iterations);
-  int		s = TileCodex::tileSize;
-  int		pos = (x * s) / ((static_cast<float>(Chunk::width) *
-				  static_cast<float>(s)) /
-				 static_cast<float>(points));
-
-  prev = sf::Vector2f(_line.getPoint(pos).position.x / s,
-		      _line.getPoint(pos).position.y / s);
-  pos += 1;
-  next = sf::Vector2f(_line.getPoint(pos).position.x / s,
-		      _line.getPoint(pos).position.y / s);
-}
-
-void	Chunk::_constructLine(void)
-{
-  list<sf::Vertex>::iterator	beg;
-  sf::Vertex	prev;
-  sf::Vertex	next;
-  int		xOffset = Chunk::width * _pos.x;
-  int		chunkHeight = Chunk::height * TileCodex::tileSize;
-  int		cutPoints = 1;
-  int		height;
-  float		mheight;
-  unsigned int	tHeight = 0;
-  int		x;
-  int		y;
-  int		j;
-
-  mheight = VARIATION * scaled_raw_noise_2d(0, 1.0, static_cast<float>(_pos.x) / 10.f, 0);
-  _line.points.push_back(sf::Vertex(sf::Vector2f
-				    (0.f, MIDDLEHEIGHT + VARIATION
-				     * raw_noise_2d(_pos.x * TileCodex::tileSize, 0))));
-  _line.points.push_back(sf::Vertex(sf::Vector2f
-				    (Chunk::width * TileCodex::tileSize,
-				     MIDDLEHEIGHT + VARIATION
-				     * raw_noise_2d((_pos.x + 1) * TileCodex::tileSize, 0))));
-  tHeight += (MIDDLEHEIGHT + VARIATION * raw_noise_2d(_pos.x * TileCodex::tileSize, 0)
-	      + MIDDLEHEIGHT + VARIATION * raw_noise_2d((_pos.x + 1) * TileCodex::tileSize, 0));
-  for (unsigned int i = 0; i < iterations; ++i) {
-    for (j = 0; j < cutPoints; ++j) {
-      beg = _line.points.begin();
-      prev = _line.getPointFromList(j * 2);
-      next = _line.getPointFromList(j * 2 + 1);
-      x = next.position.x / 2 + prev.position.x / 2;
-      y = next.position.y / 2 + prev.position.y / 2;
-      height = mheight * raw_noise_2d(x + xOffset, y);
-      advance(beg, j * 2 + 1);
-      tHeight += (y + height);
-      _line.points.insert(beg, sf::Vertex(sf::Vector2f(x, y + height)));
-    }
-    mheight *= ROUGHNESS;
-    cutPoints *= 2;
-  }
-  _info.avHeight = (tHeight / (cutPoints + 1));
-  _line.update({0, static_cast<float>(chunkHeight * -_pos.y)});
+  //_line.draw(window);
 }

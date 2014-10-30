@@ -48,7 +48,7 @@ enum class TileType : std::int8_t
     Obsidian,
     ForestGrass,
     DryBlock,
-    Empty8,
+    TundraGrass,
     ChestR,
     ChestL,
     UCraft,
