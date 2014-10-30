@@ -181,10 +181,13 @@ void		Chunk::_completeField(void)
   float		a;
   float		b;
   float		p;
+
   float		biome;
   int		x;
   float		lineY;
   t_tileType	tile;
+  t_tileType	closeTile;
+
   float		part;
   float		scaledPosX;
   int		id = 0;
@@ -197,13 +200,14 @@ void		Chunk::_completeField(void)
   scaledPosX = (_pos.x >= 0 ? _pos.x : _pos.x + (_roundUpToMult(-_pos.x, LINELENGHT))) % LINELENGHT;
   for (int y = 0; y < Chunk::height; ++y)
     {
+      oldId = -1;
       for (x = 0; x < Chunk::width; ++x)
 	{
-	  oldId = -1;
 	  id = (static_cast<float>(x) + (scaledPosX * Chunk::width)) / part;
 	  if (id > oldId)
 	    {
 	      _getBiomeTile(id, tile);
+	      //_getBiomeTile(i, tile);
 	      oldId = id;
 	    }
 	  _fillVertex(prev, next, x + scaledPosX * Chunk::width);
@@ -329,9 +333,11 @@ void	Chunk::_constructLine(void)
     (static_cast<float>(leftPoint) / PSCALE, 0);
   rightHeight = MAXVARIATION * raw_noise_2d
     (static_cast<float>(rightPoint) / PSCALE, 0);
-  mHeight = MAXVARIATION * scaled_raw_noise_2d
-    (((leftPoint + rightPoint) / 2.f) / PSCALE, 0, 0, 1);
-  mHeight = _scaleNumber(mHeight, 0, MAXVARIATION, MINVARIATION, MAXVARIATION);
+
+  mHeight = MAXVARIATION * raw_noise_2d
+    (((leftPoint + rightPoint) / 2.f) / PSCALE, 0);
+  mHeight = _scaleNumber(mHeight, -MAXVARIATION, MAXVARIATION,
+			 MINVARIATION, MAXVARIATION);
 
   _line.points.push_back(sf::Vertex(sf::Vector2f
 				    (0,
@@ -339,6 +345,7 @@ void	Chunk::_constructLine(void)
   _line.points.push_back(sf::Vertex(sf::Vector2f
 				    (LINELENGHT * chunkWidth,
 				     MIDDLEHEIGHT + rightHeight)));
+
 
   for (unsigned int i = 0; i < iterations; ++i)
     {

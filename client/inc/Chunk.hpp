@@ -18,7 +18,7 @@
 # define SCALE 0.06f
 # define LINELENGHT 4
 # define MIDDLEHEIGHT 5000
-# define MAXVARIATION 2000.f
+# define MAXVARIATION 3000.f
 # define MINVARIATION 500.f
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 300.0f
