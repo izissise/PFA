@@ -167,9 +167,6 @@ void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 				  * static_cast<float>(s))
 				 / static_cast<float>(points));
 
-  // if (_pos.x >= 0 && _pos.y == 0)
-  //   std::cout << _pos.x << " " << x * s << " pos: " << pos << " "
-  // 	      << _line.getPoint(pos).position.y  << " " <<  _line.getPoint(pos + 1).position.y  << std::endl;
   prev = sf::Vector2f(_line.getPoint(pos).position.x / s,
 		      _line.getPoint(pos).position.y / s);
   pos += 1;
@@ -203,7 +200,7 @@ void		Chunk::_completeField(void)
       for (x = 0; x < Chunk::width; ++x)
 	{
 	  oldId = -1;
-	  id = static_cast<float>(x) / part;
+	  id = (static_cast<float>(x) + (scaledPosX * Chunk::width)) / part;
 	  if (id > oldId)
 	    {
 	      _getBiomeTile(id, tile);
@@ -328,18 +325,13 @@ void	Chunk::_constructLine(void)
   float	chunkWidth = Chunk::width * TileCodex::tileSize;
   float chunkHeight = Chunk::height * TileCodex::tileSize;
 
-  leftHeight = VARIATION * raw_noise_2d(leftPoint, 0);
-  rightHeight = VARIATION * raw_noise_2d(rightPoint, 0);
-  mHeight = VARIATION * scaled_raw_noise_2d((leftPoint + rightPoint) / 2.f, 0, 0, 1);
-
-  // Scale the line between [0, LINELENGHT]
-
-  // if (_pos.x < 0 && _pos.y == 0)
-  //   std::cout << "First: pos.x " <<  _pos.x << " pos.y " << _pos.y
-  // 	      << " HEIGHT: " <<  (MIDDLEHEIGHT + leftHeight) << " "
-  // 	      << (rightHeight + MIDDLEHEIGHT)  << " mHeight: " << mHeight << " "
-  // 	      << leftPoint << " " << rightPoint
-  // 	      << std::endl << std::endl;
+  leftHeight = MAXVARIATION * raw_noise_2d
+    (static_cast<float>(leftPoint) / PSCALE, 0);
+  rightHeight = MAXVARIATION * raw_noise_2d
+    (static_cast<float>(rightPoint) / PSCALE, 0);
+  mHeight = MAXVARIATION * scaled_raw_noise_2d
+    (((leftPoint + rightPoint) / 2.f) / PSCALE, 0, 0, 1);
+  mHeight = _scaleNumber(mHeight, 0, MAXVARIATION, MINVARIATION, MAXVARIATION);
 
   _line.points.push_back(sf::Vertex(sf::Vector2f
 				    (0,
@@ -360,17 +352,13 @@ void	Chunk::_constructLine(void)
 	  advance(beg, j * 2 + 1);
 	  _line.points.insert(beg, sf::Vertex
 			      (sf::Vector2f(x, y + mHeight
-					    * raw_noise_2d(x + leftPoint * Chunk::width, 0))));
+					    * raw_noise_2d
+					    ((x / Chunk::width + leftPoint), 0))));
 	}
       mHeight *= ROUGHNESS;
       cutPoints *= 2;
     }
   _line.update({0, static_cast<float>(chunkHeight * -_pos.y)});
-  if (_pos.x < 0 && _pos.y == 0)
-    for (unsigned int i = 0; i < _line.size(); ++i)
-      {
-  	std::cout << "dump: " <<_line.getPoint(i).position.x << " " << _line.getPoint(i).position.y << std::endl;
-      }
 }
 
 void Chunk::_generate(void)

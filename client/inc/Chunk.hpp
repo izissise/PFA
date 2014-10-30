@@ -16,13 +16,14 @@
 
 # define PERSISTANCE 1.0f
 # define SCALE 0.06f
-# define LINELENGHT 3
+# define LINELENGHT 4
 # define MIDDLEHEIGHT 5000
-# define VARIATION 2000.f
+# define MAXVARIATION 2000.f
+# define MINVARIATION 500.f
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 300.0f
-# define LOD 3
-# define LS 1000.f
+# define LOD 15
+# define PSCALE 50.f
 
 typedef struct	s_ChunkInfo
 {
@@ -40,10 +41,10 @@ typedef struct	s_tileType
 class Chunk
 {
 public:
-  static const int width = 256;
-  static const int height = 256;
-  static const int octaves = 2;
-  static const int iterations = 8;
+  static const int	width = 256;
+  static const int	height = 256;
+  static const int	octaves = 2;
+  static const int	iterations = 8;
 
   Chunk(void);
   virtual ~Chunk(void);
