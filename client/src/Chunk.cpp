@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 // </TESTING ZONE>
-
+#include "Unused.hpp"
 #include "Chunk.hpp"
 #include "SimplexNoise.h"
 
@@ -174,6 +174,15 @@ void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 		      _line.getPoint(pos).position.y / s);
 }
 
+void	Chunk::_generateSky(int x UNUSED, int y UNUSED, const sf::Vector2f &offset UNUSED)
+{
+}
+
+void	Chunk::_addSurface(int x, int y, const t_tileType &tile)
+{
+  _tiles[y * Chunk::width + x] = TileType::DeadBush;
+}
+
 void		Chunk::_completeField(void)
 {
   sf::Vector2f	prev;
@@ -228,12 +237,16 @@ void		Chunk::_completeField(void)
 		  				     - y * TileCodex::tileSize)))
 		  		/ FADEH))
 		    {
-		      if (y + 1 >= lineY)
+		      /*if (y + 1 >= lineY)
+			_addSurface(x, y, tile);
+			else */if (y + 1 >= lineY)
 			_tiles[y * Chunk::width + x] = tile.surface;
 		      else
 			_tiles[y * Chunk::width + x] = tile.ground;
 		    }
 		}
+	      else
+		_generateSky(x, y, offset);
 	    }
 	}
     }
@@ -250,11 +263,11 @@ void	Chunk::_determineBiome(unsigned int id)
       {Biome::Desert, 0, 20, 50},
       {Biome::Prairie, 0, 50, 80},
       {Biome::Swamp, 0, 80, 100},
-      {Biome::Desert, 250, 0, 50},
-      {Biome::Prairie, 250, 50, 100},
-      {Biome::Tundra, 500, 0, 50},
-      {Biome::Forest, 500, 50, 100},
-      {Biome::Ice, 750, 0, 100}
+      {Biome::Desert, 400, 0, 50},
+      {Biome::Prairie, 400, 50, 100},
+      {Biome::Tundra, 800, 0, 50},
+      {Biome::Forest, 800, 50, 100},
+      {Biome::Ice, 1500, 0, 100}
     }};
 
   for (i = 0; i < biomes.size(); ++i)

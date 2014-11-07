@@ -94,6 +94,8 @@ private:
   void _fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
   void _constructLine(void);
   void _getBiomeTile(unsigned int id, t_tileType &tile);
+  void _generateSky(int x, int y, const sf::Vector2f &offset);
+  void _addSurface(int x, int y, const t_tileType &tile);
   void _completeField(void);
 
   std::vector<TileType>	_tiles;

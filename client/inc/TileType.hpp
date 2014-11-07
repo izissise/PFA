@@ -62,7 +62,7 @@ enum class TileType : std::int8_t
     RedStoneOre,
     Shit2,
     Shit3,
-    Empty9,
+    DeadBush,
     Empty10,
     Empty11,
     ChestBL,
