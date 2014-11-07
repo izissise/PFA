@@ -58,6 +58,7 @@ public:
 	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;
 
+  const Lines	&getLine() const;
   TileType getTile(unsigned index) const	{ return _tiles[index]; }
   void setTile(unsigned index, TileType val)	{ _tiles[index] = val; }
   TileType getBgTile(unsigned index) const	{ return _bgTiles[index]; }

@@ -333,11 +333,11 @@ void		Chunk::_fillHeightMap()
   _info[oldId].avHeight = static_cast<float>(tHeight) / part;
 }
 
-void	Chunk::_constructLine(void)
+void	Chunk::_constructLine()
 {
-  list<sf::Vertex>::iterator	beg;
   sf::Vertex	prev;
   sf::Vertex	next;
+  unsigned int	size = std::pow(2, Chunk::iterations);
   int		cutPoints = 1;
   float		mHeight;
   float		leftHeight;
@@ -351,6 +351,7 @@ void	Chunk::_constructLine(void)
   float	chunkWidth = Chunk::width * TileCodex::tileSize;
   float chunkHeight = Chunk::height * TileCodex::tileSize;
 
+  _line.points.resize(size + 1);
   leftHeight = MAXVARIATION * raw_noise_2d
     (static_cast<float>(leftPoint) / PSCALE, 0);
   rightHeight = MAXVARIATION * raw_noise_2d
@@ -361,33 +362,32 @@ void	Chunk::_constructLine(void)
   mHeight = _scaleNumber(mHeight, -MAXVARIATION, MAXVARIATION,
 			 MINVARIATION, MAXVARIATION);
 
-  _line.points.push_back(sf::Vertex(sf::Vector2f
-				    (0,
-				     MIDDLEHEIGHT + leftHeight)));
-  _line.points.push_back(sf::Vertex(sf::Vector2f
-				    (LINELENGHT * chunkWidth,
-				     MIDDLEHEIGHT + rightHeight)));
-
+  _line.points[0] = sf::Vertex(sf::Vector2f
+			       (0, MIDDLEHEIGHT + leftHeight
+				- (chunkHeight * _pos.y)));
+  _line.points[size] = sf::Vertex(sf::Vector2f
+				  (LINELENGHT * chunkWidth,
+				   MIDDLEHEIGHT + rightHeight
+				   - (chunkHeight * _pos.y)));
 
   for (unsigned int i = 0; i < iterations; ++i)
     {
       for (j = 0; j < cutPoints; ++j)
 	{
-	  beg = _line.points.begin();
-	  prev = _line.getPointFromList(j * 2);
-	  next = _line.getPointFromList(j * 2 + 1);
+	  prev = _line.getPoint(j * size);
+	  next = _line.getPoint((j + 1) * size);
 	  x = next.position.x / 2 + prev.position.x / 2;
 	  y = next.position.y / 2 + prev.position.y / 2;
-	  advance(beg, j * 2 + 1);
-	  _line.points.insert(beg, sf::Vertex
-			      (sf::Vector2f(x, y + mHeight
-					    * raw_noise_2d
-					    ((x / Chunk::width + leftPoint), 0))));
+	  _line.points[size / 2 + j * size] = sf::Vertex(sf::Vector2f
+							 (x, y + mHeight
+							  * raw_noise_2d
+							  ((x / Chunk::width + leftPoint), 0)));
 	}
       mHeight *= ROUGHNESS;
       cutPoints *= 2;
+      size /= 2;
     }
-  _line.update({0, static_cast<float>(chunkHeight * -_pos.y)});
+  //  _line.update({0, static_cast<float>(chunkHeight * -_pos.y)});
 }
 
 void Chunk::_generate(void)
@@ -486,4 +486,9 @@ void	Chunk::draw(sf::RenderWindow& window,
   window.draw(_fgVertices, states);
   window.draw(_id, states);
   //_line.draw(window);
+}
+
+const Lines	&Chunk::getLine() const
+{
+  return _line;
 }
