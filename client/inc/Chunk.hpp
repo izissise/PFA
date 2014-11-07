@@ -15,7 +15,7 @@
 # include "Biomes.hpp"
 
 # define PERSISTANCE 1.0f
-# define SCALE 0.06f
+# define SCALE 0.045f
 # define LINELENGHT 4
 # define MIDDLEHEIGHT 5000
 # define MAXVARIATION 3000.f
@@ -45,6 +45,7 @@ public:
   static const int	height = 256;
   static const int	octaves = 2;
   static const int	iterations = 8;
+  static const int	biomeMixDist = 40;
 
   Chunk(void);
   virtual ~Chunk(void);
@@ -81,6 +82,7 @@ private:
   void _constructBranches(float x, float y, int size, int thickness);
   void _constructBranch(sf::Vector2f pos, sf::Vector2f dir,
 			int size, int cuSize, int thickness);
+
   float _scaleNumber(float nb, float flb, float fhb,
 		     float lb, float hb) { return (((hb - lb) * (nb - flb)) / (fhb - flb) + lb); }
   int	_roundUpToMult(int nb, int mult) { return (nb + (mult - (nb % mult)) % mult); }
@@ -94,8 +96,8 @@ private:
   void _fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
   void _constructLine(void);
   void _getBiomeTile(unsigned int id, t_tileType &tile);
-  void _generateSky(int x, int y, const sf::Vector2f &offset);
-  void _addSurface(int x, int y, const t_tileType &tile);
+  void _getBiomes(int * const id, t_tileType &tile,
+		  int x, int y, int &dist);
   void _completeField(void);
 
   std::vector<TileType>	_tiles;

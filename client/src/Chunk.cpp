@@ -174,13 +174,33 @@ void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 		      _line.getPoint(pos).position.y / s);
 }
 
-void	Chunk::_generateSky(int x UNUSED, int y UNUSED, const sf::Vector2f &offset UNUSED)
+void	Chunk::_getBiomes(int * const id, t_tileType &tile,
+			  int x, int y, int &dist)
 {
-}
+  int	idx;
 
-void	Chunk::_addSurface(int x, int y, const t_tileType &tile)
-{
-  _tiles[y * Chunk::width + x] = TileType::DeadBush;
+  if (id[0] != -1 && y == 0)
+    dist = (dist + 1) % Chunk::biomeMixDist;
+  if (id[0] == -1 || dist == 0)
+    {
+      _getBiomeTile(id[1], tile);
+      id[0] = id[1];
+    }
+  else
+    {
+      // idx = rand() % Chunk::biomeMixDist;
+      // idx = (idx < dist);
+      if (_scaleNumber((octave_noise_2d(1, 1, 0.5, x - dist, y)),
+		       -1, 1, 0, static_cast<float>(Chunk::biomeMixDist) / 1.5) > dist)
+	idx = 0;
+      else
+	{
+	  idx = _scaleNumber(std::rand(),
+			     0, RAND_MAX, 0, Chunk::biomeMixDist);
+	  idx = (idx < dist);
+	}
+      _getBiomeTile(id[idx], tile);
+    }
 }
 
 void		Chunk::_completeField(void)
@@ -191,43 +211,37 @@ void		Chunk::_completeField(void)
   float		b;
   float		p;
 
-  float		biome;
-  int		x;
   float		lineY;
   t_tileType	tile;
-  t_tileType	closeTile;
 
   float		part;
   float		scaledPosX;
-  int		id = 0;
-  int		oldId = -1;
+  int		id[2] = {-1, 1};
+  int		changeX = 0;
+  int		y = 0;
 
   sf::Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
-
   part = static_cast<float>(Chunk::width * LINELENGHT) / static_cast<float>(LOD);
   scaledPosX = (_pos.x >= 0 ? _pos.x : _pos.x + (_roundUpToMult(-_pos.x, LINELENGHT))) % LINELENGHT;
-  for (int y = 0; y < Chunk::height; ++y)
+
+  for (int x = 0; x < Chunk::width; ++x)
     {
-      oldId = -1;
-      for (x = 0; x < Chunk::width; ++x)
+      y = 0;
+      id[1] = (static_cast<float>(x) + (scaledPosX * Chunk::width)) / part;
+      _fillVertex(prev, next, x + scaledPosX * Chunk::width);
+      a = (next.y - prev.y) / (next.x - prev.x);
+      b = next.y - a * next.x;
+      lineY = a * (x + scaledPosX * Chunk::width) + b;
+      for (; y < Chunk::height; ++y)
 	{
-	  id = (static_cast<float>(x) + (scaledPosX * Chunk::width)) / part;
-	  if (id > oldId)
-	    {
-	      _getBiomeTile(id, tile);
-	      //_getBiomeTile(i, tile);
-	      oldId = id;
-	    }
-	  _fillVertex(prev, next, x + scaledPosX * Chunk::width);
+	  if (id[1] > id[0])
+	    _getBiomes(id, tile, x, y, changeX);
 	  if (y < prev.y || y < next.y)
 	    {
-	      a = (next.y - prev.y) / (next.x - prev.x);
-	      b = next.y - a * next.x;
-	      lineY = a * (x + scaledPosX * Chunk::width) + b;
-	      if (x == Chunk::width / 2.0 && y >= lineY && y - 1 < lineY)
-		1;//_generateTree(x, y);
-	      else if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
+	      // if (x == Chunk::width / 2.0 && y >= lineY && y - 1 < lineY)
+	      // 	_generateTree(x, y);
+	      if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
 		  p = octave_noise_2d(Chunk::octaves, PERSISTANCE, SCALE,
 		  		      x + offset.x, y + offset.y);
@@ -237,16 +251,12 @@ void		Chunk::_completeField(void)
 		  				     - y * TileCodex::tileSize)))
 		  		/ FADEH))
 		    {
-		      /*if (y + 1 >= lineY)
-			_addSurface(x, y, tile);
-			else */if (y + 1 >= lineY)
+		      if (y + 1 >= lineY)
 			_tiles[y * Chunk::width + x] = tile.surface;
 		      else
 			_tiles[y * Chunk::width + x] = tile.ground;
 		    }
 		}
-	      else
-		_generateSky(x, y, offset);
 	    }
 	}
     }
@@ -328,7 +338,6 @@ void	Chunk::_constructLine(void)
   list<sf::Vertex>::iterator	beg;
   sf::Vertex	prev;
   sf::Vertex	next;
-  float		xOffset = Chunk::width * _pos.x;
   int		cutPoints = 1;
   float		mHeight;
   float		leftHeight;
@@ -405,7 +414,7 @@ void Chunk::_generate(void)
 	  for (x = 0; x < Chunk::width; ++x)
 	    {
 	      p = octave_noise_2d(octaves, PERSISTANCE, SCALE,
-				  x + offset.x, y + offset.y);
+				  (x + offset.x) / 1.0, (y + offset.y) / 1.0);
 	      if (p >= 0)
 		{
 		  if (p < 0.1)
