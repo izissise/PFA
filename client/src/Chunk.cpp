@@ -124,29 +124,29 @@ void		Chunk::_generateTree(float x, float y)
   _constructBranches(x, y, size, thickness);
 }
 
-void	Chunk::_getBiomeTile(unsigned int id, t_tileType &tile)
+void	Chunk::_getBiomeTile(Biome biome, t_tileType &tile)
 {
-  if (_info[id].biome == Biome::Prairie)
+  if (biome == Biome::Prairie)
     {
       tile.surface = TileType::Grass;
       tile.ground = TileType::Vine;
     }
-  else if (_info[id].biome == Biome::Dry)
+  else if (biome == Biome::Dry)
     {
       tile.surface = TileType::DryBlock;
       tile.ground = TileType::DryBlock;
     }
-  else if (_info[id].biome == Biome::Desert)
+  else if (biome == Biome::Desert)
     {
       tile.surface = TileType::Sand;
       tile.ground = TileType::Sand;
     }
-  else if (_info[id].biome == Biome::Forest || _info[id].biome == Biome::Swamp)
+  else if (biome == Biome::Forest || biome == Biome::Swamp)
     {
       tile.surface = TileType::ForestGrass;
       tile.ground = TileType::Vine;
     }
-  else if (_info[id].biome == Biome::Tundra)
+  else if (biome == Biome::Tundra)
     {
       tile.surface = TileType::TundraGrass;
       tile.ground = TileType::Vine;
@@ -174,32 +174,30 @@ void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 		      _line.getPoint(pos).position.y / s);
 }
 
-void	Chunk::_getBiomes(int * const id, t_tileType &tile,
-			  int x, int y, int &dist)
+void	Chunk::_choseBiome(Biome * const biome, t_tileType &tile,
+			   int x, int y, int &dist)
 {
   int	idx;
 
-  if (id[0] != -1 && y == 0)
+  if (y == 0)
     dist = (dist + 1) % Chunk::biomeMixDist;
-  if (id[0] == -1 || dist == 0)
+  if (dist == 0)
     {
-      _getBiomeTile(id[1], tile);
-      id[0] = id[1];
+      _getBiomeTile(biome[1], tile);
+      biome[0] = biome[1];
     }
   else
     {
-      // idx = rand() % Chunk::biomeMixDist;
-      // idx = (idx < dist);
       if (_scaleNumber((octave_noise_2d(1, 1, 0.5, x - dist, y)),
-		       -1, 1, 0, static_cast<float>(Chunk::biomeMixDist) / 1.5) > dist)
-	idx = 0;
+      		       -1, 1, 0, static_cast<float>(Chunk::biomeMixDist) / 1.5f) > dist)
+      	idx = 0;
       else
-	{
+      	{
 	  idx = _scaleNumber(std::rand(),
 			     0, RAND_MAX, 0, Chunk::biomeMixDist);
 	  idx = (idx < dist);
 	}
-      _getBiomeTile(id[idx], tile);
+      _getBiomeTile(biome[idx], tile);
     }
 }
 
@@ -215,28 +213,37 @@ void		Chunk::_completeField(void)
   t_tileType	tile;
 
   float		part;
-  float		scaledPosX;
-  int		id[2] = {-1, 1};
+  unsigned int	scaledPosX;
+  Biome		biome[2];
   int		changeX = 0;
   int		y = 0;
 
   sf::Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
   part = static_cast<float>(Chunk::width * LINELENGHT) / static_cast<float>(LOD);
-  scaledPosX = (_pos.x >= 0 ? _pos.x : _pos.x + (_roundUpToMult(-_pos.x, LINELENGHT))) % LINELENGHT;
+  scaledPosX = _upScaleChunkPos(_pos.x);
+
+  Chunk prevChunk;
+  prevChunk.setPosition({_pos.x - 1, _pos.y});
+  prevChunk.constructLine();
+  prevChunk.fillChunkInfo();
+  biome[0] = prevChunk.getChunkInfo((static_cast<float>(_upScaleChunkPos(scaledPosX - 1)
+							* Chunk::width)
+				     + (Chunk::width - 1)) / part).biome;
 
   for (int x = 0; x < Chunk::width; ++x)
     {
       y = 0;
-      id[1] = (static_cast<float>(x) + (scaledPosX * Chunk::width)) / part;
+      biome[1] = _info[static_cast<float>(x + scaledPosX * Chunk::width) / part].biome;
       _fillVertex(prev, next, x + scaledPosX * Chunk::width);
       a = (next.y - prev.y) / (next.x - prev.x);
       b = next.y - a * next.x;
       lineY = a * (x + scaledPosX * Chunk::width) + b;
       for (; y < Chunk::height; ++y)
 	{
-	  if (id[1] > id[0])
-	    _getBiomes(id, tile, x, y, changeX);
+	  // second condition is to fill the tile if the border's biome are equal
+	  if (biome[0] != biome[1] || (y == 0 && x == 0))
+	    _choseBiome(biome, tile, x, y, changeX);
 	  if (y < prev.y || y < next.y)
 	    {
 	      // if (x == Chunk::width / 2.0 && y >= lineY && y - 1 < lineY)
@@ -291,23 +298,6 @@ void	Chunk::_determineBiome(unsigned int id)
   _info[id].biome = biomes[biomeId].name;
 }
 
-void	Chunk::_fillChunkInfo()
-{
-  float	moistL;
-  float moistR;
-  float	paddingX = 1.f / static_cast<float>(LOD);
-
-  for (unsigned int id = 0; id < LOD; ++id)
-    {
-      moistL = _scaleNumber(raw_noise_2d(static_cast<float>(_pos.x) / 50.f, 0),
-			    -1, 1, 0, 100);
-      moistR = _scaleNumber(raw_noise_2d((static_cast<float>(_pos.x) + paddingX) / 50.f, 0),
-			    -1, 1, 0, 100);
-      _info[id].avHumidity = (moistL + moistR) / 2.f;
-      _determineBiome(id);
-    }
-}
-
 void		Chunk::_fillHeightMap()
 {
   unsigned int	size = _line.size();
@@ -333,7 +323,27 @@ void		Chunk::_fillHeightMap()
   _info[oldId].avHeight = static_cast<float>(tHeight) / part;
 }
 
-void	Chunk::_constructLine()
+void	Chunk::fillChunkInfo()
+{
+  float	moistL;
+  float moistR;
+  float	part = 1.f / static_cast<float>(LOD);
+
+  _fillHeightMap();
+  for (unsigned int id = 0; id < LOD; ++id)
+    {
+      moistL = _scaleNumber(raw_noise_2d(((static_cast<float>(_pos.x)
+					  + static_cast<float>(id) * part) / HSCALE), 0),
+			    -1, 1, 0, 100);
+      moistR = _scaleNumber(raw_noise_2d(((static_cast<float>(_pos.x)
+					   + static_cast<float>(id + 1) * part) / HSCALE), 0),
+			    -1, 1, 0, 100);
+      _info[id].avHumidity = (moistL + moistR) / 2.f;
+      _determineBiome(id);
+    }
+}
+
+void	Chunk::constructLine()
 {
   sf::Vertex	prev;
   sf::Vertex	next;
@@ -401,9 +411,8 @@ void Chunk::_generate(void)
   std::fill(_tiles.begin(), _tiles.end(), TileType::Empty);
   if (_pos.y >= 0)
     {
-      _constructLine();
-      _fillHeightMap();
-      _fillChunkInfo();
+      constructLine();
+      fillChunkInfo();
       _completeField();
     }
   else if (_pos.y < 0)
@@ -491,4 +500,16 @@ void	Chunk::draw(sf::RenderWindow& window,
 const Lines	&Chunk::getLine() const
 {
   return _line;
+}
+
+void		Chunk::setPosition(const Vector2i &vec)
+{
+  _pos = vec;
+}
+
+const t_ChunkInfo	&Chunk::getChunkInfo(unsigned int pos) const
+{
+  if (pos >= LOD)
+    throw (std::out_of_range(""));
+  return _info[pos];
 }
