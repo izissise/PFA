@@ -32,10 +32,10 @@ void World::update(void)
 {
   static std::pair<Action, Vector2f> moveControls[] =
     {
-      {Action::Forward, {.0f, .025f}},
-      {Action::Left, {-.025f, .0f}},
-      {Action::Back, {.0f, -.025f}},
-      {Action::Right, {.025f, .0f}}
+      {Action::Forward, {.0f, .055f}},
+      {Action::Left, {-.055f, .0f}},
+      {Action::Back, {.0f, -.055f}},
+      {Action::Right, {.055f, .0f}}
     };
 
   for (auto control : moveControls) {
@@ -75,7 +75,6 @@ void World::draw(sf::RenderWindow& window) const
     screenCoord.x = screenOrigin.x;
     screenCoord.y += Chunk::height * TileCodex::tileSize;
   }
-  std::cout << std::endl;
 }
 
 auto World::_sToWPos(screenPos pos, bool noOffsets) const -> worldPos

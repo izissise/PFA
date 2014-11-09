@@ -15,6 +15,7 @@ public:
 
   virtual ~TileCodex() = default;
   TileCodex(const TileCodex&) = delete;
+
   TileCodex&	operator=(const TileCodex&) = delete;
 
   void applySpriteUV(const unsigned id, sf::Vertex *quad) const;

@@ -52,6 +52,7 @@ if (UNIX)
 			   "-Wno-switch-enum"
 			   "-march=native"
 			   "-O2"
+			   "-g"
 			   )
 
 elseif (MSVC)

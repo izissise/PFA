@@ -68,7 +68,8 @@ void	GamePanel::createVoiceButton(const sf::Texture &texture, Widget *w,
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [&controls, idx](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [&controls, idx](AWidget &widget UNUSED, const sf::Event &event,
+				sf::RenderWindow &ref UNUSED)
     -> int
     {
       if (event.type == sf::Event::KeyPressed && event.key.code == idx)
