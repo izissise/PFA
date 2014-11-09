@@ -148,7 +148,6 @@ void		ScrollWidget::updateScrollSize()
   unsigned int	biggest;
   float		diff;
 
-  biggest = barZone.width;
   if (_dir == Scroll::Vertical)
     diff = (picZone.top - barZone.top) * _ratio;
   else

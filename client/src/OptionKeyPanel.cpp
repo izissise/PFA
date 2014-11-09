@@ -17,81 +17,115 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 			       const std::vector<APanelScreen *> &panels UNUSED)
 {
   sf::Text	txt = sf::Text("", _font["default"], 20);
-
   Controls	&ctrl = set.getControls();
 
-  Widget	*wPanOption = new Widget("panOpt", {380, _zone.top, 1100, _zone.height},
-					 sf::Text(), wFlag::Resizable);
-  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, _zone.top, 13, _zone.height},
-					    Scroll::Vertical, this,
-					    sf::Text(), wFlag::None);
-  Widget	*wTitleKey = new Widget("TitleWidget", {_zone.left + 18, _zone.top + 18, 200, 40},
-					sf::Text("GAME CONTROLS", _font["Title"], 29));
-  KeyWidget	*wForward = new KeyWidget("Forward", {450, 300, 150, 40}, Action::Forward, ctrl, txt);
-  KeyWidget	*wBack = new KeyWidget("Back", {450, 400, 150, 40}, Action::Back, ctrl, txt);
-  KeyWidget	*wRight = new KeyWidget("Right", {450, 500, 150, 40}, Action::Right, ctrl, txt);
-  KeyWidget	*wLeft = new KeyWidget("Left", {450, 600, 150, 40}, Action::Left, ctrl, txt);
-  KeyWidget	*wUse = new KeyWidget("Use", {450, 700, 150, 40}, Action::Use, ctrl, txt);
-  KeyWidget	*wMoveUp = new KeyWidget("moveup", {450, 800, 150, 40}, Action::MoveUp, ctrl, txt);
-  KeyWidget	*wMoveDown = new KeyWidget("movedown", {450, 900, 150, 40},
-					   Action::MoveDown, ctrl, txt);
-  KeyWidget	*wConsole = new KeyWidget("ToggleConsole", {450, 1000, 150, 40},
-						Action::ToggleConsole, ctrl, txt);
-  Widget	*wTforward = new Widget("Tforward", {600, 300, 150, 40},
-					sf::Text("Forward", _font["default"], 20));
-  Widget	*wTback = new Widget("Tback", {600, 400, 150, 40},
-				     sf::Text("Back", _font["default"], 20));
-  Widget	*wTright = new Widget("Tright", {600, 500, 150, 40},
-				      sf::Text("Right", _font["default"], 20));
-  Widget	*wTleft = new Widget("Tleft", {600, 600, 150, 40},
-				     sf::Text("Left", _font["default"], 20));
-  Widget	*wTuse = new Widget("Tuse", {600, 700, 150, 40},
-				    sf::Text("Use", _font["default"], 20));
-  Widget	*wTconsole = new Widget("Tconsole", {600, 800, 150, 40},
-					sf::Text("Console", _font["default"], 20));
+  Widget	*wOptionBg = new Widget("panOpt", {_zone.left, _zone.top, _zone.width, _zone.height},
+					sf::Text(), wFlag::Resizable);
+  Widget	*wTitle = new Widget("TitleWidget", {_zone.left + 18, _zone.top + 18, 200, 40},
+				     sf::Text("GAME CONTROLS", _font["Title"], 24));
+  Widget	*wDesc = new Widget("Desc", {_zone.left + 18, _zone.top + 50, 200, 40},
+					sf::Text("Key mapping for general game controls", _font["default"], 20));
 
+  _widgets.push_back(wOptionBg);
+  _widgets.push_back(wTitle);
+  _widgets.push_back(wDesc);
 
-  createOptPanel(texture, wPanOption);
-  createScrollBar(texture, wScroll);
-  createKeyWidget(texture, wForward);
-  createKeyWidget(texture, wBack);
-  createKeyWidget(texture, wRight);
-  createKeyWidget(texture, wLeft);
-  createKeyWidget(texture, wUse);
-  createKeyWidget(texture, wMoveUp);
-  createKeyWidget(texture, wMoveDown);
-  createKeyWidget(texture, wConsole);
-  createTextWidget(wTforward);
-  createTextWidget(wTback);
-  createTextWidget(wTright);
-  createTextWidget(wTleft);
-  createTextWidget(wTuse);
-  createTextWidget(wTconsole);
+  fillOptionBg(texture, wOptionBg);
+  createContPanel(set, texture);
 
-  _widgets.push_back(wPanOption);
-  _widgets.push_back(wScroll);
-  _widgets.push_back(wTitleKey);
-  _widgets.push_back(wForward);
-  _widgets.push_back(wBack);
-  _widgets.push_back(wRight);
-  _widgets.push_back(wLeft);
-  _widgets.push_back(wUse);
-  _widgets.push_back(wMoveUp);
-  _widgets.push_back(wMoveDown);
-  _widgets.push_back(wConsole);
-  _widgets.push_back(wTforward);
-  _widgets.push_back(wTback);
-  _widgets.push_back(wTright);
-  _widgets.push_back(wTleft);
-  _widgets.push_back(wTuse);
-  _widgets.push_back(wTconsole);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void	OptionKeyPanel::createOptPanel(const sf::Texture &texture UNUSED, Widget *wPanOption)
+void	OptionKeyPanel::createEventPanel(Panel *eventPanel, const sf::FloatRect &zone,
+					 Settings &set, const sf::Texture &texture)
 {
-  addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 150), {1100, 730});
+  Widget	*wTextForward = new Widget("textForward", {zone.left, zone.top, zone.width, 40},
+					   sf::Text("Move: Forward", _font["default"], 20));
+  Widget	*wTextBack = new Widget("textBack", {zone.left, zone.top + 5 * 1 + 40 * 1,
+						zone.width, 40},
+						sf::Text("Move: Back", _font["default"], 20));
+  Widget	*wTextRight = new Widget("textRight", {zone.left, zone.top + 5 * 2 + 40 * 2,
+						zone.width, 40},
+						sf::Text("Move: Right", _font["default"], 20));
+  Widget	*wTextLeft = new Widget("textRight", {zone.left, zone.top + 5 * 15 + 40 * 15,
+						zone.width, 40},
+						sf::Text("Move: Right", _font["default"], 20));
+
+  createTextWidget(wTextForward);
+  createTextWidget(wTextBack);
+  createTextWidget(wTextRight);
+  createTextWidget(wTextLeft);
+  eventPanel->addWidget({wTextForward, wTextBack, wTextRight, wTextLeft});
+  eventPanel->construct(texture, set, {});
+}
+
+void	OptionKeyPanel::createKeyPanel(Panel *keyPanel, const sf::FloatRect &zone,
+				       Settings &set, const sf::Texture &texture)
+{
+  sf::Text	txt = sf::Text("", _font["default"], 20);
+  Controls	&ctrl = set.getControls();
+
+  KeyWidget	*wForward = new KeyWidget("Forward", {zone.left, zone.top, zone.width, 40},
+					  Action::Forward, ctrl, txt);
+  KeyWidget	*wBack = new KeyWidget("Back", {zone.left, zone.top + 5 * 1 + 40 * 1, zone.width, 40},
+					  Action::Back, ctrl, txt);
+  KeyWidget	*wRight = new KeyWidget("Right", {zone.left, zone.top + 5 * 2 + 40 * 2, zone.width, 40},
+					  Action::Right, ctrl, txt);
+  KeyWidget	*wLeft = new KeyWidget("Left", {zone.left, zone.top + 5 * 15 + 40 * 15, zone.width, 40},
+					  Action::Left, ctrl, txt);
+
+  createKeyWidget(texture, wForward);
+  createKeyWidget(texture, wBack);
+  createKeyWidget(texture, wRight);
+  createKeyWidget(texture, wLeft);
+  keyPanel->addWidget({wForward, wBack, wRight, wLeft});
+  keyPanel->construct(texture, set, {});
+}
+
+void	OptionKeyPanel::createContPanel(Settings &set, const sf::Texture &texture)
+{
+  Panel	*contPanel = new Panel({_zone.left + 18, _zone.top + 200,
+	_zone.width - 36, _zone.height - 250});
+  sf::FloatRect	contZone = contPanel->getZone();
+
+  Widget	*wContBg = new Widget("contBg", {contZone.left, contZone.top,
+					contZone.width, contZone.height},
+					sf::Text(), wFlag::Resizable);
+  ScrollWidget	*wScroll = new ScrollWidget("scroll", {contZone.left + contZone.width - 13,
+					contZone.top, 13, contZone.height},
+					Scroll::Vertical, contPanel,
+					sf::Text(), wFlag::None);
+
+  Panel		*eventPanel = new Panel({contZone.left, contZone.top,
+					contZone.width / 3, contZone.height});
+  Panel		*keyPanel = new Panel({contZone.left + contZone.width / 3 + 10, contZone.top,
+					contZone.width / 3, contZone.height});
+
+  Widget	*wTabEvent = new Widget("Events", {_zone.left + 18, _zone.top + 150,
+					contZone.width / 3, 40},
+					sf::Text("Events", _font["default"], 20));
+  Widget	*wTabKey = new Widget("Keys", {contZone.left + contZone.width / 3 + 10,
+					_zone.top + 150, contZone.width / 3, 40},
+					sf::Text("Keys", _font["default"], 20));
+
+  createScrollBar(texture, wScroll);
+  contPanel->addSpriteForWidget(wContBg, sf::Color(125, 125, 125, 70),
+				{contZone.width, contZone.height}, true);
+  createEventPanel(eventPanel, eventPanel->getZone(), set, texture);
+  createKeyPanel(keyPanel, keyPanel->getZone(), set, texture);
+
+  _widgets.push_back(wTabEvent);
+  _widgets.push_back(wTabKey);
+  contPanel->addPanels({eventPanel, keyPanel});
+  contPanel->addWidget({wContBg, wScroll});
+  contPanel->construct(texture, set, {});
+  addPanels({contPanel});
+}
+
+void	OptionKeyPanel::fillOptionBg(const sf::Texture &texture UNUSED, Widget *wPanOption)
+{
+  addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 150), {_zone.width, _zone.height});
 }
 
 void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidget *wKey)
@@ -109,24 +143,25 @@ void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidge
       return 0;
     };
   wKey->alignText({wzone.left,wzone.top}, {wzone.width, wzone.height}, 50, 50);
-  wKey->addSprite(texture, sf::IntRect(670, 1080, 300, 40));
-  wKey->setSpriteSize(0, 150, 40);
+  addSpriteForWidget(wKey, sf::Color(125, 125, 125, 150), {wzone.width, wzone.height});
   wKey->setUpdate(updateFunc);
-  wKey->setColor(sf::Color(0,0,0));
   //  wKey->setTextAttr(sf::Text::Bold);
 }
 
 void	OptionKeyPanel::createScrollBar(const sf::Texture &texture UNUSED, ScrollWidget *wScroll)
 {
+  sf::FloatRect zone = wScroll->getZone();
+
   wScroll->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
   wScroll->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
   wScroll->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
-  wScroll->setSpriteSize(0, 13, 730);
+  wScroll->setSpriteSize(0, 13, zone.height);
 }
 
 void	OptionKeyPanel::createTextWidget(Widget *widget)
 {
   sf::FloatRect zone = widget->getZone();
 
-  widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 45);
+  addSpriteForWidget(widget, sf::Color(125, 125, 125, 150), {zone.width, zone.height});
+  widget->alignTextLeft({zone.left,zone.top}, {zone.width, zone.height}, 5, 50);
 }

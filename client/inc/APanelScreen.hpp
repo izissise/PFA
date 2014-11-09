@@ -76,6 +76,24 @@ public:
   void		addFont(const std::string &fontName, const std::string &fontPath);
 
   /**
+   * \fn const sf::Texture *addSpriteForWidget(AWidget * const widget, const sf::Color &color, const sf::Vector2f &size)
+   * \brief Add a sprite to a widget
+   * \param[in] widget The widget
+   * \param[in] color Sprite's color
+   * \param[in] size Sprite's size
+   * \param[in] draw Specify if by default the sprite is displayed
+   * \return Return the texture
+   *
+   * This method create the needed texture, store it inside the panel.
+   * Then it creates the sprite and load it to the widget
+   *
+   */
+  const sf::Texture	*addSpriteForWidget(AWidget * const widget,
+					    const sf::Color &color,
+					    const sf::Vector2f &size,
+					    bool display = true);
+
+  /**
    * \fn const std::vector<AWidget *> &getWidgets() const;
    * \brief Getter on the panel's widgets
    * \return Return a const reference to a vector containing the panel's widgets
@@ -90,6 +108,14 @@ public:
    *
    */
   const std::vector<APanelScreen *> &getSubPanels() const;
+
+  /**
+   * \fn const sf::FloatRect &getZone() const;
+   * \brief Getter on the panel's zone
+   * \return Return a const reference to the panel's zone (it's size and position)
+   *
+   */
+  const sf::FloatRect		&getZone() const;
 
 protected:
   /**
@@ -138,24 +164,6 @@ protected:
   void			saveTexture(sf::Texture * const texture);
 
   /**
-   * \fn const sf::Texture *addSpriteForWidget(AWidget * const widget, const sf::Color &color, const sf::Vector2f &size)
-   * \brief Add a sprite to a widget
-   * \param[in] widget The widget
-   * \param[in] color Sprite's color
-   * \param[in] size Sprite's size
-   * \param[in] draw Specify if by default the sprite is displayed
-   * \return Return the texture
-   *
-   * This method create the needed texture, store it inside the panel.
-   * Then it creates the sprite and load it to the widget
-   *
-   */
-  const sf::Texture	*addSpriteForWidget(AWidget * const widget,
-					    const sf::Color &color,
-					    const sf::Vector2f &size,
-					    bool display = true);
-
-  /**
    * \fn void trigger(const t_event &event)
    * \brief Trigger the panel from an event
    * \param[in] event A structure containing the event's informations
@@ -174,14 +182,6 @@ private:
    *
    */
   const sf::RenderTexture	&getRT() const;
-
-  /**
-   * \fn const sf::FloatRect &getZone() const;
-   * \brief Getter on the panel's zone
-   * \return Return a const reference to the panel's zone (it's size and position)
-   *
-   */
-  const sf::FloatRect		&getZone() const;
 
 protected:
   bool					_hide;

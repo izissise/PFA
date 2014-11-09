@@ -22,8 +22,8 @@ Menu::Menu(Settings& settings) :
   MainMenu		*mainMenu = new MainMenu(sf::FloatRect(0,0,SIZEX,SIZEY));
   GamePanel		*gamePanel = new GamePanel(sf::FloatRect(0,0,SIZEX,SIZEY));
   OptionTabPanel	*optTabPanel = new OptionTabPanel(sf::FloatRect(380,50,1115,50));
-  OptionGamePanel	*optGamePanel = new OptionGamePanel(sf::FloatRect(380,100,1115,730));
-  OptionKeyPanel	*optKeyPanel = new OptionKeyPanel(sf::FloatRect(380,100,1123,730));
+  OptionGamePanel	*optGamePanel = new OptionGamePanel(sf::FloatRect(380,100,1130,730));
+  OptionKeyPanel	*optKeyPanel = new OptionKeyPanel(sf::FloatRect(380,100,1130,730));
 
   _panels.push_back(gamePanel);
   _panels.push_back(mainMenu);

@@ -14,14 +14,14 @@ OptionGamePanel::~OptionGamePanel()
 void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 			       const std::vector<APanelScreen *> &panels UNUSED)
 {
-  Widget	*wPanOption = new Widget("panOpt", {380, _zone.top, 1100, _zone.height},
+  Widget	*wPanOption = new Widget("panOpt", {_zone.left, _zone.top, _zone.width, _zone.height},
 					 sf::Text(), wFlag::None);
   Widget	*wCheckBox = new Widget("checkBox", {450, 200, 50, 50});
   TextWidget	*wTextWidget = new TextWidget("nameText", {450, 700, 300, 40},
 					      sf::Text("", _font["default"], 20),
 					      sf::Text("Name", _font["default"], 20), 30);
   BarWidget	*wBarWidget = new BarWidget("bar", {450, 400, 550, 10});
-  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, _zone.top, 13, _zone.height},
+  ScrollWidget	*wScroll = new ScrollWidget("scroll", {_zone.left + _zone.width - 13, _zone.top, 13, _zone.height},
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
   SelectList	*wSelectList = new SelectList({1000, 200, 260, 231});
@@ -48,7 +48,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 
 void	OptionGamePanel::createOptPanel(const sf::Texture &texture UNUSED, Widget *wPanOption)
 {
-  addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 150), {1100, 730});
+  addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 150), {_zone.width, _zone.height});
 }
 
 void	OptionGamePanel::createCheckBox(const sf::Texture &texture, Widget *wCheckBox)
