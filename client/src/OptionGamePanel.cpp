@@ -16,7 +16,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 {
   Widget	*wPanOption = new Widget("panOpt", {_zone.left, _zone.top, _zone.width, _zone.height},
 					 sf::Text(), wFlag::None);
-  Widget	*wCheckBox = new Widget("checkBox", {450, 200, 50, 50});
+  CheckBoxWidget *wCheckBox = new CheckBoxWidget("checkBox", {450, 200, 50, 50});
   TextWidget	*wTextWidget = new TextWidget("nameText", {450, 700, 300, 40},
 					      sf::Text("", _font["default"], 20),
 					      sf::Text("Name", _font["default"], 20), 30);
@@ -26,7 +26,6 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 					    sf::Text(), wFlag::None);
   SelectList	*wSelectList = new SelectList({1000, 200, 260, 231});
 
-  wSelectList->construct(texture, set, {});
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
   createTextWidget(texture, wTextWidget);
@@ -41,6 +40,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   _widgets.push_back(wCheckBox);
   _widgets.push_back(wTextWidget);
   _widgets.push_back(wBarWidget);
+  wSelectList->construct(texture, set, {});
   addPanels({wSelectList});
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
   	std::stof(set.getCvarList().getCvar("r_height"))});
@@ -51,34 +51,12 @@ void	OptionGamePanel::createOptPanel(const sf::Texture &texture UNUSED, Widget *
   addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 100), {_zone.width, _zone.height});
 }
 
-void	OptionGamePanel::createCheckBox(const sf::Texture &texture, Widget *wCheckBox)
+void	OptionGamePanel::createCheckBox(const sf::Texture &texture,
+					CheckBoxWidget *wCheckBox)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-    updateFunc;
-
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
-    -> int
-    {
-      bool	isOver;
-
-      isOver = widget.isOver(ref);
-      widget.setSpriteAttr(0, !isOver);
-      widget.setSpriteAttr(1, isOver);
-      if (isOver)
-	{
-	  if (widget.isClicked(event, sf::Mouse::Left))
-	    {
-	      widget.toggleSpriteAttr(2);
-	      return 1;
-	    }
-	}
-      return 0;
-    };
   wCheckBox->addSprite(texture, sf::IntRect(520, 1080, 50, 50));
   wCheckBox->addSprite(texture, sf::IntRect(570, 1080, 50, 50), false);
   wCheckBox->addSprite(texture, sf::IntRect(620, 1080, 50, 50), false);
-  // wCheckBox->setSpriteSize(2, 50, 50);
-  wCheckBox->setUpdate(updateFunc);
   wCheckBox->resize(0.5, 0.5);
 }
 

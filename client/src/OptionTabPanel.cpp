@@ -101,7 +101,7 @@ void	OptionTabPanel::createBarKeyboard(const sf::Texture &texture UNUSED, TabWid
 	}
       return 0;
     };
-  addSpriteForWidget(wBarKeyboard, sf::Color(45, 45, 45, 100), {260, _zone.height});
+  addSpriteForWidget(wBarKeyboard, sf::Color(55, 55, 55, 100), {260, _zone.height});
   addSpriteForWidget(wBarKeyboard, sf::Color(125, 125, 125, 100), {260, _zone.height}, false);
   wBarKeyboard->alignText({640,50}, {260, _zone.height}, 50, 50);
   wBarKeyboard->setUpdate(updateFunc);
