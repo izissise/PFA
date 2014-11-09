@@ -6,8 +6,7 @@
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0), _oldY(SHEIGHT), _dir(true), _world(nullptr)
 {
-  if (!_font.loadFromFile("../client/assets/font.otf"))
-    std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
+  addFont("default", "../client/assets/font.otf");
   setHide(true);
 }
 
@@ -25,15 +24,15 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
 
   Panel		*pSound = new Panel(panZone);
   Widget	*wHeader = new Widget("Header", {panZone.left, panZone.top, panZone.width, 60},
-				      sf::Text("Header", _font, 30));
+				      sf::Text("Header", _font["default"], 30));
   Widget	*wFirst = new Widget("sound1", {panZone.left, panZone.top + 57, panZone.width, 60},
-				     sf::Text("1.", _font, 22));
+				     sf::Text("1.", _font["default"], 22));
   Widget	*wSecond = new Widget("sound2", {panZone.left, panZone.top + 114, panZone.width, 60},
-				      sf::Text("2.", _font, 22));
+				      sf::Text("2.", _font["default"], 22));
   Widget	*wThird = new Widget("sound3", {panZone.left, panZone.top + 171, panZone.width, 60},
-				     sf::Text("3.", _font, 22));
+				     sf::Text("3.", _font["default"], 22));
   Widget	*wFourth = new Widget("sound4", {panZone.left, panZone.top + 228, panZone.width, 60},
-				      sf::Text("4.", _font, 22));
+				      sf::Text("4.", _font["default"], 22));
 
   createButton(texture, wHeader);
   createVoiceButton(texture, wFirst, controls, sf::Keyboard::Num1);

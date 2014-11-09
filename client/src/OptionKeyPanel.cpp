@@ -4,8 +4,8 @@
 OptionKeyPanel::OptionKeyPanel(const sf::FloatRect &zone) :
   APanelScreen(zone)
 {
-  if (!_font.loadFromFile("../client/assets/font.otf"))
-    std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
+  addFont("default", "../client/assets/font.otf");
+  addFont("Title", "../client/assets/Title-font.ttf");
   _hide = true;
 }
 
@@ -16,13 +16,17 @@ OptionKeyPanel::~OptionKeyPanel()
 void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 			       const std::vector<APanelScreen *> &panels UNUSED)
 {
-  sf::Text	txt = sf::Text("", _font, 20);
+  sf::Text	txt = sf::Text("", _font["default"], 20);
+
   Controls	&ctrl = set.getControls();
-  Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730},
+
+  Widget	*wPanOption = new Widget("panOpt", {380, _zone.top, 1100, _zone.height},
 					 sf::Text(), wFlag::Resizable);
-  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, 120, 13, 730},
+  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, _zone.top, 13, _zone.height},
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
+  Widget	*wTitleKey = new Widget("TitleWidget", {_zone.left + 18, _zone.top + 18, 200, 40},
+					sf::Text("GAME CONTROLS", _font["Title"], 29));
   KeyWidget	*wForward = new KeyWidget("Forward", {450, 300, 150, 40}, Action::Forward, ctrl, txt);
   KeyWidget	*wBack = new KeyWidget("Back", {450, 400, 150, 40}, Action::Back, ctrl, txt);
   KeyWidget	*wRight = new KeyWidget("Right", {450, 500, 150, 40}, Action::Right, ctrl, txt);
@@ -34,17 +38,17 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
   KeyWidget	*wConsole = new KeyWidget("ToggleConsole", {450, 1000, 150, 40},
 						Action::ToggleConsole, ctrl, txt);
   Widget	*wTforward = new Widget("Tforward", {600, 300, 150, 40},
-					sf::Text("Forward", _font, 20));
+					sf::Text("Forward", _font["default"], 20));
   Widget	*wTback = new Widget("Tback", {600, 400, 150, 40},
-				     sf::Text("Back", _font, 20));
+				     sf::Text("Back", _font["default"], 20));
   Widget	*wTright = new Widget("Tright", {600, 500, 150, 40},
-				      sf::Text("Right", _font, 20));
+				      sf::Text("Right", _font["default"], 20));
   Widget	*wTleft = new Widget("Tleft", {600, 600, 150, 40},
-				     sf::Text("Left", _font, 20));
+				     sf::Text("Left", _font["default"], 20));
   Widget	*wTuse = new Widget("Tuse", {600, 700, 150, 40},
-				    sf::Text("Use", _font, 20));
+				    sf::Text("Use", _font["default"], 20));
   Widget	*wTconsole = new Widget("Tconsole", {600, 800, 150, 40},
-					sf::Text("Console", _font, 20));
+					sf::Text("Console", _font["default"], 20));
 
 
   createOptPanel(texture, wPanOption);
@@ -66,6 +70,7 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 
   _widgets.push_back(wPanOption);
   _widgets.push_back(wScroll);
+  _widgets.push_back(wTitleKey);
   _widgets.push_back(wForward);
   _widgets.push_back(wBack);
   _widgets.push_back(wRight);

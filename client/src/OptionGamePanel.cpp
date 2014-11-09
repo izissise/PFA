@@ -4,8 +4,7 @@
 OptionGamePanel::OptionGamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone)
 {
-  if (!_font.loadFromFile("../client/assets/font.otf"))
-    std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
+  addFont("default", "../client/assets/font.otf");
 }
 
 OptionGamePanel::~OptionGamePanel()
@@ -15,14 +14,14 @@ OptionGamePanel::~OptionGamePanel()
 void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 			       const std::vector<APanelScreen *> &panels UNUSED)
 {
-  Widget	*wPanOption = new Widget("panOpt", {380, 120, 1100, 730},
+  Widget	*wPanOption = new Widget("panOpt", {380, _zone.top, 1100, _zone.height},
 					 sf::Text(), wFlag::None);
   Widget	*wCheckBox = new Widget("checkBox", {450, 200, 50, 50});
   TextWidget	*wTextWidget = new TextWidget("nameText", {450, 700, 300, 40},
-					      sf::Text("", _font, 20),
-					      sf::Text("Name", _font, 20), 30);
+					      sf::Text("", _font["default"], 20),
+					      sf::Text("Name", _font["default"], 20), 30);
   BarWidget	*wBarWidget = new BarWidget("bar", {450, 400, 550, 10});
-  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, 120, 13, 730},
+  ScrollWidget	*wScroll = new ScrollWidget("scroll", {1480, _zone.top, 13, _zone.height},
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
   SelectList	*wSelectList = new SelectList({1000, 200, 260, 231});

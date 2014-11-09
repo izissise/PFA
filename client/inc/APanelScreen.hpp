@@ -73,6 +73,7 @@ public:
   void	       	addPanels(const std::initializer_list<APanelScreen * const> &panels);
   void		addWidget(AWidget * const widget);
   void		addWidget(const std::initializer_list<AWidget * const> &widgets);
+  void		addFont(const std::string &fontName, const std::string &fontPath);
 
   /**
    * \fn const std::vector<AWidget *> &getWidgets() const;
@@ -185,8 +186,8 @@ private:
 protected:
   bool					_hide;
   sf::FloatRect				_zone;
-  sf::Font				_font;
   sf::RenderTexture			_rt;
+  std::map<std::string, sf::Font>	_font;
   std::function<void (const t_event &event)>	_trigger;
   std::vector<const sf::Texture *>	_textures;
   std::vector<APanelScreen *>		_panels;

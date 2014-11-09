@@ -4,8 +4,7 @@
 MainMenu::MainMenu(const sf::FloatRect &zone) :
   APanelScreen(zone)
 {
-  if (!_font.loadFromFile("../client/assets/font.otf"))
-    std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
+  addFont("default", "../client/assets/font.otf");
 }
 
 MainMenu::~MainMenu()
@@ -18,13 +17,15 @@ void	MainMenu::construct(const sf::Texture &texture, Settings &set,
 			    const std::vector<APanelScreen *> &panels)
 {
   Widget	*wBackground = new Widget("background", {0, 0, SIZEX, SIZEY});
-  Widget	*wMback = new Widget("menuback", {30, 50, 300, 600});
-  Widget	*wMenuTitle = new Widget("menu-title", {30, 50, 300, 70},
-  					 sf::Text("MAIN", _font, 40));
-  Widget	*wPlay = new Widget("play", {50, 150, 260, 60},
-  				    sf::Text("PLAY ONLINE", _font, 30));
-  Widget	*wOpt = new Widget("opt", {50, 230, 260, 60}, sf::Text("OPTION", _font, 30));
-  Widget	*wQuit = new Widget("quit", {50, 310, 260, 60}, sf::Text("QUIT", _font, 30));
+  Widget	*wMback = new Widget("menuback", {30, 100, 300, 600});
+  Widget	*wMenuTitle = new Widget("menu-title", {30, 100, 300, 70},
+  					 sf::Text("MAIN", _font["default"], 40));
+  Widget	*wPlay = new Widget("play", {50, 200, 260, 60},
+  				    sf::Text("PLAY ONLINE", _font["default"], 30));
+  Widget	*wOpt = new Widget("opt", {50, 280, 260, 60},
+				   sf::Text("OPTION", _font["default"], 30));
+  Widget	*wQuit = new Widget("quit", {50, 360, 260, 60},
+				    sf::Text("QUIT", _font["default"], 30));
 
   createBgPanel(texture, wBackground, wMback, wMenuTitle);
   createPlayButton(texture, wPlay);
@@ -48,15 +49,18 @@ void	MainMenu::construct(const sf::Texture &texture, Settings &set,
 void	MainMenu::createBgPanel(const sf::Texture &texture, Widget *wBackground,
 				Widget *wMback, Widget *wMenuTitle)
 {
+  sf::FloatRect zone = wMenuTitle->getZone();
+
   wBackground->addSprite(texture, sf::IntRect(0, 0, 1920, 1080));
   addSpriteForWidget(wMback, sf::Color(125, 125, 125, 150), {300, 600});
   addSpriteForWidget(wMenuTitle, sf::Color(10, 06, 12, 255), {300, 70});
   wMenuTitle->setTextAttr(sf::Text::Bold);
-  wMenuTitle->alignText({30,50}, {300, 70}, 25, 50);
+  wMenuTitle->alignText({zone.left,zone.top}, {zone.width, zone.height}, 25, 50);
 }
 
 void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
 {
+  sf::FloatRect zone = wPlay->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
 
@@ -78,14 +82,15 @@ void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
 	}
       return 0;
     };
-  wPlay->alignText({50,150}, {260, 60}, 50, 50);
-  wPlay->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
-  wPlay->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
+  wPlay->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+  wPlay->addSprite(texture, sf::IntRect(0, 1080, zone.width, zone.height));
+  wPlay->addSprite(texture, sf::IntRect(260, 1080, zone.width, zone.height), false);
   wPlay->setUpdate(updateFunc);
 }
 
 void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
 {
+  sf::FloatRect zone = wOpt->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
 
@@ -107,14 +112,15 @@ void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
 	}
       return 0;
     };
-  wOpt->alignText({50,230}, {260, 60}, 50, 50);
-  wOpt->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
-  wOpt->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
+  wOpt->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+  wOpt->addSprite(texture, sf::IntRect(0, 1080, zone.width, zone.height));
+  wOpt->addSprite(texture, sf::IntRect(260, 1080, zone.width, zone.height), false);
   wOpt->setUpdate(updateFunc);
 }
 
 void	MainMenu::createQuitButton(const sf::Texture &texture, Widget *wQuit)
 {
+  sf::FloatRect zone = wQuit->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
 
@@ -136,8 +142,8 @@ void	MainMenu::createQuitButton(const sf::Texture &texture, Widget *wQuit)
 	}
       return 0;
     };
-  wQuit->alignText({50,310}, {260, 60}, 50, 50);
-  wQuit->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
-  wQuit->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
+  wQuit->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+  wQuit->addSprite(texture, sf::IntRect(0, 1080, zone.width, zone.height));
+  wQuit->addSprite(texture, sf::IntRect(260, 1080, zone.width, zone.height), false);
   wQuit->setUpdate(updateFunc);
 }

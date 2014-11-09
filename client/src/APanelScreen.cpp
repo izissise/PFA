@@ -161,6 +161,16 @@ void	APanelScreen::addWidget(const std::initializer_list<AWidget * const> &widge
     _widgets.push_back(widget);
 }
 
+void		APanelScreen::addFont(const std::string &fontName,
+				      const std::string &fontPath)
+{
+  sf::Font	font;
+
+  if (!font.loadFromFile(fontPath))
+    throw (std::invalid_argument(fontPath + " does not exist"));
+  _font.insert(std::pair<std::string, sf::Font>(fontName, font));
+}
+
 const std::vector<AWidget *>	&APanelScreen::getWidgets() const
 {
   return _widgets;

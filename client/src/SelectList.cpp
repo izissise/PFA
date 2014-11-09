@@ -4,8 +4,7 @@
 SelectList::SelectList(const sf::FloatRect &zone) :
   ASelectList(zone)
 {
-  if (!_font.loadFromFile("../client/assets/font.otf"))
-    std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
+  addFont("default", "../client/assets/font.otf");
 }
 
 void	SelectList::construct(const sf::Texture &texture, Settings &set,
@@ -17,15 +16,15 @@ void	SelectList::construct(const sf::Texture &texture, Settings &set,
   Panel		*container = new Panel(sf::FloatRect(_zone.left, contTop,
 						     _zone.width, contHeight));
   Widget	*wHeader = new Widget("header", {_zone.left, _zone.top, _zone.width, 60},
-				      sf::Text("Select", _font, 25));
+				      sf::Text("Select", _font["default"], 25));
   Widget	*wFirst = new Widget("first", {_zone.left, _zone.top + 57, _zone.width, 60},
-				      sf::Text("first", _font, 22));
+				      sf::Text("first", _font["default"], 22));
   Widget	*wSecond = new Widget("second", {_zone.left, _zone.top + 114, _zone.width, 60},
-				      sf::Text("second", _font, 22));
+				      sf::Text("second", _font["default"], 22));
   Widget	*wThird = new Widget("third", {_zone.left, _zone.top + 171, _zone.width, 60},
-				      sf::Text("third", _font, 22));
+				      sf::Text("third", _font["default"], 22));
   Widget	*wFourth = new Widget("fourth", {_zone.left, _zone.top + 228, _zone.width, 60},
-				      sf::Text("fourth", _font, 22));
+				      sf::Text("fourth", _font["default"], 22));
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
 					    {_zone.left + _zone.width - 13, contTop, 13, contHeight},
 					    Scroll::Vertical, container,
