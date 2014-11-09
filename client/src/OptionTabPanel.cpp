@@ -4,7 +4,7 @@
 OptionTabPanel::OptionTabPanel(const sf::FloatRect &zone) :
   APanelScreen(zone)
 {
-  addFont("default", "../client/assets/font.otf");
+  addFont("default", "../client/assets/default.TTF");
   _hide = true;
 }
 
@@ -70,8 +70,8 @@ void	OptionTabPanel::createBarGame(const sf::Texture &texture UNUSED, TabWidget 
 	}
       return 0;
     };
-  addSpriteForWidget(wBarGame, sf::Color(45, 45, 45, 150), {260, _zone.height}, false);
-  addSpriteForWidget(wBarGame, sf::Color(125, 125, 125, 150), {260, _zone.height}, true);
+  addSpriteForWidget(wBarGame, sf::Color(45, 45, 45, 100), {260, _zone.height}, false);
+  addSpriteForWidget(wBarGame, sf::Color(125, 125, 125, 100), {260, _zone.height}, true);
   wBarGame->alignText({380,50}, {260, _zone.height}, 50, 50);
   wBarGame->setUpdate(updateFunc);
 }
@@ -101,8 +101,8 @@ void	OptionTabPanel::createBarKeyboard(const sf::Texture &texture UNUSED, TabWid
 	}
       return 0;
     };
-  addSpriteForWidget(wBarKeyboard, sf::Color(45, 45, 45, 150), {260, _zone.height});
-  addSpriteForWidget(wBarKeyboard, sf::Color(125, 125, 125, 150), {260, _zone.height}, false);
+  addSpriteForWidget(wBarKeyboard, sf::Color(45, 45, 45, 100), {260, _zone.height});
+  addSpriteForWidget(wBarKeyboard, sf::Color(125, 125, 125, 100), {260, _zone.height}, false);
   wBarKeyboard->alignText({640,50}, {260, _zone.height}, 50, 50);
   wBarKeyboard->setUpdate(updateFunc);
 }

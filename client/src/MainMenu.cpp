@@ -4,7 +4,7 @@
 MainMenu::MainMenu(const sf::FloatRect &zone) :
   APanelScreen(zone)
 {
-  addFont("default", "../client/assets/font.otf");
+  addFont("default", "../client/assets/default.TTF");
 }
 
 MainMenu::~MainMenu()

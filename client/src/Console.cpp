@@ -13,7 +13,7 @@ Console::Console(Settings* set) : _set(set), _cursor(), _history()
   _rectangle.setOutlineThickness(2);
   _rectangle.setFillColor(color);
 
-  if (!_font.loadFromFile("../client/assets/font.otf"))
+  if (!_font.loadFromFile("../client/assets/default.TTF"))
     std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
   _text.setFont(_font);
   _text.setStyle(sf::Text::Regular);

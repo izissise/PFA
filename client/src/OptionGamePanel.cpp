@@ -4,7 +4,7 @@
 OptionGamePanel::OptionGamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone)
 {
-  addFont("default", "../client/assets/font.otf");
+  addFont("default", "../client/assets/default.TTF");
 }
 
 OptionGamePanel::~OptionGamePanel()
@@ -48,7 +48,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 
 void	OptionGamePanel::createOptPanel(const sf::Texture &texture UNUSED, Widget *wPanOption)
 {
-  addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 150), {_zone.width, _zone.height});
+  addSpriteForWidget(wPanOption, sf::Color(125, 125, 125, 100), {_zone.width, _zone.height});
 }
 
 void	OptionGamePanel::createCheckBox(const sf::Texture &texture, Widget *wCheckBox)

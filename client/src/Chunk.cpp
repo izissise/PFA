@@ -474,7 +474,7 @@ void Chunk::_generateVBO(const TileCodex& codex)
 	    }
 	}
     }
-  _font.loadFromFile("../client/assets/font.otf");
+  _font.loadFromFile("../client/assets/default.TTF");
   std::stringstream ss;
   ss << "(" << _pos.x << "," << _pos.y << ")";
   _id.setString(ss.str());

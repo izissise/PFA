@@ -4,7 +4,7 @@
 SelectList::SelectList(const sf::FloatRect &zone) :
   ASelectList(zone)
 {
-  addFont("default", "../client/assets/font.otf");
+  addFont("default", "../client/assets/default.TTF");
 }
 
 void	SelectList::construct(const sf::Texture &texture, Settings &set,
