@@ -17,6 +17,7 @@ public:
 			  const std::vector<APanelScreen *> &panels);
 
 private:
+  void		createTabs(Widget *widget);
   void		createContPanel(Settings &set, const sf::Texture &texture);
   void		createEventPanel(Panel *eventPanel, const sf::FloatRect &zone,
 				 Settings &set, const sf::Texture &texture);

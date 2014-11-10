@@ -129,7 +129,8 @@ public:
   const std::string	&getCodeFromKey(const t_entry &entry) const;
   const std::string	&getCodeFromAction(Action act) const;
 
-  void		bindActionOnKey(const t_entry &entry, Action act);
+  void		unbindKeyFromAction(const t_entry &entry, Action act);
+  void		bindKeyOnAction(const t_entry &entry, Action act);
   void		pressKey(const t_entry &entry);
   void		releaseKey(const t_entry &entry);
 

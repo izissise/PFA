@@ -57,7 +57,8 @@ bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
       for (auto &panel : _panels)
 	{
 	  if (!panel->isHidden())
-	    panel->update(event, window, set);
+	    if ((handled = (panel->update(event, window, set) != 0)))
+	      return handled;
 	}
     }
   return handled;

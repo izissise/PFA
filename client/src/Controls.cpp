@@ -213,7 +213,31 @@ const std::string	&Controls::getCodeFromKey(const t_entry &entry) const
   throw (Exception("Key not bound"));
 }
 
-void	Controls::bindActionOnKey(const t_entry &entry, Action act)
+void	Controls::unbindKeyFromAction(const t_entry &entry, Action act)
+{
+  auto	it = _actionKeys.find(act);
+  unsigned int	i;
+
+  if (it == _actionKeys.end())
+    return ;
+
+  std::array<t_entry, 5>	&keys = it->second;
+  for (i = 0; i < keys.size(); ++i)
+    if (entry == keys[i])
+      break ;
+  while (i < keys.size() - 1)
+    {
+      keys[i] = keys[i + 1];
+      ++i;
+    }
+  while (i < keys.size())
+    {
+      keys[i] = ctrl::state::Unset;
+      ++i;
+    }
+}
+
+void	Controls::bindKeyOnAction(const t_entry &entry, Action act)
 {
   auto	it = _actionKeys.find(act);
 

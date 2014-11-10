@@ -1,3 +1,4 @@
+
 #ifndef _AWIDGET_H_
 #define _AWIDGET_H_
 

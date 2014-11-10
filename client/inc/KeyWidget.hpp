@@ -13,6 +13,11 @@ public:
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 
 private:
+  void	bindKey(Settings &set);
+  void	unbindKey(Settings &set);
+  void	getKeyName(const Controls &ctrl);
+
+private:
   bool		_isActive;
   Action	_action;
   t_entry	_entry;

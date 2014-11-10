@@ -46,7 +46,7 @@ void		Settings::bindKeyword(const std::vector<std::string> &tokens)
   act = _ctrl.getActionFromCode(tokens[2]);
   if (act == Action::Unknown)
     throw (Exception("Unknown Action ["+ tokens[2] +"] for key ["+ tokens[1] +"]"));
-  _ctrl.bindActionOnKey(entry, act);
+  _ctrl.bindKeyOnAction(entry, act);
 }
 
 void	Settings::parseCommandLine(const std::string &cmd)
