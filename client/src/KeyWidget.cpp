@@ -10,27 +10,36 @@ KeyWidget::KeyWidget(const std::string &id, const sf::FloatRect &zone,
 
 void	KeyWidget::getKeyName(const Controls &ctrl)
 {
-  _entry = ctrl.getLastKey(_action);
-  try
+  std::array<t_entry, 5> keys = ctrl.getBoundKeys(_action);
+  auto end = keys.end();
+  std::string	keyNames;
+
+  if (keys.empty() || *(keys.begin()) == ctrl::state::Unset)
+    _text.setString("Unset");
+  else
     {
-      _text.setString(ctrl.getCodeFromKey(_entry));
-    }
-  catch (Exception &e)
-    {
-      _text.setString("Unset");
+      for (auto it = keys.begin(); it != end && !(*it == ctrl::state::Unset); ++it)
+	{
+	  if (it != keys.begin())
+	    keyNames = keyNames + "; ";
+	  keyNames = keyNames + ctrl.getCodeFromKey(*it);
+	}
+      _text.setString(keyNames);
     }
 }
 
 void	KeyWidget::bindKey(Settings &set)
 {
+  Controls	&ctrl = set.getControls();
+
   try
     {
-      _text.setString(set.getControls().getCodeFromKey(_entry));
-      set.getControls().bindKeyOnAction(_entry, _action);
+      ctrl.getCodeFromKey(_entry); // Check Existance of key
+      ctrl.bindKeyOnAction(_entry, _action);
+      getKeyName(ctrl);
     }
   catch (Exception &e)
     {
-      _text.setString("Unknown");
     }
 }
 
@@ -38,7 +47,7 @@ void	KeyWidget::unbindKey(Settings &set)
 {
   Controls	&ctrl = set.getControls();
 
-  ctrl.unbindKeyFromAction(ctrl.getLastKey(_action), _action);
+  ctrl.unbindKeyFromAction(_entry, _action);
   getKeyName(ctrl);
 }
 
@@ -64,10 +73,11 @@ int	KeyWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 	  event.type == sf::Event::MouseButtonPressed ||
 	  event.type == sf::Event::MouseWheelMoved)
 	{
+	  std::array<t_entry, 5> keys = set.getControls().getBoundKeys(_action);
 	  _entry.fill(event);
-	  retVal = 1;
 	  _isActive = false;
-	  if (_entry.type == ctrl::type::Keyboard && _entry.key == sf::Keyboard::Escape)
+	  retVal = 1;
+	  if (std::find(keys.begin(), keys.end(), _entry) != keys.end())
 	    unbindKey(set);
 	  else
 	    bindKey(set);

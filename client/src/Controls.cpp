@@ -123,6 +123,15 @@ Controls::Controls()
   _actions.push_back(t_action("movedown"));
   _actions.push_back(t_action("console", actionType::Toggle));
   _actions.push_back(t_action("quickMenu", actionType::Toggle));
+
+  for (unsigned int i = 0; i < static_cast<int>(Action::Last); ++i)
+    _actionKeys.insert(std::pair<Action, std::array<t_entry, 5>> (static_cast<Action>(i),
+      {t_entry(sf::Keyboard::Unknown),
+	  t_entry(sf::Keyboard::Unknown),
+	  t_entry(sf::Keyboard::Unknown),
+	  t_entry(sf::Keyboard::Unknown),
+	  t_entry(sf::Keyboard::Unknown)}));
+
 }
 
 Controls::~Controls()
@@ -211,6 +220,13 @@ const std::string	&Controls::getCodeFromKey(const t_entry &entry) const
 	return it.first;
     }
   throw (Exception("Key not bound"));
+}
+
+const std::array<t_entry, 5>	&Controls::getBoundKeys(Action act) const
+{
+  auto  it = _actionKeys.find(act);
+
+  return it->second;
 }
 
 void	Controls::unbindKeyFromAction(const t_entry &entry, Action act)

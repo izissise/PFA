@@ -128,6 +128,7 @@ public:
   t_entry		getLastKey(Action act) const;
   const std::string	&getCodeFromKey(const t_entry &entry) const;
   const std::string	&getCodeFromAction(Action act) const;
+  const std::array<t_entry, 5>	&getBoundKeys(Action act) const;
 
   void		unbindKeyFromAction(const t_entry &entry, Action act);
   void		bindKeyOnAction(const t_entry &entry, Action act);
