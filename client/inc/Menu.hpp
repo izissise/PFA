@@ -3,14 +3,14 @@
 
 # include <SFML/Graphics.hpp>
 # include <string>
-# include "Settings.hpp"
+# include "Parser.hpp"
 # include "Console.hpp"
 # include "APanelScreen.hpp"
 
 class Menu
 {
 public:
-  Menu(Settings &set);
+  Menu(Settings &set, Parser &parser);
   virtual ~Menu();
 
   bool		run(const sf::Event &event, sf::RenderWindow &window, Settings &set);

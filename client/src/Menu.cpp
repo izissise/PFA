@@ -11,11 +11,12 @@
 #include "OptionGamePanel.hpp"
 #include "OptionKeyPanel.hpp"
 
-Menu::Menu(Settings& settings) :
+Menu::Menu(Settings &settings, Parser &parser) :
     _consoleActive(false),
-    _console(&settings),
+    _console(settings, &parser),
     _panelPos(0)
 {
+  parser.loadConfigFile("../config.cfg");
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
     throw (Exception("Can't load Menu texture"));
 
@@ -49,7 +50,7 @@ bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
   _consoleActive = set.getControls().getActionState(Action::ToggleConsole);
   if (_consoleActive)
     {
-      _console.run(event);
+      _console.run(event, set.getControls());
       handled = true;
     }
   else

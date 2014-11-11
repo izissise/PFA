@@ -3,9 +3,10 @@
 
 #include <SFML/Graphics.hpp>
 #include <deque>
-#include "Settings.hpp"
+#include <map>
 #include "UserInput.hpp"
 #include "Cursor.hpp"
+#include "Parser.hpp"
 
 #define FONTSIZE 20
 #define LINESPACING 4
@@ -24,20 +25,20 @@ typedef struct			s_history
 class Console
 {
 public:
-  Console(Settings * const set);
+  Console(Settings &set, Parser *parser);
   virtual ~Console();
 
-  void		run(const sf::Event& event);
+  void		run(const sf::Event& event, Controls &ctrl);
   void		draw(sf::RenderWindow &window);
 
 private:
-  Settings		*_set;
   UserInput		_input;
   Cursor		_cursor;
   t_history		_history;
   sf::RectangleShape	_rectangle;
   sf::Font		_font;
   sf::Text		_text;
+  Parser		*_parser;
 };
 
 #endif /* _CONSOLE_H_ */

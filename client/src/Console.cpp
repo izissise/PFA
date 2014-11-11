@@ -1,11 +1,13 @@
+#include "Settings.hpp"
 #include "Console.hpp"
 #include "Exception.hpp"
 
-Console::Console(Settings* set) : _set(set), _cursor(), _history()
+Console::Console(Settings &set, Parser *parser) :
+  _cursor(), _history(), _parser(parser)
 {
   sf::Color	color(20, 20, 20);
-  int		width = std::stoi(set->getCvarList().getCvar("r_width"));
-  int		height = std::stoi(set->getCvarList().getCvar("r_height"));
+  int		width = std::stoi(set.getCvarList().getCvar("r_width"));
+  int		height = std::stoi(set.getCvarList().getCvar("r_height"));
 
   _rectangle.setSize(sf::Vector2f(width, height / 2));
   _rectangle.setPosition(0, 0);
@@ -27,16 +29,18 @@ Console::~Console()
 }
 
 
-void		Console::run(const sf::Event& event)
+void		Console::run(const sf::Event& event, Controls &ctrl)
 {
-  Controls	&ctrl = _set->getControls();
+  t_entry	entry;
 
   if (_input.getInput(event))
     {
-      try {
-          _set->parseCommandLine(_input.getString().toAnsiString());
+      try
+	{
+	  _parser->parseLine(_input.getString().toAnsiString());
         }
-      catch (const Exception &e) {
+      catch (const Exception &e)
+	{
           std::cerr << e.what() << std::endl;
         }
       _history.content.push_front(_input.getString());
@@ -47,13 +51,14 @@ void		Console::run(const sf::Event& event)
   _text.setString("]" + _input.getString());
   _cursor.update();
   _cursor.setCursorPos(_text);
+  entry.fill(event);
   switch (event.type)
     {
     case sf::Event::KeyPressed:
-      ctrl.pressKey(event.key.code);
+      ctrl.pressKey(entry);
       break;
     case sf::Event::KeyReleased:
-      ctrl.releaseKey(event.key.code);
+      ctrl.releaseKey(entry);
       break;
     case sf::Event::MouseWheelMoved:
       _history.pos =
@@ -71,8 +76,10 @@ void		Console::draw(sf::RenderWindow &window)
 {
   unsigned int	wSize = (FONTSIZE + 2 * LINESPACING);
   unsigned int	cSize;
+  sf::FloatRect	rect;
 
-  cSize = std::stoi(_set->getCvarList().getCvar("r_height")) / 2 - wSize;
+  rect = _rectangle.getGlobalBounds();
+  cSize = rect.height - wSize;
   window.draw(_rectangle);
   _text.setPosition(0, cSize - (FONTSIZE + 3 * LINESPACING));
   for (auto it = _history.content.cbegin() + _history.pos;

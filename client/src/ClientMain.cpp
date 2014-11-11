@@ -1,9 +1,10 @@
 #include "ClientMain.hpp"
 
 ClientMain::ClientMain()
-  : _window(sf::VideoMode(std::stoi(_settings.getCvarList().getCvar("r_width")),
+  : _settings(), _parser(&_settings),
+    _window(sf::VideoMode(std::stoi(_settings.getCvarList().getCvar("r_width")),
                           std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
-  _menu(_settings),
+    _menu(_settings, _parser),
   _showMenu(false)//,
     //_updateThread(std::bind(&ClientMain::update, this))
 {
@@ -21,7 +22,7 @@ void ClientMain::update()
 
 void ClientMain::run()
 {
-  Controls &ctrl = _settings.getControls();
+  Controls	&ctrl = _settings.getControls();
   sf::Event	event;
   t_entry	entry;
 
