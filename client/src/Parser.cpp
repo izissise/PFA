@@ -10,6 +10,7 @@ Parser::Parser(Settings *set) :
   _parseKey["set"] = &Parser::setKeyword;
   _parseKey["bind"] = &Parser::bindKeyword;
   _parseKey["unbind"] = &Parser::unbindKeyword;
+  _parseKey["exec"] = &Parser::execKeyword;
 }
 
 Parser::~Parser()
@@ -58,6 +59,13 @@ void		Parser::unbindKeyword(const std::vector<std::string> &tokens)
   if (act == Action::Unknown)
     throw (Exception("Key ["+ tokens[1] +"] is not bound"));
   ctrl.unbindKeyFromAction(entry, act);
+}
+
+void	Parser::execKeyword(const std::vector<std::string> &tokens)
+{
+  if (tokens.size() < 2)
+    throw (Exception("Missing parameters for exec command"));
+  loadConfigFile(tokens[1]);
 }
 
 void	Parser::parseCommandLine(const std::string &cmd, bool isFile)

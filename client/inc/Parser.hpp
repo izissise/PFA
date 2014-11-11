@@ -18,6 +18,7 @@ private:
   void		setKeyword(const std::vector<std::string> &tokens);
   void		bindKeyword(const std::vector<std::string> &tokens);
   void		unbindKeyword(const std::vector<std::string> &tokens);
+  void		execKeyword(const std::vector<std::string> &tokens);
   void		split(const std::string &s, char delim,
 		      std::vector<std::string> &elems);
 
