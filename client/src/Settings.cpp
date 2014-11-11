@@ -8,6 +8,7 @@ Settings::Settings()
 {
   _parseKey["set"] = &Settings::setKeyword;
   _parseKey["bind"] = &Settings::bindKeyword;
+  _parseKey["unbind"] = &Settings::unbindKeyword;
   loadConfigFile("../config.cfg");
 }
 
@@ -49,7 +50,23 @@ void		Settings::bindKeyword(const std::vector<std::string> &tokens)
   _ctrl.bindKeyOnAction(entry, act);
 }
 
-void	Settings::parseCommandLine(const std::string &cmd)
+void		Settings::unbindKeyword(const std::vector<std::string> &tokens)
+{
+  t_entry	entry;
+  Action	act;
+
+  if (tokens.size() < 2)
+    throw (Exception("Missing parameters for bind command"));
+  entry = _ctrl.getKeyFromCode(tokens[1]);
+  if (entry == ctrl::state::Unset)
+    throw (Exception("Unknown key ["+ tokens[1] +"]"));
+  act = _ctrl.getActionFromKey(entry);
+  if (act == Action::Unknown)
+    throw (Exception("Key ["+ tokens[1] +"] is not bound"));
+  _ctrl.unbindKeyFromAction(entry, act);
+}
+
+void	Settings::parseCommandLine(const std::string &cmd, bool isFile)
 {
   std::istringstream			buf(cmd);
   std::istream_iterator<std::string>	beg(buf), end;
@@ -57,10 +74,15 @@ void	Settings::parseCommandLine(const std::string &cmd)
 
   if (tokens.empty())
     return ;
-  auto elem = _parseKey.find(*tokens.begin());
-  if (elem == _parseKey.end())
-    throw (Exception("Invalid Keyword ["+ *tokens.begin() + "]"));
-  (this->*(elem->second))(tokens);
+  else if (tokens[0].at(0) == '/' || isFile == true)
+    {
+      if (tokens[0].at(0) == '/')
+	tokens[0] = tokens[0].substr(1);
+      auto elem = _parseKey.find(*tokens.begin());
+      if (elem == _parseKey.end())
+	throw (Exception("Invalid Keyword ["+ *tokens.begin() + "]"));
+      (this->*(elem->second))(tokens);
+    }
 }
 
 void	Settings::loadConfigFile(const std::string &filename)
@@ -79,11 +101,13 @@ void	Settings::loadConfigFile(const std::string &filename)
     throw (Exception("File [" + filename + "] not found"));
   for (const auto &it : content)
   {
-	  try {
-		  parseCommandLine(it);
-	  }
-	  catch (const Exception &e) {
-		  std::cerr << e.what() << std::endl;
-	  }
+    try
+      {
+	parseCommandLine(it, true);
+      }
+    catch (const Exception &e)
+      {
+	std::cerr << e.what() << std::endl;
+      }
   }
 }

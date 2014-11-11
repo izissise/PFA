@@ -16,12 +16,13 @@ public:
   CvarList	&getCvarList();
   Controls	&getControls();
   void		loadConfigFile(const std::string &filename);
-  void		parseCommandLine(const std::string &cmd);
+  void		parseCommandLine(const std::string &cmd, bool isFile = false);
 
 private:
   typedef	void (Settings::*func)(const std::vector<std::string> &vec);
   void		setKeyword(const std::vector<std::string> &tokens);
   void		bindKeyword(const std::vector<std::string> &tokens);
+  void		unbindKeyword(const std::vector<std::string> &tokens);
 
   CvarList			_vars;
   Controls			_ctrl;
