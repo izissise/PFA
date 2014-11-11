@@ -212,6 +212,14 @@ t_entry	Controls::getLastKey(Action act) const
   return last;
 }
 
+bool	Controls::isKnownKey(const t_entry &entry) const
+{
+  for (auto &it : _keycode)
+    if (it.second == entry)
+      return true;
+  return false;
+}
+
 const std::string	&Controls::getCodeFromKey(const t_entry &entry) const
 {
   for (auto &it : _keycode)

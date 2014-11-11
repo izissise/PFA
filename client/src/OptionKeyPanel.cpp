@@ -33,7 +33,7 @@ void	OptionKeyPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 					contZone.width / 3, 40},
 					sf::Text("Events", _font["default"], 20));
   Widget	*wTabKey = new Widget("Keys", {contZone.left + contZone.width / 3 + 10,
-					_zone.top + 150, contZone.width / 3, 40},
+					_zone.top + 150, contZone.width / 1.5f - 23, 40},
 					sf::Text("Keys", _font["default"], 20));
 
 
@@ -124,7 +124,7 @@ void	OptionKeyPanel::createContPanel(Settings &set, const sf::Texture &texture)
   Panel		*eventPanel = new Panel({contZone.left, contZone.top,
 					contZone.width / 3, contZone.height});
   Panel		*keyPanel = new Panel({contZone.left + contZone.width / 3 + 10, contZone.top,
-					contZone.width / 3, contZone.height});
+					contZone.width / 1.5f - 23, contZone.height});
 
 
   createScrollBar(texture, wScroll);

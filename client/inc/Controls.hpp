@@ -126,6 +126,7 @@ public:
   t_entry		getKeyFromCode(const std::string &code) const;
   t_entry		getKeyFromAction(Action act) const;
   t_entry		getLastKey(Action act) const;
+  bool			isKnownKey(const t_entry &entry) const;
   const std::string	&getCodeFromKey(const t_entry &entry) const;
   const std::string	&getCodeFromAction(Action act) const;
   const std::array<t_entry, 5>	&getBoundKeys(Action act) const;

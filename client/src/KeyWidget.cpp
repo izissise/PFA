@@ -32,15 +32,9 @@ void	KeyWidget::bindKey(Settings &set)
 {
   Controls	&ctrl = set.getControls();
 
-  try
-    {
-      ctrl.getCodeFromKey(_entry); // Check Existance of key
-      ctrl.bindKeyOnAction(_entry, _action);
-      getKeyName(ctrl);
-    }
-  catch (Exception &e)
-    {
-    }
+  if (ctrl.isKnownKey(_entry))
+    ctrl.bindKeyOnAction(_entry, _action);
+  getKeyName(ctrl);
 }
 
 void	KeyWidget::unbindKey(Settings &set)
