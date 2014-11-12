@@ -68,6 +68,18 @@ void	Parser::execKeyword(const std::vector<std::string> &tokens)
   loadConfigFile(tokens[1]);
 }
 
+void	Parser::giveCvarInfo(const std::vector<std::string> &tokens)
+{
+  CvarList	&cvars = _set->getCvarList();
+  const std::array<std::string, 3> cvarInfo = cvars.getCvarInfo(tokens[0]);
+  const std::string cvarValue = cvars.getCvar(tokens[0]);
+
+  _retVal.push_back(tokens[0] + " [" + cvarValue + "] [Def: "
+		    + cvarInfo[0] + " | Min: "
+		    + cvarInfo[1] + " | Max: "
+		    + cvarInfo[2] + "]");
+}
+
 void	Parser::parseCommandLine(const std::string &cmd, bool isFile)
 {
   std::istringstream			buf(cmd);
@@ -80,10 +92,14 @@ void	Parser::parseCommandLine(const std::string &cmd, bool isFile)
     {
       if (tokens[0].at(0) == '/')
 	tokens[0] = tokens[0].substr(1);
-      auto elem = _parseKey.find(*tokens.begin());
-      if (elem == _parseKey.end())
+
+      auto elem = _parseKey.find(tokens[0]);
+      if (elem != _parseKey.end())
+	(this->*(elem->second))(tokens);
+      else if (_set->getCvarList().isCvar(tokens[0]))
+	giveCvarInfo(tokens);
+      else
 	throw (Exception("Invalid Keyword ["+ *tokens.begin() + "]"));
-      (this->*(elem->second))(tokens);
     }
 }
 
