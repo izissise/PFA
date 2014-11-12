@@ -3,7 +3,7 @@
 
 KeyWidget::KeyWidget(const std::string &id, const sf::FloatRect &zone,
 		     Action act, const Controls &ctrl, const sf::Text &text):
-  AWidget(id, zone, text), _isActive(false), _action(act)
+  AWidget(id, zone, text), _isActive(false), _action(act), _forceUpdate(false)
 {
   getKeyName(ctrl);
 }
@@ -75,13 +75,24 @@ int	KeyWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 	    unbindKey(set);
 	  else
 	    bindKey(set);
+	  if (_update)
+	    _update(*this, event, ref);
 	}
     }
-  if (_update)
+  else if (_forceUpdate)
     {
-      if (_update(*this, event, ref) != 0)
-	return 1;
+      _forceUpdate = false;
+      getKeyName(set.getControls());
+      if (_update)
+	_update(*this, event, ref);
     }
   return retVal;
 }
 
+void	KeyWidget::trigger(const t_event &event)
+{
+  if (event.e & wEvent::Update)
+    _forceUpdate = true;
+  else
+    AWidget::trigger(event);
+}

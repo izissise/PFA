@@ -20,7 +20,8 @@ enum class	wEvent
     Hide = 2,
     Show = 4,
     SetSprite = 16,
-    UpdateText = 32
+    UpdateText = 32,
+    Update = 64
     };
 
 enum class	wFlag

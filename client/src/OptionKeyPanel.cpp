@@ -97,13 +97,21 @@ void	OptionKeyPanel::createKeyPanel(Panel *keyPanel, const sf::FloatRect &zone,
   KeyWidget	*wConsole = new KeyWidget("Left", {zone.left, zone.top + 5 * 4 + 40 * 4,
 					zone.width, 40},
 					Action::ToggleConsole, ctrl, txt);
+  std::function<void (const t_event &event)> eventFunc;
 
-  createKeyWidget(texture, wForward);
-  createKeyWidget(texture, wBack);
-  createKeyWidget(texture, wRight);
-  createKeyWidget(texture, wLeft);
-  createKeyWidget(texture, wConsole);
+  eventFunc = [keyPanel](const t_event &event)
+    {
+      if (event.e & wEvent::Update)
+	keyPanel->notify(event);
+    };
+  keyPanel->addObserver({wForward, wBack, wRight, wLeft, wConsole});
+  createKeyWidget(texture, wForward, keyPanel);
+  createKeyWidget(texture, wBack, keyPanel);
+  createKeyWidget(texture, wRight, keyPanel);
+  createKeyWidget(texture, wLeft, keyPanel);
+  createKeyWidget(texture, wConsole, keyPanel);
   keyPanel->addWidget({wForward, wBack, wRight, wLeft, wConsole});
+  keyPanel->setTrigger(eventFunc);
   keyPanel->construct(texture, set, {});
 }
 
@@ -153,7 +161,8 @@ void	OptionKeyPanel::createTabs(Widget *widget)
   widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
 }
 
-void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidget *wKey)
+void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED,
+					KeyWidget *wKey, Panel *panel)
 {
   sf::FloatRect wzone = wKey->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
@@ -165,12 +174,13 @@ void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED, KeyWidge
       sf::FloatRect zone = widget.getZone();
 
       widget.alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+      widget.notify(t_event(wEvent::Update));
       return 0;
     };
   wKey->alignText({wzone.left,wzone.top}, {wzone.width, wzone.height}, 50, 50);
   addSpriteForWidget(wKey, sf::Color(125, 125, 125, 150), {wzone.width, wzone.height});
   wKey->setUpdate(updateFunc);
-  //  wKey->setTextAttr(sf::Text::Bold);
+  wKey->addObserver(panel);
 }
 
 void	OptionKeyPanel::createScrollBar(const sf::Texture &texture UNUSED, ScrollWidget *wScroll)

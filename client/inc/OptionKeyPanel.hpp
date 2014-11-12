@@ -24,7 +24,7 @@ private:
   void		createKeyPanel(Panel *eventPanel, const sf::FloatRect &zone,
 			       Settings &set, const sf::Texture &texture);
   void		fillOptionBg(const sf::Texture &texture, Widget *);
-  void		createKeyWidget(const sf::Texture &texture, KeyWidget *wKey);
+  void		createKeyWidget(const sf::Texture &texture, KeyWidget *wKey, Panel *pan);
   void		createScrollBar(const sf::Texture &texture, ScrollWidget *wKey);
   void		createTextWidget(Widget *widget);
 };
