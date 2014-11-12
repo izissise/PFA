@@ -9,8 +9,8 @@ public:
   Parser(Settings *set);
   virtual ~Parser();
 
-  const std::string	&loadConfigFile(const std::string &filename);
-  const std::string	&parseLine(const std::string &cmd, bool isFile = true);
+  const std::vector<std::string>	&loadConfigFile(const std::string &filename);
+  const std::vector<std::string>	&parseLine(const std::string &cmd, bool isFile = false);
 
 private:
   typedef	void (Parser::*func)(const std::vector<std::string> &vec);
@@ -24,7 +24,7 @@ private:
 
 private:
   std::map<std::string, func>	_parseKey;
-  std::string			_retVal;
+  std::vector<std::string>	_retVal;
   Settings			*_set;
 };
 

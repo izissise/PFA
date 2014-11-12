@@ -100,11 +100,12 @@ void	Parser::split(const std::string &s, char delim,
     }
 }
 
-const std::string	&Parser::parseLine(const std::string &cmd, bool isFile)
+const std::vector<std::string>	&Parser::parseLine(const std::string &cmd, bool isFile)
 {
   std::vector<std::string> elems;
 
-  _retVal.clear();
+  if (!isFile)
+    _retVal.clear();
   split(cmd, ';', elems);
   for (auto &command : elems)
     {
@@ -114,18 +115,19 @@ const std::string	&Parser::parseLine(const std::string &cmd, bool isFile)
 	}
       catch (const Exception &e)
 	{
-	  _retVal = e.what();
+	  _retVal.push_back(e.what());
 	}
     }
   return _retVal;
 }
 
-const std::string	&Parser::loadConfigFile(const std::string &filename)
+const std::vector<std::string>	&Parser::loadConfigFile(const std::string &filename)
 {
   std::ifstream	file(filename.c_str());
   std::string	line;
   std::vector<std::string>	content;
 
+  _retVal.clear();
   if (file.is_open())
     {
       while (std::getline(file, line))
@@ -133,7 +135,10 @@ const std::string	&Parser::loadConfigFile(const std::string &filename)
       file.close();
     }
   else
-    throw (Exception("File [" + filename + "] not found"));
+    {
+      _retVal.push_back("File [" + filename + "] not found");
+      return _retVal;
+    }
   for (const auto &it : content)
     {
       if (!parseLine(it, true).empty())

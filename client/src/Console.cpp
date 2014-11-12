@@ -3,7 +3,7 @@
 #include "Exception.hpp"
 
 Console::Console(Settings &set, Parser *parser) :
-  _cursor(), _history(), _parser(parser)
+  _cursor(), _historical(), _parser(parser)
 {
   sf::Color	color(20, 20, 20);
   int		width = std::stoi(set.getCvarList().getCvar("r_width"));
@@ -28,26 +28,24 @@ Console::~Console()
 {
 }
 
+void	Console::getInput()
+{
+  const std::vector<std::string> &output = _parser->parseLine(_input.getString().toAnsiString());
+  _historical.addString(_input.getString());
+  _input.clear();
+  for (auto &it : output)
+    _historical.addString(it);
+}
 
 void		Console::run(const sf::Event& event, Controls &ctrl)
 {
   t_entry	entry;
 
-  if (_input.getInput(event))
-    {
-      try
-	{
-	  _parser->parseLine(_input.getString().toAnsiString());
-        }
-      catch (const Exception &e)
-	{
-          std::cerr << e.what() << std::endl;
-        }
-      _history.content.push_front(_input.getString());
-      if (_history.content.size() > _history.maxSize)
-        _history.content.pop_back();
-      _input.clear();
-    }
+  if (_input.getInput(event)) // means enter got pressed
+    getInput();
+  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
+	   && sf::Keyboard::isKeyPressed(sf::Keyboard::L))
+    _historical.clear();
   _text.setString("]" + _input.getString());
   _cursor.update();
   _cursor.setCursorPos(_text);
@@ -61,11 +59,10 @@ void		Console::run(const sf::Event& event, Controls &ctrl)
       ctrl.releaseKey(entry);
       break;
     case sf::Event::MouseWheelMoved:
-      _history.pos =
-        ((static_cast<int>(_history.pos) + event.mouseWheel.delta < 0) ? 0 :
-         (_history.pos + event.mouseWheel.delta > _history.content.size()) ?
-         _history.content.size() :
-         _history.pos + event.mouseWheel.delta);
+      _historical.setPos((static_cast<int>(_historical.getPos()) + event.mouseWheel.delta < 0) ? 0 :
+			 (_historical.getPos() + event.mouseWheel.delta > _historical.getSize()) ?
+			 _historical.getSize() :
+			 _historical.getPos() + event.mouseWheel.delta);
       break;
     default:
       break;
@@ -82,8 +79,8 @@ void		Console::draw(sf::RenderWindow &window)
   cSize = rect.height - wSize;
   window.draw(_rectangle);
   _text.setPosition(0, cSize - (FONTSIZE + 3 * LINESPACING));
-  for (auto it = _history.content.cbegin() + _history.pos;
-       it != _history.content.cend() && wSize < cSize; ++it)
+  for (auto it = _historical.getContent().cbegin() + _historical.getPos();
+       it != _historical.getContent().cend() && wSize < cSize; ++it)
     {
       _text.setString(*it);
       window.draw(_text);
