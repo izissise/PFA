@@ -11,7 +11,7 @@ const unsigned TileCodex::tileSize;
 TileCodex::TileCodex(const std::string& path)
 {
   // load sprite sheet
-  if (not _spriteSheet.loadFromFile(path)) {
+  if (_spriteSheet.loadFromFile(path)) {
     throw std::invalid_argument("Invalid sprite sheet path");
   }
 
