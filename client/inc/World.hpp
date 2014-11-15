@@ -45,19 +45,19 @@ private:
     Camera(const Camera& other) = default;
     Camera&	operator=(const Camera& other) = default;
 
-    void	translate(const worldPos& v) noexcept;
-    void	move(const worldPos& pos) noexcept;
+    void	translate(const worldPos& v);
+    void	move(const worldPos& pos);
 
-    void	scale(const worldPos& s) noexcept;
-    void	resize(const worldPos& s) noexcept;
+    void	scale(const worldPos& s);
+    void	resize(const worldPos& s);
 
-    float	left(void) const noexcept	{ return _botLeft.x; }
-    float	right(void) const noexcept	{ return _botLeft.x + _size.w; }
-    float	top(void) const noexcept	{ return _botLeft.y + _size.h; }
-    float	bottom(void) const noexcept	{ return _botLeft.y; }
-    float	width(void) const noexcept	{ return _size.w; }
-    float	height(void) const noexcept	{ return _size.h; }
-    worldPos	center(void) const noexcept	{ return _center; }
+    float	left(void) const	{ return _botLeft.x; }
+    float	right(void) const	{ return _botLeft.x + _size.w; }
+    float	top(void) const		{ return _botLeft.y + _size.h; }
+    float	bottom(void) const	{ return _botLeft.y; }
+    float	width(void) const	{ return _size.w; }
+    float	height(void) const	{ return _size.h; }
+    worldPos	center(void) const	{ return _center; }
 
   private:
     worldPos	_botLeft;
