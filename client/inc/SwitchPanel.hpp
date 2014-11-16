@@ -6,14 +6,6 @@
 class SwitchPanel : public APanelScreen
 {
 public:
-  enum Zone
-    {
-      Left,
-      Middle,
-      Right
-    };
-
-public:
   SwitchPanel(const sf::FloatRect &panelZone, const sf::FloatRect &contentZone);
 
   void	construct(const sf::Texture &texture, Settings &set,

@@ -32,6 +32,7 @@ public:
    */
   virtual void	draw(sf::RenderWindow &window, bool toWin);
 
+  bool	checkPanelBounds(AWidget * const widget) const;
   /**
    * \fn void print(sf::RenderTexture &rt)
    * \brief Draw the Panel's content

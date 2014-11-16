@@ -65,6 +65,7 @@ void	OptionGamePanel::createCheckBox(const sf::Texture &texture,
 
 void	OptionGamePanel::createTextWidget(const sf::Texture &texture UNUSED, TextWidget *wTextWidget)
 {
+  sf::FloatRect	wZone = wTextWidget->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
 
@@ -77,6 +78,7 @@ void	OptionGamePanel::createTextWidget(const sf::Texture &texture UNUSED, TextWi
       return 0;
     };
   wTextWidget->addSprite(texture, sf::IntRect(670, 1080, 300, 40));
+  wTextWidget->setSpriteSize(0, wZone.width, wZone.height);
   wTextWidget->setUpdate(updateFunc);
   wTextWidget->setColor(sf::Color(0,0,0));
   wTextWidget->setDefaultColor(sf::Color(60,60,60));
@@ -101,12 +103,17 @@ void	OptionGamePanel::createSwitchPanel(const sf::Texture &texture UNUSED, Switc
   Widget	*content1 = new Widget("c1", cZone, sf::Text("Low", _font["default"], 20));
   Widget	*content2 = new Widget("c2", cZone, sf::Text("Med", _font["default"], 20));
   Widget	*content3 = new Widget("c3", cZone, sf::Text("High", _font["default"], 20));
+  TextWidget	*wTextWidget = new TextWidget("nameText", cZone,
+					      sf::Text("", _font["default"], 20),
+					      sf::Text("Name", _font["default"], 20), 30);
+
 
   pSwitch->addSpriteForWidget(lSide, sf::Color(255,255,0), {lZone.width, lZone.height});
   pSwitch->addSpriteForWidget(rSide, sf::Color(255,255,0), {rZone.width, rZone.height});
   pSwitch->addSpriteForWidget(content1, sf::Color(0,0,255), {cZone.width, cZone.height});
   pSwitch->addSpriteForWidget(content2, sf::Color(0,255,0), {cZone.width, cZone.height});
   pSwitch->addSpriteForWidget(content3, sf::Color(255,0,0), {cZone.width, cZone.height});
+  createTextWidget(texture, wTextWidget);
   pSwitch->addSides({lSide, rSide});
-  pSwitch->addContent({content1, content2, content3});
+  pSwitch->addContent({content1, content2, content3, wTextWidget});
 }
