@@ -25,11 +25,13 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
   SelectList	*wSelectList = new SelectList({1000, 200, 260, 231});
+  SwitchPanel	*pSwitch = new SwitchPanel({1000, 600, 260, 50}, {1050, 600, 160, 50});
 
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
   createTextWidget(texture, wTextWidget);
   createScrollWidget(texture, wScroll);
+  createSwitchPanel(texture, pSwitch);
 
   wBarWidget->addSprite(texture, sf::IntRect(970, 1080, 549, 5));
   wBarWidget->resize(0.5, 1.0);
@@ -41,7 +43,8 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   _widgets.push_back(wTextWidget);
   _widgets.push_back(wBarWidget);
   wSelectList->construct(texture, set, {});
-  addPanels({wSelectList});
+  pSwitch->construct(texture, set, {});
+  addPanels({wSelectList, pSwitch});
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
   	std::stof(set.getCvarList().getCvar("r_height"))});
 }
@@ -86,4 +89,24 @@ void	OptionGamePanel::createScrollWidget(const sf::Texture &texture, ScrollWidge
   wScroll->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
   wScroll->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
   wScroll->toSize(0, 13, 730);
+}
+
+void	OptionGamePanel::createSwitchPanel(const sf::Texture &texture UNUSED, SwitchPanel *pSwitch)
+{
+  sf::FloatRect	lZone = pSwitch->getLeftZone();
+  sf::FloatRect	rZone = pSwitch->getRightZone();
+  sf::FloatRect	cZone = pSwitch->getContentZone();
+  Widget	*lSide = new Widget("lSide", lZone);
+  Widget	*rSide = new Widget("rSide", rZone);
+  Widget	*content1 = new Widget("c1", cZone, sf::Text("Low", _font["default"], 20));
+  Widget	*content2 = new Widget("c2", cZone, sf::Text("Med", _font["default"], 20));
+  Widget	*content3 = new Widget("c3", cZone, sf::Text("High", _font["default"], 20));
+
+  pSwitch->addSpriteForWidget(lSide, sf::Color(255,255,0), {lZone.width, lZone.height});
+  pSwitch->addSpriteForWidget(rSide, sf::Color(255,255,0), {rZone.width, rZone.height});
+  pSwitch->addSpriteForWidget(content1, sf::Color(0,0,255), {cZone.width, cZone.height});
+  pSwitch->addSpriteForWidget(content2, sf::Color(0,255,0), {cZone.width, cZone.height});
+  pSwitch->addSpriteForWidget(content3, sf::Color(255,0,0), {cZone.width, cZone.height});
+  pSwitch->addSides({lSide, rSide});
+  pSwitch->addContent({content1, content2, content3});
 }

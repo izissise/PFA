@@ -122,7 +122,7 @@ void	OptionKeyPanel::createContPanel(Settings &set, const sf::Texture &texture)
   sf::FloatRect	contZone = contPanel->getZone();
 
   Widget	*wContBg = new Widget("contBg", {contZone.left, contZone.top,
-					contZone.width, contZone.height},
+					contZone.width - 13, contZone.height},
 					sf::Text(), wFlag::Resizable);
   ScrollWidget	*wScroll = new ScrollWidget("scroll", {contZone.left + contZone.width - 13,
 					contZone.top, 13, contZone.height},
@@ -137,7 +137,7 @@ void	OptionKeyPanel::createContPanel(Settings &set, const sf::Texture &texture)
 
   createScrollBar(texture, wScroll);
   contPanel->addSpriteForWidget(wContBg, sf::Color(125, 125, 125, 70),
-				{contZone.width, contZone.height}, true);
+				{contZone.width - 13, contZone.height}, true);
   createEventPanel(eventPanel, eventPanel->getZone(), set, texture);
   createKeyPanel(keyPanel, keyPanel->getZone(), set, texture);
 
@@ -191,6 +191,7 @@ void	OptionKeyPanel::createScrollBar(const sf::Texture &texture UNUSED, ScrollWi
   wScroll->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
   wScroll->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
   wScroll->setSpriteSize(0, 13, zone.height);
+  wScroll->setAutoHide(true);
 }
 
 void	OptionKeyPanel::createTextWidget(Widget *widget)

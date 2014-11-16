@@ -71,8 +71,8 @@ public:
   void		setHide(bool hide);
   void		setTrigger(const std::function<void (const t_event &event)> &func);
   void	       	addPanels(const std::initializer_list<APanelScreen * const> &panels);
-  void		addWidget(AWidget * const widget);
-  void		addWidget(const std::initializer_list<AWidget * const> &widgets);
+  virtual void	addWidget(AWidget * const widget);
+  virtual void	addWidget(const std::initializer_list<AWidget * const> &widgets);
   void		addFont(const std::string &fontName, const std::string &fontPath);
 
   /**
@@ -108,6 +108,14 @@ public:
    *
    */
   const std::vector<APanelScreen *> &getSubPanels() const;
+
+  /**
+   * \fn std::vector<APanelScreen *> &getSubPanels();
+   * \brief Getter on the panel's subPanels
+   * \return Return a const reference to the panel's subPanels
+   *
+   */
+  std::vector<APanelScreen *> &getSubPanels();
 
   /**
    * \fn const sf::FloatRect &getZone() const;

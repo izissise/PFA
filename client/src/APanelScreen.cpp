@@ -181,6 +181,11 @@ const std::vector<APanelScreen *>	&APanelScreen::getSubPanels() const
   return _panels;
 }
 
+std::vector<APanelScreen *>	&APanelScreen::getSubPanels()
+{
+  return _panels;
+}
+
 const sf::RenderTexture	&APanelScreen::getRT() const
 {
   return _rt;
