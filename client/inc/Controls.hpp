@@ -131,6 +131,7 @@ public:
   const std::string	&getCodeFromAction(Action act) const;
   const std::array<t_entry, 5>	&getBoundKeys(Action act) const;
 
+  void		unbindKey(const t_entry &entry);
   void		unbindKeyFromAction(const t_entry &entry, Action act);
   void		bindKeyOnAction(const t_entry &entry, Action act);
   void		pressKey(const t_entry &entry);

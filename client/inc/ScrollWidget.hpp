@@ -27,11 +27,13 @@ public:
 	       wFlag flg = wFlag::Movable | wFlag::Resizable);
 
   int   update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  void	draw(sf::RenderTexture &window) const;
   bool	isOver(const sf::RenderWindow &ref) const;
   void	addSprite(t_sprite &elem);
   void	addSprite(const sf::Texture &texture, const sf::IntRect &rect,
 		  bool display = true);
   void	toSize(unsigned int spritePos, float pX, float pY);
+  void	setAutoHide(bool state);
 
 private:
   bool	isOver(const sf::RenderWindow &ref, unsigned int spritePos) const;
@@ -49,6 +51,7 @@ private:
 
 private:
   bool		_active;
+  bool		_autoHide;
   Scroll	_dir;
   APanelScreen	*_panel;
   float		_ratio;

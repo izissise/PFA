@@ -3,7 +3,8 @@
 ScrollWidget::ScrollWidget(const std::string &id, const sf::FloatRect &zone,
 			   Scroll dir, APanelScreen *panel,
 			   const sf::Text &text, wFlag flg) :
-  AWidget(id, zone, text, flg), _active(false), _dir(dir), _panel(panel), _ratio(1)
+  AWidget(id, zone, text, flg), _active(false), _autoHide(false),
+  _dir(dir), _panel(panel), _ratio(1)
 {
 }
 
@@ -264,4 +265,22 @@ void	ScrollWidget::toSize(unsigned int spritePos, float pX, float pY)
   sprite.scale(rX, rY);
   if (spritePos == 1)
     movePicker(sprite, 0, 0);
+}
+
+void	ScrollWidget::setAutoHide(bool state)
+{
+  _autoHide = state;
+}
+
+void	ScrollWidget::draw(sf::RenderTexture &window) const
+{
+  sf::FloatRect	barZone = getSpriteAttr(0).sprite.getGlobalBounds();
+  sf::FloatRect	picZone = getSpriteAttr(1).sprite.getGlobalBounds();
+
+  if (_autoHide == true && barZone.height == picZone.height)
+    return ;
+  for (auto &elem : _sprites)
+    if (elem.draw)
+      window.draw(elem.sprite);
+  window.draw(_text);
 }

@@ -11,6 +11,7 @@ public:
 	    const sf::Text &text = sf::Text());
 
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  void		trigger(const t_event &event);
 
 private:
   void	bindKey(Settings &set);
@@ -21,6 +22,7 @@ private:
   bool		_isActive;
   Action	_action;
   t_entry	_entry;
+  bool		_forceUpdate;
 };
 
 #endif /* _KEYWIDGET_H_ */

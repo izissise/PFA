@@ -110,6 +110,16 @@ void	APanelScreen::setHide(bool hide)
   _hide = hide;
 }
 
+bool	APanelScreen::checkPanelBounds(AWidget * const widget) const
+{
+  sf::FloatRect	wZone = widget->getZone();
+
+  return (wZone.left + wZone.width > _zone.left
+	  && wZone.top + wZone.height > _zone.top
+	  && wZone.left < _zone.left + _zone.width
+	  && wZone.top < _zone.top + _zone.height);
+}
+
 int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
@@ -122,8 +132,9 @@ int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings
     }
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
     {
-      if ((retVal = (*rit)->update(event, ref, set)) != 0)
-	return retVal;
+      if (checkPanelBounds(*rit))
+	if ((retVal = (*rit)->update(event, ref, set)) != 0)
+	  return retVal;
     }
   return retVal;
 }
@@ -177,6 +188,11 @@ const std::vector<AWidget *>	&APanelScreen::getWidgets() const
 }
 
 const std::vector<APanelScreen *>	&APanelScreen::getSubPanels() const
+{
+  return _panels;
+}
+
+std::vector<APanelScreen *>	&APanelScreen::getSubPanels()
 {
   return _panels;
 }

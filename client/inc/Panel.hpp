@@ -11,6 +11,7 @@ public:
 
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
+  void		trigger(const t_event &event);
 };
 
 #endif /* _PANEL_H_ */

@@ -237,6 +237,14 @@ const std::array<t_entry, 5>	&Controls::getBoundKeys(Action act) const
   return it->second;
 }
 
+void	Controls::unbindKey(const t_entry &entry)
+{
+  Action	act;
+
+  while ((act = getActionFromKey(entry)) != Action::Unknown)
+    unbindKeyFromAction(entry, act);
+}
+
 void	Controls::unbindKeyFromAction(const t_entry &entry, Action act)
 {
   auto	it = _actionKeys.find(act);
@@ -265,6 +273,7 @@ void	Controls::bindKeyOnAction(const t_entry &entry, Action act)
 {
   auto	it = _actionKeys.find(act);
 
+  unbindKey(entry);
   if (it == _actionKeys.end())
     {
       _actionKeys.insert(std::pair<Action, std::array<t_entry, 5>> (act,

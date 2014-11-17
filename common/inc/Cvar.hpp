@@ -2,7 +2,7 @@
 #define _CVAR_H_
 
 # include <map>
-# include <vector>
+# include <array>
 # include <iostream>
 
 enum cvarType {Number, String};
@@ -14,10 +14,10 @@ enum cvarType {Number, String};
 
 typedef struct	s_cvar
 {
-  std::vector<std::string>	restrictValue;
+  std::array<std::string, 3>	restrictValue;
   std::string			value;
   cvarType			type;
-  s_cvar(const std::vector<std::string> &vec,
+  s_cvar(const std::array<std::string, 3> &vec,
 	 const std::string &val,  cvarType dtype) :
     restrictValue(vec), value(val), type(dtype)
   {
@@ -30,6 +30,8 @@ public:
   CvarList();
   virtual ~CvarList();
 
+  bool	isCvar(const std::string &name) const;
+  const std::array<std::string, 3>	&getCvarInfo(const std::string &name) const;
   const std::string	&getCvar(const std::string &name) const;
   void			setCvar(const std::string &name, const std::string &value);
   bool			addCvar(const std::string &name, t_cvar *cvar);

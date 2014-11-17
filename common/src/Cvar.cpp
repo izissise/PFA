@@ -14,6 +14,22 @@ CvarList::~CvarList()
 {
 }
 
+bool	CvarList::isCvar(const std::string &name) const
+{
+  auto it = _cvars.find(name);
+
+  return it != _cvars.end();
+}
+
+const std::array<std::string, 3>	&CvarList::getCvarInfo(const std::string &name) const
+{
+  auto it = _cvars.find(name);
+
+  if (it == _cvars.end())
+    throw(Exception("Cvar [" + name + "] doesn't exist"));
+  return it->second->restrictValue;
+}
+
 const std::string	&CvarList::getCvar(const std::string &name) const
 {
   auto it = _cvars.find(name);
