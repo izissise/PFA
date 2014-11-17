@@ -98,8 +98,8 @@ void	OptionGamePanel::createSwitchPanel(const sf::Texture &texture UNUSED, Switc
   sf::FloatRect	lZone = pSwitch->getLeftZone();
   sf::FloatRect	rZone = pSwitch->getRightZone();
   sf::FloatRect	cZone = pSwitch->getContentZone();
-  Widget	*lSide = new Widget("lSide", lZone);
-  Widget	*rSide = new Widget("rSide", rZone);
+  Widget	*lSide = new Widget("lSide", lZone, sf::Text("<", _font["default"], 40));
+  Widget	*rSide = new Widget("rSide", rZone, sf::Text(">", _font["default"], 40));
   Widget	*content1 = new Widget("c1", cZone, sf::Text("Low", _font["default"], 20));
   Widget	*content2 = new Widget("c2", cZone, sf::Text("Med", _font["default"], 20));
   Widget	*content3 = new Widget("c3", cZone, sf::Text("High", _font["default"], 20));
@@ -108,11 +108,16 @@ void	OptionGamePanel::createSwitchPanel(const sf::Texture &texture UNUSED, Switc
 					      sf::Text("Name", _font["default"], 20), 30);
 
 
-  pSwitch->addSpriteForWidget(lSide, sf::Color(255,255,0), {lZone.width, lZone.height});
-  pSwitch->addSpriteForWidget(rSide, sf::Color(255,255,0), {rZone.width, rZone.height});
+  pSwitch->addSpriteForWidget(lSide, sf::Color(150,150,150,150), {lZone.width, lZone.height});
+  pSwitch->addSpriteForWidget(rSide, sf::Color(150,150,150,150), {rZone.width, rZone.height});
   pSwitch->addSpriteForWidget(content1, sf::Color(0,0,255), {cZone.width, cZone.height});
   pSwitch->addSpriteForWidget(content2, sf::Color(0,255,0), {cZone.width, cZone.height});
   pSwitch->addSpriteForWidget(content3, sf::Color(255,0,0), {cZone.width, cZone.height});
+  lSide->alignText({lZone.left, lZone.top}, {lZone.width, lZone.height}, 50, 50);
+  rSide->alignText({rZone.left, rZone.top}, {rZone.width, rZone.height}, 50, 50);
+  content1->alignText({cZone.left, cZone.top}, {cZone.width, cZone.height}, 50, 50);
+  content2->alignText({cZone.left, cZone.top}, {cZone.width, cZone.height}, 50, 50);
+  content3->alignText({cZone.left, cZone.top}, {cZone.width, cZone.height}, 50, 50);
   createTextWidget(texture, wTextWidget);
   pSwitch->addSides({lSide, rSide});
   pSwitch->addContent({content1, content2, content3, wTextWidget});
