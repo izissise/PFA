@@ -5,9 +5,9 @@ SwitchPanel::SwitchPanel(const sf::FloatRect &panelZone,
   APanelScreen(panelZone), _idx(0)
 {
   _content = new Panel(contentZone);
-  _leftSide = new Panel({_zone.left, _zone.top,
+  _leftSide = new Panel(sf::FloatRect{_zone.left, _zone.top,
 	(_zone.width - contentZone.width) / 2.f, _zone.height});
-  _rightSide = new Panel({
+  _rightSide = new Panel(sf::FloatRect{
       (_zone.left + _zone.width - (_zone.width - contentZone.width) / 2.f), _zone.top,
 	(_zone.width - contentZone.width) / 2.f, _zone.height});
 }

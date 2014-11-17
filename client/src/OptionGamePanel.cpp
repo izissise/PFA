@@ -24,8 +24,8 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   ScrollWidget	*wScroll = new ScrollWidget("scroll", {_zone.left + _zone.width - 13, _zone.top, 13, _zone.height},
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
-  SelectList	*wSelectList = new SelectList({1000, 200, 260, 231});
-  SwitchPanel	*pSwitch = new SwitchPanel({1000, 600, 260, 50}, {1050, 600, 160, 50});
+  SelectList	*wSelectList = new SelectList(sf::FloatRect{1000, 200, 260, 231});
+  SwitchPanel	*pSwitch = new SwitchPanel(sf::FloatRect{1000, 600, 260, 50}, {1050, 600, 160, 50});
 
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);

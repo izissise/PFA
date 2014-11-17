@@ -6,12 +6,10 @@
 
 #include "TileCodex.hpp"
 
-const unsigned TileCodex::tileSize;
-
 TileCodex::TileCodex(const std::string& path)
 {
   // load sprite sheet
-  if (_spriteSheet.loadFromFile(path)) {
+  if (!_spriteSheet.loadFromFile(path)) {
     throw std::invalid_argument("Invalid sprite sheet path");
   }
 
@@ -49,7 +47,11 @@ TileCodex::TileCodex(const std::string& path)
 void TileCodex::applySpriteUV(const unsigned id, sf::Vertex *quad) const
 {
   for (int i = 0; i < 4; ++i) {
-    const sf::Vector2f& a = _spriteUVs.at(id * 4 + i);
-    quad[i].texCoords = {a.x, a.y};
+    try {
+      const sf::Vector2f& a = _spriteUVs.at(id * 4 + i);
+      quad[i].texCoords = { a.x, a.y };
+    } catch (const std::out_of_range& oor) {
+      std::cerr << oor.what() << std::endl;
+    }
   }
 }
