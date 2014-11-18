@@ -136,6 +136,7 @@ void	Chunk::_getBiomeTile(Biome biome, t_tileType &tile)
       tile.surface = TileType::DryBlock;
       tile.ground = TileType::DryBlock;
     }
+
   else if (biome == Biome::Desert)
     {
       tile.surface = TileType::Sand;
@@ -208,6 +209,7 @@ void		Chunk::_completeField(void)
   float		a;
   float		b;
   float		p;
+  float		off;
 
   float		lineY;
   t_tileType	tile;
@@ -216,7 +218,7 @@ void		Chunk::_completeField(void)
   unsigned int	scaledPosX;
   Biome		biome[2];
   int		changeX = 0;
-  int		y = 0;
+  float		y = 0;
 
   sf::Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
@@ -250,13 +252,16 @@ void		Chunk::_completeField(void)
 	      // 	_generateTree(x, y);
 	      if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
-		  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, OFFSET,
+		  off = 1.4 - ((fabs(lineY * TileCodex::tileSize
+				     + offset.y * TileCodex::tileSize
+				     - (y + offset.y) * TileCodex::tileSize) >= FADEH) ?
+			       (FADEH) :
+			       fabs(lineY * TileCodex::tileSize
+				    + offset.y * TileCodex::tileSize
+				    - (y + offset.y) * TileCodex::tileSize)) / FADEH / 2.5;
+		  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, off,
 			     x + offset.x, y + offset.y);
-		  if (p >= 0.5 - ((FADEH - ((lineY * TileCodex::tileSize + FADEH / 4
-		  			   - y * TileCodex::tileSize >= FADEH)
-		  			  ? FADEH : (lineY * TileCodex::tileSize + FADEH / 4
-		  				     - y * TileCodex::tileSize)))
-		  		/ FADEH))
+		  if (p >= 0.5)
 		    {
 		      if (y + 1 >= lineY)
 			_tiles[y * Chunk::width + x] = tile.surface;
