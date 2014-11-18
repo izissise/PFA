@@ -16,55 +16,110 @@
 // Larger values produce rougher noise.
 
 
-float	octave_noise_2d(float octaves, float persistence,
-			float scale, float x, float y)
+float	fbm_2d(int octaves, float lacunarity,
+	       float gain, float scale,
+	       float x, float y)
 {
   float total = 0;
   float amplitude = 1;
-  float maxAmplitude = 0;
-  int	i;
 
-  for (i = 0; i < octaves; ++i)
+  for (int i = 0; i < octaves; ++i)
     {
       total += raw_noise_2d(x * scale, y * scale) * amplitude;
-      scale *= 2;
-      maxAmplitude += amplitude;
-      amplitude *= persistence;
+      scale *= lacunarity;
+      amplitude *= gain;
     }
-  return total / maxAmplitude;
+  return total;
 }
 
-float octave_noise_3d(float octaves, float persistence,
-		      float scale, float x, float y, float z)
+float fbm_3d(int octaves, float lacunarity,
+	     float gain, float scale,
+	     float x, float y, float z)
 {
   float total = 0;
-  float frequency = scale;
   float amplitude = 1;
-  float maxAmplitude = 0;
 
-  for (int i = 0; i < octaves; i++)
+  for (int i = 0; i < octaves; ++i)
     {
-      total += raw_noise_3d(x * frequency, y * frequency, z * frequency) * amplitude;
-      frequency *= 2;
-      maxAmplitude += amplitude;
-      amplitude *= persistence;
+      total += raw_noise_3d(x * scale, y * scale, z * scale) * amplitude;
+      scale *= lacunarity;
+      amplitude *= gain;
     }
-  return total / maxAmplitude;
+  return total;
 }
 
-float scaled_octave_noise_2d(float octaves, float persistence, float scale,
-			     float loBound, float hiBound, float x, float y)
+float	turbulence_2d(int octaves, float lacunarity,
+		      float gain, float scale,
+		      float x, float y)
 {
-  return octave_noise_2d(octaves, persistence, scale, x, y) *
-    (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
+  float total = 0;
+  float amplitude = 1.0;
+
+  for(int i = 0; i < octaves; ++i)
+    {
+      total += fabs(raw_noise_2d(x * scale, y * scale)) * amplitude;
+      scale *= lacunarity;
+      amplitude *= gain;
+    }
+  return total;
 }
 
-float scaled_octave_noise_3d(float octaves, float persistence, float scale,
-			     float loBound, float hiBound,
-			     float x, float y, float z)
+float	turbulence_3d(int octaves, float lacunarity,
+		      float gain, float scale,
+		      float x, float y, float z)
 {
-  return octave_noise_3d(octaves, persistence, scale, x, y, z) *
-    (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
+  float total = 0;
+  float amplitude = 1.0;
+
+  for(int i = 0; i < octaves; ++i)
+    {
+      total += fabs(raw_noise_3d(x * scale, y * scale, z * scale)) * amplitude;
+      scale *= lacunarity;
+      amplitude *= gain;
+    }
+  return total;
+}
+
+float	ridge(float h, float offset)
+{
+  h = fabs(h);
+  h = offset - h;
+  h = h * h;
+  return h;
+}
+
+float	ridged_mf(int octaves, float lacunarity,
+		  float gain, float scale,
+		  float offset,
+		  int x, int y)
+{
+  return ridge(0.3 + 0.5 * fbm_2d(octaves, lacunarity, gain, scale, x, y), offset);
+}
+
+float scaled_fbm_2d(int octaves, float lacunarity,
+		    float gain, float scale,
+		    float loBound, float hiBound,
+		    float x, float y)
+{
+  return fbm_2d(octaves,
+		lacunarity,
+		gain,
+		scale,
+		x, y)
+    * (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
+}
+
+float scaled_fbm_3d(int octaves, float lacunarity,
+		    float gain, float scale,
+		    float loBound, float hiBound,
+		    float x, float y, float z)
+{
+  return fbm_3d(octaves,
+		lacunarity,
+		gain,
+		scale,
+		x, y, z)
+    * (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
 }
 
 float scaled_raw_noise_2d(float loBound, float hiBound,
