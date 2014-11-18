@@ -14,14 +14,16 @@
 # include "Vector2.hpp"
 # include "Biomes.hpp"
 
-# define PERSISTANCE 1.0f
-# define SCALE 0.045f
+# define LACUNARITY 2.5f
+# define GAIN 0.5
+# define OFFSET 1.0
+# define SCALE 0.035f
 # define LINELENGHT 4
 # define MIDDLEHEIGHT 5000
 # define MAXVARIATION 3000.f
 # define MINVARIATION 500.f
 # define ROUGHNESS 0.5f // [0 - 1]
-# define FADEH 300.0f
+# define FADEH 600.0f
 # define LOD 15
 # define PSCALE 50.f
 # define HSCALE 25.f

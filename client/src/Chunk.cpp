@@ -188,7 +188,7 @@ void	Chunk::_choseBiome(Biome * const biome, t_tileType &tile,
     }
   else
     {
-      if (_scaleNumber((octave_noise_2d(1, 1, 0.5, x - dist, y)),
+      if (_scaleNumber((fbm_2d(1, 1, 0.5, SCALE, x - dist, y)),
       		       -1, 1, 0, static_cast<float>(Chunk::biomeMixDist) / 1.5f) > dist)
       	idx = 0;
       else
@@ -250,9 +250,9 @@ void		Chunk::_completeField(void)
 	      // 	_generateTree(x, y);
 	      if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
-		  p = octave_noise_2d(Chunk::octaves, PERSISTANCE, SCALE,
-		  		      x + offset.x, y + offset.y);
-		  if (p >= 0 - ((FADEH - ((lineY * TileCodex::tileSize + FADEH / 4
+		  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, OFFSET,
+			     x + offset.x, y + offset.y);
+		  if (p >= 0.5 - ((FADEH - ((lineY * TileCodex::tileSize + FADEH / 4
 		  			   - y * TileCodex::tileSize >= FADEH)
 		  			  ? FADEH : (lineY * TileCodex::tileSize + FADEH / 4
 		  				     - y * TileCodex::tileSize)))
@@ -422,9 +422,9 @@ void Chunk::_generate(void)
 	{
 	  for (x = 0; x < Chunk::width; ++x)
 	    {
-	      p = octave_noise_2d(octaves, PERSISTANCE, SCALE,
-				  (x + offset.x) / 1.0, (y + offset.y) / 1.0);
-	      if (p >= 0)
+	      p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, OFFSET,
+			 (x + offset.x) / 1.0, (y + offset.y) / 1.0);
+	      if (p >= 0.5)
 		{
 		  if (p < 0.1)
 		    _tiles[i] = TileType::Vine;

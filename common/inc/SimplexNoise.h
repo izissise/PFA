@@ -6,43 +6,64 @@
 #define F2 0.366025403 // F2 = 0.5*(sqrt(3.0)-1.0)
 #define G2 0.211324865 // G2 = (3.0-Math.sqrt(3.0))/6.0
 
-float octave_noise_2d( float octaves,
-		       float persistence,
+float fbm_2d( int octaves,
+	      float lacunarity,
+	      float gain,
+	      float scale,
+	      float x,
+	      float y);
+
+float fbm_3d( int octaves,
+	      float lacunarity,
+	      float gain,
+	      float scale,
+	      float x,
+	      float y,
+	      float z);
+
+float scaled_fbm_2d(   int octaves,
+		       float lacunarity,
+		       float gain,
 		       float scale,
+		       float loBound,
+		       float hiBound,
 		       float x,
 		       float y);
-float octave_noise_3d( float octaves,
-		       float persistence,
+
+float scaled_fbm_3d(   int octaves,
+		       float lacunarity,
+		       float gain,
 		       float scale,
+		       float loBound,
+		       float hiBound,
 		       float x,
 		       float y,
 		       float z);
-
-float scaled_octave_noise_2d(   float octaves,
-			        float persistence,
-			        float scale,
-			        float loBound,
-			        float hiBound,
-			        float x,
-			        float y);
-float scaled_octave_noise_3d(   float octaves,
-			        float persistence,
-			        float scale,
-			        float loBound,
-			        float hiBound,
-			        float x,
-			        float y,
-			        float z);
 
 float scaled_raw_noise_2d(  float loBound,
 			    float hiBound,
 			    float x,
 			    float y);
+
 float scaled_raw_noise_3d(  float loBound,
 			    float hiBound,
 			    float x,
 			    float y,
 			    float z);
+
+float	turbulence_2d(int octaves, float lacunarity,
+		      float gain, float scale,
+		      float x, float y);
+
+float	turbulence_3d(int octaves, float lacunarity,
+		      float gain, float scale,
+		      float x, float y, float z);
+
+float	ridge(float h, float offset);
+float	ridged_mf(int octaves, float lacunarity,
+		  float gain, float scale,
+		  float offset,
+		  int x, int y);
 
 float raw_noise_2d(float x, float y);
 float raw_noise_3d(float x, float y, float z);
