@@ -1,6 +1,7 @@
 #ifndef	CHUNK_H
 # define CHUNK_H
 
+# include <array>
 # include <cstdint>
 # include <utility>
 # include <vector>

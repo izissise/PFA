@@ -138,7 +138,7 @@ void World::_loadChunks(void)
        std::min(bufferRange.top(), _loadedRange.top())}
     };
   auto		predicate = [intersection](Vector2i& v) {
-    return (std::find(intersection.begin(), intersection.end(), v) != intersection.end());
+    return (std::find(intersection.cbegin(), intersection.cend(), v) != intersection.cend());
   };
 
   added.assign(bufferRange.begin(), bufferRange.end());

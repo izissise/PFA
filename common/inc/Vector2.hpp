@@ -35,11 +35,11 @@ public:
   Vector2&	operator/=(const T& rhs) { x /= rhs; y /= rhs; return *this; }
   Vector2&	operator%=(const T& rhs) { x %= rhs; y %= rhs; return *this; }
 
-  bool		operator==(const Vector2& rhs) const { return (x == rhs.x and y == rhs.y); }
-  bool		operator!=(const Vector2& rhs) const { return (x != rhs.x or y != rhs.y); }
+  bool		operator==(const Vector2& rhs) const { return (x == rhs.x && y == rhs.y); }
+  bool		operator!=(const Vector2& rhs) const { return (x != rhs.x || y != rhs.y); }
 
   bool		operator<(const Vector2& rhs) const {
-    return (y < rhs.y or (y == rhs.y and x < rhs.x));
+    return (y < rhs.y || (y == rhs.y && x < rhs.x));
   }
 
   union {

@@ -117,7 +117,7 @@ void	OptionKeyPanel::createKeyPanel(Panel *keyPanel, const sf::FloatRect &zone,
 
 void	OptionKeyPanel::createContPanel(Settings &set, const sf::Texture &texture)
 {
-  Panel	*contPanel = new Panel({_zone.left + 18, _zone.top + 190,
+  Panel	*contPanel = new Panel(sf::FloatRect{_zone.left + 18, _zone.top + 190,
 	_zone.width - 36, _zone.height - 250});
   sf::FloatRect	contZone = contPanel->getZone();
 
@@ -129,9 +129,9 @@ void	OptionKeyPanel::createContPanel(Settings &set, const sf::Texture &texture)
 					Scroll::Vertical, contPanel,
 					sf::Text(), wFlag::None);
 
-  Panel		*eventPanel = new Panel({contZone.left, contZone.top,
+  Panel		*eventPanel = new Panel(sf::FloatRect{contZone.left, contZone.top,
 					contZone.width / 3, contZone.height});
-  Panel		*keyPanel = new Panel({contZone.left + contZone.width / 3 + 10, contZone.top,
+  Panel		*keyPanel = new Panel(sf::FloatRect{contZone.left + contZone.width / 3 + 10, contZone.top,
 					contZone.width / 1.5f - 23, contZone.height});
 
 
