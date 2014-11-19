@@ -28,6 +28,16 @@
 # define LOD 15
 # define PSCALE 50.f
 # define HSCALE 25.f
+# define OREDIST 10
+
+enum class	Ore
+{
+  Coal,
+    Iron,
+    Copper,
+    Diamond,
+    Count
+    };
 
 typedef struct	s_ChunkInfo
 {
@@ -35,6 +45,18 @@ typedef struct	s_ChunkInfo
   int		avHeight;
   Biome		biome;
 }		t_ChunkInfo;
+
+typedef struct	s_OreInfo
+{
+  Ore		name;
+  TileType	tile;
+  float		minNvalue;
+  unsigned int	minSize;
+  unsigned int	maxSize;
+  int		minHeight;
+  unsigned int	proportion;
+  unsigned int	percentage;
+}		t_OreInfo;
 
 typedef struct	s_tileType
 {
@@ -104,6 +126,7 @@ private:
     return ((num >= 0 ?
 	     num :
 	     num + (_roundUpToMult(-num, LINELENGHT))) % LINELENGHT); }
+  float	_maxNoise(float n1, float n2) const { return ((n1 > n2) ? (n1) : (n2)); }
   void _loadFromFile(void);
   void _generateVBO(const TileCodex& codex);
   void _fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
@@ -111,9 +134,14 @@ private:
   void _choseBiome(Biome * const biome, t_tileType &tile,
 		 int x, int y, int &dist);
   void _completeField(void);
+  void _generateOres();
+  void _findOrePosition(const t_OreInfo &ore, int it);
+  int  _getCellSubdivisor(int nbCell) const;
+  bool _getOreRoot(const t_OreInfo &ore, int &x, int &y);
 
   std::vector<TileType>	_tiles;
   std::vector<TileType> _bgTiles;
+  std::vector<float>	_chunkMap;
   bool			_loaded;
   sf::Font		_font;
   sf::Text		_id;

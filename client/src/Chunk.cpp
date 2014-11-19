@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdio>
 #include <random>
+#include <functional>
 // <TESTING ZONE>
 #include <iostream>
 #include <sstream>
@@ -15,6 +16,7 @@ using namespace std;
 Chunk::Chunk(void) :
   _tiles(width * height, TileType::Empty),
   _bgTiles(width * height, TileType::Empty),
+  _chunkMap(width * height, 0),
   _loaded(false)
 {
 }
@@ -261,6 +263,7 @@ void		Chunk::_completeField(void)
 				    - (y + offset.y) * TileCodex::tileSize)) / FADEH / 2.5;
 		  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, off,
 			     x + offset.x, y + offset.y);
+		  _chunkMap[y * Chunk::width + x] = p;
 		  if (p >= 0.5)
 		    {
 		      if (y + 1 >= lineY)
@@ -405,7 +408,145 @@ void	Chunk::constructLine()
   //  _line.update({0, static_cast<float>(chunkHeight * -_pos.y)});
 }
 
-void Chunk::_generate(void)
+int	Chunk::_getCellSubdivisor(int nbCell) const
+{
+  float	divisor[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; // let subdivide max 100
+  float	cuDiv;
+  float	bDiv = 1;
+  float	oldSpace = -1;
+
+  for (unsigned int p = 0; p < sizeof(divisor) / sizeof(int); ++p)
+    {
+      cuDiv = static_cast<float>(nbCell) / divisor[p];
+      if (cuDiv == 0)
+	break ;
+      if (cuDiv > static_cast<int>(cuDiv))
+	continue ;
+      if (oldSpace != -1 && abs(cuDiv - divisor[p]) > oldSpace)
+	break ;
+      bDiv = cuDiv;
+      oldSpace = abs(cuDiv - divisor[p]);
+    }
+  return bDiv;
+}
+
+bool	Chunk::_getOreRoot(const t_OreInfo &ore, int &x, int &y)
+{
+  int	tx = x;
+  int	ty = y;
+  float	dirX;
+  float	dirY;
+  float cuN;
+  float maxN;
+
+  for (int it = 0; it < OREDIST; ++it)
+    {
+      maxN = -1;
+      _tiles[ty * Chunk::width + tx] = TileType::Tnt;
+      if (_chunkMap[ty * Chunk::width + tx] > ore.minNvalue)
+	{
+	  x = tx;
+	  y = ty;
+	  return true;
+	}
+      dirX = 0;
+      dirY = 0;
+      if (ty + 1 < Chunk::height)
+	{
+	  if ((cuN = _maxNoise(maxN, _chunkMap[(ty + 1) * Chunk::width + tx])) > maxN)
+	    {
+	      maxN = cuN;
+	      dirX = 0;
+	      dirY = 1;
+	    }
+	}
+      if (ty - 1 >= 0)
+	{
+	  if ((cuN = _maxNoise(maxN, _chunkMap[(ty - 1) * Chunk::width + tx])) > maxN)
+	    {
+	      maxN = cuN;
+	      dirX = 0;
+	      dirY = -1;
+	    }
+	}
+      if (tx + 1 < Chunk::width)
+	{
+	  if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width + tx + 1])) > maxN)
+	    {
+	      maxN = cuN;
+	      dirX = 1;
+	      dirY = 0;
+	    }
+	}
+      if (tx - 1 < Chunk::width)
+	{
+	  if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width + tx - 1])) > maxN)
+	    {
+	      maxN = cuN;
+	      dirX = -1;
+	      dirY = 0;
+	    }
+	}
+      if (dirX == 0 && dirY == 0)
+	std::cout << "Correct this" << std::endl;
+      tx += dirX;
+      ty += dirY;
+    }
+  return false;
+}
+
+void	Chunk::_findOrePosition(const t_OreInfo &ore, int it)
+{
+  int	div;
+  float	cellX;
+  float	cellY;
+  int	posX;
+  int	posY;
+
+  div = _getCellSubdivisor(ore.proportion);
+  cellX = Chunk::width / div;
+  cellY = Chunk::height / (ore.proportion / div);
+  posX = (it % div) * cellX;
+  posY = (it / div) * cellY;
+  // This gets me a random position in the subcell n It
+  do
+    {
+      posX += _scaleNumber(std::rand(), 0, RAND_MAX, 0, cellX);
+      posY += _scaleNumber(std::rand(), 0, RAND_MAX, 0, cellY);
+      std::cout << "again" << std::endl;
+    } while (_chunkMap[posY * Chunk::width + posX] <= 0.1);
+  if (_getOreRoot(ore, posX, posY))
+    _tiles[posY * Chunk::width + posX] = ore.tile;
+  else
+    std::cout << "pos not found" << std::endl;
+}
+
+void	Chunk::_generateOres()
+{
+  const t_OreInfo	ores[static_cast<int>(Ore::Count)] =
+    {
+      {Ore::Coal,TileType::CoalOre, 0.5, 6, 16, 0, 5, 100},
+      {Ore::Iron, TileType::IronOre, 0.5, 6, 16, 0, 0, 80},
+      {Ore::Copper, TileType::GoldOre, 0.5, 6, 16, -3, 0, 80},
+      {Ore::Diamond, TileType::DiamondOre, 0.8, 6, 16, -5, 0, 20},
+    };
+  unsigned int	randNb;
+
+  for (int i = sizeof(ores) / sizeof(t_OreInfo) - 1; i >= 0; --i)
+    {
+      if (_pos.y < ores[i].minHeight)
+	{
+	  for (unsigned int n = 0; n < ores[i].proportion; ++n)
+	    {
+	      randNb = _scaleNumber(rand(), 0, RAND_MAX, 0, 100);
+	      if (randNb <= ores[i].percentage)
+		_findOrePosition(ores[i], n);
+	    }
+	}
+    }
+}
+
+void	Chunk::_generate(void)
 {
   unsigned int	i{0};
   float		x;
@@ -429,6 +570,7 @@ void Chunk::_generate(void)
 	    {
 	      p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, OFFSET,
 			 (x + offset.x) / 1.0, (y + offset.y) / 1.0);
+	      _chunkMap[y * Chunk::width + x] = p;
 	      if (p >= 0.5)
 		{
 		  if (p < 0.1)
@@ -439,6 +581,7 @@ void Chunk::_generate(void)
 	      ++i;
 	    }
 	}
+      _generateOres();
     }
 }
 
