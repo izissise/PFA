@@ -29,6 +29,7 @@
 # define PSCALE 50.f
 # define HSCALE 25.f
 # define OREDIST 8
+# define SEED 15
 
 enum class	Ore
 {
@@ -67,8 +68,8 @@ typedef struct	s_tileType
 class Chunk
 {
 public:
-  static const int	width = 256;
-  static const int	height = 256;
+  static const int	width = 100;
+  static const int	height = 900/16;
   static const int	octaves = 2;
   static const int	iterations = 8;
   static const int	biomeMixDist = (width * LINELENGHT) / LOD;
@@ -116,13 +117,13 @@ private:
 			int size, int cuSize, int thickness);
 
   float _scaleNumber(float nb, float flb, float fhb,
-		     float lb, float hb) { return (((hb - lb) * (nb - flb)) / (fhb - flb) + lb); }
-  int	_roundUpToMult(int nb, int mult) { return (nb + (mult - (nb % mult)) % mult); }
-  int	_roundNearToMult(int nb, int mult) { return (mult * std::round(nb / mult)); }
-  int	_roundDownToMult(int nb, int mult) { return (nb >= 0 ?
+		     float lb, float hb) const { return (((hb - lb) * (nb - flb)) / (fhb - flb) + lb); }
+  int	_roundUpToMult(int nb, int mult) const  { return (nb + (mult - (nb % mult)) % mult); }
+  int	_roundNearToMult(int nb, int mult) const { return (mult * std::round(nb / mult)); }
+  int	_roundDownToMult(int nb, int mult) const { return (nb >= 0 ?
 						     mult * (nb / mult) :
 						     -_roundUpToMult(-nb, mult)); }
-  int	_upScaleChunkPos(int num) {
+  int	_upScaleChunkPos(int num) const {
     return ((num >= 0 ?
 	     num :
 	     num + (_roundUpToMult(-num, LINELENGHT))) % LINELENGHT); }
@@ -141,8 +142,9 @@ private:
   void _fullScanPoint(int x, int y, int &dirX, int &dirY, int distance);
   void _checkAdjacentPoint(int x, int y, int &dirX, int &dirY, int distance);
   void _checkCornerPoint(int x, int y, int &dirX, int &dirY, int distance);
-  void _drawOres(const t_OreInfo &ore, int posX, int posY);
   bool _checkPoint(int x, int y, float &maxN) const;
+  void _drawOres(const t_OreInfo &ore, float posX, float posY);
+  bool _isOreRand(int distX, int distY, int sideSize) const;
 
   std::vector<TileType>	_tiles;
   std::vector<TileType> _bgTiles;
