@@ -28,7 +28,7 @@
 # define LOD 15
 # define PSCALE 50.f
 # define HSCALE 25.f
-# define OREDIST 10
+# define OREDIST 8
 
 enum class	Ore
 {
@@ -67,8 +67,8 @@ typedef struct	s_tileType
 class Chunk
 {
 public:
-  static const int	width = 100;
-  static const int	height = 900/16;
+  static const int	width = 256;
+  static const int	height = 256;
   static const int	octaves = 2;
   static const int	iterations = 8;
   static const int	biomeMixDist = (width * LINELENGHT) / LOD;
@@ -136,12 +136,13 @@ private:
   void _completeField(void);
   void _generateOres();
   void _findOrePosition(const t_OreInfo &ore, int it);
-  void _displaceOrePosition(int &x, int &y, int padX, int padY);
   int  _getCellSubdivisor(int nbCell) const;
   bool _getOreRoot(const t_OreInfo &ore, int &x, int &y);
   void _fullScanPoint(int x, int y, int &dirX, int &dirY, int distance);
   void _checkAdjacentPoint(int x, int y, int &dirX, int &dirY, int distance);
   void _checkCornerPoint(int x, int y, int &dirX, int &dirY, int distance);
+  void _drawOres(const t_OreInfo &ore, int posX, int posY);
+  bool _checkPoint(int x, int y, float &maxN) const;
 
   std::vector<TileType>	_tiles;
   std::vector<TileType> _bgTiles;

@@ -430,58 +430,51 @@ int	Chunk::_getCellSubdivisor(int nbCell) const
   return bDiv;
 }
 
+bool	Chunk::_checkPoint(int x, int y, float &maxN) const
+{
+  float	cuN;
+
+  if (x >= 0 && y >= 0 && x < Chunk::width && y < Chunk::height)
+    {
+      if ((cuN = _maxNoise(maxN, _chunkMap[y * Chunk::width + x])) > maxN)
+	{
+	  maxN = cuN;
+	  return true;
+	}
+    }
+  return false;
+}
+
 void	Chunk::_fullScanPoint(int x, int y, int &dirX, int &dirY, int distance)
 {
-  int	tx = x;
-  int	ty = y;
-  float cuN;
+  int	tx;
+  int	ty;
   float maxN = -1;
 
-  ty = y - distance;
-  for (tx = x - 1; tx <= x + 1; ++tx)
-    {
-      if (tx >= 0 && tx < Chunk::width)
-	{
-	  if (ty >= 0)
-	    {
-	      if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width + tx])) > maxN)
-		{
-		  maxN = cuN;
-		  dirX = tx - x;
-		  dirY = -1;
-		}
-	    }
-	  if (ty + 2 * distance < Chunk::height)
-	    {
-	      if ((cuN = _maxNoise(maxN, _chunkMap[(ty + 2 * distance) * Chunk::width + tx])) > maxN)
-		{
-		  maxN = cuN;
-		  dirX = tx - x;
-		  dirY = 1;
-		}
-	    }
-	}
-    }
-  ty = y;
-  tx = x - distance;
-  if (tx >= 0)
-    {
-      if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width])) > maxN)
-	{
-	  maxN = cuN;
-	  dirX = -1;
-	  dirY = 0;
-	}
-    }
   tx = x + distance;
-  if (tx < Chunk::width)
+  ty = y + distance;
+  if (_checkPoint(tx, ty, maxN) == true)
     {
-      if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width + tx])) > maxN)
-	{
-	  maxN = cuN;
-	  dirX = 1;
-	  dirY = 0;
-	}
+      dirX = 1;
+      dirY = 1;
+    }
+  tx -= 2 * distance;
+  if (_checkPoint(tx, ty, maxN) == true)
+    {
+      dirX = -1;
+      dirY = 1;
+    }
+  ty -= 2 * distance;
+  if (_checkPoint(tx, ty, maxN) == true)
+    {
+      dirX = -1;
+      dirY = -1;
+    }
+  tx += 2 * distance;
+  if (_checkPoint(tx, ty, maxN) == true)
+    {
+      dirX = 1;
+      dirY = -1;
     }
 }
 
@@ -490,36 +483,23 @@ void	Chunk::_checkAdjacentPoint(int x, int y, int &dirX, int &dirY, int distance
   int	tx;
   int	ty;
   float	maxN = -1;
-  float	cuN;
 
   tx = x + dirX * distance;
   ty = y + dirY * distance;
-  if (dirX && tx >= 0 && tx < Chunk::width)
+  if (dirX)
     {
-      for (ty = y - 1; ty <= y + 1; ++ty)
+      for (ty = y - distance; ty <= y + distance; ty += distance)
 	{
-	  if (ty >= 0 && ty < Chunk::height)
-	    {
-	      if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width + tx])) > maxN)
-		{
-		  maxN = cuN;
-		  dirY = ty - y;
-		}
-	    }
+	  if (_checkPoint(tx, ty, maxN) == true)
+	    dirY = ((ty - y < 0) ? -1 : (ty - y > 0) ? 1 : 0);
 	}
     }
-  else if (dirY && ty >= 0 && ty < Chunk::height)
+  else if (dirY)
     {
-      for (tx = x - 1; tx <= x + 1; ++tx)
+      for (tx = x - distance; tx <= x + distance; tx += distance)
 	{
-	  if (tx >= 0 && tx < Chunk::height)
-	    {
-	      if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width + tx])) > maxN)
-		{
-		  maxN = cuN;
-		  dirX = tx - x;
-		}
-	    }
+	  if (_checkPoint(tx, ty, maxN) == true)
+	    dirX = ((tx - x < 0) ? -1 : (tx - x > 0) ? 1 : 0);
 	}
     }
 }
@@ -530,32 +510,24 @@ void	Chunk::_checkCornerPoint(int x, int y, int &dirX, int &dirY, int distance)
   int	ty;
   float	maxN = -1;
   float	cuN;
+  float	saveX = dirX;
 
   x = x + dirX * distance;
   y = y + dirY * distance;
-  tx = x - dirX;
+  _checkPoint(x, y, maxN);
+  tx = x - (dirX * distance);
   ty = y;
-  if (x >= 0 && x < Chunk::width && y >= 0 && y < Chunk::height)
-      maxN = _maxNoise(maxN, _chunkMap[y * Chunk::width + x]);
-  if (tx >= 0 && tx < Chunk::width && ty >= 0 && y < Chunk::height)
+  if (_checkPoint(tx, ty, maxN))
     {
-      if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width + tx])) > maxN)
-	{
-	  maxN = cuN;
-	  dirX = tx - x;
-	}
+      dirX = 0;
     }
   tx = x;
-  ty = y - dirY;
-  if (ty >= 0 && ty < Chunk::height && ty >= 0 && y < Chunk::height)
+  ty = y - (dirY * distance);
+  if (_checkPoint(tx, ty, maxN))
     {
-      if ((cuN = _maxNoise(maxN, _chunkMap[ty * Chunk::width + tx])) > maxN)
-	{
-	  maxN = cuN;
-	  dirY = ty - y;
-	}
+      dirX = saveX;
+      dirY = 0;
     }
-
 }
 
 bool	Chunk::_getOreRoot(const t_OreInfo &ore, int &x, int &y)
@@ -573,8 +545,7 @@ bool	Chunk::_getOreRoot(const t_OreInfo &ore, int &x, int &y)
 	return false;
       if (caseNoise >= ore.minNvalue)
 	return true;
-      _tiles[y * Chunk::width + x] = (TileType)((int)TileType::UWood + it);
-      distance = 2;
+      distance = 2.5 + ((ore.minNvalue - caseNoise) * 10.0) / 1.5;
      if (it == 0) // Full scan needed
        _fullScanPoint(x, y, dirX, dirY, distance);
       else // just test the 2 adjacents cases
@@ -584,62 +555,20 @@ bool	Chunk::_getOreRoot(const t_OreInfo &ore, int &x, int &y)
 	  else
 	    _checkCornerPoint(x, y, dirX, dirY, distance);
 	}
-      x += dirX * distance;
-      y += dirY * distance;
+     x += dirX * distance;
+     y += dirY * distance;
     }
   return false;
 }
 
-void	Chunk::_displaceOrePosition(int &x, int &y, int padX, int padY)
+void	Chunk::_drawOres(const t_OreInfo &ore, int x, int y)
 {
-  float cuN;
-  float maxN = -1;
-  int	dirX = 0;
-  int	dirY = 0;
+  int	total = _scaleNumber(std::rand(), 0, RAND_MAX, ore.minSize, ore.maxSize);
+  int	tx = x;
+  int	ty = y;
+  int	radius = 0;
 
-  if (y + padY < Chunk::height)
-    {
-      if ((cuN = _maxNoise(maxN, _chunkMap[(y + padY) * Chunk::width + x])) > maxN)
-	{
-	  maxN = cuN;
-	  dirX = 0;
-	  dirY = padY;
-	}
-    }
-  if (y - padY >= 0)
-    {
-      if ((cuN = _maxNoise(maxN, _chunkMap[(y - padY) * Chunk::width + x])) > maxN)
-	{
-	  maxN = cuN;
-	  dirX = 0;
-	  dirY = -padY;
-	}
-    }
-  if (x + padX < Chunk::width)
-    {
-      if ((cuN = _maxNoise(maxN, _chunkMap[y * Chunk::width + x + padX])) > maxN)
-	{
-	  maxN = cuN;
-	  dirX = padX;
-	  dirY = 0;
-	}
-    }
-  if (x - padX >= 0)
-    {
-      if ((cuN = _maxNoise(maxN, _chunkMap[y * Chunk::width + x - padX])) > maxN)
-	{
-	  maxN = cuN;
-	  dirX = -padX;
-	  dirY = 0;
-	}
-    }
-  if (_chunkMap[(y + dirY) * Chunk::width + x + dirX] > _chunkMap[y * Chunk::width + x])
-    {
-      x += dirX;
-      y += dirY;
-    }
-  else
-    std::cout << "failed" << std::endl;
+  _tiles[y * Chunk::width + x] = ore.tile;
 }
 
 void	Chunk::_findOrePosition(const t_OreInfo &ore, int it)
@@ -658,11 +587,9 @@ void	Chunk::_findOrePosition(const t_OreInfo &ore, int it)
   // This gets me a random position in the subcell n It
   posX += _scaleNumber(std::rand(), 0, RAND_MAX, 0, cellX);
   posY += _scaleNumber(std::rand(), 0, RAND_MAX, 0, cellY);
-  if (_chunkMap[posY * Chunk::width + posX] < 0.3)
-    _displaceOrePosition(posX, posY, 8, 8);
   if (_getOreRoot(ore, posX, posY))
     {
-      _tiles[posY * Chunk::width + posX] = ore.tile;
+      _drawOres(ore, posX, posY);
     }
   else
     std::cout << "pos not found" << std::endl;
@@ -672,10 +599,10 @@ void	Chunk::_generateOres()
 {
   const t_OreInfo	ores[static_cast<int>(Ore::Count)] =
     {
-      {Ore::Coal,TileType::CoalOre, 0.5, 6, 16, 0, 20, 100},
-      {Ore::Iron, TileType::IronOre, 0.5, 6, 16, 0, 0, 80},
-      {Ore::Copper, TileType::GoldOre, 0.5, 6, 16, -3, 0, 80},
-      {Ore::Diamond, TileType::DiamondOre, 0.8, 6, 16, -5, 0, 20},
+      {Ore::Coal,TileType::CoalOre, 0.5, 6, 16, 0, 100, 100},
+      {Ore::Iron, TileType::IronOre, 0.5, 6, 16, 0, 100, 80},
+      {Ore::Copper, TileType::GoldOre, 0.5, 6, 16, -3, 100, 80},
+      {Ore::Diamond, TileType::DiamondOre, 0.8, 6, 16, -5, 50, 20},
     };
   unsigned int	randNb;
 
