@@ -560,30 +560,27 @@ bool	Chunk::_getOreRoot(const t_OreInfo &ore, int &x, int &y)
   return false;
 }
 
-bool	Chunk::_isOreRand(int distX, int distY, int sideSize) const
-{
-  return (_scaleNumber(std::rand(), 0, RAND_MAX, 0, 100) <= 100 - ((distX + distY) / 2)
-	  * 30);
-}
-
 void	Chunk::_drawOres(const t_OreInfo &ore, float x, float y)
 {
-  unsigned int	randVal;
   unsigned int	cellNb;
-  int		side;
+  float		side;
+  float		stat;
+  float		randFactor;
 
-  randVal = std::rand();
-  cellNb = _scaleNumber(randVal, 0, RAND_MAX, ore.minSize, ore.maxSize);
+  cellNb = _scaleNumber(std::rand(), 0, RAND_MAX, ore.minSize, ore.maxSize);
   for (side = 1; side * side <= cellNb && (side + 1) * (side + 1) < cellNb; ++side);
-  for (int ty = y - side / 2; ty <= y + side / 2; ++ty)
+  for (float ty = y - side / 2; ty <= y + side / 2; ++ty)
     {
-      for (int tx = x - side / 2; tx <= x + side / 2; ++tx)
+      for (float tx = x - side / 2; tx <= x + side / 2; ++tx)
   	{
   	  if (tx >= 0 && ty >= 0 && tx < Chunk::width && ty < Chunk::height
-  	      && _chunkMap[ty * Chunk::width + tx] >= ore.minNvalue
-	      && _isOreRand(abs(x - tx), abs(y - ty), side))
+  	      && _chunkMap[static_cast<int>(ty) * Chunk::width
+			   + static_cast<int>(tx)] >= ore.minNvalue)
   	    {
-  	      _tiles[ty * Chunk::width + tx] = ore.tile;
+  	      stat = _scaleNumber((fabs(tx - x) + fabs(ty - y)) / 2, 0, side / 2, 0, 50);
+  	      randFactor = _scaleNumber(std::rand(), 0, RAND_MAX, 0, 0.6);
+  	      if (50.f + (stat * 0.4) + (stat * randFactor) < 75)
+		_tiles[static_cast<int>(ty) * Chunk::width + static_cast<int>(tx)] = ore.tile;
   	    }
   	}
     }
@@ -615,10 +612,10 @@ void	Chunk::_generateOres()
 {
   const t_OreInfo	ores[static_cast<int>(Ore::Count)] =
     {
-      {Ore::Coal,TileType::CoalOre, 0.5, 16, 24, 0, 10, 100},
-      {Ore::Iron, TileType::IronOre, 0.5, 10, 16, 0, 5, 80},
-      {Ore::Copper, TileType::GoldOre, 0.5, 10, 16, -3, 3, 80},
-      {Ore::Diamond, TileType::DiamondOre, 0.9, 5, 9, -5, 2, 50},
+      {Ore::Coal,TileType::CoalOre, 0.5, 16, 24, 0, 50, 100},
+      {Ore::Iron, TileType::IronOre, 0.5, 10, 16, -2, 30, 80},
+      {Ore::Copper, TileType::GoldOre, 0.5, 10, 16, -3, 30, 80},
+      {Ore::Diamond, TileType::DiamondOre, 0.9, 5, 9, -5, 20, 50},
     };
   unsigned int	randNb;
 

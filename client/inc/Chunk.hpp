@@ -68,8 +68,8 @@ typedef struct	s_tileType
 class Chunk
 {
 public:
-  static const int	width = 100;
-  static const int	height = 900/16;
+  static const int	width = 256;
+  static const int	height = 256;
   static const int	octaves = 2;
   static const int	iterations = 8;
   static const int	biomeMixDist = (width * LINELENGHT) / LOD;
@@ -144,7 +144,6 @@ private:
   void _checkCornerPoint(int x, int y, int &dirX, int &dirY, int distance);
   bool _checkPoint(int x, int y, float &maxN) const;
   void _drawOres(const t_OreInfo &ore, float posX, float posY);
-  bool _isOreRand(int distX, int distY, int sideSize) const;
 
   std::vector<TileType>	_tiles;
   std::vector<TileType> _bgTiles;
