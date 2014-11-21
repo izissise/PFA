@@ -38,10 +38,10 @@ INCLUDE(GenerateValgrind)
 INCLUDE(DefineProjectVersion)
 INCLUDE(CurrentDate)
 INCLUDE(DemangleCppABI)
-INCLUDE(CheckApplyCXXCompilerFlags)
+INCLUDE(CheckApplyCompilerFlags)
 # --- global compiler flags ---
 if (UNIX)
-  COMPILER_CXX_FLAGS(FLAGS "-pipe" "-Wall" "-Wextra"
+  COMPILER_FLAGS(FLAGS "-pipe" "-Wall" "-Wextra"
 			   "--std=c++1y"
 			   "-Wchar-subscripts" "-Winit-self" "-Wswitch-enum"
 			   "-Wstrict-aliasing=3"
@@ -50,13 +50,11 @@ if (UNIX)
 			   "-Wmissing-declarations"
 			   "-Wdocumentation"
 			   "-Wno-switch-enum"
-			   "-march=native"
-			   "-O2"
-			   "-g"
+		FLAGS_RELEASE  "-march=native" "-O2"
+		FLAGS_DEBUG    "-DNDEBUG" "-g3"
 			   )
-
 elseif (MSVC)
-  COMPILER_CXX_FLAGS(FLAGS "/wd4251" # needs to have dll-interface to be used by clients
+  COMPILER_FLAGS(FLAGS "/wd4251" # needs to have dll-interface to be used by clients
 			   "/wd4275" # exported class derived from non-exported class
 			   )
 endif()
