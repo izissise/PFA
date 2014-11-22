@@ -23,7 +23,8 @@ Server::~Server()
 
 void Server::run()
 {
-    ENetEvent event;
+    ENetEvent       event;
+    ServerProtocol  proto;
 
     std::cout << "Actual port => " << _arg.port << std::endl;
     std::cout << "Quiet => " << _arg.quiet << std::endl;
@@ -43,6 +44,7 @@ void Server::run()
                 it->sendPacket(0, std::string(reinterpret_cast<char *>(event.packet->data)));
               std::cout << "A packet of length " << event.packet->dataLength << " containing [" << event.packet->data
                         << "] was received from " << event.peer->data << " on channel " << (int)event.channelID << std::endl;
+                proto.parseCmd(event.packet->data, event.packet->dataLength);
               enet_packet_destroy (event.packet);
               break;
             case ENET_EVENT_TYPE_DISCONNECT:
@@ -53,7 +55,6 @@ void Server::run()
             default:
                 break;
         }
-      _set.setCvar("com_displayFps", "60");
     }
 }
 

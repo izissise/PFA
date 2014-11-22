@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(Project)
+project(PFA)
 
 set(NAME_LIB "common")
 set(NAME_CLIENT "client")
@@ -113,7 +113,7 @@ file(
 file(
   GLOB_RECURSE
   proto_files
-  ${PROTO_DIR}/*.proto
+  ${PROTO_DIR}/proto/*.proto
 )
 
 # configure a header file to pass some of the CMake settings
@@ -124,7 +124,23 @@ configure_file (
 )
 
 if(PROTOBUF_FOUND)
-  PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${proto_files})
+
+  execute_process(	COMMAND protoc --proto_path "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/proto" --cpp_out "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp" ${proto_files} )
+
+  file(
+  GLOB_RECURSE
+  PROTO_SRCS
+  ${PROTO_DIR}/cpp/*.cc
+  )
+
+  file(
+  GLOB_RECURSE
+  PROTO_HDRS
+  ${PROTO_DIR}/cpp/*.h
+  )
+
+  include_directories("${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp")
+
 endif()
 
 include_directories("${INCLUDE_DIRECTORY}")

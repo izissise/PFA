@@ -9,6 +9,7 @@
 # include "client.hpp"
 # include "Observer.hpp"
 # include "ServerSettings.hpp"
+# include "ServerProtocol.hpp"
 
 #define DEFAULT_PORT 6060
 
