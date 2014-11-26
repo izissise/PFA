@@ -16,15 +16,15 @@
 # include "Biomes.hpp"
 
 # define LACUNARITY 2.5f
-# define GAIN 0.5
-# define OFFSET 1.0
+# define GAIN 0.6
+# define OFFSET 1.02
 # define SCALE 0.025f
 # define LINELENGHT 4
 # define MIDDLEHEIGHT 5000
 # define MAXVARIATION 3000.f
 # define MINVARIATION 500.f
 # define ROUGHNESS 0.5f // [0 - 1]
-# define FADEH 900.0f
+# define FADEH 600.0f
 # define LOD 15
 # define PSCALE 50.f
 # define HSCALE 25.f

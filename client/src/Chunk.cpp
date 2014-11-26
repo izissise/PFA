@@ -12,6 +12,7 @@
 #include "SimplexNoise.h"
 
 using namespace std;
+using namespace noise;
 
 Chunk::Chunk(void) :
   _tiles(width * height, TileType::Empty),
@@ -254,15 +255,15 @@ void		Chunk::_completeField(void)
 	      // 	_generateTree(x, y);
 	      if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
-		  off = 1.4 - ((fabs(lineY * TileCodex::tileSize
-				     + offset.y * TileCodex::tileSize
-				     - (y + offset.y) * TileCodex::tileSize) >= FADEH) ?
-			       (FADEH) :
-			       fabs(lineY * TileCodex::tileSize
-				    + offset.y * TileCodex::tileSize
-				    - (y + offset.y) * TileCodex::tileSize)) / FADEH / 2.5;
+		  off = OFFSET + 0.4 - ((fabs(lineY * TileCodex::tileSize
+					      + offset.y * TileCodex::tileSize
+					      - (y + offset.y) * TileCodex::tileSize) >= FADEH) ?
+					(FADEH) :
+					fabs(lineY * TileCodex::tileSize
+					     + offset.y * TileCodex::tileSize
+					     - (y + offset.y) * TileCodex::tileSize)) / FADEH / 2.5;
 		  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, off,
-			     x + offset.x, y + offset.y);
+				x + offset.x, y + offset.y);
 		  _chunkMap[y * Chunk::width + x] = p;
 		  if (p >= 0.5)
 		    {
