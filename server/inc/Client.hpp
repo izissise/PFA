@@ -16,7 +16,7 @@ public:
     const ENetPeer *getPeer() const;
 
 private:
-    ENetPeer *_peer;
+    ENetPeer	*_peer;
 };
 
 #endif

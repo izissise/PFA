@@ -1,4 +1,4 @@
-#include "client.hpp"
+#include "Client.hpp"
 
 Client::Client(ENetPeer *peer)
 : _peer(peer)
