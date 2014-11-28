@@ -3,15 +3,19 @@
 #include <stdexcept>
 
 #include "World.hpp"
+#include "Perlin.h"
 
 World::World(Settings& settings) :
   _settings(settings)
 {
+  CvarList	&cvarList = _settings.getCvarList();
   chunkId	first;
   chunkId	last;
 
-  _screenSize =	{std::stoi(_settings.getCvarList().getCvar("r_width")),
-		 std::stoi(_settings.getCvarList().getCvar("r_height"))};
+  noise::setSeed(std::stoi(cvarList.getCvar("s_seed")));
+  noise::initPerm();
+  _screenSize =	{std::stoi(cvarList.getCvar("r_width")),
+		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_sToWPos(_screenSize, true));
   _camera.move({0.5f, 0.5f});
 

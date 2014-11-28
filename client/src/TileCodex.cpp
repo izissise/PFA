@@ -46,12 +46,10 @@ TileCodex::TileCodex(const std::string& path)
 
 void TileCodex::applySpriteUV(const unsigned id, sf::Vertex *quad) const
 {
-  for (int i = 0; i < 4; ++i) {
-    try {
-      const sf::Vector2f& a = _spriteUVs.at(id * 4 + i);
-      quad[i].texCoords = { a.x, a.y };
-    } catch (const std::out_of_range& oor) {
-      std::cerr << oor.what() << std::endl;
-    }
-  }
+  unsigned int pos = id * 4;
+
+  quad[0].texCoords = _spriteUVs[pos];
+  quad[1].texCoords = _spriteUVs[pos + 1];
+  quad[2].texCoords = _spriteUVs[pos + 2];
+  quad[3].texCoords = _spriteUVs[pos + 3];
 }

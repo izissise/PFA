@@ -16,9 +16,9 @@
 # include "Biomes.hpp"
 
 # define LACUNARITY 2.5f
-# define GAIN 0.5
-# define OFFSET 1.0
-# define SCALE 0.035f
+# define GAIN 0.6
+# define OFFSET 1.02
+# define SCALE 0.025f
 # define LINELENGHT 4
 # define MIDDLEHEIGHT 5000
 # define MAXVARIATION 3000.f

@@ -12,6 +12,7 @@
 #include "SimplexNoise.h"
 
 using namespace std;
+using namespace noise;
 
 Chunk::Chunk(void) :
   _tiles(width * height, TileType::Empty),
@@ -254,15 +255,15 @@ void		Chunk::_completeField(void)
 	      // 	_generateTree(x, y);
 	      if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
-		  off = 1.4 - ((fabs(lineY * TileCodex::tileSize
-				     + offset.y * TileCodex::tileSize
-				     - (y + offset.y) * TileCodex::tileSize) >= FADEH) ?
-			       (FADEH) :
-			       fabs(lineY * TileCodex::tileSize
-				    + offset.y * TileCodex::tileSize
-				    - (y + offset.y) * TileCodex::tileSize)) / FADEH / 2.5;
+		  off = OFFSET + 0.4 - ((fabs(lineY * TileCodex::tileSize
+					      + offset.y * TileCodex::tileSize
+					      - (y + offset.y) * TileCodex::tileSize) >= FADEH) ?
+					(FADEH) :
+					fabs(lineY * TileCodex::tileSize
+					     + offset.y * TileCodex::tileSize
+					     - (y + offset.y) * TileCodex::tileSize)) / FADEH / 2.5;
 		  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, off,
-			     x + offset.x, y + offset.y);
+				x + offset.x, y + offset.y);
 		  _chunkMap[y * Chunk::width + x] = p;
 		  if (p >= 0.5)
 		    {
@@ -612,10 +613,10 @@ void	Chunk::_generateOres()
 {
   const t_OreInfo	ores[static_cast<int>(Ore::Count)] =
     {
-      {Ore::Coal,TileType::CoalOre, 0.5, 16, 24, 0, 50, 100},
-      {Ore::Iron, TileType::IronOre, 0.5, 10, 16, -2, 30, 80},
-      {Ore::Copper, TileType::GoldOre, 0.5, 10, 16, -3, 30, 80},
-      {Ore::Diamond, TileType::DiamondOre, 0.9, 5, 9, -5, 20, 50},
+      {Ore::Coal,TileType::CoalOre, 0.5, 16, 24, 0, 500, 100},
+      {Ore::Iron, TileType::IronOre, 0.5, 10, 16, -2, 300, 80},
+      {Ore::Copper, TileType::GoldOre, 0.5, 10, 16, -3, 300, 80},
+      {Ore::Diamond, TileType::DiamondOre, 0.9, 5, 9, -5, 200, 50},
     };
   unsigned int	randNb;
 

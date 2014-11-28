@@ -1,86 +1,81 @@
 #include <math.h>
 #include "SimplexNoise.h"
 
-// 2D Multi-octave Simplex noise.
-//
-// For each octave, a higher frequency/lower amplitude function will be added to the original.
-// The higher the persistence [0-1], the more of each succeeding octave will be added.
+using namespace noise;
 
-
-// Octaves:
-// The number of octaves control the amount of detail of the Perlin noise.
-// Adding more octaves increases the detail of the Perlin noise, but with the drawback of increasing the calculation time.
-
-// Persistence:
-// The persistence value controls the roughness of the Perlin noise.
-// Larger values produce rougher noise.
-
-
-float	fbm_2d(int octaves, float lacunarity,
-	       float gain, float scale,
-	       float x, float y)
+float	noise::fbm_2d(int octaves, float lacunarity,
+		      float gain, float scale,
+		      float x, float y)
 {
-  float total = 0;
-  float amplitude = 1;
+  float total = 0.f;
+  float amplitude = 1.f;
+  float	max = 0.f;
 
   for (int i = 0; i < octaves; ++i)
     {
+      max += amplitude;
       total += raw_noise_2d(x * scale, y * scale) * amplitude;
       scale *= lacunarity;
       amplitude *= gain;
     }
-  return total;
+  return total / max;
 }
 
-float fbm_3d(int octaves, float lacunarity,
-	     float gain, float scale,
-	     float x, float y, float z)
+float	noise::fbm_3d(int octaves, float lacunarity,
+		      float gain, float scale,
+		      float x, float y, float z)
 {
-  float total = 0;
-  float amplitude = 1;
+  float total = 0.f;
+  float amplitude = 1.f;
+  float	max = 0.f;
 
   for (int i = 0; i < octaves; ++i)
     {
+      max += amplitude;
       total += raw_noise_3d(x * scale, y * scale, z * scale) * amplitude;
       scale *= lacunarity;
       amplitude *= gain;
     }
-  return total;
+  return total / max;
 }
 
-float	turbulence_2d(int octaves, float lacunarity,
-		      float gain, float scale,
-		      float x, float y)
+float	noise::turbulence_2d(int octaves, float lacunarity,
+			     float gain, float scale,
+			     float x, float y)
 {
-  float total = 0;
-  float amplitude = 1.0;
+  float total = 0.f;
+  float amplitude = 1.f;
+  float	max = 0.f;
 
   for(int i = 0; i < octaves; ++i)
     {
+      max += amplitude;
       total += fabs(raw_noise_2d(x * scale, y * scale)) * amplitude;
       scale *= lacunarity;
       amplitude *= gain;
     }
-  return total;
+  return total / max;
 }
 
-float	turbulence_3d(int octaves, float lacunarity,
-		      float gain, float scale,
-		      float x, float y, float z)
+float	noise::turbulence_3d(int octaves, float lacunarity,
+			     float gain, float scale,
+			     float x, float y, float z)
 {
-  float total = 0;
-  float amplitude = 1.0;
+  float total = 0.f;
+  float amplitude = 1.f;
+  float	max = 0.f;
 
   for(int i = 0; i < octaves; ++i)
     {
+      max += amplitude;
       total += fabs(raw_noise_3d(x * scale, y * scale, z * scale)) * amplitude;
       scale *= lacunarity;
       amplitude *= gain;
     }
-  return total;
+  return total / max;
 }
 
-float	ridge(float h, float offset)
+float	noise::ridge(float h, float offset)
 {
   h = fabs(h);
   h = offset - h;
@@ -88,18 +83,26 @@ float	ridge(float h, float offset)
   return h;
 }
 
-float	ridged_mf(int octaves, float lacunarity,
-		  float gain, float scale,
-		  float offset,
-		  int x, int y)
+float	noise::ridged_mf(int octaves, float lacunarity,
+			 float gain, float scale,
+			 float offset,
+			 int x, int y)
 {
   return ridge(0.3 + 0.5 * fbm_2d(octaves, lacunarity, gain, scale, x, y), offset);
 }
 
-float scaled_fbm_2d(int octaves, float lacunarity,
-		    float gain, float scale,
-		    float loBound, float hiBound,
-		    float x, float y)
+float	noise::ridged_mf3(int octaves, float lacunarity,
+			  float gain, float scale,
+			  float offset,
+			  int x, int y, int z)
+{
+  return ridge(0.3 + 0.5 * fbm_3d(octaves, lacunarity, gain, scale, x, y, z), offset);
+}
+
+float	noise::scaled_fbm_2d(int octaves, float lacunarity,
+			     float gain, float scale,
+			     float loBound, float hiBound,
+			     float x, float y)
 {
   return fbm_2d(octaves,
 		lacunarity,
@@ -109,10 +112,10 @@ float scaled_fbm_2d(int octaves, float lacunarity,
     * (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
 }
 
-float scaled_fbm_3d(int octaves, float lacunarity,
-		    float gain, float scale,
-		    float loBound, float hiBound,
-		    float x, float y, float z)
+float	noise::scaled_fbm_3d(int octaves, float lacunarity,
+			     float gain, float scale,
+			     float loBound, float hiBound,
+			     float x, float y, float z)
 {
   return fbm_3d(octaves,
 		lacunarity,
@@ -122,19 +125,19 @@ float scaled_fbm_3d(int octaves, float lacunarity,
     * (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
 }
 
-float scaled_raw_noise_2d(float loBound, float hiBound,
-			  float x, float y)
+float	noise::scaled_raw_noise_2d(float loBound, float hiBound,
+				   float x, float y)
 {
   return raw_noise_2d(x, y) * (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
 }
 
-float scaled_raw_noise_3d(float loBound, float hiBound,
-			  float x, float y, float z)
+float	noise::scaled_raw_noise_3d(float loBound, float hiBound,
+				   float x, float y, float z)
 {
   return raw_noise_3d(x, y, z) * (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
 }
 
-float raw_noise_2d(float x, float y)
+float	noise::raw_noise_2d(float x, float y)
 {
   float n0, n1, n2;
   float s = (x + y) * F2;
@@ -188,7 +191,7 @@ float raw_noise_2d(float x, float y)
   return 70.0 * (n0 + n1 + n2);
 }
 
-float raw_noise_3d(float x, float y, float z)
+float	noise::raw_noise_3d(float x, float y, float z)
 {
   float n0, n1, n2, n3;
   float F3 = 1.0/3.0;
@@ -213,7 +216,7 @@ float raw_noise_3d(float x, float y, float z)
     else if (x0>=z0) { i1=1; j1=0; k1=0; i2=1; j2=0; k2=1; }
     else { i1=0; j1=0; k1=1; i2=1; j2=0; k2=1; }
   }
-  else { // x0<y0
+  else {
     if (y0<z0) { i1=0; j1=0; k1=1; i2=0; j2=1; k2=1; }
     else if (x0<z0) { i1=0; j1=1; k1=0; i2=0; j2=1; k2=1; }
     else { i1=0; j1=1; k1=0; i2=1; j2=1; k2=0; }
@@ -241,28 +244,29 @@ float raw_noise_3d(float x, float y, float z)
   if (t0<0) n0 = 0.0;
   else {
     t0 *= t0;
-    n0 = t0 * t0 * dot3(grad3[gi0], x0, y0, z0);
+    n0 = t0 * t0 * dot3(grad3[gi0], x0, y0, z0) * -1;
   }
 
   float t1 = 0.6 - x1*x1 - y1*y1 - z1*z1;
   if (t1<0) n1 = 0.0;
   else {
     t1 *= t1;
-    n1 = t1 * t1 * dot3(grad3[gi1], x1, y1, z1);
+    n1 = t1 * t1 * dot3(grad3[gi1], x1, y1, z1) * -1;
   }
 
   float t2 = 0.6 - x2*x2 - y2*y2 - z2*z2;
   if (t2<0) n2 = 0.0;
   else {
     t2 *= t2;
-    n2 = t2 * t2 * dot3(grad3[gi2], x2, y2, z2);
+    n2 = t2 * t2 * dot3(grad3[gi2], x2, y2, z2) * -1;
   }
 
   float t3 = 0.6 - x3*x3 - y3*y3 - z3*z3;
   if (t3<0) n3 = 0.0;
   else {
     t3 *= t3;
-    n3 = t3 * t3 * dot3(grad3[gi3], x3, y3, z3);
+    n3 = t3 * t3 * dot3(grad3[gi3], x3, y3, z3) * -1;
   }
   return 32.0*(n0 + n1 + n2 + n3);
 }
+
