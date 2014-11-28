@@ -26,7 +26,7 @@ public:
 
 protected:
 private:
-  void update();
+  void	update();
 
 private:
   Settings	_settings;

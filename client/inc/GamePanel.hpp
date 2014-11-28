@@ -1,6 +1,10 @@
 #ifndef _GAMEPANEL_H_
 #define _GAMEPANEL_H_
 
+#include <enet/enet.h>
+
+#include "Network.hpp"
+#include "NetworkException.hpp"
 #include "Panel.hpp"
 #include "Widget.hpp"
 #include "World.hpp"
@@ -20,6 +24,8 @@ public:
 
   void		draw(sf::RenderWindow &window, bool toWin);
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  void		trigger(const t_event &event);
+
 private:
   void		createButton(const sf::Texture &texture, Widget *w);
   void		createVoiceButton(const sf::Texture &texture, Widget *w,
@@ -28,12 +34,15 @@ private:
   void		completeField(sf::RenderWindow &window);
   void		fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
   void		drawHud(sf::RenderWindow &window, bool toWin);
+  int		updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  int		updateNetwork();
 
   int		_pad;
   int		_padup;
   int		_oldY;
   bool		_dir;
   std::unique_ptr<World>	_world;
+  Network      	_socket;
 };
 
 #endif /* _GAMEPANEL_H_ */

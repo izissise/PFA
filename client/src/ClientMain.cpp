@@ -18,47 +18,39 @@ ClientMain::~ClientMain()
 
 void ClientMain::update()
 {
-  int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
-  TimeHandling time((std::chrono::milliseconds(gfps)));
+  // int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
+  // TimeHandling time((std::chrono::milliseconds(gfps)));
 
-  ENetEvent	event;
-  Network      	socket;
+  // ENetEvent	event;
+  // Network      	socket;
 
-  try
-    {
-      socket.connect("127.0.0.1", "6060", 2);
-      // the updating loop
-      time.start();
-      while (_window.isOpen())
-	{
-	  if (socket.pollEvent(&event, 1) < 0)
-	    throw NetworkException("Connection problem");
-	  switch (event.type)
-	    {
-	    case ENET_EVENT_TYPE_CONNECT:
-	      event.peer->data = (char *)("Server");
-	      break;
-	    case ENET_EVENT_TYPE_RECEIVE:
-	      printf ("A packet of length %lu containing %s was received from %s on channel %u.\n",
-		      event.packet->dataLength,
-		      event.packet->data,
-		      event.peer->data,
-		      event.channelID);
-	      enet_packet_destroy (event.packet);
-	      break;
-	    default:
-	      break;
-	    }
-	  socket.sendPacket("Salut", 0);
-	  //update object here
-	  time.endFrame();
-	}
-      socket.disconnect();
-    }
-  catch (NetworkException &e)
-    {
-      std::cerr << e.what() << std::endl;
-    }
+  // try
+  //   {
+  //     socket.connect("127.0.0.1", "6060", 2);
+  //     // the updating loop
+  //     time.start();
+  //     while (_window.isOpen())
+  // 	{
+  // 	      printf ("A packet of length %lu containing %s was received from %s on channel %u.\n",
+  // 		      event.packet->dataLength,
+  // 		      event.packet->data,
+  // 		      event.peer->data,
+  // 		      event.channelID);
+  // 	      enet_packet_destroy (event.packet);
+  // 	      break;
+  // 	    default:
+  // 	      break;
+  // 	    }
+  // 	  socket.sendPacket("Salut", 0);
+  // 	  //update object here
+  // 	  // time.endFrame();
+  // 	}
+  //     socket.disconnect();
+  //   }
+  // catch (NetworkException &e)
+  //   {
+  //     std::cerr << e.what() << std::endl;
+  //   }
 }
 
 void ClientMain::run()
@@ -93,18 +85,6 @@ void ClientMain::run()
 		  if (event.type == sf::Event::KeyPressed ||
 		      event.type == sf::Event::MouseButtonPressed)
 		    ctrl.pressKey(entry);
-                  // try {
-		  //   std::cout << "Action for key " << ctrl.getCodeFromKey(entry) << " is: ";
-		  //   }
-                  // catch (const Exception &e) {
-		  //   std::cout << "Action for key " << "Unknown" << " is: ";
-                  //   }
-                  // try {
-		  //   std::cout << ctrl.getCodeFromAction(ctrl.getActionFromKey(entry)) << std::endl;
-                  //   }
-                  // catch (const std::out_of_range &oor) {
-		  //    std::cout << "Unknown" << std::endl;
-                  //   }
                 }
               else if (event.type == sf::Event::KeyReleased ||
 		       event.type == sf::Event::MouseButtonReleased)

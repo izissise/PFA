@@ -4,7 +4,9 @@
 #include "SimplexNoise.h"
 
 GamePanel::GamePanel(const sf::FloatRect &zone) :
-  APanelScreen(zone), _pad(0), _padup(0), _oldY(SHEIGHT), _dir(true), _world(nullptr)
+  APanelScreen(zone), _pad(0), _padup(0),
+  _oldY(SHEIGHT), _dir(true), _world(nullptr),
+  _socket()
 {
   addFont("default", "../client/assets/default.TTF");
   setHide(true);
@@ -12,6 +14,7 @@ GamePanel::GamePanel(const sf::FloatRect &zone) :
 
 GamePanel::~GamePanel()
 {
+  _socket.disconnect();
 }
 
 void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSED,
@@ -104,11 +107,37 @@ void	GamePanel::draw(sf::RenderWindow &window, bool toWin)
   drawHud(window, toWin);
 }
 
-int	GamePanel::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
+void	GamePanel::trigger(const t_event &event)
+{
+  if (event.e & wEvent::Hide)
+    {
+      if (event.e & wEvent::Toggle)
+	{
+	  _hide = !_hide;
+	  if (_hide == false)
+	    {
+	      try
+		{
+		  _socket.connect("127.0.0.1", "6060", 2);
+		}
+	      catch (NetworkException &e)
+		{
+		  std::cerr << e.what() << std::endl;
+		}
+	    }
+	}
+      else
+	_hide = true;
+    }
+  else
+    APanelScreen::trigger(event);
+}
+
+int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
 
-  (getSubPanels()[0])->setHide(!set.getControls().getActionState(Action::ToggleQuickMenu));
+  //  (getSubPanels()[0])->setHide(!set.getControls().getActionState(Action::ToggleQuickMenu));
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
       if ((*rit)->isHidden() == false)
@@ -120,6 +149,49 @@ int	GamePanel::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
       if ((retVal = (*rit)->update(event, ref, set)) != 0)
 	return retVal;
     }
+  return 0;
+}
+
+int		GamePanel::updateNetwork()
+{
+  ENetEvent	event;
+
+  try
+    {
+      if (_socket.pollEvent(&event, 1) < 0)
+	throw NetworkException("Connection problem");
+      switch (event.type)
+	{
+	case ENET_EVENT_TYPE_CONNECT:
+	  event.peer->data = (char *)("Server");
+	  break;
+	case ENET_EVENT_TYPE_RECEIVE:
+	  printf ("A packet of length %lu containing %s was received from %s on channel %u.\n",
+		  event.packet->dataLength,
+		  event.packet->data,
+		  event.peer->data,
+		  event.channelID);
+	  enet_packet_destroy (event.packet);
+	  break;
+	default:
+	  break;
+	}
+    }
+  catch (NetworkException &e)
+    {
+      std::cerr << e.what() << std::endl;
+    }
+  return 0;
+}
+
+int		GamePanel::update(const sf::Event &event,
+				  sf::RenderWindow &ref,
+				  Settings &set)
+{
+  int		retVal;
+
+  updateNetwork();
+  retVal = updateHud(event, ref, set);
   _world->update();
   return retVal;
 }
