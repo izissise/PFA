@@ -16,7 +16,7 @@ public:
   const sf::String	&getString() const;
   void			clear();
 
-private:
+protected:
   sf::String	_input;
   unsigned int	_maxSize;
 };

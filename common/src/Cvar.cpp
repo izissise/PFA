@@ -8,10 +8,27 @@ CvarList::CvarList()
   addCvar("r_height", new t_cvar({"800", "1", "1080"}, "900", Number));
   addCvar("com_displayFps", new t_cvar({"-1, 1000"}, "-1", Number));
   addCvar("com_gameFps", new t_cvar({"20, 300"}, "125", Number));
+  addCvar("s_seed", new t_cvar({"0, 4294967295"}, "253341", Number));
 }
 
 CvarList::~CvarList()
 {
+}
+
+bool	CvarList::isCvar(const std::string &name) const
+{
+  auto it = _cvars.find(name);
+
+  return it != _cvars.end();
+}
+
+const std::array<std::string, 3>	&CvarList::getCvarInfo(const std::string &name) const
+{
+  auto it = _cvars.find(name);
+
+  if (it == _cvars.end())
+    throw(Exception("Cvar [" + name + "] doesn't exist"));
+  return it->second->restrictValue;
 }
 
 const std::string	&CvarList::getCvar(const std::string &name) const

@@ -10,8 +10,9 @@
 # include "Menu.hpp"
 # include "TimeHandling.hpp"
 # include "Exception.hpp"
-# include "Settings.hpp"
+# include "Parser.hpp"
 # include "Console.hpp"
+# include "World.hpp"
 
 class ClientMain
 {
@@ -28,10 +29,12 @@ private:
   void update();
 
 private:
-  Settings _settings;
+  Settings	_settings;
+  Parser	_parser;
   sf::RenderWindow _window;
-  Menu _menu;
-  std::thread _updateThread;
+  Menu		_menu;
+  bool		_showMenu;
+  std::thread	_updateThread;
 };
 
 #endif // CLIENTMAIN_H

@@ -7,13 +7,15 @@
 class MainMenu : public APanelScreen
 {
 public:
-  MainMenu();
+  MainMenu(const sf::FloatRect &zone);
   virtual ~MainMenu();
 
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
 
 private:
+  void		createBgPanel(const sf::Texture &texture, Widget *wBackground,
+			      Widget *wMback, Widget *wMenuTitle);
   void		createPlayButton(const sf::Texture &texture, Widget *);
   void		createOptButton(const sf::Texture &texture, Widget *);
   void		createQuitButton(const sf::Texture &texture, Widget *);
