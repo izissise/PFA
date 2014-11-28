@@ -37,8 +37,8 @@ public:
 private:
   void	handlePackets(ServerProtocol &proto,
 		      ENetEvent &event);
-  void	connectClient(ENetPeer * const client);
-  void	disconnectClient(ENetPeer * const client);
+  void	connectClient(ENetPeer * const peer);
+  void	disconnectClient(ENetPeer * const peer);
 
 private:
   t_arg               _arg;
