@@ -51,7 +51,8 @@ void Server::run()
 void	Server::handlePackets(ServerProtocol &proto,
 			      ENetEvent &event)
 {
-  ENetPeer	*client = event.peer;
+  ENetPeer	*peer = event.peer;
+  Client	*client = static_cast<Client *>(peer->data);
   ENetPacket	*packet = event.packet;
 
   for (auto it : _clients)
@@ -60,32 +61,33 @@ void	Server::handlePackets(ServerProtocol &proto,
 	    << packet->dataLength << " containing ["
 	    << packet->data
 	    << "] was received from "
-	    << client->data
+	    << peer->data
 	    << " user id -> "
-	    << client->connectID
+	    << peer->connectID
 	    << " on channel "
 	    << (int)event.channelID << std::endl;
   proto.parseCmd(packet->data, packet->dataLength);
   enet_packet_destroy(packet);
 }
 
-void	Server::connectClient(ENetPeer * const client)
+void		Server::connectClient(ENetPeer * const peer)
 {
-  std::cout << "A new client connected from "
-	    << client->address.host << " : "
-	    << client->address.port << std::endl;
-  client->data = const_cast<char *>("Client");
+  Client	*newClient = new Client(peer);
 
-  _clients.push_back(new Client(client));
+  std::cout << "A new client connected from "
+	    << peer->address.host << " : "
+	    << peer->address.port << std::endl;
+  peer->data = newClient;
+  _clients.push_back(newClient);
 }
 
-void	Server::disconnectClient(ENetPeer * const client)
+void	Server::disconnectClient(ENetPeer * const peer)
 {
   std::cout << "Client disconnected" << std::endl;
-  client->data = NULL;
+  peer->data = NULL;
   _clients.erase(std::find_if(_clients.begin(), _clients.end(),
-			      [client] (const Client *elem)
-			      { return elem->getPeer() == client;}));
+			      [peer] (const Client *elem)
+			      { return elem->getPeer() == peer;}));
 }
 
 void	Server::trigger(const t_event &event)
