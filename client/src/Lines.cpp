@@ -22,7 +22,6 @@ const sf::Vertex	&Lines::getPoint(unsigned int idx)
 void	Lines::clear()
 {
   points.clear();
-  points.clear();
 }
 
 unsigned int	Lines::size() const

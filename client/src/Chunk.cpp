@@ -32,6 +32,10 @@ void Chunk::load(int xId, int yId, const TileCodex& codex)
   _generate();
   _generateVBO(codex);
   _loaded = true;
+  _chunkMap.clear();
+  _line.clear();
+  _tiles.clear();
+  _bgTiles.clear();
 }
 
 void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
@@ -605,8 +609,6 @@ void	Chunk::_findOrePosition(const t_OreInfo &ore, int it)
   posY += _scaleNumber(std::rand(), 0, RAND_MAX, 0, cellY);
   if (_getOreRoot(ore, posX, posY))
     _drawOres(ore, posX, posY);
-  else
-    std::cout << "pos not found" << std::endl;
 }
 
 void	Chunk::_generateOres()
