@@ -1,7 +1,7 @@
 #include "Server.hpp"
 
 Server::Server(t_arg &arg)
-  : _arg(arg), _set(), _clients()
+  : _arg(arg), _set(), _world(_set), _clients()
 {
   if (enet_initialize() != 0)
     throw (NetworkException("An error occurred while initializing ENet."));

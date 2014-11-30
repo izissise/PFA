@@ -10,6 +10,7 @@
 # include "Observer.hpp"
 # include "ServerSettings.hpp"
 # include "ServerProtocol.hpp"
+# include "World.hpp"
 
 #define DEFAULT_PORT 6060
 
@@ -41,10 +42,11 @@ private:
   void	disconnectClient(ENetPeer * const peer);
 
 private:
-  t_arg               _arg;
-  ServerSettings      _set;
-  ENetAddress         _address;
-  ENetHost*           _server;
+  t_arg			_arg;
+  ServerSettings	_set;
+  ENetAddress		_address;
+  ENetHost*		_server;
+  World			_world;
   std::vector<Client *>	_clients;
 };
 

@@ -4,19 +4,21 @@
 #include <iostream>
 #include <enet/enet.h>
 #include "NetworkException.hpp"
+#include "ClientEntity.hpp"
 
 class Client
 {
 public:
-    Client(ENetPeer *peer);
-    ~Client();
+  Client(ENetPeer *peer);
+  ~Client();
 
-    void sendPacket(enet_uint8 chan, const std::string &packet) const;
+  void sendPacket(enet_uint8 chan, const std::string &packet) const;
 
-    const ENetPeer *getPeer() const;
+  const ENetPeer *getPeer() const;
 
 private:
-    ENetPeer	*_peer;
+  ENetPeer	*_peer;
+  ClientEntity	_entity;
 };
 
 #endif

@@ -13,10 +13,10 @@ typedef struct  s_event
 class ServerSettings : public CvarList, public Observable
 {
 public:
-	ServerSettings();
-	virtual ~ServerSettings();
-  
-  void setCvar(const std::string &name, const std::string &value);
+  ServerSettings();
+  virtual ~ServerSettings();
+
+  void	setCvar(const std::string &name, const std::string &value);
 };
 
 #endif
