@@ -41,7 +41,7 @@ INCLUDE(DemangleCppABI)
 INCLUDE(CheckApplyCompilerFlags)
 # --- global compiler flags ---
 if (UNIX)
-  COMPILER_FLAGS(FLAGS "-pipe" "-Wall" "-Wextra"
+  COMPILER_FLAGS(FLAGS     "-pipe" "-Wall" "-Wextra"
 			   "--std=c++1y"
 			   "-Wchar-subscripts" "-Winit-self" "-Wswitch-enum"
 			   "-Wstrict-aliasing=3"
@@ -115,7 +115,6 @@ configure_file (
   "${NAME_LIB}/inc/Config.h"
 )
 
-include_directories("${INCLUDE_DIRECTORY}")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
 
 add_library(
@@ -126,6 +125,8 @@ add_library(
   ${lib_include_files}
 )
 
+set_property(TARGET ${NAME_LIB} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+
 add_executable(
 # executable name
   ${NAME_CLIENT}
@@ -134,12 +135,18 @@ add_executable(
   ${client_include_files}
 )
 
+set_property(TARGET ${NAME_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc")
+set_property(TARGET ${NAME_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+
 add_executable(
   ${NAME_SERVER}
 # source files
   ${server_source_files}
   ${server_include_files}
 )
+
+set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc")
+set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
 
 target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
 target_link_libraries(${NAME_SERVER} ${NAME_LIB})
