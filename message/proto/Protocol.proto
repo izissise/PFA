@@ -1,6 +1,0 @@
-import "Player.proto";
-
-message Protocol{
-  required int32 action = 1;
-  optional Player player = 2;
-}

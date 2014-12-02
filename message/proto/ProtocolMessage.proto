@@ -1,0 +1,16 @@
+import "PlayerMessage.proto";
+import "SettingMessage.proto";
+
+message ProtocolMessage {
+  enum Action
+  {
+    ANSWER = 0;
+    CONNECTION = 1;
+    LOGIN = 2;
+    SETTING = 3;
+    CHUNCK = 4;
+  }
+  required Action action = 1;
+  optional SettingMessage settings = 2;
+  optional PlayerMessage player = 3;
+}

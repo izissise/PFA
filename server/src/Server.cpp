@@ -79,6 +79,7 @@ void		Server::connectClient(ENetPeer * const peer)
 	    << peer->address.port << std::endl;
   peer->data = newClient;
   _clients.push_back(newClient);
+  newClient->sendPacket(0, _set.serialize());
 }
 
 void	Server::disconnectClient(ENetPeer * const peer)

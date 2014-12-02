@@ -1,0 +1,3 @@
+message SettingMessage {
+  optional int32 gameFPS = 1;
+}

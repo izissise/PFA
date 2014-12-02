@@ -1,0 +1,3 @@
+message PlayerMessage {
+	optional int32 life = 2;
+}

@@ -1,4 +1,0 @@
-message Player {
-	optional string name = 1;
-	optional int32 life = 2;
-}
