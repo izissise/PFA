@@ -2,7 +2,7 @@
 #define _PERLIN_H_
 
 #define FADE(t) (t * t * t * (t * (t * 6 - 15) + 10))
-#define FASTFLOOR(x) (((x) > 0) ? ((int)x) : ((int)x - 1))
+//#define FASTFLOOR(x) (((x) > 0) ? ((int)x) : ((int)x - 1))
 #define LERP(t, a, b) ((a) + (t) * ((b) - (a)))
 
 #define S_NOISE_GEN 1013
@@ -12,6 +12,10 @@
 
 namespace noise
 {
+  inline int	FASTFLOOR(float val)
+  {
+    return (((val) > 0) ? (int)(val) : (int)((val) - 1));
+  }
   float	perlin_grad2d(int hash, float x, float y);
   float	perlin2d(float x, float y);
 

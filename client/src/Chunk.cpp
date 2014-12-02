@@ -605,8 +605,8 @@ void	Chunk::_findOrePosition(const t_OreInfo &ore, int it)
   posY += _scaleNumber(std::rand(), 0, RAND_MAX, 0, cellY);
   if (_getOreRoot(ore, posX, posY))
     _drawOres(ore, posX, posY);
-  else
-    std::cout << "pos not found" << std::endl;
+  // else
+  //   std::cout << "pos not found" << std::endl;
 }
 
 void	Chunk::_generateOres()
