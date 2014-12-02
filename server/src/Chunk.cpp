@@ -26,7 +26,7 @@ Chunk::~Chunk(void)
 {
 }
 
-void Chunk::load(int xId, int yId, const TileCodex& codex)
+void Chunk::load(int xId, int yId)
 {
   _pos = {xId, yId};
   _generate();
@@ -37,7 +37,7 @@ void Chunk::load(int xId, int yId, const TileCodex& codex)
   _bgTiles.clear();
 }
 
-void		Chunk::_constructBranch(sf::Vector2f pos, sf::Vector2f dir,
+void		Chunk::_constructBranch(Vector2f pos, Vector2f dir,
 					int size, int cuSize, int thickness)
 {
   if (cuSize > 0)
@@ -91,17 +91,17 @@ void		Chunk::_constructBranches(float x, float y, int size, int thickness)
 				    (thickness - ((v >= thickness) ? 1 : v)));
       	  if (_scaleNumber(std::rand(), 0, RAND_MAX, 0, 100) < 30)
       	    {
-      	      sf::Vector2f t1(x + side * (thickness / 2 + 1)
+      	      Vector2f t1(x + side * (thickness / 2 + 1)
 			      - (side > 0 && thickness % 2 == 0), y + ty);
-      	      sf::Vector2f t2(side, 0);
+      	      Vector2f t2(side, 0);
       	      _constructBranch(t1, t2, size / 4, -1, branchSize);
 	      ty += 1 + branchSize * 2;
 	    }
 	  else
 	    ty += 2;
       	}
-      sf::Vector2f t1(x, y + size - 3);
-      sf::Vector2f t2(0.5 * side, 1);
+      Vector2f t1(x, y + size - 3);
+      Vector2f t2(0.5 * side, 1);
       _constructBranch(t1, t2, size / 4, size / 4, (thickness == 1) ? 1 : thickness - 1);
     }
 }
@@ -165,7 +165,7 @@ void	Chunk::_getBiomeTile(Biome biome, t_tileType &tile)
     }
 }
 
-void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
+void		Chunk::_fillVertex(Vector2f &prev, Vector2f &next, int x)
 {
   int		points = pow(2, iterations);
   int		s = TileCodex::tileSize;
@@ -174,10 +174,10 @@ void		Chunk::_fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x)
 				  * static_cast<float>(s))
 				 / static_cast<float>(points));
 
-  prev = sf::Vector2f(_line.getPoint(pos).x / s,
+  prev = Vector2f(_line.getPoint(pos).x / s,
 		      _line.getPoint(pos).y / s);
   pos += 1;
-  next = sf::Vector2f(_line.getPoint(pos).x / s,
+  next = Vector2f(_line.getPoint(pos).x / s,
 		      _line.getPoint(pos).y / s);
 }
 
@@ -210,8 +210,8 @@ void	Chunk::_choseBiome(Biome * const biome, t_tileType &tile,
 
 void		Chunk::_completeField(void)
 {
-  sf::Vector2f	prev;
-  sf::Vector2f	next;
+  Vector2f	prev;
+  Vector2f	next;
   float		a;
   float		b;
   float		p;
@@ -226,7 +226,7 @@ void		Chunk::_completeField(void)
   int		changeX = 0;
   float		y = 0;
 
-  sf::Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
+  Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
   part = static_cast<float>(Chunk::width * LINELENGHT) / static_cast<float>(LOD);
   scaledPosX = _upScaleChunkPos(_pos.x);

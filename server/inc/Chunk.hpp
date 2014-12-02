@@ -3,12 +3,13 @@
 
 # include <array>
 # include <cstdint>
+# include <cmath>
 # include <utility>
 # include <vector>
 
 # include "Lines.hpp"
-# include "TileCodex.hpp"
 # include "TileType.hpp"
+# include "TileCodex.hpp"
 # include "Vector2.hpp"
 # include "Biomes.hpp"
 
@@ -77,7 +78,7 @@ public:
   Chunk(const Chunk& other) = delete;
   Chunk&	operator=(const Chunk& other) = delete;
 
-  void load(int x, int y, const TileCodex& codex);
+  void load(int x, int y);
   const Lines	&getLine() const;
   void		setPosition(const Vector2i &vec);
 
@@ -106,7 +107,7 @@ private:
   void _fillHeightMap();
   void _generateTree(float x, float y);
   void _constructBranches(float x, float y, int size, int thickness);
-  void _constructBranch(sf::Vector2f pos, sf::Vector2f dir,
+  void _constructBranch(Vector2f pos, Vector2f dir,
 			int size, int cuSize, int thickness);
 
   float _scaleNumber(float nb, float flb, float fhb,
@@ -122,7 +123,7 @@ private:
 	     num + (_roundUpToMult(-num, LINELENGHT))) % LINELENGHT); }
   float	_maxNoise(float n1, float n2) const { return ((n1 > n2) ? (n1) : (n2)); }
   void _loadFromFile(void);
-  void _fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
+  void _fillVertex(Vector2f &prev, Vector2f &next, int x);
   void _getBiomeTile(Biome biome, t_tileType &tile);
   void _choseBiome(Biome * const biome, t_tileType &tile,
 		 int x, int y, int &dist);
