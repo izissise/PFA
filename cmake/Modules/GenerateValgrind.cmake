@@ -35,18 +35,19 @@ INCLUDE(ParseArguments)
 FIND_PACKAGE(Valgrind)
 
 FUNCTION(GENERATE_VALGRIND)
-
     IF(VALGRIND_FOUND)
-        
         # argument parsing
         PARSE_ARGUMENTS(ARG "TARGETS" "" ${ARGN})
-        SET(VALGRIND_REPORT_FILE${ARG_TARGETS} "${CMAKE_BINARY_DIR}/${ARG_TARGETS}-valgrind.xml")
-        ADD_CUSTOM_COMMAND(OUTPUT ${VALGRIND_REPORT_FILE}
-                           DEPENDS ${ARG_TARGETS}
-                           COMMAND ${VALGRIND_EXECUTABLE} ARGS --xml=yes "--xml-file=${VALGRIND_REPORT_FILE${ARG_TARGETS}}" ${ARG_TARGETS}
-                           WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
-        ADD_CUSTOM_TARGET(valgrind DEPENDS ${VALGRIND_REPORT_FILE${ARG_TARGETS}})
+        foreach(target ${ARG_TARGETS})
+          SET(VALGRIND_REPORT_FILE${target} "${target}-valgrind.xml")
+          ADD_CUSTOM_COMMAND(OUTPUT "${VALGRIND_REPORT_FILE${target}}"
+                             DEPENDS ${target}
+                             COMMAND ${VALGRIND_EXECUTABLE} ARGS --xml=yes "--xml-file=${VALGRIND_REPORT_FILE${target}}" ${target}
+                             WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+          list(APPEND deptarget "${VALGRIND_REPORT_FILE${target}}")
+        endforeach()
+        ADD_CUSTOM_TARGET(valgrind DEPENDS ${deptarget} VERBATIM)
         
         MESSAGE(STATUS "Generated valgrind target (valgrind).")
     
