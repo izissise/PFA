@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "CvarParser.hpp"
 
 Server::Server(t_arg &arg)
   : _arg(arg), _set(), _world(_set), _clients()
@@ -13,6 +14,10 @@ Server::Server(t_arg &arg)
   if (_server == NULL)
     throw (NetworkException("An error occurred while trying to create an ENet server host."));
   _set.addObserver(this);
+
+  CvarParser	parser(_set);
+
+  parser.loadConfigFile("../ServerConfig.cfg");
 }
 
 Server::~Server()

@@ -10,7 +10,7 @@ Parser::Parser(Settings *set) :
   _parseKey["set"] = &Parser::setKeyword;
   _parseKey["bind"] = &Parser::bindKeyword;
   _parseKey["unbind"] = &Parser::unbindKeyword;
-  _parseKey["include"] = &Parser::execKeyword;
+  _parseKey["exec"] = &Parser::execKeyword;
 }
 
 Parser::~Parser()

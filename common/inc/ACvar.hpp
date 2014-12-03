@@ -30,10 +30,11 @@ public:
   ACvar();
   virtual ~ACvar();
 
+  virtual void	       	setCvar(const std::string &name, const std::string &value);
+
   bool	isCvar(const std::string &name) const;
   const std::array<std::string, 3>	&getCvarInfo(const std::string &name) const;
   const std::string	&getCvar(const std::string &name) const;
-  void			setCvar(const std::string &name, const std::string &value);
   bool			addCvar(const std::string &name, t_cvar *cvar);
 
 protected:

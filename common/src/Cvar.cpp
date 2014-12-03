@@ -71,6 +71,7 @@ void	ACvar::setCvar(const std::string &name, const std::string &value)
         }
       if (cvar->restrictValue.size() > 1) // Means the cvar has value limits
         {
+	  std::cout << *(cvar->restrictValue.begin() + 1) << std::endl;
           if (numValue < std::stod(*(cvar->restrictValue.begin() + 1)))
             throw (Exception("Value for " + name + ": " + value + ", minimum: " +
                              * (cvar->restrictValue.begin() + 1)));
