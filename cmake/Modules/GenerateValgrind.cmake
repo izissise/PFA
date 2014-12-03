@@ -2,9 +2,9 @@
 # The function GENERATE_VALGRIND is provided to create a "doc" target that
 # generates a valgrind documentation (currently only as HTML report).
 #
-# GENERATE_VALGRIND(BIN "Binary to execute in valgrind")
+# GENERATE_VALGRIND(TARGETS "Binary to execute in valgrind")
 #
-#     BIN: The binary to execute 
+#     TARGETS: The binaries to execute 
 #
 # This function can always be called, even if no valgrind was found. Then no
 # target is created.
@@ -35,18 +35,19 @@ INCLUDE(ParseArguments)
 FIND_PACKAGE(Valgrind)
 
 FUNCTION(GENERATE_VALGRIND)
-
     IF(VALGRIND_FOUND)
-        
         # argument parsing
-        PARSE_ARGUMENTS(ARG "BIN" "" ${ARGN})
-        SET(VALGRIND_REPORT_FILE ${CMAKE_BINARY_DIR}/valgrind.xml)
-        
-        ADD_CUSTOM_COMMAND(OUTPUT ${VALGRIND_REPORT_FILE}
-                           DEPENDS ${ARG_BIN}
-                           COMMAND ${VALGRIND_EXECUTABLE} ARGS --xml=yes --xml-file=${VALGRIND_REPORT_FILE} ${ARG_BIN}
-                           WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-        ADD_CUSTOM_TARGET(valgrind DEPENDS ${VALGRIND_REPORT_FILE})
+        PARSE_ARGUMENTS(ARG "TARGETS" "" ${ARGN})
+
+        foreach(target ${ARG_TARGETS})
+          SET(VALGRIND_REPORT_FILE${target} "${target}-valgrind.xml")
+          ADD_CUSTOM_COMMAND(OUTPUT "${VALGRIND_REPORT_FILE${target}}"
+                             DEPENDS ${target}
+                             COMMAND ${VALGRIND_EXECUTABLE} ARGS --xml=yes "--xml-file=${VALGRIND_REPORT_FILE${target}}" ${target}
+                             WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+          list(APPEND deptarget "${VALGRIND_REPORT_FILE${target}}")
+        endforeach()
+        ADD_CUSTOM_TARGET(valgrind DEPENDS ${deptarget} VERBATIM)
         
         MESSAGE(STATUS "Generated valgrind target (valgrind).")
     

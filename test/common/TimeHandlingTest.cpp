@@ -11,7 +11,7 @@ class TestTimeHandling : public CppUnit::TestCase
 {
   CPPUNIT_TEST_SUITE(TestTimeHandling);
   CPPUNIT_TEST(targetFrameDuration);
-  CPPUNIT_TEST(frameDurationAlign);
+  //CPPUNIT_TEST(frameDurationAlign);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -36,7 +36,7 @@ protected:
     res = time.GetTargetFrameDuration();
     CPPUNIT_ASSERT(target == res);
   }
-
+/*
   template<class func>
   std::chrono::nanoseconds benchmark_func(func f)
   {
@@ -70,7 +70,7 @@ protected:
     decltype(target) resTar = std::chrono::duration_cast<decltype(target)>(res);
     CPPUNIT_ASSERT(resTar == target);
   }
-
+*/
 private:
 };
 

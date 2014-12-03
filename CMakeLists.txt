@@ -5,7 +5,9 @@ project(Project)
 set(NAME_LIB "common")
 set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
-set(TEST_EXEC "UnitTester")
+set(TEST_EXEC_LIB "UnitTesterLib")
+set(TEST_EXEC_CLIENT "UnitTesterClient")
+set(TEST_EXEC_SERVER "UnitTesterServer")
 
 set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/"
 					  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/"
@@ -151,12 +153,6 @@ set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJEC
 target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
 target_link_libraries(${NAME_SERVER} ${NAME_LIB})
 
-file(
-  GLOB_RECURSE
-  test_files
-  test/*
-)
-
 if (THREADS_FOUND)
   target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
 endif()
@@ -168,14 +164,12 @@ endif()
 
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
-   target_link_libraries (${NAME_SERVER} ${Boost_LIBRARIES})
-   target_link_libraries (${NAME_CLIENT} ${Boost_LIBRARIES})
+   target_link_libraries (${NAME_LIB} ${Boost_LIBRARIES})
 endif()
 
 if (ENET_FOUND)
    include_directories(${ENet_INCLUDE_DIRS})
-   target_link_libraries(${NAME_SERVER} ${ENet_LIBRARIES})
-   target_link_libraries(${NAME_CLIENT} ${ENet_LIBRARIES})
+   target_link_libraries(${NAME_LIB} ${ENet_LIBRARIES})
 endif()
 
 # --- enable unit tests if desired ---
@@ -183,33 +177,91 @@ if(BUILD_TESTS)
   if(NOT CPPUNIT_FOUND)
     MESSAGE(WARNING "CppUnit library can't be found, Unit test won't be compiled")
   else()
-    add_executable(
-    # executable name
-      ${TEST_EXEC}
-    # source files
-     ${test_files}
+    file(
+      GLOB_RECURSE
+      test_files_lib
+      test/common/*
     )
+    
+    file(
+      GLOB_RECURSE
+      test_files_client
+      test/client/*
+    )
+
+    file(
+      GLOB_RECURSE
+      test_files_server
+      test/server/*
+    )
+    
+   # list(REMOVE_ITEM ALL_SRCS ${ui} ${f}.cpp ${f}Driver.cpp)
+    
+    add_executable(
+      ${TEST_EXEC_LIB}
+      ${test_files_lib}
+    )
+    set_property(TARGET ${TEST_EXEC_LIB} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+    
+    set(client_source_files_test ${client_source_files})
+    list(REMOVE_ITEM client_source_files_test "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/main.cpp")
+    add_executable(
+      ${TEST_EXEC_CLIENT}
+      ${test_files_client} ${client_source_files_test}
+      ${client_include_files}
+    )
+
+    set_property(TARGET ${TEST_EXEC_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+    set_property(TARGET ${TEST_EXEC_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc")
+    
+    set(server_source_files_test ${server_source_files})
+    list(REMOVE_ITEM server_source_files_test "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/main.cpp")
+    add_executable(
+      ${TEST_EXEC_SERVER}
+      ${test_files_server} ${server_source_files_test}
+      ${server_include_files}
+    )
+    set_property(TARGET ${TEST_EXEC_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+    set_property(TARGET ${TEST_EXEC_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc")
 
     if(BUILD_TESTS_COVERAGE)
       # --- coverage report ---
-      ENABLE_COVERAGE_REPORT(TARGETS ${TEST_EXEC} TESTS ${test_files})
+      ENABLE_COVERAGE_REPORT(TARGETS ${TEST_EXEC_LIB} ${TEST_EXEC_CLIENT} ${TEST_EXEC_SERVER} TESTS ${test_files})
     endif()
 
     if(VALGRIND_CHECK)
       # --- Valgrind --- #
-      GENERATE_VALGRIND(BIN "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}")
+      GENERATE_VALGRIND(TARGETS "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC_LIB}" "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC_CLIENT}" "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC_SERVER}")
     endif()
 
     set(TEST_REPORT_FILE "cpptestresults.xml")
     # Execute ${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC} binary to execute tests
-    ADD_CUSTOM_COMMAND(OUTPUT ${TEST_REPORT_FILE}
-                           DEPENDS ${TEST_EXEC}
-                           COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC}" ARGS "--xml-file=${TEST_REPORT_FILE}"
+    ADD_CUSTOM_COMMAND(OUTPUT "${TEST_EXEC_LIB}-${TEST_REPORT_FILE}"
+                           DEPENDS ${TEST_EXEC_LIB}
+                           COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC_LIB}" ARGS "--xml-file=${TEST_EXEC_LIB}-${TEST_REPORT_FILE}"
                            WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    ADD_CUSTOM_TARGET(launchtest DEPENDS ${TEST_REPORT_FILE})
+    ADD_CUSTOM_COMMAND(OUTPUT "${TEST_EXEC_CLIENT}-${TEST_REPORT_FILE}"
+                           DEPENDS ${TEST_EXEC_CLIENT}
+                           COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC_CLIENT}" ARGS "--xml-file=${TEST_EXEC_CLIENT}-${TEST_REPORT_FILE}"
+                           WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    ADD_CUSTOM_COMMAND(OUTPUT "${TEST_EXEC_SERVER}-${TEST_REPORT_FILE}"
+                           DEPENDS ${TEST_EXEC_SERVER}
+                           COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXEC_SERVER}" ARGS "--xml-file=${TEST_EXEC_SERVER}-${TEST_REPORT_FILE}"
+                           WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    ADD_CUSTOM_TARGET(launchtest DEPENDS "${TEST_EXEC_LIB}-${TEST_REPORT_FILE}" "${TEST_EXEC_CLIENT}-${TEST_REPORT_FILE}" "${TEST_EXEC_SERVER}-${TEST_REPORT_FILE}")
 
     include_directories(${CPPUNIT_INCLUDE_DIRS})
-    target_link_libraries (${TEST_EXEC} ${CPPUNIT_LIBRARY} ${NAME_LIB})
+    target_link_libraries(${TEST_EXEC_SERVER} ${CPPUNIT_LIBRARY} ${NAME_LIB})
+    target_link_libraries(${TEST_EXEC_CLIENT} ${CPPUNIT_LIBRARY} ${NAME_LIB})
+    target_link_libraries(${TEST_EXEC_LIB} ${CPPUNIT_LIBRARY} ${NAME_LIB})
+    
+    target_link_libraries(${TEST_EXEC_CLIENT} ${NAME_LIB})
+    target_link_libraries(${TEST_EXEC_SERVER} ${NAME_LIB})
+
+    if (SFML_FOUND)
+      include_directories(${SFML_INCLUDE_DIR})
+      target_link_libraries (${TEST_EXEC_CLIENT} ${SFML_LIBRARIES})
+    endif()
 
   endif()
 endif()
