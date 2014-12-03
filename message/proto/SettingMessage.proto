@@ -1,3 +1,6 @@
 message SettingMessage {
-  optional int32 gameFPS = 1;
+  repeated group SettingEntry = 1{
+    required string key = 2;
+    required string value = 3;
+  }
 }

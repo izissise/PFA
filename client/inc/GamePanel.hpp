@@ -8,6 +8,7 @@
 #include "Panel.hpp"
 #include "Widget.hpp"
 #include "World.hpp"
+#include "ClientProtocol.hpp"
 
 #define ITERATIONS 5
 #define MHEIGHT 300

@@ -13,7 +13,7 @@ Client::~Client()
 
 void Client::sendPacket(enet_uint8 chan, const std::string &packet) const
 {
-  ENetPacket *message = enet_packet_create(packet.c_str(), packet.size() + 1, ENET_PACKET_FLAG_RELIABLE);
+  ENetPacket *message = enet_packet_create(packet.c_str(), packet.size(), ENET_PACKET_FLAG_RELIABLE);
   if (message == NULL || enet_peer_send(_peer, chan, message) != 0)
     throw (NetworkException("Cannot send the message"));
 }

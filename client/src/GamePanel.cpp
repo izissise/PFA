@@ -155,6 +155,7 @@ int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings
 int		GamePanel::updateNetwork()
 {
   ENetEvent	event;
+  ClientProtocol proto;
 
   try
     {
@@ -171,7 +172,7 @@ int		GamePanel::updateNetwork()
 		  event.packet->data,
 		  event.peer->data,
 		  event.channelID);
-	  std::cout << &(((unsigned char *)event.packet->data)[4])  << std::endl;
+      proto.parseCmd(event.packet->data, event.packet->dataLength);
 	  enet_packet_destroy (event.packet);
 	  break;
 	default:
