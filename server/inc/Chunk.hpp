@@ -73,6 +73,7 @@ public:
   static const int	biomeMixDist = (width * LINELENGHT) / LOD;
 
   Chunk(void);
+  Chunk(int xId, int yId);
   virtual ~Chunk(void);
 
   Chunk(const Chunk& other) = delete;

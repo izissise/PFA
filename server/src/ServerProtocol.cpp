@@ -8,12 +8,11 @@ ServerProtocol::ServerProtocol()
 
 ServerProtocol::~ServerProtocol()
 {
-  
 }
 
-void  ServerProtocol::parseCmd(const void *data, int size)
+void	ServerProtocol::parseCmd(const void *data, int size)
 {
-	ProtocolMessage          tmp;
+  ProtocolMessage          tmp;
 
   if (tmp.ParseFromString(std::string((char *)data, size)))
   {
@@ -22,14 +21,13 @@ void  ServerProtocol::parseCmd(const void *data, int size)
     if (_func.find(act) != _func.end())
       (this->*_func[act])();
   }
-	else
-		std::cerr << "Cannot DeSerialize Data" << std::endl;
+  else
+    std::cerr << "Cannot DeSerialize Data" << std::endl;
 }
 
 void  ServerProtocol::handleConnection()
 {
   std::cout << "CONNECTION" << std::endl;
-  
 }
 
 void  ServerProtocol::handleLogin()

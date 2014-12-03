@@ -171,6 +171,7 @@ int		GamePanel::updateNetwork()
 		  event.packet->data,
 		  event.peer->data,
 		  event.channelID);
+	  std::cout << &(((unsigned char *)event.packet->data)[4])  << std::endl;
 	  enet_packet_destroy (event.packet);
 	  break;
 	default:

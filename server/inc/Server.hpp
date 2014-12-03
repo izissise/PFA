@@ -43,7 +43,7 @@ private:
 
 private:
   t_arg			_arg;
-  ServerSettings _set;
+  ServerSettings	_set;
   ENetAddress		_address;
   ENetHost*		_server;
   World			_world;

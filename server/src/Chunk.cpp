@@ -22,6 +22,15 @@ Chunk::Chunk(void) :
 {
 }
 
+Chunk::Chunk(int xId, int yId) :
+  _tiles(width * height, TileType::Empty),
+  _bgTiles(width * height, TileType::Empty),
+  _chunkMap(width * height, 0),
+  _loaded(false),
+  _pos(xId, yId)
+{
+}
+
 Chunk::~Chunk(void)
 {
 }
@@ -31,10 +40,12 @@ void Chunk::load(int xId, int yId)
   _pos = {xId, yId};
   _generate();
   _loaded = true;
+
+  _tiles.shrink_to_fit();
+  _bgTiles.shrink_to_fit();
+
   _chunkMap.clear();
   _line.clear();
-  _tiles.clear();
-  _bgTiles.clear();
 }
 
 void		Chunk::_constructBranch(Vector2f pos, Vector2f dir,

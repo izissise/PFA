@@ -1,7 +1,7 @@
 #ifndef _SERVERSETTINGS_HPP_
 # define _SERVERSETTINGS_HPP_
 
-# include "Cvar.hpp"
+# include "ACvar.hpp"
 # include "Exception.hpp"
 # include "Observer.hpp"
 # include "ISerialize.hpp"
@@ -11,7 +11,7 @@ typedef struct  s_event
   std::string   change;
 }               t_event;
 
-class ServerSettings : public CvarList, public Observable, public ISerialize
+class ServerSettings : public ACvar, public Observable, public ISerialize
 {
 public:
   ServerSettings();
