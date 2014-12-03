@@ -12,8 +12,6 @@ World::World(Settings& settings) :
   chunkId	first;
   chunkId	last;
 
-  noise::setSeed(std::stoi(cvarList.getCvar("s_seed")));
-  noise::initPerm();
   _screenSize =	{std::stoi(cvarList.getCvar("r_width")),
 		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_sToWPos(_screenSize, true));
