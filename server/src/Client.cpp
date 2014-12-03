@@ -22,3 +22,8 @@ const ENetPeer *Client::getPeer() const
 {
   return (_peer);
 }
+
+ClientEntity	&Client::getEntity()
+{
+  return _entity;
+}

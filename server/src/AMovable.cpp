@@ -17,9 +17,14 @@ void	AMovable::move(AMovable::Direction dir)
     _pos.x += ((dir == Right) ? 1 : -1);
 }
 
-const Vector2i	&AMovable::getPosition() const
+const Vector2f	&AMovable::getPosition() const
 {
   return _pos;
+}
+
+const Vector2i	&AMovable::getChunkId() const
+{
+  return _chunkId;
 }
 
 AMovable::Direction	AMovable::getDirection() const

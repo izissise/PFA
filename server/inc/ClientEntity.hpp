@@ -8,6 +8,7 @@ class ClientEntity : public AMovable
 public:
   ClientEntity();
   virtual ~ClientEntity();
+
 };
 
 #endif /* _CLIENTENTITY_H_ */

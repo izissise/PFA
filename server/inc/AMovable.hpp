@@ -19,11 +19,13 @@ public:
   virtual ~AMovable();
 
   void			move(Direction dir);
-  const Vector2i	&getPosition() const;
+  const Vector2f	&getPosition() const;
+  const Vector2i	&getChunkId() const;
   Direction		getDirection() const;
 
 private:
-  Vector2i	_pos;
+  Vector2f	_pos;
+  Vector2i	_chunkId;
   Direction	_dir;
 };
 

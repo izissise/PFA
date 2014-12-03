@@ -3,6 +3,6 @@
 
 #include <complex>
 
-float	pointDist(int dx, int dy);
+float	pointDist(unsigned int dx, unsigned int dy);
 
 #endif /* _FASTMATH_H_ */
