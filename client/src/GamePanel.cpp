@@ -165,16 +165,13 @@ int		GamePanel::updateNetwork()
       switch (event.type)
 	{
 	case ENET_EVENT_TYPE_CONNECT:
-	  event.peer->data = (char *)("Server");
+	  connectClient(event.peer);
 	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
-	  printf ("A packet of length %lu containing %s was received from %s on channel %u.\n",
-		  event.packet->dataLength,
-		  event.packet->data,
-		  event.peer->data,
-		  event.channelID);
-      _proto.parseCmd(event.packet->data, event.packet->dataLength);
-	  enet_packet_destroy (event.packet);
+	  handlePackets(event);
+	  break;
+	case ENET_EVENT_TYPE_DISCONNECT:
+	  disconnectClient(event.peer);
 	  break;
 	default:
 	  break;
@@ -185,6 +182,28 @@ int		GamePanel::updateNetwork()
       std::cerr << e.what() << std::endl;
     }
   return 0;
+}
+
+void	GamePanel::handlePackets(ENetEvent &event)
+{
+  printf ("A packet of length %lu containing %s was received from %s on channel %u.\n",
+	  event.packet->dataLength,
+	  event.packet->data,
+	  event.peer->data,
+	  event.channelID);
+  _proto.parseCmd(event.packet->data, event.packet->dataLength);
+  enet_packet_destroy(event.packet);
+}
+
+void	GamePanel::connectClient(ENetPeer * const peer)
+{
+  peer->data = (char *)("Server");
+}
+
+void	GamePanel::disconnectClient(ENetPeer * const peer)
+{
+  std::cout << "Disconnect Peer" << std::endl;
+  setHide(true);
 }
 
 int		GamePanel::update(const sf::Event &event,

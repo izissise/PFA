@@ -36,7 +36,12 @@ private:
   void		fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
   void		drawHud(sf::RenderWindow &window, bool toWin);
   int		updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+
   int		updateNetwork();
+  void		handlePackets(ENetEvent &event);
+  void		connectClient(ENetPeer * const peer);
+  void		disconnectClient(ENetPeer * const peer);
+
 
   int		_pad;
   int		_padup;
