@@ -28,8 +28,11 @@ public:
   void			update(void);
   void			draw(sf::RenderWindow& window) const;
 
-  void			translateCam(const sf::Vector2<float>& v);
-  void			moveCam(const sf::Vector2<float>& pos);
+  void			moveCam(const Vector2f &dir);
+  void			fillChunkData(const Vector2i &pos,
+				      const std::vector<TileType> &fgTiles,
+				      const std::vector<TileType> &bgTiles);
+
 
 protected:
 private:
@@ -76,6 +79,7 @@ private:
 			   const chunkId& cursor,
 			   screenPos& windowCoord) const;
   void		_loadChunks(void);
+
 private:
   std::map<chunkId, std::unique_ptr<Chunk>>	_chunks;
   Settings&	_settings;

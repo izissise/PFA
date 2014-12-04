@@ -26,6 +26,8 @@ public:
   Chunk&	operator=(const Chunk& other) = delete;
 
   void load(int x, int y, const TileCodex& codex);
+  void fillTiles(const std::vector<TileType> &fgTiles,
+		 const std::vector<TileType> &bgTiles);
   void draw(sf::RenderWindow& window,
 	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;

@@ -18,39 +18,44 @@ World::World(Settings& settings) :
   _camera.move({0.5f, 0.5f});
 
   _calculateVisibleRange();
-  Range2i bufferRange =
+  _loadedRange =
     {
-      {_visibleRange.left() - 1, _visibleRange.bottom() - 1},
+      {_visibleRange.left(), _visibleRange.bottom() - 1},
       {_visibleRange.right() + 1, _visibleRange.top() + 1}
     };
-  for (auto cursor : bufferRange) {
+  for (auto cursor : _loadedRange) {
     _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
-    _chunks[cursor]->load(cursor.x, cursor.y, _codex);
   }
-  _loadedRange = bufferRange;
 }
 
-void World::update(void)
+void   	World::fillChunkData(const Vector2i &pos,
+			     const std::vector<TileType> &fgTiles,
+			     const std::vector<TileType> &bgTiles)
 {
-  static std::pair<Action, Vector2f> moveControls[] =
+  _loadChunks();
+
+  auto	chunk = _chunks.find(pos);
+  if (chunk == _chunks.end())
     {
-      {Action::Forward, {.0f, .055f}},
-      {Action::Left, {-.055f, .0f}},
-      {Action::Back, {.0f, -.055f}},
-      {Action::Right, {.055f, .0f}}
-    };
-
-  for (auto control : moveControls) {
-    if (_settings.getControls().getActionState(control.first)) {
-      _camera.translate(control.second);
+      std::cout << "Must do smth special" << std::endl;
+      return ;
     }
-  }
-  Range2i oldRange = _visibleRange;
+  (chunk->second)->fillTiles(fgTiles, bgTiles);
+}
 
+void		World::moveCam(const Vector2f &dir)
+{
+  Range2i	oldRange = _visibleRange;
+
+  _camera.translate(dir);
   _calculateVisibleRange();
   if (_visibleRange != oldRange) {
     _loadChunks();
   }
+}
+
+void	World::update()
+{
 }
 
 auto World::_getScreenOrigin(void) const -> screenPos

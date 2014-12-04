@@ -34,6 +34,13 @@ void Chunk::load(int xId, int yId, const TileCodex& codex)
   _bgTiles.clear();
 }
 
+void	Chunk::fillTiles(const std::vector<TileType> &fgTiles,
+			 const std::vector<TileType> &bgTiles)
+{
+  _tiles = fgTiles;
+  _bgTiles = bgTiles;
+}
+
 void Chunk::_generateVBO(const TileCodex& codex)
 {
   unsigned i;
