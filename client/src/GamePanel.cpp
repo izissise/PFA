@@ -18,7 +18,7 @@ GamePanel::~GamePanel()
 }
 
 void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSED,
-			     const std::vector<APanelScreen *> &panels UNUSED)
+			     const std::vector<APanelScreen *> &panels)
 {
   Controls	&controls = set.getControls();
   float	gWidth = std::stof(set.getCvarList().getCvar("r_width"));
@@ -37,6 +37,7 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
   Widget	*wFourth = new Widget("sound4", {panZone.left, panZone.top + 228, panZone.width, 60},
 				      sf::Text("4.", _font["default"], 22));
 
+  addObserver(panels[0]);
   createButton(texture, wHeader);
   createVoiceButton(texture, wFirst, controls, sf::Keyboard::Num1);
   createVoiceButton(texture, wSecond, controls, sf::Keyboard::Num2);
@@ -204,6 +205,7 @@ void	GamePanel::disconnectClient(ENetPeer * const peer)
 {
   std::cout << "Disconnect Peer" << std::endl;
   setHide(true);
+  notify(t_event(wEvent::Hide | wEvent::Toggle));
 }
 
 int		GamePanel::update(const sf::Event &event,

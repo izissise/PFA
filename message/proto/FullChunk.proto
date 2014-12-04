@@ -1,0 +1,11 @@
+import "Vectors.proto";
+
+message  ChunkData {
+  required vectorInt  id = 1;
+  repeated uint32 bgTiles = 2 [packed=true];
+  repeated uint32 fgTiles = 3 [packed=true];
+}
+
+message FullChunk {
+  repeated ChunkData chunkData = 1;
+}
