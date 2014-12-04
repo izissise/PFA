@@ -13,8 +13,17 @@ public:
   World(ServerSettings &cvars);
   ~World() = default;
 
-  void		loadChunk(const std::vector<Client *> &clients, int x, int y);
+  Chunk		*loadChunk(const std::vector<Client *> &clients, int x, int y);
+  inline Chunk	*loadChunk(const std::vector<Client *> &clients,
+			   const Vector2i &pos) { return loadChunk(clients, pos.x, pos.y); }
+
   Chunk		*getChunk(int x, int y) const;
+  inline Chunk	*getChunk(const Vector2i &pos) const { return getChunk(pos.x, pos.y); }
+  bool		isChunkLoaded(const Vector2i &pos) const;
+  bool		isChunkLoaded(int x, int y) const { return isChunkLoaded({x, y}); }
+
+
+  std::string	serialize(std::initializer_list<const Vector2i * const> chunkIds);
 
 public:
   static const float	chunkDist;

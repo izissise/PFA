@@ -1,5 +1,6 @@
 import "PlayerMessage.proto";
 import "SettingMessage.proto";
+import "FullChunk.proto";
 
 message ProtocolMessage {
   enum Action
@@ -13,4 +14,5 @@ message ProtocolMessage {
   required Action action = 1;
   optional SettingMessage settings = 2;
   optional PlayerMessage player = 3;
+  optional FullChunk fullChunk = 4;
 }

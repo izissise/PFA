@@ -12,13 +12,14 @@ World::World(ServerSettings &cvars) :
   noise::initPerm();
 }
 
-void	World::loadChunk(const std::vector<Client *> &clients, int x, int y)
+Chunk	*World::loadChunk(const std::vector<Client *> &clients, int x, int y)
 {
   Chunk	*chunk = new Chunk;
 
   chunk->load(x, y);
   _loadedChunks.push_back(chunk);
   removeUnusedChunks(clients);
+  return chunk;
 }
 
 Chunk	*World::getChunk(int x, int y) const
@@ -102,3 +103,27 @@ unsigned int	World::removeUnusedChunks(const std::vector<Client *> &clients)
   return counter;
 }
 
+bool	World::isChunkLoaded(const Vector2i &pos) const
+{
+  auto it = std::find_if(_loadedChunks.begin(), _loadedChunks.end(),
+			 [pos](Chunk *chunk)
+			 {
+			   return (chunk->getPosition() == pos);
+			 });
+  return (it != _loadedChunks.end());
+}
+
+std::string		World::serialize(std::initializer_list<const Vector2i * const> chunkIds)
+{
+  ProtocolMessage	msg;
+  std::string		serialized;
+  Chunk			*chunk;
+  FullChunk		*fullChunk = new FullChunk();
+
+  for (auto chunkId : chunkIds)
+    {
+      if ((chunk = getChunk(*chunkId)) != nullptr)
+	1;
+    }
+  return serialized;
+}
