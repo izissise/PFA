@@ -12,12 +12,13 @@ World::World(ServerSettings &cvars) :
   noise::initPerm();
 }
 
-void	World::loadChunk(int x, int y)
+void	World::loadChunk(const std::vector<Client *> &clients, int x, int y)
 {
   Chunk	*chunk = new Chunk;
 
   chunk->load(x, y);
   _loadedChunks.push_back(chunk);
+  removeUnusedChunks(clients);
 }
 
 Chunk	*World::getChunk(int x, int y) const
@@ -62,8 +63,9 @@ float	World::getClosestPlayer(const std::vector<Client *> &clients,
   float		closest = -1.f;
   ClientEntity	clEnt;
 
-  x += Chunk::width;
-  y += Chunk::height;
+  // Going up makes the Y indice increment
+  x += Chunk::width / 2;
+  y -= Chunk::height / 2;
   for (const auto cl : clients)
     {
       clEnt = cl->getEntity();
@@ -71,7 +73,7 @@ float	World::getClosestPlayer(const std::vector<Client *> &clients,
       chunkId = clEnt.getChunkId();
       chunkId.x *= Chunk::width;
       chunkId.y *= Chunk::height;
-      pos += Vector2f(chunkId);
+      pos = Vector2f(chunkId.x + pos.x, chunkId.y - pos.y);
       distance = pointDist(std::abs(pos.x - x), std::abs(pos.y - y));
       if (closest == -1 || distance < closest)
 	closest = distance;
@@ -99,3 +101,4 @@ unsigned int	World::removeUnusedChunks(const std::vector<Client *> &clients)
 				     }), _loadedChunks.end());
   return counter;
 }
+

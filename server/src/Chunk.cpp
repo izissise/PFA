@@ -41,11 +41,11 @@ void Chunk::load(int xId, int yId)
   _generate();
   _loaded = true;
 
-  _tiles.shrink_to_fit();
-  _bgTiles.shrink_to_fit();
-
   _chunkMap.clear();
   _line.clear();
+
+  _tiles.shrink_to_fit();
+  _bgTiles.shrink_to_fit();
 }
 
 void		Chunk::_constructBranch(Vector2f pos, Vector2f dir,

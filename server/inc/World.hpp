@@ -13,7 +13,7 @@ public:
   World(ServerSettings &cvars);
   ~World() = default;
 
-  void		loadChunk(int x, int y);
+  void		loadChunk(const std::vector<Client *> &clients, int x, int y);
   Chunk		*getChunk(int x, int y) const;
 
 public:
