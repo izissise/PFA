@@ -6,7 +6,7 @@
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
   _oldY(SHEIGHT), _dir(true), _world(nullptr),
-  _socket()
+  _socket(), _proto()
 {
   addFont("default", "../client/assets/default.TTF");
   setHide(true);
@@ -53,6 +53,8 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
   addPanels({pSound});
   _world.reset(new World{set});
   resizeWidgets({gWidth, gHeight});
+  _proto.setSetting(&set);
+  _proto.setWorld(_world);
 }
 
 void	GamePanel::createButton(const sf::Texture &texture, Widget *w)
@@ -155,7 +157,6 @@ int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings
 int		GamePanel::updateNetwork()
 {
   ENetEvent	event;
-  ClientProtocol proto;
 
   try
     {
@@ -172,7 +173,7 @@ int		GamePanel::updateNetwork()
 		  event.packet->data,
 		  event.peer->data,
 		  event.channelID);
-      proto.parseCmd(event.packet->data, event.packet->dataLength);
+      _proto.parseCmd(event.packet->data, event.packet->dataLength);
 	  enet_packet_destroy (event.packet);
 	  break;
 	default:

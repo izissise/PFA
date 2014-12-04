@@ -42,8 +42,9 @@ private:
   int		_padup;
   int		_oldY;
   bool		_dir;
-  std::unique_ptr<World>	_world;
+  std::shared_ptr<World>	_world;
   Network      	_socket;
+  ClientProtocol _proto;
 };
 
 #endif /* _GAMEPANEL_H_ */

@@ -29,8 +29,16 @@ std::string	ServerSettings::serialize()
   for (auto it : _cvars)
   {
     SettingMessage::SettingEntry  *entry = set->add_settingentry();
+    SettingMessage::SettingEntry::Cvar *cvar = new SettingMessage::SettingEntry::Cvar();
+    
     entry->set_allocated_key(new std::string(it.first));
-    entry->set_allocated_value(new std::string(it.second->value));
+    cvar->set_allocated_default_(new std::string(it.second->restrictValue[0]));
+    cvar->set_allocated_min(new std::string(it.second->restrictValue[1]));
+    cvar->set_allocated_max(new std::string(it.second->restrictValue[2]));
+    cvar->set_allocated_value(new std::string(it.second->value));
+    cvar->set_type(it.second->type);
+    
+    entry->set_allocated_cvar(cvar);
   }
 
   msg.set_action(ProtocolMessage::SETTING);
