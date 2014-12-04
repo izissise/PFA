@@ -28,11 +28,12 @@ public:
   void			update(void);
   void			draw(sf::RenderWindow& window) const;
 
-  void			moveCam(const Vector2f &dir);
+  void			movePlayer(const Vector2f &dir);
+  void			setPlayerPosition(const Vector2f &position);
   void			fillChunkData(const Vector2i &pos,
 				      const std::vector<TileType> &fgTiles,
 				      const std::vector<TileType> &bgTiles);
-
+  void			forceChunkReloading();
 
 protected:
 private:

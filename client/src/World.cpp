@@ -16,7 +16,18 @@ World::World(Settings& settings) :
 		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_sToWPos(_screenSize, true));
   _camera.move({0.5f, 0.5f});
+  _visibleRange = {Vector2i(0,0),
+		   Vector2i(0,0)};
+  _loadedRange =
+    {
+      {_visibleRange.left(), _visibleRange.bottom() - 1},
+      {_visibleRange.right() + 1, _visibleRange.top() + 1}
+    };
+}
 
+void	World::setPlayerPosition(const Vector2f &position)
+{
+  _camera.move(position);
   _calculateVisibleRange();
   _loadedRange =
     {
@@ -32,8 +43,6 @@ void   	World::fillChunkData(const Vector2i &pos,
 			     const std::vector<TileType> &fgTiles,
 			     const std::vector<TileType> &bgTiles)
 {
-  _loadChunks();
-
   auto	chunk = _chunks.find(pos);
   if (chunk == _chunks.end())
     {
@@ -43,7 +52,7 @@ void   	World::fillChunkData(const Vector2i &pos,
   (chunk->second)->fillTiles(fgTiles, bgTiles);
 }
 
-void		World::moveCam(const Vector2f &dir)
+void		World::movePlayer(const Vector2f &dir)
 {
   Range2i	oldRange = _visibleRange;
 
@@ -52,6 +61,11 @@ void		World::moveCam(const Vector2f &dir)
   if (_visibleRange != oldRange) {
     _loadChunks();
   }
+}
+
+void	World::forceChunkReloading()
+{
+  _loadChunks();
 }
 
 void	World::update()
