@@ -23,6 +23,9 @@ public:
   const Vector2i	&getChunkId() const;
   Direction		getDirection() const;
 
+  void			setPosition(const Vector2f &position);
+  void			setChunkId(const Vector2i chunkId);
+
 private:
   Vector2f	_pos;
   Vector2i	_chunkId;

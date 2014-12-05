@@ -31,3 +31,13 @@ AMovable::Direction	AMovable::getDirection() const
 {
   return _dir;
 }
+
+void	AMovable::setPosition(const Vector2f &position)
+{
+  _pos = position;
+}
+
+void	AMovable::setChunkId(const Vector2i chunkId)
+{
+  _chunkId = chunkId;
+}
