@@ -113,17 +113,42 @@ bool	World::isChunkLoaded(const Vector2i &pos) const
   return (it != _loadedChunks.end());
 }
 
-std::string		World::serialize(std::initializer_list<const Vector2i * const> chunkIds)
+std::string		World::serialize(const std::vector<Vector2i> &chunkIds)
 {
   ProtocolMessage	msg;
+  FullChunk		*fullChunk = new FullChunk;
+  ChunkData		*chunkData;
+  VectorInt		*vecInt;
   std::string		serialized;
   Chunk			*chunk;
-  FullChunk		*fullChunk = new FullChunk();
+  unsigned int		x;
+  unsigned int		y;
 
   for (auto chunkId : chunkIds)
     {
-      if ((chunk = getChunk(*chunkId)) != nullptr)
-	1;
+      chunkData = fullChunk->add_chunkdata();
+
+      if (chunkData == nullptr || (vecInt = new VectorInt) == nullptr)
+	continue ;
+      if ((chunk = getChunk(chunkId)) != nullptr)
+	{
+	  for (y = 0; y < Chunk::height; ++y)
+	    {
+	      for (x = 0; x < Chunk::width; ++x)
+		{
+		  chunkData->add_bgtiles(static_cast<unsigned int>(chunk->getBgTile(x, y)));
+		  chunkData->add_fgtiles(static_cast<unsigned int>(chunk->getTile(x, y)));
+		}
+	    }
+	}
+      else
+	continue ;
+      vecInt->set_x(chunkId.x);
+      vecInt->set_y(chunkId.y);
+      chunkData->set_allocated_id(vecInt);
     }
+  msg.set_action(ProtocolMessage::CHUNK);
+  msg.set_allocated_fullchunk(fullChunk);
+  msg.SerializeToString(&serialized);
   return serialized;
 }

@@ -30,9 +30,9 @@ public:
 
   void			movePlayer(const Vector2f &dir);
   void			setPlayerPosition(const Vector2f &position);
-  void			fillChunkData(const Vector2i &pos,
-				      const std::vector<TileType> &fgTiles,
-				      const std::vector<TileType> &bgTiles);
+  void			fillChunkData(const VectorInt &pos,
+				      const RepeatedField<uint32> &bgTiles,
+				      const RepeatedField<uint32> &fgTiles);
   void			forceChunkReloading();
 
 protected:

@@ -84,7 +84,18 @@ void		Server::connectClient(ENetPeer * const peer)
 	    << peer->address.port << std::endl;
   peer->data = newClient;
   _clients.push_back(newClient);
+
   newClient->sendPacket(0, _set.serialize());
+  std::vector<Vector2i> chunks;
+  for (int y = -1; y <= 1; ++y)
+    {
+      for (int x = -1; x <= 1; ++x)
+	{
+	  _world.loadChunk(_clients, x, y);
+	  chunks.push_back({x, y});
+	}
+    }
+  newClient->sendPacket(0, _world.serialize(chunks));
 }
 
 void	Server::disconnectClient(ENetPeer * const peer)

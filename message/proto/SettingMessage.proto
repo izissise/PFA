@@ -1,5 +1,6 @@
 message SettingMessage {
-  repeated group SettingEntry = 1{
+  repeated group SettingEntry = 1
+  {
 
     required string key = 2;
 

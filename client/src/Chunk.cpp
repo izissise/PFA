@@ -34,11 +34,20 @@ void Chunk::load(int xId, int yId, const TileCodex& codex)
   _bgTiles.clear();
 }
 
-void	Chunk::fillTiles(const std::vector<TileType> &fgTiles,
-			 const std::vector<TileType> &bgTiles)
+void	Chunk::fillTiles(const RepeatedField<uint32> &bgTiles,
+			 const RepeatedField<uint32> &fgTiles)
 {
-  _tiles = fgTiles;
-  _bgTiles = bgTiles;
+  unsigned int x;
+  unsigned int y;
+  unsigned int index;
+
+  for (y = 0; y < Chunk::height; ++y)
+    for (x = 0; x < Chunk::width; ++x)
+      {
+	index = y * Chunk::width + x;
+	_bgTiles.push_back(static_cast<TileType>(bgTiles.Get(index)));
+	_tiles.push_back(static_cast<TileType>(fgTiles.Get(index)));
+      }
 }
 
 void Chunk::_generateVBO(const TileCodex& codex)

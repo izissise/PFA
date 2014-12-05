@@ -39,11 +39,11 @@ void	World::setPlayerPosition(const Vector2f &position)
   }
 }
 
-void   	World::fillChunkData(const Vector2i &pos,
-			     const std::vector<TileType> &fgTiles,
-			     const std::vector<TileType> &bgTiles)
+void   	World::fillChunkData(const VectorInt &pos,
+			     const RepeatedField<uint32> &bgTiles,
+			     const RepeatedField<uint32> &fgTiles)
 {
-  auto	chunk = _chunks.find(pos);
+  auto	chunk = _chunks.find(Vector2i(pos.x(), pos.y()));
   if (chunk == _chunks.end())
     {
       std::cout << "Must do smth special" << std::endl;

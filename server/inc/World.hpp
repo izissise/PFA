@@ -7,7 +7,7 @@
 #include "Chunk.hpp"
 #include "Vector2.hpp"
 
-class World
+class World : public ISerialize
 {
 public:
   World(ServerSettings &cvars);
@@ -23,7 +23,8 @@ public:
   bool		isChunkLoaded(int x, int y) const { return isChunkLoaded({x, y}); }
 
 
-  std::string	serialize(std::initializer_list<const Vector2i * const> chunkIds);
+  std::string	serialize() { return std::string(); };
+  std::string	serialize(const std::vector<Vector2i> &chunkIds);
 
 public:
   static const float	chunkDist;

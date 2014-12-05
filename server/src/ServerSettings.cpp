@@ -22,9 +22,9 @@ void	ServerSettings::setCvar(const std::string &name, const std::string &value)
 
 std::string	ServerSettings::serialize()
 {
-  ProtocolMessage  msg;
-  std::string ret;
-  SettingMessage *set = new SettingMessage();
+  ProtocolMessage	msg;
+  std::string		ret;
+  SettingMessage	*set = new SettingMessage();
 
   for (auto it : _cvars)
   {

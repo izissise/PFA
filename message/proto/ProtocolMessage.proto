@@ -9,7 +9,7 @@ message ProtocolMessage {
     CONNECTION = 1;
     LOGIN = 2;
     SETTING = 3;
-    CHUNCK = 4;
+    CHUNK = 4;
   }
   required Action action = 1;
   optional SettingMessage settings = 2;

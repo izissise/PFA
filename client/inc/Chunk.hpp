@@ -12,6 +12,9 @@
 # include "TileCodex.hpp"
 # include "TileType.hpp"
 # include "Vector2.hpp"
+# include "ProtocolMessage.pb.h"
+
+using namespace google::protobuf;
 
 class Chunk
 {
@@ -26,8 +29,8 @@ public:
   Chunk&	operator=(const Chunk& other) = delete;
 
   void load(int x, int y, const TileCodex& codex);
-  void fillTiles(const std::vector<TileType> &fgTiles,
-		 const std::vector<TileType> &bgTiles);
+  void fillTiles(const RepeatedField<uint32> &bgTiles,
+		 const RepeatedField<uint32> &fgTiles);
   void draw(sf::RenderWindow& window,
 	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;
