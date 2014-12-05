@@ -28,7 +28,7 @@ public:
   Chunk(const Chunk& other) = delete;
   Chunk&	operator=(const Chunk& other) = delete;
 
-  void load(int x, int y, const TileCodex& codex);
+  void load(const TileCodex& codex);
   void fillTiles(const RepeatedField<uint32> &bgTiles,
 		 const RepeatedField<uint32> &fgTiles);
   void draw(sf::RenderWindow& window,

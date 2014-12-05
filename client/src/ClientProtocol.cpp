@@ -25,12 +25,12 @@ void  ClientProtocol::parseCmd(const void *data, int size)
   ProtocolMessage          packet;
 
   if (packet.ParseFromString(std::string((char *)data, size)))
-  {
-    ProtocolMessage::Action  act = packet.action();
+    {
+      ProtocolMessage::Action  act = packet.action();
 
-    if (_func.find(act) != _func.end())
-      (this->*_func[act])(packet);
-  }
+      if (_func.find(act) != _func.end())
+	(this->*_func[act])(packet);
+    }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;
 }

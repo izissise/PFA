@@ -21,7 +21,7 @@ World::World(Settings& settings) :
 void	World::load()
 {
   for (auto &cursor : _loadedRange)
-    _chunks[cursor]->load(cursor.x, cursor.y, _codex);
+    _chunks[cursor]->load(_codex);
   _loaded = true;
 }
 
@@ -34,9 +34,11 @@ void	World::setPlayerPosition(const Vector2f &position)
       {_visibleRange.left() - 1, _visibleRange.bottom() - 1},
       {_visibleRange.right() + 1, _visibleRange.top() + 1}
     };
-  for (auto &cursor : _loadedRange) {
-    _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
-  }
+  for (auto &cursor : _loadedRange)
+    {
+      _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
+      _chunks[cursor]->setPosition({cursor.x, cursor.y});
+    }
 }
 
 void   	World::fillChunkData(const VectorInt &pos,
@@ -167,7 +169,7 @@ void World::_loadChunks(void)
   for (auto cursor : added) {
     if (_chunks.find(cursor) == _chunks.end()) {
       _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk()));
-      _chunks[cursor]->load(cursor.x, cursor.y, _codex);
+      _chunks[cursor]->load(_codex);
     }
   }
   for (auto cursor : removed) {
