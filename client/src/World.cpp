@@ -51,7 +51,7 @@ void   	World::fillChunkData(const VectorInt &pos,
       std::cout << "Could not find Chunks at pos y: " << pos.y() << " x: " << pos.x() << std::endl;
       return ;
     }
-  (chunk->second)->fillTiles(fgTiles, bgTiles);
+  (chunk->second)->fillTiles(bgTiles, fgTiles);
 }
 
 void		World::movePlayer(const Vector2f &dir)

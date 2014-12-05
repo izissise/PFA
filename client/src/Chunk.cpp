@@ -44,9 +44,6 @@ void	Chunk::fillTiles(const RepeatedField<uint32> &bgTiles,
     for (x = 0; x < Chunk::width; ++x)
       {
 	index = y * Chunk::width + x;
-	std::cout << "ChunkId: " << _pos.y << " " << _pos.x
-		  << " pos: " << y << " " << x
-		  << " tile: " << static_cast<int>(fgTiles.Get(index)) << std::endl;
 	_bgTiles.push_back(static_cast<TileType>(bgTiles.Get(index)));
 	_tiles.push_back(static_cast<TileType>(fgTiles.Get(index)));
       }
