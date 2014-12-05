@@ -77,5 +77,5 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
 
       _world->fillChunkData(chunkId, bgTiles, fgTiles);
     }
-  _world->forceChunkReloading();
+  _world->load();
 }

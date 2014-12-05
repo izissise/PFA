@@ -27,13 +27,13 @@ public:
 
   void			update(void);
   void			draw(sf::RenderWindow& window) const;
+  void			load();
 
   void			movePlayer(const Vector2f &dir);
   void			setPlayerPosition(const Vector2f &position);
   void			fillChunkData(const VectorInt &pos,
 				      const RepeatedField<uint32> &bgTiles,
 				      const RepeatedField<uint32> &fgTiles);
-  void			forceChunkReloading();
 
 protected:
 private:
@@ -89,6 +89,7 @@ private:
   Camera	_camera;
   Range2i	_loadedRange;
   Range2i	_visibleRange;
+  bool		_loaded;
 };
 
 #endif /* WORLD_H */

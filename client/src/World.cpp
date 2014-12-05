@@ -6,7 +6,8 @@
 #include "Perlin.h"
 
 World::World(Settings& settings) :
-  _settings(settings)
+  _settings(settings),
+  _loaded(false)
 {
   CvarList	&cvarList = _settings.getCvarList();
   chunkId	first;
@@ -15,14 +16,13 @@ World::World(Settings& settings) :
   _screenSize =	{std::stoi(cvarList.getCvar("r_width")),
 		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_sToWPos(_screenSize, true));
-  _camera.move({0.5f, 0.5f});
-  _visibleRange = {Vector2i(0,0),
-  		   Vector2i(0,0)};
-  _loadedRange =
-    {
-      {_visibleRange.left(), _visibleRange.bottom() - 1},
-      {_visibleRange.right() + 1, _visibleRange.top() + 1}
-    };
+}
+
+void	World::load()
+{
+  for (auto &cursor : _loadedRange)
+    _chunks[cursor]->load(cursor.x, cursor.y, _codex);
+  _loaded = true;
 }
 
 void	World::setPlayerPosition(const Vector2f &position)
@@ -34,7 +34,7 @@ void	World::setPlayerPosition(const Vector2f &position)
       {_visibleRange.left(), _visibleRange.bottom() - 1},
       {_visibleRange.right() + 1, _visibleRange.top() + 1}
     };
-  for (auto cursor : _loadedRange) {
+  for (auto &cursor : _loadedRange) {
     _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
   }
 }
@@ -63,11 +63,6 @@ void		World::movePlayer(const Vector2f &dir)
   }
 }
 
-void	World::forceChunkReloading()
-{
-  _loadChunks();
-}
-
 void	World::update()
 {
 }
@@ -81,13 +76,15 @@ auto World::_getScreenOrigin(void) const -> screenPos
   return _wToSPos(worldOrigin, true);
 }
 
-void World::draw(sf::RenderWindow& window) const
+void	World::draw(sf::RenderWindow& window) const
 {
   screenPos	screenOrigin = _getScreenOrigin();
   screenPos	screenCoord = screenOrigin;
   auto&		range = _visibleRange;
   int		x;
 
+  if (!_loaded)
+    return ;
   for (int y = range.top(); y >= range.bottom(); --y) {
     for (x = range.left(); x <= range.right(); ++x) {
       _drawChunk(window, {x, y}, screenCoord);
