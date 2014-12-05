@@ -17,7 +17,7 @@ World::World(Settings& settings) :
   _camera.resize(_sToWPos(_screenSize, true));
   _camera.move({0.5f, 0.5f});
   _visibleRange = {Vector2i(0,0),
-		   Vector2i(0,0)};
+  		   Vector2i(0,0)};
   _loadedRange =
     {
       {_visibleRange.left(), _visibleRange.bottom() - 1},
@@ -31,8 +31,8 @@ void	World::setPlayerPosition(const Vector2f &position)
   _calculateVisibleRange();
   _loadedRange =
     {
-      {_visibleRange.left(), _visibleRange.bottom() - 1},
-      {_visibleRange.right() + 1, _visibleRange.top() + 1}
+      {_visibleRange.left(), _visibleRange.bottom() - 1.f},
+      {_visibleRange.right() + 1.f, _visibleRange.top() + 1.f}
     };
   for (auto cursor : _loadedRange) {
     _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
@@ -46,7 +46,7 @@ void   	World::fillChunkData(const VectorInt &pos,
   auto	chunk = _chunks.find(Vector2i(pos.x(), pos.y()));
   if (chunk == _chunks.end())
     {
-      std::cout << "Must do smth special" << std::endl;
+      std::cout << "Could not find Chunks at pos y: " << pos.y() << " x: " << pos.x() << std::endl;
       return ;
     }
   (chunk->second)->fillTiles(fgTiles, bgTiles);
