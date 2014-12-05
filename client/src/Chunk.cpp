@@ -44,8 +44,8 @@ void	Chunk::fillTiles(const RepeatedField<uint32> &bgTiles,
     for (x = 0; x < Chunk::width; ++x)
       {
 	index = y * Chunk::width + x;
-	_bgTiles.push_back(static_cast<TileType>(bgTiles.Get(index)));
-	_tiles.push_back(static_cast<TileType>(fgTiles.Get(index)));
+	_bgTiles[index] = static_cast<TileType>(bgTiles.Get(index));
+	_tiles[index] = static_cast<TileType>(fgTiles.Get(index));
       }
 }
 
@@ -58,7 +58,6 @@ void Chunk::_generateVBO(const TileCodex& codex)
       {_bgTiles, _bgVertices},
       {_tiles,   _fgVertices}
     };
-
   for (auto layer : layers)
     {
       i = 0;
