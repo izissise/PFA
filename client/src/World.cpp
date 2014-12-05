@@ -31,7 +31,7 @@ void	World::setPlayerPosition(const Vector2f &position)
   _calculateVisibleRange();
   _loadedRange =
     {
-      {_visibleRange.left(), _visibleRange.bottom() - 1},
+      {_visibleRange.left() - 1, _visibleRange.bottom() - 1},
       {_visibleRange.right() + 1, _visibleRange.top() + 1}
     };
   for (auto &cursor : _loadedRange) {
