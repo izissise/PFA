@@ -38,6 +38,11 @@ enum class	Action
     Last
     };
 
+inline Action	operator++(Action &x)
+{
+  return (x = static_cast<Action>(static_cast<int>(x) + 1));
+}
+
 enum class	actionType
 {
   Default = 0,

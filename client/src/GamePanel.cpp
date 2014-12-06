@@ -6,7 +6,9 @@
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
   _oldY(SHEIGHT), _dir(true), _world(nullptr),
-  _socket(), _proto()
+  _socket(), _proto(),
+  _oldActionState(static_cast<int>(Action::Last), false),
+  _diffState(static_cast<int>(Action::Last), Action::Unknown)
 {
   addFont("default", "../client/assets/default.TTF");
   setHide(true);
@@ -208,6 +210,40 @@ void	GamePanel::disconnectClient(ENetPeer * const peer)
   notify(t_event(wEvent::Hide | wEvent::Toggle));
 }
 
+unsigned int	GamePanel::getInputChanges(Settings &set)
+{
+  Controls	&ctrl = set.getControls();
+  bool		cuState;
+  int		idx;
+  unsigned int	changes = 0;
+
+  std::fill(_diffState.begin(), _diffState.end(), Action::Unknown);
+  for (Action act = Action::Forward; act < Action::Last; ++act)
+    {
+      cuState = ctrl.getActionState(act);
+      idx = static_cast<int>(act);
+      if (cuState != _oldActionState[idx])
+	{
+	  _oldActionState[idx] = cuState;
+	  _diffState[changes++] = act;
+	}
+    }
+  return changes;
+}
+
+void		GamePanel::sendInputs(Settings &set)
+{
+  Controls	&ctrl = set.getControls();
+
+  for (unsigned int x = 0; _diffState[x] != Action::Unknown; ++x)
+    {
+      bool state = ctrl.getActionState(_diffState[x]);
+
+      std::cout << ctrl.getCodeFromAction(_diffState[x]) << " "
+		<< ((state == true) ? "On" : "Off") << std::endl;
+    }
+}
+
 int		GamePanel::update(const sf::Event &event,
 				  sf::RenderWindow &ref,
 				  Settings &set)
@@ -215,6 +251,8 @@ int		GamePanel::update(const sf::Event &event,
   int		retVal;
 
   updateNetwork();
+  if (getInputChanges(set))
+    sendInputs(set);
   retVal = updateHud(event, ref, set);
   _world->update();
   return retVal;

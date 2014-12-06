@@ -42,14 +42,18 @@ private:
   void		connectClient(ENetPeer * const peer);
   void		disconnectClient(ENetPeer * const peer);
 
+  unsigned int	getInputChanges(Settings &set);
+  void		sendInputs(Settings &set);
 
   int		_pad;
   int		_padup;
   int		_oldY;
   bool		_dir;
   std::shared_ptr<World>	_world;
-  Network      	_socket;
-  ClientProtocol _proto;
+  Network		_socket;
+  ClientProtocol	_proto;
+  std::vector<bool>	_oldActionState;
+  std::vector<Action>	_diffState;
 };
 
 #endif /* _GAMEPANEL_H_ */
