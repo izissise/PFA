@@ -1,8 +1,6 @@
 #ifndef _GAMEPANEL_H_
 #define _GAMEPANEL_H_
 
-#include <enet/enet.h>
-
 #include "Network.hpp"
 #include "NetworkException.hpp"
 #include "Panel.hpp"
@@ -42,7 +40,6 @@ private:
   void		handlePackets(ENetEvent &event);
   void		connectClient(ENetPeer * const peer);
   void		disconnectClient(ENetPeer * const peer);
-  void		sendSerializedObj(const std::string &str) const;
 
   int		_pad;
   int		_padup;

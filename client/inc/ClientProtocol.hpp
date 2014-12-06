@@ -2,6 +2,7 @@
 # define _CLIENTPROTOCOL_HPP_
 
 # include <iostream>
+
 # include "World.hpp"
 # include "Settings.hpp"
 # include "ProtocolMessage.pb.h"

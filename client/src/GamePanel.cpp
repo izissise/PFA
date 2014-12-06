@@ -208,10 +208,6 @@ void	GamePanel::disconnectClient(ENetPeer * const peer)
   notify(t_event(wEvent::Hide | wEvent::Toggle));
 }
 
-void	GamePanel::sendSerializedObj(const std::string &str) const
-{
-}
-
 int		GamePanel::update(const sf::Event &event,
 				  sf::RenderWindow &ref,
 				  Settings &set)
@@ -223,7 +219,7 @@ int		GamePanel::update(const sf::Event &event,
   if (_actAnalyzer.getInputChanges(set))
     {
       serialized = _actAnalyzer.serialize();
-      sendSerializedObj(serialized);
+      _socket.sendPacket(1, serialized);
     }
   retVal = updateHud(event, ref, set);
   _world->update();
