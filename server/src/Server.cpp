@@ -2,7 +2,8 @@
 #include "CvarParser.hpp"
 
 Server::Server(t_arg &arg)
-  : _arg(arg), _set(), _world(_set), _clients()
+  : _arg(arg), _set(),
+    _world(_set), _proto(_world), _clients()
 {
   if (enet_initialize() != 0)
     throw (NetworkException("An error occurred while initializing ENet."));
@@ -29,7 +30,6 @@ Server::~Server()
 void Server::run()
 {
   ENetEvent       event;
-  ServerProtocol  proto;
 
   std::cout << "Actual port => " << _arg.port << std::endl;
   std::cout << "Quiet => " << _arg.quiet << std::endl;
@@ -43,7 +43,7 @@ void Server::run()
 	  connectClient(event.peer);
 	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
-	  handlePackets(proto, event);
+	  handlePackets(event);
 	  break;
 	case ENET_EVENT_TYPE_DISCONNECT:
 	  disconnectClient(event.peer);
@@ -53,8 +53,7 @@ void Server::run()
     }
 }
 
-void	Server::handlePackets(ServerProtocol &proto,
-			      ENetEvent &event)
+void	Server::handlePackets(ENetEvent &event)
 {
   ENetPeer	*peer = event.peer;
   Client	*client = static_cast<Client *>(peer->data);
@@ -71,7 +70,7 @@ void	Server::handlePackets(ServerProtocol &proto,
 	    << peer->connectID
 	    << " on channel "
 	    << (int)event.channelID << std::endl;
-  proto.parseCmd(packet->data, packet->dataLength);
+  _proto.parseCmd(packet->data, packet->dataLength, peer, _clients);
   enet_packet_destroy(packet);
 }
 
@@ -86,7 +85,6 @@ void		Server::connectClient(ENetPeer * const peer)
   newClient->getEntity().setPosition({128, 128});
   newClient->getEntity().setChunkId({0, 0});
   _clients.push_back(newClient);
-
   newClient->sendPacket(0, _set.serialize());
   std::vector<Vector2i> chunks;
   for (int y = -1; y <= 1; ++y)

@@ -2,15 +2,12 @@
 # define Server_H_
 
 # include <enet/enet.h>
-# include <vector>
 # include <algorithm>
 # include <iostream>
 # include "NetworkException.hpp"
-# include "Client.hpp"
 # include "Observer.hpp"
 # include "ServerSettings.hpp"
 # include "ServerProtocol.hpp"
-# include "World.hpp"
 
 #define DEFAULT_PORT 6060
 
@@ -36,8 +33,7 @@ public:
   virtual void	trigger(const t_event &event);
 
 private:
-  void	handlePackets(ServerProtocol &proto,
-		      ENetEvent &event);
+  void	handlePackets(ENetEvent &event);
   void	connectClient(ENetPeer * const peer);
   void	disconnectClient(ENetPeer * const peer);
 
@@ -47,6 +43,7 @@ private:
   ENetAddress		_address;
   ENetHost*		_server;
   World			_world;
+  ServerProtocol	_proto;
   std::vector<Client *>	_clients;
 };
 
