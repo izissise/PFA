@@ -9,14 +9,16 @@ class ServerProtocol
 public:
   ServerProtocol();
   ~ServerProtocol();
-  
-	void  parseCmd(const void *data, int size);
+
+  void  parseCmd(const void *data, int size);
 
 private:
-  void  handleConnection();
-  void  handleLogin();
-  
-  std::map<ProtocolMessage::Action, void (ServerProtocol::*)()> _func;
+  typedef void (ServerProtocol::*parseFunc)(ProtocolMessage &message);
+  void  handleConnection(ProtocolMessage &message);
+  void  handleLogin(ProtocolMessage &message);
+  void	handleActions(ProtocolMessage &message);
+
+  std::map<ProtocolMessage::PacketContent, parseFunc> _func;
 };
 
 #endif

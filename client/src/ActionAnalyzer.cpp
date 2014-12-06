@@ -34,16 +34,27 @@ unsigned int	ActionAnalyzer::getInputChanges(Settings &set)
   return changes;
 }
 
-std::string	ActionAnalyzer::serialize()
+std::string		ActionAnalyzer::serialize()
 {
-  unsigned int	action = -1;
-  std::string	serialized;
+  ProtocolMessage	msg;
+  ClientActions		*actions = new ClientActions;
+  ClientAction		*action;
+  std::string		serialized;
+  unsigned int		actionId = -1;
 
   for (auto state : _diffState)
     {
-      ++action;
+      ++actionId;
       if (state == -1)
 	continue ;
+      action = actions->add_actions();
+      if (action == nullptr)
+	continue;
+      action->set_name(actionId);
+      action->set_state(state);
     }
+  msg.set_content(ProtocolMessage::ACTION);
+  msg.set_allocated_actions(actions);
+  msg.SerializeToString(&serialized);
   return serialized;
 }

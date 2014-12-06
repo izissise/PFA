@@ -24,7 +24,7 @@ private:
   void  handleSetting(const ProtocolMessage &packet);
   void	fillChunk(const ProtocolMessage &packet);
 
-  std::map<ProtocolMessage::Action, func>	_func;
+  std::map<ProtocolMessage::PacketContent, func>	_func;
   std::shared_ptr<World>	_world;
   Settings			*_set;
 };

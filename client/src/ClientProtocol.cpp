@@ -26,7 +26,7 @@ void  ClientProtocol::parseCmd(const void *data, int size)
 
   if (packet.ParseFromString(std::string((char *)data, size)))
     {
-      ProtocolMessage::Action  act = packet.action();
+      ProtocolMessage::PacketContent  act = packet.content();
 
       if (_func.find(act) != _func.end())
 	(this->*_func[act])(packet);

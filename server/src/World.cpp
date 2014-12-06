@@ -147,7 +147,7 @@ std::string		World::serialize(const std::vector<Vector2i> &chunkIds)
       vecInt->set_y(chunkId.y);
       chunkData->set_allocated_id(vecInt);
     }
-  msg.set_action(ProtocolMessage::CHUNK);
+  msg.set_content(ProtocolMessage::CHUNK);
   msg.set_allocated_fullchunk(fullChunk);
   msg.SerializeToString(&serialized);
   return serialized;

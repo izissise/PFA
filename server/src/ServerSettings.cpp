@@ -40,7 +40,7 @@ std::string	ServerSettings::serialize()
 
     entry->set_allocated_cvar(cvar);
   }
-  msg.set_action(ProtocolMessage::SETTING);
+  msg.set_content(ProtocolMessage::SETTING);
   msg.set_allocated_settings(set);
   msg.SerializeToString(&ret);
   return (ret);
