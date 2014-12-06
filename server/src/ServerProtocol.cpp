@@ -1,6 +1,7 @@
 #include "ServerProtocol.hpp"
 
-ServerProtocol::ServerProtocol()
+ServerProtocol::ServerProtocol(World &world) :
+  _world(world)
 {
   _func[ProtocolMessage::CONNECTION] = &ServerProtocol::handleConnection;
   _func[ProtocolMessage::LOGIN] = &ServerProtocol::handleLogin;
@@ -11,7 +12,9 @@ ServerProtocol::~ServerProtocol()
 {
 }
 
-void	ServerProtocol::parseCmd(const void *data, int size)
+void	ServerProtocol::parseCmd(const void *data, int size,
+				 const ENetPeer *peer,
+				 const std::vector<Client *> &clients)
 {
   ProtocolMessage          tmp;
 
@@ -19,26 +22,42 @@ void	ServerProtocol::parseCmd(const void *data, int size)
   {
     ProtocolMessage::PacketContent  act = tmp.content();
 
-    if (_func.find(act) != _func.end())
-      (this->*_func[act])(tmp);
+    auto it = _func.find(act);
+
+    if (it != _func.end())
+      (this->*(it->second))(tmp, peer, clients);
   }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;
 }
 
-void  ServerProtocol::handleConnection(ProtocolMessage &message)
+void  ServerProtocol::handleConnection(ProtocolMessage &message,
+				       const ENetPeer *peer,
+				       const std::vector<Client *> &clients)
 {
   std::cout << "CONNECTION" << std::endl;
 }
 
-void  ServerProtocol::handleLogin(ProtocolMessage &message)
+void  ServerProtocol::handleLogin(ProtocolMessage &message,
+				  const ENetPeer *peer,
+				  const std::vector<Client *> &clients)
+
 {
   std::cout << "LOGIN" << std::endl;
 }
 
-void	ServerProtocol::handleActions(ProtocolMessage &message)
+void	ServerProtocol::handleActions(ProtocolMessage &message,
+				      const ENetPeer *peer,
+				      const std::vector<Client *> &clients)
 {
-  const ClientActions	&actions = message.actions();
+  const ClientActions	&clientActions = message.actions();
+  unsigned int		nbActions = clientActions.actions_size();
+  unsigned int		actionId;
 
+  for (unsigned int i = 0; i < nbActions; ++i)
+    {
+      const ClientAction	&clAction = clientActions.actions(i);
 
+      std::cout << clAction.name() << " " << clAction.state() << std::endl;
+    }
 }

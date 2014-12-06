@@ -51,7 +51,7 @@ std::string		ActionAnalyzer::serialize()
       if (action == nullptr)
 	continue;
       action->set_name(actionId);
-      action->set_state(state);
+      action->set_state(static_cast<bool>(state));
     }
   msg.set_content(ProtocolMessage::ACTION);
   msg.set_allocated_actions(actions);
