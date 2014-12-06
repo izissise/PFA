@@ -127,7 +127,7 @@ configure_file (
 
 if(PROTOBUF_FOUND)
 
-  execute_process(	COMMAND protoc --proto_path "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/proto" --cpp_out "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp" ${proto_files} )
+  execute_process( COMMAND protoc --proto_path "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/proto" --cpp_out "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp" ${proto_files} )
 
   file(
   GLOB_RECURSE
@@ -135,13 +135,17 @@ if(PROTOBUF_FOUND)
   ${PROTO_DIR}/cpp/*.cc
   )
 
+  foreach(source_file ${PROTO_SRCS})
+    set_source_files_properties(${source_file} PROPERTIES COMPILE_FLAGS -Wno-shadow)
+  endforeach(source_file)
+
   file(
   GLOB_RECURSE
   PROTO_HDRS
   ${PROTO_DIR}/cpp/*.h
   )
 
-  include_directories("${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp")
+  include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp/")
 
 endif()
 
