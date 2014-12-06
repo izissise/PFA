@@ -9,6 +9,7 @@
 #include "Widget.hpp"
 #include "World.hpp"
 #include "ClientProtocol.hpp"
+#include "ActionAnalyzer.hpp"
 
 #define ITERATIONS 5
 #define MHEIGHT 300
@@ -41,9 +42,7 @@ private:
   void		handlePackets(ENetEvent &event);
   void		connectClient(ENetPeer * const peer);
   void		disconnectClient(ENetPeer * const peer);
-
-  unsigned int	getInputChanges(Settings &set);
-  void		sendInputs(Settings &set);
+  void		sendSerializedObj(const std::string &str) const;
 
   int		_pad;
   int		_padup;
@@ -52,8 +51,7 @@ private:
   std::shared_ptr<World>	_world;
   Network		_socket;
   ClientProtocol	_proto;
-  std::vector<bool>	_oldActionState;
-  std::vector<Action>	_diffState;
+  ActionAnalyzer	_actAnalyzer;
 };
 
 #endif /* _GAMEPANEL_H_ */
