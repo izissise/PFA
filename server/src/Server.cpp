@@ -59,8 +59,6 @@ void	Server::handlePackets(ENetEvent &event)
   Client	*client = static_cast<Client *>(peer->data);
   ENetPacket	*packet = event.packet;
 
-  for (auto it : _clients)
-    it->sendPacket(0, std::string(reinterpret_cast<char *>(packet->data)));
   std::cout << "A packet of length "
 	    << packet->dataLength << " containing ["
 	    << packet->data

@@ -16,16 +16,15 @@ void	ServerProtocol::parseCmd(const void *data, int size,
 				 const ENetPeer *peer,
 				 const std::vector<Client *> &clients)
 {
-  ProtocolMessage          tmp;
+  ProtocolMessage          packet;
 
-  if (tmp.ParseFromString(std::string((char *)data, size)))
+  if (packet.ParseFromString(std::string((char *)data, size)))
   {
-    ProtocolMessage::PacketContent  act = tmp.content();
-
+    ProtocolMessage::PacketContent  act = packet.content();
     auto it = _func.find(act);
 
     if (it != _func.end())
-      (this->*(it->second))(tmp, peer, clients);
+      (this->*(it->second))(packet, peer, clients);
   }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;

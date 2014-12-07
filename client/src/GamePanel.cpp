@@ -213,13 +213,11 @@ int		GamePanel::update(const sf::Event &event,
 				  Settings &set)
 {
   int		retVal;
-  std::string	serialized;
 
   updateNetwork();
   if (_actAnalyzer.getInputChanges(set))
     {
-      serialized = _actAnalyzer.serialize();
-      _socket.sendPacket(1, serialized);
+      _socket.sendPacket(1, _actAnalyzer.serialize());
     }
   retVal = updateHud(event, ref, set);
   _world->update();
