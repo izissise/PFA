@@ -126,12 +126,12 @@ std::string		World::serialize(const std::vector<Vector2i> &chunkIds)
 
   for (auto chunkId : chunkIds)
     {
-      chunkData = fullChunk->add_chunkdata();
-
-      if (chunkData == nullptr || (vecInt = new VectorInt) == nullptr)
-	continue ;
       if ((chunk = getChunk(chunkId)) != nullptr)
 	{
+	  chunkData = fullChunk->add_chunkdata();
+
+	  if (chunkData == nullptr)
+	    continue ;
 	  for (y = 0; y < Chunk::height; ++y)
 	    {
 	      for (x = 0; x < Chunk::width; ++x)
@@ -143,12 +143,69 @@ std::string		World::serialize(const std::vector<Vector2i> &chunkIds)
 	}
       else
 	continue ;
+      vecInt = new VectorInt;
       vecInt->set_x(chunkId.x);
       vecInt->set_y(chunkId.y);
       chunkData->set_allocated_id(vecInt);
     }
   msg.set_content(ProtocolMessage::CHUNK);
   msg.set_allocated_fullchunk(fullChunk);
+  msg.SerializeToString(&serialized);
+  return serialized;
+}
+
+std::string		World::serialize(const std::vector<Vector2i> &chunkIds,
+					 const std::vector<Vector2i> &positions,
+					 const std::vector<Vector2i> &sizes)
+{
+  ProtocolMessage	msg;
+  WorldZone		*worldZone = new WorldZone;
+  ChunkZone		*chunkZone;
+  VectorInt		*id;
+  VectorUint		*position;
+  VectorUint		*size;
+  std::string		serialized;
+
+  Chunk			*chunk;
+  unsigned int		x;
+  unsigned int		y;
+  unsigned int		chunkNb;
+  unsigned int		nbChunks = chunkIds.size();
+
+  for (chunkNb = 0; chunkNb < nbChunks; ++chunkNb)
+    {
+      if ((chunk = getChunk(chunkIds[chunkNb])) != nullptr)
+  	{
+	  chunkZone = worldZone->add_chunkzone();
+
+	  if (chunkZone == nullptr)
+	    continue ;
+  	  for (y = 0; y < Chunk::height; ++y)
+  	    {
+  	      for (x = 0; x < Chunk::width; ++x)
+  		{
+  		  chunkZone->add_fgtiles(static_cast<unsigned int>(chunk->getTile(x, y)));
+  		}
+  	    }
+  	}
+      else
+  	continue ;
+      id = new VectorInt;
+      position = new VectorUint;
+      size = new VectorUint;
+
+      id->set_x(chunkIds[chunkNb].x);
+      id->set_y(chunkIds[chunkNb].y);
+      position->set_x(positions[chunkNb].x);
+      position->set_y(positions[chunkNb].y);
+      size->set_x(sizes[chunkNb].x);
+      size->set_y(sizes[chunkNb].y);
+      chunkZone->set_allocated_id(id);
+      chunkZone->set_allocated_position(position);
+      chunkZone->set_allocated_size(size);
+    }
+  msg.set_content(ProtocolMessage::CHUNKZONE);
+  msg.set_allocated_worldzone(worldZone);
   msg.SerializeToString(&serialized);
   return serialized;
 }

@@ -25,6 +25,9 @@ public:
 
   std::string	serialize() { return std::string(); };
   std::string	serialize(const std::vector<Vector2i> &chunkIds);
+  std::string	serialize(const std::vector<Vector2i> &chunkIds,
+			  const std::vector<Vector2i> &positions,
+			  const std::vector<Vector2i> &sizes);
 
 public:
   static const float	chunkDist;

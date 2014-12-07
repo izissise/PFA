@@ -56,7 +56,5 @@ std::string		ActionAnalyzer::serialize()
   msg.set_content(ProtocolMessage::ACTION);
   msg.set_allocated_actions(actions);
   msg.SerializeToString(&serialized);
-  for (auto it : serialized)
-    std::cout << (int)it << std::endl;
   return serialized;
 }

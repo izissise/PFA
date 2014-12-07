@@ -1,6 +1,7 @@
 import "PlayerMessage.proto";
 import "SettingMessage.proto";
 import "FullChunk.proto";
+import "ChunkZone.proto";
 import "ClientActions.proto";
 
 message ProtocolMessage {
@@ -11,11 +12,13 @@ message ProtocolMessage {
     LOGIN = 2;
     SETTING = 3;
     CHUNK = 4;
-    ACTION = 5;
+    CHUNKZONE = 5;
+    ACTION = 6;
   }
   required PacketContent content = 1;
   optional SettingMessage settings = 2;
   optional PlayerMessage player = 3;
   optional FullChunk fullChunk = 4;
-  optional ClientActions actions = 5;
+  optional WorldZone worldZone = 5;
+  optional ClientActions actions = 6;
 }
