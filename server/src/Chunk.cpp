@@ -73,7 +73,7 @@ void		Chunk::_constructBranch(Vector2f pos, Vector2f dir,
       cuSize = size;
       size /= 1.5;
       dir.y = _scaleNumber(std::rand(), 0, RAND_MAX,
-			   (first) ? 0 : -1000, 1000) / 1000.0;
+			   (first) ? 0 : -1000, 1000) / 1000.f;
       _constructBranch(pos, dir, size, cuSize, thickness - 1 * !first);
       if (!first)
 	{
@@ -91,7 +91,7 @@ void		Chunk::_constructBranches(float x, float y, int size, int thickness)
 
   for (char side = -1; side <= 1; side += 2)
     {
-      ty = static_cast<float>(size) / 3.0;
+      ty = static_cast<float>(size) / 3.f;
       while (ty < size)
       	{
 	  v = std::ceil((ty - static_cast<float>(size) / 3.f)
@@ -265,7 +265,7 @@ void		Chunk::_completeField(void)
 	    _choseBiome(biome, tile, x, y, changeX);
 	  if (y < prev.y || y < next.y)
 	    {
-	      // if (x == Chunk::width / 2.0 && y >= lineY && y - 1 < lineY)
+	      // if (x == Chunk::width / 2.f && y >= lineY && y - 1 < lineY)
 	      // 	_generateTree(x, y);
 	      if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
@@ -559,7 +559,7 @@ bool	Chunk::_getOreRoot(const t_OreInfo &ore, int &x, int &y)
 	return false;
       if (caseNoise >= ore.minNvalue)
 	return true;
-      distance = 2.5 + ((ore.minNvalue - caseNoise) * 10.0) / 1.5;
+      distance = 2.5f + ((ore.minNvalue - caseNoise) * 10.f) / 1.5f;
      if (it == 0) // Full scan needed
        _fullScanPoint(x, y, dirX, dirY, distance);
       else // just test the 2 adjacents cases
@@ -669,7 +669,7 @@ void	Chunk::_generate(void)
 	  for (x = 0; x < Chunk::width; ++x)
 	    {
 	      p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, OFFSET,
-			 (x + offset.x) / 1.0, (y + offset.y) / 1.0);
+			 (x + offset.x) / 1.f, (y + offset.y) / 1.f);
 	      _chunkMap[y * Chunk::width + x] = p;
 	      if (p >= 0.5)
 		{
