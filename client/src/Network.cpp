@@ -42,7 +42,7 @@ void	Network::sendPacket(enet_uint8 chan, const std::string &message)
 {
   if (_host)
     {
-      ENetPacket *packet = enet_packet_create(message.c_str(), message.size() + 1,
+      ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
 					      ENET_PACKET_FLAG_RELIABLE);
       if (packet == nullptr || enet_peer_send(_peer, chan, packet) != 0)
 	throw (NetworkException("Cannot send the message"));
