@@ -204,20 +204,25 @@ if (SFML_FOUND)
 endif()
 
 if (Boost_FOUND)
-   include_directories(${Boost_INCLUDE_DIRS})
-   target_link_libraries (${NAME_SERVER} ${Boost_LIBRARIES})
-   target_link_libraries (${NAME_CLIENT} ${Boost_LIBRARIES})
+  include_directories(${Boost_INCLUDE_DIRS})
+  target_link_libraries (${NAME_SERVER} ${Boost_LIBRARIES})
+  target_link_libraries (${NAME_CLIENT} ${Boost_LIBRARIES})
 endif()
 
 if (ENET_FOUND)
-   include_directories(${ENet_INCLUDE_DIRS})
-   target_link_libraries(${NAME_SERVER} ${ENet_LIBRARIES})
-   target_link_libraries(${NAME_CLIENT} ${ENet_LIBRARIES})
+  include_directories(${ENet_INCLUDE_DIRS})
+  target_link_libraries(${NAME_SERVER} ${ENet_LIBRARIES})
+  target_link_libraries(${NAME_CLIENT} ${ENet_LIBRARIES})
 endif()
 
 if (PROTOBUF_FOUND)
-   include_directories(${PROTOBUF_INCLUDE_DIRS})
-   target_link_libraries(${NAME_LIB} ${PROTOBUF_LIBRARIES})
+  include_directories(${PROTOBUF_INCLUDE_DIRS})
+  target_link_libraries(${NAME_LIB} ${PROTOBUF_LIBRARIES})
+endif()
+
+if (ENTITYX_FOUND)
+  include_directories(${ENTITYX_INCLUDE_DIRS})
+  target_link_libraries(${NAME_LIB} ${ENTITYX_LIBRARIES})
 endif()
 
 # --- enable unit tests if desired ---

@@ -121,7 +121,7 @@ void	GamePanel::trigger(const t_event &event)
 	    {
 	      try
 		{
-		  _socket.connect("127.0.0.1", "6060", 2);
+		  _socket.connect("10.10.253.238", "6060", 2);
 		}
 	      catch (NetworkException &e)
 		{

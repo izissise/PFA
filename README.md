@@ -10,13 +10,13 @@ Look at the Generators section.
 
 cmake . -G"Generator you choose"
 
-For exemple:
+For example:
 
 cmake . -G"Unix Makefiles"
 
 cmake . -G"Unix Makefiles" -DCMAKE_BUILD_TYPE:STRING=Debug
 
-Also, this might usefull:
+Also, this might be useful:
 -DCMAKE_VERBOSE_MAKEFILE=On
 
 
