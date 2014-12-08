@@ -32,16 +32,35 @@ void	ServerProtocol::parseCmd(const void *data, int size,
 
 void  ServerProtocol::handleConnection(ProtocolMessage &message,
 				       Client *client,
-				       const std::vector<Client *> &clients UNUSED)
+				       const std::vector<Client *> &clients)
 {
-  ClientInfo	&clInfo = client->getInfo();
+  ClientInfo			&clInfo = client->getInfo();
+  ClientEntity			&clEnt = client->getEntity();
   const ConnectionMessage	&coInfo = message.co();
   const VectorUint		&screenRes = coInfo.screenres();
 
-  clInfo.setResolution(Vector2u(screenRes.x(), screenRes.y()));
+  Vector2i			chunkPos;
+  std::vector<Vector2i>		chunks;
+  Vector2i			sideSize;
+
   std::cout << "CONNECTION" << std::endl;
-  std::cout << "Res set to " << clInfo.getResolution().x << " x "
-	    << clInfo.getResolution().y << std::endl;
+  clInfo.setResolution(Vector2u(screenRes.x(), screenRes.y()));
+
+  chunkPos = clEnt.getChunkId();
+  // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
+  sideSize.x = (screenRes.x() / (Chunk::width * TileCodex::tileSize) * 2) + 1 + 2;
+  sideSize.y = (screenRes.y() / (Chunk::height * TileCodex::tileSize) * 2) + 1 + 2;
+  for (int y = chunkPos.y - (sideSize.y - 1) / 2;
+       y <= chunkPos.y + (sideSize.y - 1) / 2; ++y)
+    {
+      for (int x = chunkPos.x - (sideSize.x - 1) / 2;
+	   x <= chunkPos.x + (sideSize.x - 1) / 2; ++x)
+	{
+	  _world.loadChunk(clients, x, y);
+	  chunks.push_back({x, y});
+	}
+    }
+  client->sendPacket(0, _world.serialize(chunks));
 }
 
 void  ServerProtocol::handleLogin(ProtocolMessage &message,
