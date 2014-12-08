@@ -5,6 +5,7 @@
 #include <enet/enet.h>
 #include "NetworkException.hpp"
 #include "ClientEntity.hpp"
+#include "ClientInfo.hpp"
 
 class Client
 {
@@ -16,10 +17,12 @@ public:
 
   const ENetPeer	*getPeer() const;
   ClientEntity		&getEntity();
+  ClientInfo		&getInfo();
 
 private:
   ENetPeer	*_peer;
   ClientEntity	_entity;
+  ClientInfo	_info;
 };
 
 #endif

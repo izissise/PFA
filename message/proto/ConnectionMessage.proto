@@ -1,0 +1,6 @@
+import "Vectors.proto";
+
+message ConnectionMessage
+{
+  required VectorUint	screenRes = 1;
+}

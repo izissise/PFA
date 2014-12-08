@@ -27,3 +27,8 @@ ClientEntity	&Client::getEntity()
 {
   return _entity;
 }
+
+ClientInfo	&Client::getInfo()
+{
+  return _info;
+}

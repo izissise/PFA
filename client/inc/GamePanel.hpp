@@ -36,10 +36,12 @@ private:
   void		drawHud(sf::RenderWindow &window, bool toWin);
   int		updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 
-  int		updateNetwork();
+  int		updateNetwork(Settings &set);
   void		handlePackets(ENetEvent &event);
-  void		connectClient(ENetPeer * const peer);
+  void		connectClient(ENetPeer * const peer, Settings &set);
   void		disconnectClient(ENetPeer * const peer);
+
+  void		sendConnectionInfo(Settings &set) const;
 
   int		_pad;
   int		_padup;

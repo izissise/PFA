@@ -6,6 +6,7 @@
 #include "ProtocolMessage.pb.h"
 #include "World.hpp"
 #include "Client.hpp"
+#include "Unused.hpp"
 
 class ServerProtocol
 {
@@ -14,21 +15,21 @@ public:
   ~ServerProtocol();
 
   void  parseCmd(const void *data, int size,
-		 const ENetPeer *peer,
+		 Client *client,
 		 const std::vector<Client *> &clients);
 
 private:
   typedef void (ServerProtocol::*parseFunc)(ProtocolMessage &message,
-					    const ENetPeer *peer,
+					    Client *client,
 					    const std::vector<Client *> &clients);
   void  handleConnection(ProtocolMessage &message,
-			 const ENetPeer *peer,
+			 Client *client,
 			 const std::vector<Client *> &clients);
   void  handleLogin(ProtocolMessage &message,
-		    const ENetPeer *peer,
+		    Client *client,
 		    const std::vector<Client *> &clients);
   void	handleActions(ProtocolMessage &message,
-		      const ENetPeer *peer,
+		      Client *client,
 		      const std::vector<Client *> &clients);
 
   std::map<ProtocolMessage::PacketContent, parseFunc> _func;

@@ -3,6 +3,7 @@ import "SettingMessage.proto";
 import "FullChunk.proto";
 import "ChunkZone.proto";
 import "ClientActions.proto";
+import "ConnectionMessage.proto";
 
 message ProtocolMessage {
   enum PacketContent
@@ -16,9 +17,10 @@ message ProtocolMessage {
     ACTION = 6;
   }
   required PacketContent content = 1;
-  optional SettingMessage settings = 2;
-  optional PlayerMessage player = 3;
-  optional FullChunk fullChunk = 4;
-  optional WorldZone worldZone = 5;
-  optional ClientActions actions = 6;
+  optional ConnectionMessage co = 2;
+  optional SettingMessage settings = 3;
+  optional PlayerMessage player = 4;
+  optional FullChunk fullChunk = 5;
+  optional WorldZone worldZone = 6;
+  optional ClientActions actions = 7;
 }

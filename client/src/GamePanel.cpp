@@ -155,7 +155,7 @@ int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings
   return 0;
 }
 
-int		GamePanel::updateNetwork()
+int		GamePanel::updateNetwork(Settings &set)
 {
   ENetEvent	event;
 
@@ -166,7 +166,7 @@ int		GamePanel::updateNetwork()
       switch (event.type)
 	{
 	case ENET_EVENT_TYPE_CONNECT:
-	  connectClient(event.peer);
+	  connectClient(event.peer, set);
 	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
 	  handlePackets(event);
@@ -196,9 +196,10 @@ void	GamePanel::handlePackets(ENetEvent &event)
   enet_packet_destroy(event.packet);
 }
 
-void	GamePanel::connectClient(ENetPeer * const peer)
+void	GamePanel::connectClient(ENetPeer * const peer, Settings &set)
 {
   peer->data = (char *)("Server");
+  sendConnectionInfo(set);
 }
 
 void	GamePanel::disconnectClient(ENetPeer * const peer)
@@ -208,13 +209,31 @@ void	GamePanel::disconnectClient(ENetPeer * const peer)
   notify(t_event(wEvent::Hide | wEvent::Toggle));
 }
 
+void			GamePanel::sendConnectionInfo(Settings &set) const
+{
+  ProtocolMessage	msg;
+  ConnectionMessage	*co = new ConnectionMessage;
+  VectorUint		*res = new VectorUint;
+  std::string		serialized;
+
+  res->set_x(std::stoi(set.getCvarList().getCvar("r_width")));
+  res->set_y(std::stoi(set.getCvarList().getCvar("r_height")));
+  co->set_allocated_screenres(res);
+
+  msg.set_content(ProtocolMessage::CONNECTION);
+  msg.set_allocated_co(co);
+  msg.SerializeToString(&serialized);
+
+  _socket.sendPacket(1, serialized);
+}
+
 int		GamePanel::update(const sf::Event &event,
 				  sf::RenderWindow &ref,
 				  Settings &set)
 {
   int		retVal;
 
-  updateNetwork();
+  updateNetwork(set);
   if (_actAnalyzer.getInputChanges(set))
     {
       _socket.sendPacket(1, _actAnalyzer.serialize());

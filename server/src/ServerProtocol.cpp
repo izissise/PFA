@@ -13,7 +13,7 @@ ServerProtocol::~ServerProtocol()
 }
 
 void	ServerProtocol::parseCmd(const void *data, int size,
-				 const ENetPeer *peer,
+				 Client *client,
 				 const std::vector<Client *> &clients)
 {
   ProtocolMessage          packet;
@@ -24,21 +24,28 @@ void	ServerProtocol::parseCmd(const void *data, int size,
     auto it = _func.find(act);
 
     if (it != _func.end())
-      (this->*(it->second))(packet, peer, clients);
+      (this->*(it->second))(packet, client, clients);
   }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;
 }
 
 void  ServerProtocol::handleConnection(ProtocolMessage &message,
-				       const ENetPeer *peer,
-				       const std::vector<Client *> &clients)
+				       Client *client,
+				       const std::vector<Client *> &clients UNUSED)
 {
+  ClientInfo	&clInfo = client->getInfo();
+  const ConnectionMessage	&coInfo = message.co();
+  const VectorUint		&screenRes = coInfo.screenres();
+
+  clInfo.setResolution(Vector2u(screenRes.x(), screenRes.y()));
   std::cout << "CONNECTION" << std::endl;
+  std::cout << "Res set to " << clInfo.getResolution().x << " x "
+	    << clInfo.getResolution().y << std::endl;
 }
 
 void  ServerProtocol::handleLogin(ProtocolMessage &message,
-				  const ENetPeer *peer,
+				  Client *client,
 				  const std::vector<Client *> &clients)
 
 {
@@ -46,7 +53,7 @@ void  ServerProtocol::handleLogin(ProtocolMessage &message,
 }
 
 void	ServerProtocol::handleActions(ProtocolMessage &message,
-				      const ENetPeer *peer,
+				      Client *client,
 				      const std::vector<Client *> &clients)
 {
   const ClientActions	&clientActions = message.actions();

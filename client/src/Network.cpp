@@ -38,7 +38,7 @@ void	Network::disconnect()
     enet_host_destroy(_host);
 }
 
-void	Network::sendPacket(enet_uint8 chan, const std::string &message)
+void	Network::sendPacket(enet_uint8 chan, const std::string &message) const
 {
   if (_host)
     {

@@ -68,7 +68,7 @@ void	Server::handlePackets(ENetEvent &event)
 	    << peer->connectID
 	    << " on channel "
 	    << (int)event.channelID << std::endl;
-  _proto.parseCmd(packet->data, packet->dataLength, peer, _clients);
+  _proto.parseCmd(packet->data, packet->dataLength, client, _clients);
   enet_packet_destroy(packet);
 }
 
