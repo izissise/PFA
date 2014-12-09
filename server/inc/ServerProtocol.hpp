@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "ProtocolMessage.pb.h"
+#include "ClientMessage.pb.h"
 #include "World.hpp"
 #include "Client.hpp"
 #include "Unused.hpp"
@@ -19,20 +20,17 @@ public:
 		 const std::vector<Client *> &clients);
 
 private:
-  typedef void (ServerProtocol::*parseFunc)(ProtocolMessage &message,
+  typedef void (ServerProtocol::*parseFunc)(ClientMessage &message,
 					    Client *client,
 					    const std::vector<Client *> &clients);
-  void  handleConnection(ProtocolMessage &message,
+  void  handleConnection(ClientMessage &message,
 			 Client *client,
 			 const std::vector<Client *> &clients);
-  void  handleLogin(ProtocolMessage &message,
-		    Client *client,
-		    const std::vector<Client *> &clients);
-  void	handleActions(ProtocolMessage &message,
+  void	handleActions(ClientMessage &message,
 		      Client *client,
 		      const std::vector<Client *> &clients);
 
-  std::map<ProtocolMessage::PacketContent, parseFunc> _func;
+  std::map<ClientMessage::PacketContent, parseFunc> _func;
   World		&_world;
 };
 

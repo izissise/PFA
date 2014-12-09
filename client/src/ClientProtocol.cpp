@@ -68,7 +68,6 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
   FullChunk	fullChunk = packet.fullchunk();
   unsigned int	nbChunk = fullChunk.chunkdata_size();
 
-  _world->setPlayerPosition({0.5, 0.5});
   for (unsigned int i = 0; i < nbChunk; ++i)
     {
       const ChunkData	&chunk = fullChunk.chunkdata(i);

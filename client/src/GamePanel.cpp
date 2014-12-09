@@ -200,6 +200,31 @@ void	GamePanel::connectClient(ENetPeer * const peer, Settings &set)
 {
   peer->data = (char *)("Server");
   sendConnectionInfo(set);
+
+  // here query the player's position
+  _world->setPlayerPosition({0.5, 0.5});
+
+  // then we could query the chunks
+
+  // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
+
+
+  // Vector2f	position = _world.getPlayerPosition();
+  // sideSize.x =  1 + (std::stoi(set.getCvarList().getCvar("r_width"))
+  // 		     / (Chunk::width * TileCodex::tileSize) * 2) + 2;
+  // sideSize.y = 1 + (std::stoi(set.getCvarList().getCvar("r_height"))
+  // 		    / (Chunk::height * TileCodex::tileSize) * 2) + 2;
+  // for (int y = chunkPos.y - (sideSize.y - 1) / 2;
+  //      y <= chunkPos.y + (sideSize.y - 1) / 2; ++y)
+  //   {
+  //     for (int x = chunkPos.x - (sideSize.x - 1) / 2;
+  // 	   x <= chunkPos.x + (sideSize.x - 1) / 2; ++x)
+  // 	{
+  // 	  _world.loadChunk(clients, x, y);
+  // 	  chunks.push_back({x, y});
+  // 	}
+  //   }
+  // client->sendPacket(0, _world.serialize(chunks));
 }
 
 void	GamePanel::disconnectClient(ENetPeer * const peer)
@@ -209,18 +234,35 @@ void	GamePanel::disconnectClient(ENetPeer * const peer)
   notify(t_event(wEvent::Hide | wEvent::Toggle));
 }
 
-void			GamePanel::sendConnectionInfo(Settings &set) const
+void			GamePanel::queryChunks(const std::vector<Vector2i> &chunkIds) const
 {
-  ProtocolMessage	msg;
-  ConnectionMessage	*co = new ConnectionMessage;
-  VectorUint		*res = new VectorUint;
+  ClientMessage		msg;
+  QueryChunk		*qChunk = new QueryChunk;
+  VectorInt		*id;
   std::string		serialized;
 
-  res->set_x(std::stoi(set.getCvarList().getCvar("r_width")));
-  res->set_y(std::stoi(set.getCvarList().getCvar("r_height")));
-  co->set_allocated_screenres(res);
+  for (auto &chunkId : chunkIds)
+    {
+      id = qChunk->add_id();
+      id->set_x(chunkId.x);
+      id->set_y(chunkId.y);
+    }
+  msg.set_content(ClientMessage::QUERYCHUNK);
+  msg.set_allocated_querychunk(qChunk);
+  msg.SerializeToString(&serialized);
+  _socket.sendPacket(1, serialized);
+}
 
-  msg.set_content(ProtocolMessage::CONNECTION);
+void			GamePanel::sendConnectionInfo(Settings &set) const
+{
+  ClientMessage		msg;
+  ConnectionMessage	*co = new ConnectionMessage;
+  std::string		*userId = new std::string;
+  std::string		serialized;
+
+  *userId = "toto"; //modify
+  co->set_allocated_userid(userId);
+  msg.set_content(ClientMessage::CONNECTION);
   msg.set_allocated_co(co);
   msg.SerializeToString(&serialized);
 

@@ -36,7 +36,7 @@ unsigned int	ActionAnalyzer::getInputChanges(Settings &set)
 
 std::string		ActionAnalyzer::serialize()
 {
-  ProtocolMessage	msg;
+  ClientMessage		msg;
   ClientActions		*actions = new ClientActions;
   ClientAction		*action;
   std::string		serialized;
@@ -53,7 +53,7 @@ std::string		ActionAnalyzer::serialize()
       action->set_name(actionId);
       action->set_state(static_cast<bool>(state));
     }
-  msg.set_content(ProtocolMessage::ACTION);
+  msg.set_content(ClientMessage::ACTION);
   msg.set_allocated_actions(actions);
   msg.SerializeToString(&serialized);
   return serialized;

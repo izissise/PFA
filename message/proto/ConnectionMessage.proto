@@ -1,6 +1,4 @@
-import "Vectors.proto";
-
 message ConnectionMessage
 {
-  required VectorUint	screenRes = 1;
+  required string userId = 1;
 }

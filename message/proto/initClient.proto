@@ -1,0 +1,6 @@
+import "Vectors.proto";
+
+message initClient {
+  required VectorInt	chunkId = 1;
+  required VectorUint 	pos = 2;
+}

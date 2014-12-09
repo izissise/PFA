@@ -31,6 +31,7 @@ public:
 
   void			movePlayer(const Vector2f &dir);
   void			setPlayerPosition(const Vector2f &position);
+  const Vector2f	&getPlayerPosition() const;
   void			fillChunkData(const VectorInt &pos,
 				      const RepeatedField<uint32> &bgTiles,
 				      const RepeatedField<uint32> &fgTiles);

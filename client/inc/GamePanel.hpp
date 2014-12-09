@@ -42,6 +42,7 @@ private:
   void		disconnectClient(ENetPeer * const peer);
 
   void		sendConnectionInfo(Settings &set) const;
+  void		queryChunks(const std::vector<Vector2i> &chunkIds) const;
 
   int		_pad;
   int		_padup;

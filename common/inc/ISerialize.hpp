@@ -2,6 +2,7 @@
 # define _ISERIALIZE_HPP_
 
 # include "ProtocolMessage.pb.h"
+# include "ClientMessage.pb.h"
 
 class ISerialize
 {

@@ -1,25 +1,17 @@
-import "PlayerMessage.proto";
 import "SettingMessage.proto";
 import "FullChunk.proto";
 import "ChunkZone.proto";
-import "ClientActions.proto";
-import "ConnectionMessage.proto";
 
 message ProtocolMessage {
   enum PacketContent
   {
     ANSWER = 0;
-    CONNECTION = 1;
-    SETTING = 2;
-    CHUNK = 3;
-    CHUNKZONE = 4;
-    ACTION = 5;
+    SETTING = 1;
+    CHUNK = 2;
+    CHUNKZONE = 3;
   }
   required PacketContent content = 1;
-  optional ConnectionMessage co = 2;
-  optional SettingMessage settings = 3;
-  optional PlayerMessage player = 4;
-  optional FullChunk fullChunk = 5;
-  optional WorldZone worldZone = 6;
-  optional ClientActions actions = 7;
+  optional SettingMessage settings = 2;
+  optional FullChunk fullChunk = 3;
+  optional WorldZone worldZone = 4;
 }
