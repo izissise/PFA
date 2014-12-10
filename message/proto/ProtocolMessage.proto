@@ -1,4 +1,5 @@
 import "SettingMessage.proto";
+import "InitClient.proto";
 import "FullChunk.proto";
 import "ChunkZone.proto";
 
@@ -7,11 +8,13 @@ message ProtocolMessage {
   {
     ANSWER = 0;
     SETTING = 1;
-    CHUNK = 2;
-    CHUNKZONE = 3;
+    CLINIT = 2;
+    CHUNK = 3;
+    CHUNKZONE = 4;
   }
   required PacketContent content = 1;
   optional SettingMessage settings = 2;
-  optional FullChunk fullChunk = 3;
-  optional WorldZone worldZone = 4;
+  optional InitClient clInit = 3;
+  optional FullChunk fullChunk = 4;
+  optional WorldZone worldZone = 5;
 }

@@ -1,4 +1,6 @@
+#include <fstream>
 #include "ServerProtocol.hpp"
+#include "StringUtils.hpp"
 
 ServerProtocol::ServerProtocol(World &world) :
   _world(world)
@@ -44,7 +46,12 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
 			   return (client != cl && cl->getInfo().getId() == userId);
 			 });
   if (it != clients.end())
-    enet_peer_disconnect(client->getPeer(), 0);
+    {
+      enet_peer_disconnect(client->getPeer(), 0);
+      return ;
+    }
+  loadClientProfile(client, userId);
+  sendClientProfile(client);
   std::cout << "CONNECTION, UserId: " << userId <<  std::endl;
 }
 
@@ -62,4 +69,72 @@ void	ServerProtocol::handleActions(ClientMessage &message,
 
       std::cout << clAction.name() << " " << clAction.state() << std::endl;
     }
+}
+
+void	ServerProtocol::spawnClient(Client *client)
+{
+  ClientEntity	&clEnt = client->getEntity();
+
+  std::cout << "New client -> Spawn init" << std::endl;
+  //easy placement
+  clEnt.setChunkId({0,0});
+  clEnt.setPosition({0,0});
+}
+
+void	ServerProtocol::loadClientProfile(Client *client, const std::string &userId)
+{
+  std::fstream			file;
+  StringUtils			utils;
+  std::vector<std::string>	clientInfo;
+  std::vector<std::string>	vec;
+  ClientEntity			&clEnt = client->getEntity();
+  const std::string		&clId = client->getInfo().getId();
+
+  file.open(LOGFILE, std::ios::binary | std::ios::in);
+  if (!file) // Can be the first client joining
+    {
+      std::cout << "File doesnt exist yet" << std::endl;
+      spawnClient(client);
+      return ;
+    }
+  for (std::string line; getline(file, line);)
+    {
+      if (line.find(clId) != std::string::npos)
+	{
+	  std::cout << "Found in database -> load client's data" << std::endl;
+	  utils.split(line, ';', clientInfo);
+	  utils.split(clientInfo.at(1), ' ', vec);
+	  clEnt.setChunkId({std::stoi(vec.at(0)), std::stoi(vec.at(1))});
+	  vec.clear();
+	  utils.split(clientInfo.at(2), ' ', vec);
+	  clEnt.setPosition({std::stof(vec.at(0)), std::stof(vec.at(1))});
+	  file.close();
+	  return ;
+	}
+    }
+  file.close();
+  spawnClient(client);
+}
+
+void	ServerProtocol::sendClientProfile(Client *client)
+{
+  ProtocolMessage	msg;
+  InitClient		*initInfo = new InitClient;
+  VectorInt		*chunkId = new VectorInt;
+  VectorUint		*clPos = new VectorUint;
+  ClientEntity		&clEnt = client->getEntity();
+  std::string		serialized;
+
+  chunkId->set_x(clEnt.getChunkId().x);
+  chunkId->set_y(clEnt.getChunkId().y);
+  initInfo->set_allocated_chunkid(chunkId);
+
+  clPos->set_x(clEnt.getPosition().x);
+  clPos->set_y(clEnt.getPosition().y);
+  initInfo->set_allocated_pos(clPos);
+
+  msg.set_content(ProtocolMessage::CLINIT);
+  msg.set_allocated_clinit(initInfo);
+  msg.SerializeToString(&serialized);
+  client->sendPacket(0, serialized);
 }

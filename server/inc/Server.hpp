@@ -10,7 +10,6 @@
 # include "ServerProtocol.hpp"
 
 #define DEFAULT_PORT 6060
-#define LOGFILE "../log/ClientInfo.txt"
 
 typedef struct  s_arg
 {

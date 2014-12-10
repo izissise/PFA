@@ -1,6 +1,6 @@
 import "Vectors.proto";
 
-message initClient {
+message InitClient {
   required VectorInt	chunkId = 1;
   required VectorUint 	pos = 2;
 }

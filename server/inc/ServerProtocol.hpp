@@ -9,6 +9,8 @@
 #include "Client.hpp"
 #include "Unused.hpp"
 
+#define LOGFILE "../log/ClientInfo.txt"
+
 class ServerProtocol
 {
 public:
@@ -29,6 +31,10 @@ private:
   void	handleActions(ClientMessage &message,
 		      Client *client,
 		      const std::vector<Client *> &clients);
+
+  void	loadClientProfile(Client *client, const std::string &userId);
+  void	spawnClient(Client *Client);
+  void	sendClientProfile(Client *client);
 
   std::map<ClientMessage::PacketContent, parseFunc> _func;
   World		&_world;

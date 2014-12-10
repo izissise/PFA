@@ -114,13 +114,13 @@ void	Server::saveClientId(Client *client)
   unsigned int		foundId = 0;
   bool			found = false;
 
-  file.open(LOGFILE, std::fstream::binary | std::fstream::in | std::fstream::out);
-  printv(newLine, "%,% %,% %",
+  file.open(LOGFILE, std::ios::binary | std::ios::in | std::ios::out);
+  printv(newLine, "%;% %;% %",
 	  clId, chunkId.x, chunkId.y,
 	  position.x, position.y);
   if (!file)
     {
-      file.open(LOGFILE, std::fstream::binary | std::fstream::out);
+      file.open(LOGFILE, std::ios::binary | std::ios::out);
       if (!file)
 	throw std::invalid_argument(std::string(LOGFILE) + ": File not found");
       file << newLine.str() << std::endl;
@@ -141,6 +141,7 @@ void	Server::saveClientId(Client *client)
     content.push_back(newLine.str());
   for (auto &s : content)
     file << s << std::endl;
+  std::cout << "write to file" << std::endl;
   file.close();
 }
 
