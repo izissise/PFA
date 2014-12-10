@@ -10,6 +10,7 @@
 # include "ServerProtocol.hpp"
 
 #define DEFAULT_PORT 6060
+#define LOGFILE "../log/ClientInfo.txt"
 
 typedef struct  s_arg
 {
@@ -36,6 +37,7 @@ private:
   void	handlePackets(ENetEvent &event);
   void	connectClient(ENetPeer * const peer);
   void	disconnectClient(ENetPeer * const peer);
+  void	saveClientId(Client *cl);
 
 private:
   t_arg			_arg;

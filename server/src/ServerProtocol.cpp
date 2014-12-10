@@ -38,6 +38,7 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
   const ConnectionMessage	&coInfo = message.co();
   const std::string		&userId = coInfo.userid();
 
+  client->getInfo().setId(userId);
   std::cout << "CONNECTION, UserId: " << userId <<  std::endl;
 }
 

@@ -1,5 +1,9 @@
+#include <fstream>
+#include <string>
 #include "Server.hpp"
 #include "CvarParser.hpp"
+#include "printv.hpp"
+#include "demangle.hpp"
 
 Server::Server(t_arg &arg)
   : _arg(arg), _set(),
@@ -89,10 +93,55 @@ void		Server::connectClient(ENetPeer * const peer)
 void	Server::disconnectClient(ENetPeer * const peer)
 {
   std::cout << "Client disconnected" << std::endl;
+  saveClientId(static_cast<Client *>(peer->data));
   peer->data = NULL;
   _clients.erase(std::find_if(_clients.begin(), _clients.end(),
 			      [peer] (const Client *elem)
 			      { return elem->getPeer() == peer;}));
+}
+
+void	Server::saveClientId(Client *client)
+{
+  const ClientInfo	&clInfo = client->getInfo();
+  const ClientEntity	&clEnt = client->getEntity();
+  const std::string	&clId = clInfo.getId();
+  const Vector2f	&position = clEnt.getPosition();
+  const Vector2i	&chunkId = clEnt.getChunkId();
+
+  std::fstream		file;
+  std::vector<std::string> content;
+  std::ostringstream	newLine("");
+  unsigned int		foundId = 0;
+  bool			found = false;
+
+  file.open(LOGFILE, std::fstream::binary | std::fstream::in | std::fstream::out);
+  printv(newLine, "%,% %,% %",
+	  clId, chunkId.x, chunkId.y,
+	  position.x, position.y);
+  if (!file)
+    {
+      file.open(LOGFILE, std::fstream::binary | std::fstream::out);
+      if (!file)
+	throw std::invalid_argument(std::string(LOGFILE) + ": File not found");
+      file << newLine.str() << std::endl;
+      file.close();
+      return ;
+    }
+  for (std::string line; getline(file, line);)
+    {
+      content.push_back(line);
+      if (!found && line.find(clId) != std::string::npos)
+	found = true;
+      if (!found)
+	++foundId;
+    }
+  if (found)
+    content[foundId] = newLine.str();
+  else
+    content.push_back(newLine.str());
+  for (auto &s : content)
+    file << s << std::endl;
+  file.close();
 }
 
 void	Server::trigger(const t_event &event)

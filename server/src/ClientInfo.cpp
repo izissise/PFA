@@ -8,12 +8,12 @@ ClientInfo::~ClientInfo()
 {
 }
 
-void	ClientInfo::setResolution(const Vector2u &screenRes)
+void	ClientInfo::setId(const std::string &id)
 {
-  _screenRes = screenRes;
+  _id = id;
 }
 
-const Vector2u	&ClientInfo::getResolution() const
+const std::string	&ClientInfo::getId() const
 {
-  return _screenRes;
+  return _id;
 }

@@ -4,6 +4,7 @@
 # include <iostream>
 # include <string>
 # include <stdexcept>
+# include <sstream>
 
 /**
  * \fn std::ostream& printv(std::ostream& f, const std::string& s)
@@ -17,7 +18,7 @@
  *
  */
 
-std::ostream& printv(std::ostream& f, const std::string& s);
+std::ostream&	printv(std::ostream& f, const std::string& s);
 
 template<typename T, typename... Args>
 std::ostream& printv(std::ostream& f, const std::string& s, T value, Args... args)

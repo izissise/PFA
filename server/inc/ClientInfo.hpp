@@ -1,6 +1,7 @@
 #ifndef _CLIENTINFO_H_
 #define _CLIENTINFO_H_
 
+#include <string>
 #include "Vector2.hpp"
 
 class ClientInfo
@@ -9,12 +10,12 @@ public:
   ClientInfo();
   virtual ~ClientInfo();
 
-  void		setResolution(const Vector2u &screenRes);
+  void		setId(const std::string &id);
 
-  const Vector2u	&getResolution() const;
+  const std::string	&getId() const;
 
 private:
-  Vector2u	_screenRes;
+  std::string	_id;
 };
 
 #endif /* _CLIENTINFO_H_ */
