@@ -15,7 +15,7 @@ public:
 
   void sendPacket(enet_uint8 chan, const std::string &packet) const;
 
-  const ENetPeer	*getPeer() const;
+  ENetPeer		*getPeer();
   ClientEntity		&getEntity();
   ClientInfo		&getInfo();
 

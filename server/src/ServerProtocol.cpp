@@ -39,6 +39,12 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
   const std::string		&userId = coInfo.userid();
 
   client->getInfo().setId(userId);
+  auto it = std::find_if(clients.begin(), clients.end(), [client, &userId](Client *cl)
+			 {
+			   return (client != cl && cl->getInfo().getId() == userId);
+			 });
+  if (it != clients.end())
+    enet_peer_disconnect(client->getPeer(), 0);
   std::cout << "CONNECTION, UserId: " << userId <<  std::endl;
 }
 

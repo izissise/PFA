@@ -96,7 +96,7 @@ void	Server::disconnectClient(ENetPeer * const peer)
   saveClientId(static_cast<Client *>(peer->data));
   peer->data = NULL;
   _clients.erase(std::find_if(_clients.begin(), _clients.end(),
-			      [peer] (const Client *elem)
+			      [peer] (Client * const elem)
 			      { return elem->getPeer() == peer;}));
 }
 

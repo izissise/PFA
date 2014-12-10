@@ -18,7 +18,7 @@ void Client::sendPacket(enet_uint8 chan, const std::string &packet) const
     throw (NetworkException("Cannot send the message"));
 }
 
-const ENetPeer *Client::getPeer() const
+ENetPeer *Client::getPeer()
 {
   return (_peer);
 }
