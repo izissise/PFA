@@ -71,8 +71,9 @@ void	ClientProtocol::initClient(const ProtocolMessage &packet)
   const VectorInt	&chunkId = initData.chunkid();
   const VectorUint	&playerPos = initData.pos();
 
-  _world->setPlayerPosition({static_cast<float>(chunkId.x() * TileCodex::tileSize + playerPos.x()),
-	static_cast<float>(chunkId.y() * TileCodex::tileSize + playerPos.x())});
+  _world->setPlayerPosition(Vector2i(chunkId.x(), chunkId.y()),
+			    Vector2f(static_cast<float>(playerPos.x()),
+				     static_cast<float>(playerPos.y())));
   queryInitialChunks();
 }
 

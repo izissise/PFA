@@ -29,10 +29,13 @@ void		World::load()
   _loaded = true;
 }
 
-void		World::setPlayerPosition(const Vector2f &position)
+void		World::setPlayerPosition(const Vector2i &chunkId,
+					 const Vector2f &position)
 {
-  Range2i	&loadedRange = _player.getLoadedRange();
+  Range2i	loadedRange;
 
+  _player.setPlayerPosition(chunkId, position);
+  loadedRange = _player.getLoadedRange();
   for (const auto &cursor : loadedRange)
     {
       _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());

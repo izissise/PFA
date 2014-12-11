@@ -19,7 +19,9 @@ void	Player::move(const Vector2f &dir)
 void	Player::setPlayerPosition(const Vector2i &chunkId,
 				  const Vector2f &position)
 {
-  _camera.move(position);
+  Vector2f	fullPos(chunkId.x * TileCodex::tileSize + position.x,
+			chunkId.y * TileCodex::tileSize + position.y);
+  _camera.move(fullPos);
   calculateVisibleRange();
   _loadedRange =
     {

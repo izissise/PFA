@@ -9,7 +9,6 @@
 
 # include "Chunk.hpp"
 # include "Settings.hpp"
-# include "TileCodex.hpp"
 # include "Camera.hpp"
 # include "Player.hpp"
 
@@ -35,7 +34,8 @@ public:
   void			load();
 
   void			movePlayer(const Vector2f &dir);
-  void			setPlayerPosition(const Vector2f &position);
+  void			setPlayerPosition(const Vector2i &chunkId,
+					  const Vector2f &position);
   const Player		&getPlayer() const; // use world's setter to set the client's attr
   void			fillChunkData(const VectorInt &pos,
 				      const RepeatedField<uint32> &bgTiles,

@@ -200,9 +200,6 @@ void	GamePanel::connectClient(ENetPeer * const peer, Settings &set)
 {
   peer->data = (char *)("Server");
   sendConnectionInfo(set);
-
-  // here query the player's position
-  _world->setPlayerPosition({0.5, 0.5});
 }
 
 void	GamePanel::disconnectClient(ENetPeer * const peer)
