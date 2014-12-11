@@ -2,6 +2,7 @@
 # define RANGE2_H
 
 # include <iterator>
+# include <stdexcept>
 
 # include "Vector2.hpp"
 
@@ -51,7 +52,7 @@ public:
     ~Iterator(void) = default;
 
 	Iterator&	operator=(const Iterator& rhs) { _container = rhs._container; _cursor = rhs._cursor; }
-	
+
 	Iterator&	operator++() { _next(); return *this; }
     Iterator	operator++(int) { Iterator tmp(*this); _next(); return tmp; }
 

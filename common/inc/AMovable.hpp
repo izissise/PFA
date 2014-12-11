@@ -6,22 +6,12 @@
 class AMovable
 {
 public:
-  enum Direction
-    {
-      Up,
-      Right,
-      Down,
-      Left
-    };
-
-public:
   AMovable();
   virtual ~AMovable();
 
-  void			move(Direction dir);
+  virtual void		move(const Vector2f &dir);
   const Vector2f	&getPosition() const;
   const Vector2i	&getChunkId() const;
-  Direction		getDirection() const;
 
   void			setPosition(const Vector2f &position);
   void			setChunkId(const Vector2i chunkId);
@@ -29,7 +19,6 @@ public:
 private:
   Vector2f	_pos;
   Vector2i	_chunkId;
-  Direction	_dir;
 };
 
 #endif /* _AMOVABLE_H_ */

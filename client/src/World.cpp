@@ -7,6 +7,8 @@
 
 World::World(Settings& settings) :
   _settings(settings),
+  _camera(),
+  _player(_camera),
   _loaded(false)
 {
   CvarList	&cvarList = _settings.getCvarList();
@@ -18,23 +20,20 @@ World::World(Settings& settings) :
   _camera.resize(_sToWPos(_screenSize, true));
 }
 
-void	World::load()
+void		World::load()
 {
-  for (auto &cursor : _loadedRange)
+  Range2i	&loadedRange = _player.getLoadedRange();
+
+  for (auto &cursor : loadedRange)
     _chunks[cursor]->load(_codex);
   _loaded = true;
 }
 
-void	World::setPlayerPosition(const Vector2f &position)
+void		World::setPlayerPosition(const Vector2f &position)
 {
-  _camera.move(position);
-  _calculateVisibleRange();
-  _loadedRange =
-    {
-      {_visibleRange.left() - 1, _visibleRange.bottom() - 1},
-      {_visibleRange.right() + 1, _visibleRange.top() + 1}
-    };
-  for (auto &cursor : _loadedRange)
+  Range2i	&loadedRange = _player.getLoadedRange();
+
+  for (const auto &cursor : loadedRange)
     {
       _chunks[cursor] = std::unique_ptr<Chunk>(new Chunk());
       _chunks[cursor]->setPosition({cursor.x, cursor.y});
@@ -56,13 +55,13 @@ void   	World::fillChunkData(const VectorInt &pos,
 
 void		World::movePlayer(const Vector2f &dir)
 {
-  Range2i	oldRange = _visibleRange;
+  Range2i	oldRange = _player.getVisibleRange();
+  Range2i	visibleRange;
 
-  _camera.translate(dir);
-  _calculateVisibleRange();
-  if (_visibleRange != oldRange) {
+  _player.move(dir);
+  visibleRange =  _player.getVisibleRange();
+  if (visibleRange != oldRange)
     _loadChunks();
-  }
 }
 
 void	World::update()
@@ -73,8 +72,8 @@ auto World::_getScreenOrigin(void) const -> screenPos
 {
   worldPos worldOrigin;
 
-  worldOrigin.x = -(_camera.left() - floor(_camera.left()));
-  worldOrigin.y = -(1 - (_camera.top() - floor(_camera.top())));
+  worldOrigin.x = -(_camera.left() - std::floor(_camera.left()));
+  worldOrigin.y = -(1 - (_camera.top() - std::floor(_camera.top())));
   return _wToSPos(worldOrigin, true);
 }
 
@@ -82,7 +81,7 @@ void	World::draw(sf::RenderWindow& window) const
 {
   screenPos	screenOrigin = _getScreenOrigin();
   screenPos	screenCoord = screenOrigin;
-  auto&		range = _visibleRange;
+  const Range2i	&range = _player.getVisibleRange();
   int		x;
 
   if (!_loaded)
@@ -115,13 +114,7 @@ auto World::_wToSPos(worldPos pos, bool noOffsets) const -> screenPos
 
 float World::_getGridOffset(float w) const
 {
-  return -(w - floor(w));
-}
-
-void World::_calculateVisibleRange(void)
-{
-  _visibleRange = {Vector2i(floor(_camera.left()), floor(_camera.bottom())),
-		   Vector2i(floor(_camera.right()), floor(_camera.top()))};
+  return -(w - std::floor(w));
 }
 
 void World::_drawChunk(sf::RenderWindow& window,
@@ -143,37 +136,45 @@ void World::_drawChunk(sf::RenderWindow& window,
 ** This method probably needs refactoring. It doesn't seem very optimal
 ** even though for now it works and that's currently good enough.
 */
-void World::_loadChunks(void)
+void		World::_loadChunks(void)
 {
-  Range2i	bufferRange({_visibleRange.left() - 1, _visibleRange.bottom() - 1},
-			    {_visibleRange.right() + 1, _visibleRange.top() + 1});
+  const Range2i	&visibleRange = _player.getVisibleRange();
+  const Range2i	&loadedRange = _player.getLoadedRange();
+  Range2i	bufferRange({visibleRange.left() - 1, visibleRange.bottom() - 1},
+			    {visibleRange.right() + 1, visibleRange.top() + 1});
 
   std::vector<Vector2i>	added;
   std::vector<Vector2i> removed;
   Range2i	intersection =
     {
-      {std::max(bufferRange.left(), _loadedRange.left()),
-       std::max(bufferRange.bottom(), _loadedRange.bottom())},
-      {std::min(bufferRange.right(), _loadedRange.right()),
-       std::min(bufferRange.top(), _loadedRange.top())}
+      {std::max(bufferRange.left(), loadedRange.left()),
+       std::max(bufferRange.bottom(), loadedRange.bottom())},
+      {std::min(bufferRange.right(), loadedRange.right()),
+       std::min(bufferRange.top(), loadedRange.top())}
     };
   auto		predicate = [intersection](Vector2i& v) {
     return (std::find(intersection.cbegin(), intersection.cend(), v) != intersection.cend());
   };
 
   added.assign(bufferRange.begin(), bufferRange.end());
-  removed.assign(_loadedRange.begin(), _loadedRange.end());
+  removed.assign(loadedRange.cbegin(), loadedRange.cend());
   added.erase(std::remove_if(added.begin(), added.end(), predicate), added.end());
   removed.erase(std::remove_if(removed.begin(), removed.end(), predicate), removed.end());
 
-  for (auto cursor : added) {
-    if (_chunks.find(cursor) == _chunks.end()) {
-      _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk()));
-      _chunks[cursor]->load(_codex);
+  for (auto cursor : added)
+    {
+      if (_chunks.find(cursor) == _chunks.end())
+	{
+	  _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk()));
+	  _chunks[cursor]->load(_codex);
+	}
     }
-  }
-  for (auto cursor : removed) {
+  for (auto cursor : removed)
     _chunks.erase(cursor);
-  }
-  _loadedRange = bufferRange;
+  _player.setLoadedRange(bufferRange);
+}
+
+const Player	&World::getPlayer() const
+{
+  return _player;
 }

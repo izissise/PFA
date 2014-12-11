@@ -6,7 +6,7 @@
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
   _oldY(SHEIGHT), _dir(true), _world(nullptr),
-  _socket(), _proto(), _actAnalyzer()
+  _socket(), _proto(_socket), _actAnalyzer()
 {
   addFont("default", "../client/assets/default.TTF");
   setHide(true);
@@ -203,28 +203,6 @@ void	GamePanel::connectClient(ENetPeer * const peer, Settings &set)
 
   // here query the player's position
   _world->setPlayerPosition({0.5, 0.5});
-
-  // then we could query the chunks
-
-  // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
-
-
-  // Vector2f	position = _world.getPlayerPosition();
-  // sideSize.x =  1 + (std::stoi(set.getCvarList().getCvar("r_width"))
-  // 		     / (Chunk::width * TileCodex::tileSize) * 2) + 2;
-  // sideSize.y = 1 + (std::stoi(set.getCvarList().getCvar("r_height"))
-  // 		    / (Chunk::height * TileCodex::tileSize) * 2) + 2;
-  // for (int y = chunkPos.y - (sideSize.y - 1) / 2;
-  //      y <= chunkPos.y + (sideSize.y - 1) / 2; ++y)
-  //   {
-  //     for (int x = chunkPos.x - (sideSize.x - 1) / 2;
-  // 	   x <= chunkPos.x + (sideSize.x - 1) / 2; ++x)
-  // 	{
-  // 	  _world.loadChunk(clients, x, y);
-  // 	  chunks.push_back({x, y});
-  // 	}
-  //   }
-  // client->sendPacket(0, _world.serialize(chunks));
 }
 
 void	GamePanel::disconnectClient(ENetPeer * const peer)
@@ -232,25 +210,6 @@ void	GamePanel::disconnectClient(ENetPeer * const peer)
   std::cout << "Disconnect Peer" << std::endl;
   setHide(true);
   notify(t_event(wEvent::Hide | wEvent::Toggle));
-}
-
-void			GamePanel::queryChunks(const std::vector<Vector2i> &chunkIds) const
-{
-  ClientMessage		msg;
-  QueryChunk		*qChunk = new QueryChunk;
-  VectorInt		*id;
-  std::string		serialized;
-
-  for (auto &chunkId : chunkIds)
-    {
-      id = qChunk->add_id();
-      id->set_x(chunkId.x);
-      id->set_y(chunkId.y);
-    }
-  msg.set_content(ClientMessage::QUERYCHUNK);
-  msg.set_allocated_querychunk(qChunk);
-  msg.SerializeToString(&serialized);
-  _socket.sendPacket(1, serialized);
 }
 
 void			GamePanel::sendConnectionInfo(Settings &set) const

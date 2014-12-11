@@ -1,8 +1,10 @@
 #include "ClientProtocol.hpp"
 
-ClientProtocol::ClientProtocol()
+ClientProtocol::ClientProtocol(Network &net) :
+  _socket(net)
 {
   _func[ProtocolMessage::SETTING] = &ClientProtocol::handleSetting;
+  _func[ProtocolMessage::CLINIT] = &ClientProtocol::initClient;
   _func[ProtocolMessage::CHUNK] = &ClientProtocol::fillChunk;
 }
 
@@ -57,6 +59,65 @@ void  ClientProtocol::handleSetting(const ProtocolMessage &packet)
 	  delete entry;
 	}
     }
+}
+
+void	ClientProtocol::initClient(const ProtocolMessage &packet)
+{
+  if (!packet.has_clinit())
+    return ;
+  std::cout << "Client Initialization" << std::endl;
+
+  const InitClient	&initData = packet.clinit();
+  const VectorInt	&chunkId = initData.chunkid();
+  const VectorUint	&playerPos = initData.pos();
+
+  _world->setPlayerPosition({static_cast<float>(chunkId.x() * TileCodex::tileSize + playerPos.x()),
+	static_cast<float>(chunkId.y() * TileCodex::tileSize + playerPos.x())});
+  queryInitialChunks();
+}
+
+void			ClientProtocol::queryInitialChunks()
+{
+  Vector2f		position;
+  Vector2i		chunkPos;
+  Vector2u		sideSize;
+  std::vector<Vector2i>	chunks;
+  const Player		&player = _world->getPlayer();
+
+  // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
+  position = player.getPosition();
+  chunkPos = player.getChunkId();
+  sideSize.x =  1 + (std::stoi(_set->getCvarList().getCvar("r_width"))
+  		     / (Chunk::width * TileCodex::tileSize) * 2) + 2;
+  sideSize.y = 1 + (std::stoi(_set->getCvarList().getCvar("r_height"))
+  		    / (Chunk::height * TileCodex::tileSize) * 2) + 2;
+  for (int y = chunkPos.y - (sideSize.y - 1) / 2;
+       y <= chunkPos.y + (static_cast<int>(sideSize.y) - 1) / 2; ++y)
+    {
+      for (int x = chunkPos.x - (sideSize.x - 1) / 2;
+  	   x <= chunkPos.x + (static_cast<int>(sideSize.x) - 1) / 2; ++x)
+	chunks.push_back({x, y});
+    }
+  queryChunks(chunks);
+}
+
+void			ClientProtocol::queryChunks(const std::vector<Vector2i> &chunkIds) const
+{
+  ClientMessage		msg;
+  QueryChunk		*qChunk = new QueryChunk;
+  VectorInt		*id;
+  std::string		serialized;
+
+  for (auto &chunkId : chunkIds)
+    {
+      id = qChunk->add_id();
+      id->set_x(chunkId.x);
+      id->set_y(chunkId.y);
+    }
+  msg.set_content(ClientMessage::QUERYCHUNK);
+  msg.set_allocated_querychunk(qChunk);
+  msg.SerializeToString(&serialized);
+  _socket.sendPacket(1, serialized);
 }
 
 void	ClientProtocol::fillChunk(const ProtocolMessage &packet)

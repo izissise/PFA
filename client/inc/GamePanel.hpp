@@ -1,8 +1,6 @@
 #ifndef _GAMEPANEL_H_
 #define _GAMEPANEL_H_
 
-#include "Network.hpp"
-#include "NetworkException.hpp"
 #include "Panel.hpp"
 #include "Widget.hpp"
 #include "World.hpp"
@@ -42,7 +40,6 @@ private:
   void		disconnectClient(ENetPeer * const peer);
 
   void		sendConnectionInfo(Settings &set) const;
-  void		queryChunks(const std::vector<Vector2i> &chunkIds) const;
 
   int		_pad;
   int		_padup;
