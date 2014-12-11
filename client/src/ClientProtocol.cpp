@@ -122,13 +122,13 @@ void			ClientProtocol::queryChunks(const std::vector<Vector2i> &chunkIds) const
 
 void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
 {
-  std::cout << "FullChunk packet" << std::endl;
   if (!packet.has_fullchunk())
     return ;
 
   FullChunk	fullChunk = packet.fullchunk();
   unsigned int	nbChunk = fullChunk.chunkdata_size();
 
+  std::cout << "FullChunk packet -> " << nbChunk << std::endl;
   for (unsigned int i = 0; i < nbChunk; ++i)
     {
       const ChunkData	&chunk = fullChunk.chunkdata(i);

@@ -7,6 +7,7 @@ ServerProtocol::ServerProtocol(World &world) :
 {
   _func[ClientMessage::CONNECTION] = &ServerProtocol::handleConnection;
   _func[ClientMessage::ACTION] = &ServerProtocol::handleActions;
+  _func[ClientMessage::QUERYCHUNK] = &ServerProtocol::queryChunks;
 }
 
 ServerProtocol::~ServerProtocol()
@@ -52,7 +53,6 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
     }
   loadClientProfile(client, userId);
   sendClientProfile(client);
-  std::cout << "CONNECTION, UserId: " << userId <<  std::endl;
 }
 
 void	ServerProtocol::handleActions(ClientMessage &message,
@@ -69,6 +69,29 @@ void	ServerProtocol::handleActions(ClientMessage &message,
 
       std::cout << clAction.name() << " " << clAction.state() << std::endl;
     }
+}
+
+void	ServerProtocol::queryChunks(ClientMessage &message,
+				    Client *client,
+				    const std::vector<Client *> &clients)
+{
+  const QueryChunk	&qChunks = message.querychunk();
+  const RepeatedPtrField<VectorInt>	&chunkIds = qChunks.id();
+  std::vector<Vector2i>	newChunks;
+  unsigned int		idx = 0;
+  Vector2i		pos;
+
+  newChunks.reserve(chunkIds.size());
+  std::cout << "Query Chunk" << std::endl;
+  for (auto &id : chunkIds)
+    {
+      pos = {id.x(), id.y()};
+      if (_world.isChunkLoaded(pos) == false)
+	_world.loadChunk(clients, pos);
+      newChunks.emplace(newChunks.begin() + idx, pos);
+      ++idx;
+    }
+  client->sendPacket(0, _world.serialize(newChunks));
 }
 
 void	ServerProtocol::spawnClient(Client *client)
@@ -88,7 +111,6 @@ void	ServerProtocol::loadClientProfile(Client *client, const std::string &userId
   std::vector<std::string>	clientInfo;
   std::vector<std::string>	vec;
   ClientEntity			&clEnt = client->getEntity();
-  const std::string		&clId = client->getInfo().getId();
 
   file.open(LOGFILE, std::ios::binary | std::ios::in);
   if (!file) // Can be the first client joining
@@ -99,7 +121,7 @@ void	ServerProtocol::loadClientProfile(Client *client, const std::string &userId
     }
   for (std::string line; getline(file, line);)
     {
-      if (line.find(clId) != std::string::npos)
+      if (line.find(userId) != std::string::npos)
 	{
 	  std::cout << "Found in database -> load client's data" << std::endl;
 	  utils.split(line, ';', clientInfo);

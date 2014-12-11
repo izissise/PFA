@@ -11,6 +11,8 @@
 
 #define LOGFILE "../log/ClientInfo.txt"
 
+using namespace google::protobuf;
+
 class ServerProtocol
 {
 public:
@@ -31,6 +33,9 @@ private:
   void	handleActions(ClientMessage &message,
 		      Client *client,
 		      const std::vector<Client *> &clients);
+  void	queryChunks(ClientMessage &message,
+		    Client *client,
+		    const std::vector<Client *> &clients);
 
   void	loadClientProfile(Client *client, const std::string &userId);
   void	spawnClient(Client *Client);
