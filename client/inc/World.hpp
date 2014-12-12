@@ -7,7 +7,6 @@
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
-# include "Chunk.hpp"
 # include "Settings.hpp"
 # include "Camera.hpp"
 # include "Player.hpp"
@@ -43,8 +42,6 @@ public:
 
 protected:
 private:
-  worldPos	_sToWPos(screenPos pos, bool noOffsets = false) const;
-  screenPos	_wToSPos(worldPos pos, bool noOffsets = false) const;
   float		_getGridOffset(float w) const;
 
   void		_calculateVisibleRange(void);

@@ -2,6 +2,7 @@
 #define _CAMERA_H_
 
 # include "Vector2.hpp"
+# include "Chunk.hpp"
 
 class Camera
 {
@@ -29,6 +30,10 @@ public:
   float	width(void) const	{ return _size.w; }
   float	height(void) const	{ return _size.h; }
   worldPos	center(void) const	{ return _center; }
+
+  worldPos	sToWPos(const screenPos &pos) const;
+  worldPos	sToWPos(const Vector2i &chunkId, const Vector2u &position) const;
+  screenPos	wToSPos(const worldPos &pos) const;
 
 private:
   worldPos	_botLeft;

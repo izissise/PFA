@@ -21,6 +21,8 @@ class Chunk
 public:
   static const int	width = 256;
   static const int	height = 256;
+  static const unsigned	pWidth = width * TileCodex::tileSize;
+  static const unsigned pHeight = height * TileCodex::tileSize;
 
   Chunk(void);
   virtual ~Chunk(void);

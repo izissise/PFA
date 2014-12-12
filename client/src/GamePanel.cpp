@@ -187,11 +187,6 @@ int		GamePanel::updateNetwork(Settings &set)
 
 void	GamePanel::handlePackets(ENetEvent &event)
 {
-  printf ("A packet of length %lu containing %s was received from %s on channel %u.\n",
-	  event.packet->dataLength,
-	  event.packet->data,
-	  event.peer->data,
-	  event.channelID);
   _proto.parseCmd(event.packet->data, event.packet->dataLength);
   enet_packet_destroy(event.packet);
 }

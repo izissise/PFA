@@ -17,7 +17,7 @@ World::World(Settings& settings) :
 
   _screenSize =	{std::stoi(cvarList.getCvar("r_width")),
 		 std::stoi(cvarList.getCvar("r_height"))};
-  _camera.resize(_sToWPos(_screenSize, true));
+  _camera.resize(_camera.sToWPos(_screenSize));
 }
 
 void		World::load()
@@ -77,7 +77,7 @@ auto World::_getScreenOrigin(void) const -> screenPos
 
   worldOrigin.x = -(_camera.left() - std::floor(_camera.left()));
   worldOrigin.y = -(1 - (_camera.top() - std::floor(_camera.top())));
-  return _wToSPos(worldOrigin, true);
+  return _camera.wToSPos(worldOrigin);
 }
 
 void	World::draw(sf::RenderWindow& window) const
@@ -97,22 +97,6 @@ void	World::draw(sf::RenderWindow& window) const
     screenCoord.x = screenOrigin.x;
     screenCoord.y += Chunk::height * TileCodex::tileSize;
   }
-}
-
-auto World::_sToWPos(screenPos pos, bool noOffsets) const -> worldPos
-{
-  float sy = (noOffsets ? pos.y : _screenSize.y - pos.y);
-  float wy = sy / (Chunk::height * TileCodex::tileSize);
-
-  return {static_cast<float>(pos.x) / (Chunk::width * TileCodex::tileSize), wy};
-}
-
-auto World::_wToSPos(worldPos pos, bool noOffsets) const -> screenPos
-{
-  float wy = pos.y * (Chunk::height * TileCodex::tileSize);
-  int sy = (noOffsets ? wy : _screenSize.y - wy);
-
-  return {static_cast<int>(pos.x * (Chunk::width * TileCodex::tileSize)), sy};
 }
 
 float World::_getGridOffset(float w) const

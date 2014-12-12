@@ -21,7 +21,7 @@ void	Player::setPlayerPosition(const Vector2i &chunkId,
 {
   Vector2f	fullPos(chunkId.x * TileCodex::tileSize + position.x,
 			chunkId.y * TileCodex::tileSize + position.y);
-  _camera.move(fullPos);
+  _camera.move({0.001f, 0.f});
   calculateVisibleRange();
   _loadedRange =
     {

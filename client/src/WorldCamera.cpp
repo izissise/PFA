@@ -24,3 +24,24 @@ void Camera::resize(const worldPos& s)
 {
   _size = s;
 }
+
+auto	Camera::wToSPos(const worldPos &pos) const -> screenPos
+{
+  return {static_cast<int>(pos.x * static_cast<float>(Chunk::pWidth)),
+      static_cast<int>(pos.y * static_cast<float>(Chunk::pHeight))};
+}
+
+auto	Camera::sToWPos(const screenPos &pos) const -> worldPos
+{
+  return {static_cast<float>(pos.x) / static_cast<float>(Chunk::pWidth),
+      static_cast<float>(pos.y) / static_cast<float>(Chunk::pHeight)};
+}
+
+auto	Camera::sToWPos(const Vector2i &chunkId, const Vector2u &position) const -> worldPos
+{
+  int	x = chunkId.x * Chunk::pWidth + position.x;
+  int	y = chunkId.y * Chunk::pHeight + position.y;
+
+  return {static_cast<float>(x) / static_cast<float>(Chunk::pWidth),
+      static_cast<float>(y) / static_cast<float>(Chunk::pHeight)};
+}

@@ -6,8 +6,6 @@
 #include "AMovable.hpp"
 #include "Range2.hpp"
 #include "Camera.hpp"
-#include "TileCodex.hpp"
-
 
 class Player : public AMovable
 {
