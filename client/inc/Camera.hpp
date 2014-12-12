@@ -32,7 +32,7 @@ public:
   worldPos	center(void) const	{ return _center; }
 
   worldPos	sToWPos(const screenPos &pos) const;
-  worldPos	sToWPos(const Vector2i &chunkId, const Vector2u &position) const;
+  worldPos	sToWPos(const Vector2i &chunkId, const Vector2f &position) const;
   screenPos	wToSPos(const worldPos &pos) const;
 
 private:

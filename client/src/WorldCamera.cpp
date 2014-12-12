@@ -37,11 +37,11 @@ auto	Camera::sToWPos(const screenPos &pos) const -> worldPos
       static_cast<float>(pos.y) / static_cast<float>(Chunk::pHeight)};
 }
 
-auto	Camera::sToWPos(const Vector2i &chunkId, const Vector2u &position) const -> worldPos
+auto	Camera::sToWPos(const Vector2i &chunkId, const Vector2f &position) const -> worldPos
 {
-  int	x = chunkId.x * Chunk::pWidth + position.x;
-  int	y = chunkId.y * Chunk::pHeight + position.y;
+  float	x = chunkId.x * Chunk::pWidth + position.x;
+  float	y = chunkId.y * Chunk::pHeight + position.y;
 
-  return {static_cast<float>(x) / static_cast<float>(Chunk::pWidth),
-      static_cast<float>(y) / static_cast<float>(Chunk::pHeight)};
+  return {x / static_cast<float>(Chunk::pWidth),
+      y / static_cast<float>(Chunk::pHeight)};
 }
