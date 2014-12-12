@@ -13,7 +13,7 @@
 # include "TileType.hpp"
 # include "Vector2.hpp"
 # include "ProtocolMessage.pb.h"
-# include "demangle.hpp"
+# include "Config.h"
 
 using namespace google::protobuf;
 

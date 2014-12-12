@@ -12,7 +12,7 @@
 # include "TileCodex.hpp"
 # include "Vector2.hpp"
 # include "Biomes.hpp"
-# include "demangle.hpp"
+# include "Config.h"
 
 # define LACUNARITY 2.5f
 # define GAIN 0.6

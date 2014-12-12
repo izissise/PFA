@@ -15,10 +15,12 @@ void	Player::move(const Vector2f &dir)
   calculateVisibleRange();
   AMovable::move(dir);
 }
-
+#include <iostream>
 void	Player::setPlayerPosition(const Vector2i &chunkId,
 				  const Vector2f &position)
 {
+  std::cout << "Chunk: " << chunkId.x << " " << chunkId.y << " "
+	    << "Pos : " << position.x << " " << position.y << std::endl;
   _camera.move(_camera.sToWPos(chunkId, position));
   calculateVisibleRange();
   _loadedRange =

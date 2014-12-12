@@ -35,6 +35,12 @@ public:
   void			movePlayer(const Vector2f &dir);
   void			setPlayerPosition(const Vector2i &chunkId,
 					  const Vector2f &position);
+  void			setPlayerPosition(const VectorInt &chunkId,
+					  const VectorFloat &position)
+  {
+    setPlayerPosition(Vector2i(chunkId.x(), chunkId.y()),
+		      Vector2f(position.x(), position.y()));
+  }
   const Player		&getPlayer() const; // use world's setter to set the client's attr
   void			fillChunkData(const VectorInt &pos,
 				      const RepeatedField<uint32> &bgTiles,

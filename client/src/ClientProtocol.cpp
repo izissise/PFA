@@ -6,6 +6,7 @@ ClientProtocol::ClientProtocol(Network &net) :
   _func[ProtocolMessage::SETTING] = &ClientProtocol::handleSetting;
   _func[ProtocolMessage::CLINIT] = &ClientProtocol::initClient;
   _func[ProtocolMessage::CHUNK] = &ClientProtocol::fillChunk;
+  _func[ProtocolMessage::DISPLACEMENT] = &ClientProtocol::handleDisplacements;
 }
 
 ClientProtocol::~ClientProtocol()
@@ -127,8 +128,8 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
   if (!packet.has_fullchunk())
     return ;
 
-  FullChunk	fullChunk = packet.fullchunk();
-  unsigned int	nbChunk = fullChunk.chunkdata_size();
+  const FullChunk	&fullChunk = packet.fullchunk();
+  unsigned int		nbChunk = fullChunk.chunkdata_size();
 
   std::cout << "FullChunk packet -> " << nbChunk << std::endl;
   for (unsigned int i = 0; i < nbChunk; ++i)
@@ -141,4 +142,17 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
       _world->fillChunkData(chunkId, bgTiles, fgTiles);
     }
   _world->load();
+}
+
+void	ClientProtocol::handleDisplacements(const ProtocolMessage &packet)
+{
+  if (!packet.has_displacement())
+    return ;
+
+  const Displacement	&displacement = packet.displacement();
+  const	Position	&position = displacement.position();
+  const	VectorInt	&chunkId = position.chunkid();
+  const VectorFloat	&pos = position.pos();
+
+  _world->setPlayerPosition(chunkId, pos);
 }

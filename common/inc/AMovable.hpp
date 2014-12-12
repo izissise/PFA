@@ -2,6 +2,7 @@
 #define _AMOVABLE_H_
 
 #include "Vector2.hpp"
+#include "Config.h"
 
 class AMovable
 {

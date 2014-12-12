@@ -27,6 +27,7 @@ private:
   void  handleSetting(const ProtocolMessage &packet);
   void	initClient(const ProtocolMessage &packet);
   void	fillChunk(const ProtocolMessage &packet);
+  void	handleDisplacements(const ProtocolMessage &packet);
   void	queryInitialChunks();
   void	queryChunks(const std::vector<Vector2i> &chunkIds) const;
 
