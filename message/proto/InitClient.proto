@@ -1,6 +1,5 @@
-import "Vectors.proto";
+import "Position.proto";
 
 message InitClient {
-  required VectorInt	chunkId = 1;
-  required VectorUint 	pos = 2;
+  required Position pos = 1;
 }

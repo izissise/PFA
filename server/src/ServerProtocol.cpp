@@ -142,19 +142,21 @@ void	ServerProtocol::sendClientProfile(Client *client)
 {
   ProtocolMessage	msg;
   InitClient		*initInfo = new InitClient;
+  Position		*pos = new Position;
   VectorInt		*chunkId = new VectorInt;
-  VectorUint		*clPos = new VectorUint;
+  VectorFloat		*clPos = new VectorFloat;
   ClientEntity		&clEnt = client->getEntity();
   std::string		serialized;
 
   chunkId->set_x(clEnt.getChunkId().x);
   chunkId->set_y(clEnt.getChunkId().y);
-  initInfo->set_allocated_chunkid(chunkId);
+  pos->set_allocated_chunkid(chunkId);
 
   clPos->set_x(clEnt.getPosition().x);
   clPos->set_y(clEnt.getPosition().y);
-  initInfo->set_allocated_pos(clPos);
+  pos->set_allocated_pos(clPos);
 
+  initInfo->set_allocated_pos(pos);
   msg.set_content(ProtocolMessage::CLINIT);
   msg.set_allocated_clinit(initInfo);
   msg.SerializeToString(&serialized);

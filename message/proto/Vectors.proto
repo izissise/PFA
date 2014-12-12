@@ -7,3 +7,8 @@ message VectorInt {
   required int32 x = 1;
   required int32 y = 2;
 }
+
+message VectorFloat {
+  required float x = 1;
+  required float y = 2;
+}

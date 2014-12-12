@@ -68,12 +68,13 @@ void	ClientProtocol::initClient(const ProtocolMessage &packet)
   std::cout << "Client Initialization" << std::endl;
 
   const InitClient	&initData = packet.clinit();
-  const VectorInt	&chunkId = initData.chunkid();
-  const VectorUint	&playerPos = initData.pos();
+  const	Position	&pos = initData.pos();
+  const VectorInt	&chunkId = pos.chunkid();
+  const VectorFloat	&playerPos = pos.pos();
 
   _world->setPlayerPosition(Vector2i(chunkId.x(), chunkId.y()),
-			    Vector2f(static_cast<float>(playerPos.x()),
-				     static_cast<float>(playerPos.y())));
+			    Vector2f(playerPos.x(),
+				     playerPos.y()));
   queryInitialChunks();
 }
 
