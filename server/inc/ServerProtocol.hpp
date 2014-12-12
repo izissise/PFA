@@ -8,6 +8,7 @@
 #include "World.hpp"
 #include "Client.hpp"
 #include "Unused.hpp"
+#include "ActionEnum.hpp"
 
 #define LOGFILE "../log/ClientInfo.txt"
 
@@ -27,6 +28,7 @@ private:
   typedef void (ServerProtocol::*parseFunc)(ClientMessage &message,
 					    Client *client,
 					    const std::vector<Client *> &clients);
+
   void  handleConnection(ClientMessage &message,
 			 Client *client,
 			 const std::vector<Client *> &clients);

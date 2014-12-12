@@ -1,10 +1,12 @@
 #ifndef _CONTROLS_H_
 #define _CONTROLS_H_
 
-# include <SFML/Window.hpp>
-# include <map>
-# include <array>
-# include <vector>
+#include <SFML/Window.hpp>
+#include <map>
+#include <array>
+#include <vector>
+
+#include "ActionEnum.hpp"
 
 namespace ctrl
 {
@@ -22,21 +24,6 @@ namespace ctrl
     Unset = 0
       };
 }
-
-enum class	Action
-{
-  Unknown = -1,
-    Forward = 0,
-    Back,
-    Right,
-    Left,
-    Use,
-    MoveUp,
-    MoveDown,
-    ToggleConsole,
-    ToggleQuickMenu,
-    Last
-    };
 
 inline Action	operator++(Action &x)
 {

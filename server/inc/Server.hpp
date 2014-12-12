@@ -4,6 +4,8 @@
 # include <enet/enet.h>
 # include <algorithm>
 # include <iostream>
+# include <functional>
+
 # include "NetworkException.hpp"
 # include "Observer.hpp"
 # include "ServerSettings.hpp"
@@ -36,7 +38,9 @@ private:
   void	handlePackets(ENetEvent &event);
   void	connectClient(ENetPeer * const peer);
   void	disconnectClient(ENetPeer * const peer);
+  void	updateClients();
   void	saveClientId(Client *cl);
+  void	actDisplacement(Action act);
 
 private:
   t_arg			_arg;
@@ -45,7 +49,7 @@ private:
   ENetHost*		_server;
   World			_world;
   ServerProtocol	_proto;
-  std::vector<Client *>	_clients;
+  std::vector<Client *>		_clients;
 };
 
 #endif

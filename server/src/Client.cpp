@@ -1,7 +1,8 @@
 #include "Client.hpp"
 
 Client::Client(ENetPeer *peer)
-: _peer(peer)
+  : _peer(peer),
+    _actions(static_cast<int>(Action::Last), false)
 {
   std::cout << peer << std::endl;
 }
@@ -31,4 +32,16 @@ ClientEntity	&Client::getEntity()
 ClientInfo	&Client::getInfo()
 {
   return _info;
+}
+
+const std::vector<bool>	&Client::getActions() const
+{
+  return _actions;
+}
+
+void	Client::setAction(unsigned int actionIdx, bool state)
+{
+  if (actionIdx >= _actions.size())
+    throw std::out_of_range("Action index is out of range");
+  _actions[actionIdx] = state;
 }

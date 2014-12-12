@@ -61,13 +61,12 @@ void	ServerProtocol::handleActions(ClientMessage &message,
 {
   const ClientActions	&clientActions = message.actions();
   unsigned int		nbActions = clientActions.actions_size();
-  unsigned int		actionId;
 
   for (unsigned int i = 0; i < nbActions; ++i)
     {
       const ClientAction	&clAction = clientActions.actions(i);
 
-      std::cout << clAction.name() << " " << clAction.state() << std::endl;
+      client->setAction(clAction.name(), clAction.state());
     }
 }
 

@@ -31,9 +31,9 @@ Server::~Server()
   enet_deinitialize();
 }
 
-void Server::run()
+void		Server::run()
 {
-  ENetEvent       event;
+  ENetEvent	event;
 
   std::cout << "Actual port => " << _arg.port << std::endl;
   std::cout << "Quiet => " << _arg.quiet << std::endl;
@@ -54,6 +54,7 @@ void Server::run()
 	default:
 	  break;
         }
+      updateClients();
     }
 }
 
@@ -100,6 +101,36 @@ void	Server::disconnectClient(ENetPeer * const peer)
 			      { return elem->getPeer() == peer;}));
 }
 
+void	Server::updateClients()
+{
+  for (auto client : _clients)
+    {
+      const std::vector<bool>	&actions = client->getActions();
+      unsigned int		vecSize = actions.size();
+
+      for (unsigned int actId = 0; actId < vecSize; ++actId)
+	{
+	  Action	act = static_cast<Action>(actId);
+
+	  if (actions[actId] == true)
+	    {
+	      switch (act)
+		{
+		case Action::Forward:
+		case Action::Back:
+		case Action::Right:
+		case Action::Left:
+		  actDisplacement(act);
+		  break;
+		default:
+		  std::cout << "Action n: " << actId << " not implemented" << std::endl;
+		  break;
+		}
+	    }
+	}
+    }
+}
+
 void	Server::saveClientId(Client *client)
 {
   const ClientInfo	&clInfo = client->getInfo();
@@ -143,6 +174,11 @@ void	Server::saveClientId(Client *client)
     file << s << std::endl;
   std::cout << "write to file" << std::endl;
   file.close();
+}
+
+void	Server::actDisplacement(Action act)
+{
+  std::cout << "Got action " << (int)act << std::endl;
 }
 
 void	Server::trigger(const t_event &event)

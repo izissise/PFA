@@ -3,9 +3,12 @@
 
 #include <iostream>
 #include <enet/enet.h>
+#include <vector>
+
 #include "NetworkException.hpp"
 #include "ClientEntity.hpp"
 #include "ClientInfo.hpp"
+#include "ActionEnum.hpp"
 
 class Client
 {
@@ -19,10 +22,14 @@ public:
   ClientEntity		&getEntity();
   ClientInfo		&getInfo();
 
+  void			setAction(unsigned int actionIdx, bool state);
+  const std::vector<bool> &getActions() const;
+
 private:
-  ENetPeer	*_peer;
-  ClientEntity	_entity;
-  ClientInfo	_info;
+  ENetPeer		*_peer;
+  ClientEntity		_entity;
+  ClientInfo		_info;
+  std::vector<bool>	_actions;
 };
 
 #endif
