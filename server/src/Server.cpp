@@ -120,7 +120,7 @@ void	Server::updateClients()
 		case Action::Back:
 		case Action::Right:
 		case Action::Left:
-		  actDisplacement(act);
+		  actDisplacement(client, act);
 		  break;
 		default:
 		  std::cout << "Action n: " << actId << " not implemented" << std::endl;
@@ -176,8 +176,48 @@ void	Server::saveClientId(Client *client)
   file.close();
 }
 
-void	Server::actDisplacement(Action act)
+void		Server::actDisplacement(Client *client, Action act)
 {
+  ClientEntity	&clEnt = client->getEntity();
+
+  clEnt.move(Vector2f(act == Action::Left ? -1 : act == Action::Right ? 1 : 0,
+		      act == Action::Forward ? 1 : act == Action::Back ? -1 : 0));
+
+
+  // petite partie en dur :D
+  const Vector2f	&plPos = clEnt.getPosition();
+  const Vector2i	&plChunk = clEnt.getChunkId();
+
+  ProtocolMessage       msg;
+  Displacement		*displacement = new Displacement;
+  VectorFloat		*acceleration = new VectorFloat;
+  VectorFloat		*velocity = new VectorFloat;
+  Position		*position = new Position;
+  VectorInt		*chunkId = new VectorInt;
+  VectorFloat		*pos = new VectorFloat;
+  std::string		serialized;
+
+  // quick hard coded value
+  acceleration->set_x(0);
+  acceleration->set_y(0);
+  velocity->set_x(0);
+  velocity->set_y(0);
+
+  chunkId->set_x(plChunk.x);
+  chunkId->set_y(plChunk.y);
+  pos->set_x(plPos.x);
+  pos->set_y(plPos.y);
+  position->set_allocated_chunkid(chunkId);
+  position->set_allocated_pos(pos);
+
+  displacement->set_allocated_acceleration(acceleration);
+  displacement->set_allocated_velocity(velocity);
+  displacement->set_allocated_position(position);
+
+  msg.set_content(ProtocolMessage::DISPLACEMENT);
+  msg.set_allocated_displacement(displacement);
+  msg.SerializeToString(&serialized);
+  client->sendPacket(0, serialized);
   std::cout << "Got action " << (int)act << std::endl;
 }
 

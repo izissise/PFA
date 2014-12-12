@@ -178,7 +178,7 @@ void	Chunk::_getBiomeTile(Biome biome, t_tileType &tile)
 
 void		Chunk::_fillVertex(Vector2f &prev, Vector2f &next, int x)
 {
-  int		points = pow(2, iterations);
+  int		points = pow(2, Chunk::iterations);
   int		s = TileCodex::tileSize;
   int		pos = (x * s) / ((static_cast<float>(LINELENGHT)
 				  * static_cast<float>(Chunk::width)
@@ -403,7 +403,7 @@ void	Chunk::constructLine()
      MIDDLEHEIGHT + rightHeight
      - (chunkHeight * _pos.y));
 
-  for (unsigned int i = 0; i < iterations; ++i)
+  for (unsigned int i = 0; i < Chunk::iterations; ++i)
     {
       for (j = 0; j < cutPoints; ++j)
 	{

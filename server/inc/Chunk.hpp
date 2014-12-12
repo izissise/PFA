@@ -12,6 +12,7 @@
 # include "TileCodex.hpp"
 # include "Vector2.hpp"
 # include "Biomes.hpp"
+# include "demangle.hpp"
 
 # define LACUNARITY 2.5f
 # define GAIN 0.6
@@ -66,8 +67,8 @@ typedef struct	s_tileType
 class Chunk
 {
 public:
-  static const int	width = 256;
-  static const int	height = 256;
+  static const int	width = CHUNKWIDTH;
+  static const int	height = CHUNKHEIGHT;
   static const int	octaves = 2;
   static const int	iterations = 8;
   static const int	biomeMixDist = (width * LINELENGHT) / LOD;

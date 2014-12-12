@@ -40,7 +40,7 @@ private:
   void	disconnectClient(ENetPeer * const peer);
   void	updateClients();
   void	saveClientId(Client *cl);
-  void	actDisplacement(Action act);
+  void	actDisplacement(Client *client, Action act);
 
 private:
   t_arg			_arg;

@@ -13,14 +13,15 @@
 # include "TileType.hpp"
 # include "Vector2.hpp"
 # include "ProtocolMessage.pb.h"
+# include "demangle.hpp"
 
 using namespace google::protobuf;
 
 class Chunk
 {
 public:
-  static const int	width = 256;
-  static const int	height = 256;
+  static const int	width = CHUNKWIDTH;
+  static const int	height = CHUNKHEIGHT;
   static const unsigned	pWidth = width * TileCodex::tileSize;
   static const unsigned pHeight = height * TileCodex::tileSize;
 
