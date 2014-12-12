@@ -180,8 +180,8 @@ void		Server::actDisplacement(Client *client, Action act)
 {
   ClientEntity	&clEnt = client->getEntity();
 
-  clEnt.move(Vector2f(act == Action::Left ? -1 : act == Action::Right ? 1 : 0,
-		      act == Action::Forward ? 1 : act == Action::Back ? -1 : 0));
+  clEnt.move(Vector2f(act == Action::Left ? -50 : act == Action::Right ? 50 : 0,
+		      act == Action::Forward ? 50 : act == Action::Back ? -50 : 0));
 
 
   // petite partie en dur :D

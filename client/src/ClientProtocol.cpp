@@ -154,5 +154,5 @@ void	ClientProtocol::handleDisplacements(const ProtocolMessage &packet)
   const	VectorInt	&chunkId = position.chunkid();
   const VectorFloat	&pos = position.pos();
 
-  _world->setPlayerPosition(chunkId, pos);
+  _world->movePlayer(chunkId, pos);
 }

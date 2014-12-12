@@ -62,9 +62,17 @@ void		World::movePlayer(const Vector2f &dir)
   Range2i	visibleRange;
 
   _player.move(dir);
-  visibleRange =  _player.getVisibleRange();
+  visibleRange = _player.getVisibleRange();
   if (visibleRange != oldRange)
     _loadChunks();
+}
+
+void		World::movePlayer(const VectorInt &chunkId,
+				  const VectorFloat &pos)
+{
+  movePlayer(_camera.sToWPos(Vector2i(chunkId.x(), chunkId.y()),
+			     Vector2f(pos.x(), pos.y()))
+	     - _camera.center());
 }
 
 void	World::update()
