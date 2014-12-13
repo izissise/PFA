@@ -9,15 +9,18 @@ Player::~Player()
 {
 }
 #include <iostream>
-void	Player::move(const Vector2f &dir)
+bool	Player::move(const Vector2f &dir)
 {
+  bool	retVal;
+
   _camera.translate(dir);
   calculateVisibleRange();
-  AMovable::move(dir);
+  retVal = AMovable::move(dir);
   Vector2i mchunkId = getChunkId();
   Vector2f mposition = getPosition();
   std::cout << "Chunk: " << mchunkId.x << " " << mchunkId.y << " "
 	    << "Pos : " << mposition.x << " " << mposition.y << std::endl;
+  return retVal;
 }
 
 void	Player::setPlayerPosition(const Vector2i &chunkId,

@@ -81,19 +81,18 @@ void	ClientProtocol::initClient(const ProtocolMessage &packet)
 
 void			ClientProtocol::queryInitialChunks()
 {
-  Vector2f		position;
   Vector2i		chunkPos;
   Vector2u		sideSize;
   std::vector<Vector2i>	chunks;
   const Player		&player = _world->getPlayer();
 
   // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
-  position = player.getPosition();
   chunkPos = player.getChunkId();
   sideSize.x =  1 + (std::stoi(_set->getCvarList().getCvar("r_width"))
-  		     / (Chunk::width * TileCodex::tileSize) * 2) + 2;
+  		     / Chunk::pWidth * 2) + 2;
   sideSize.y = 1 + (std::stoi(_set->getCvarList().getCvar("r_height"))
-  		    / (Chunk::height * TileCodex::tileSize) * 2) + 2;
+  		    / Chunk::pHeight * 2) + 2;
+
   for (int y = chunkPos.y - (sideSize.y - 1) / 2;
        y <= chunkPos.y + (static_cast<int>(sideSize.y) - 1) / 2; ++y)
     {
@@ -116,6 +115,7 @@ void			ClientProtocol::queryChunks(const std::vector<Vector2i> &chunkIds) const
       id = qChunk->add_id();
       id->set_x(chunkId.x);
       id->set_y(chunkId.y);
+      std::cout << "Query chunk -> " << chunkId.x << " " << chunkId.y << std::endl;
     }
   msg.set_content(ClientMessage::QUERYCHUNK);
   msg.set_allocated_querychunk(qChunk);
@@ -132,6 +132,7 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
   unsigned int		nbChunk = fullChunk.chunkdata_size();
 
   std::cout << "FullChunk packet -> " << nbChunk << std::endl;
+  _world->removeOldChunks();
   for (unsigned int i = 0; i < nbChunk; ++i)
     {
       const ChunkData	&chunk = fullChunk.chunkdata(i);
@@ -141,7 +142,16 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
 
       _world->fillChunkData(chunkId, bgTiles, fgTiles);
     }
-  _world->load();
+  if (!_world->isLoaded())
+    _world->load();
+}
+
+void			ClientProtocol::getNewChunks()
+{
+  std::vector<Vector2i>	chunks;
+
+  _world->refreshChunks(chunks);
+  queryChunks(chunks);
 }
 
 void	ClientProtocol::handleDisplacements(const ProtocolMessage &packet)
@@ -154,5 +164,6 @@ void	ClientProtocol::handleDisplacements(const ProtocolMessage &packet)
   const	VectorInt	&chunkId = position.chunkid();
   const VectorFloat	&pos = position.pos();
 
-  _world->movePlayer(chunkId, pos);
+  if (_world->movePlayer(chunkId, pos))
+    getNewChunks();
 }

@@ -48,6 +48,7 @@ void   	World::fillChunkData(const VectorInt &pos,
 			     const RepeatedField<uint32> &fgTiles)
 {
   auto	chunk = _chunks.find(Vector2i(pos.x(), pos.y()));
+
   if (chunk == _chunks.end())
     {
       std::cout << "Could not find Chunks at pos y: " << pos.y() << " x: " << pos.x() << std::endl;
@@ -56,23 +57,25 @@ void   	World::fillChunkData(const VectorInt &pos,
   (chunk->second)->fillTiles(bgTiles, fgTiles);
 }
 
-void		World::movePlayer(const Vector2f &dir)
+bool		World::movePlayer(const Vector2f &dir)
 {
   Range2i	oldRange = _player.getVisibleRange();
   Range2i	visibleRange;
+  bool		retVal;
 
-  _player.move(dir);
+  retVal = _player.move(dir);
   visibleRange = _player.getVisibleRange();
   if (visibleRange != oldRange)
     _loadChunks();
+  return retVal;
 }
 
-void		World::movePlayer(const VectorInt &chunkId,
+bool		World::movePlayer(const VectorInt &chunkId,
 				  const VectorFloat &pos)
 {
-  movePlayer(_camera.sToWPos(Vector2i(chunkId.x(), chunkId.y()),
-			     Vector2f(pos.x(), pos.y()))
-	     - _camera.center());
+  return movePlayer(_camera.sToWPos(Vector2i(chunkId.x(), chunkId.y()),
+				    Vector2f(pos.x(), pos.y()))
+		    - _camera.center());
 }
 
 void	World::update()
@@ -160,7 +163,7 @@ void		World::_loadChunks(void)
     {
       if (_chunks.find(cursor) == _chunks.end())
 	{
-	  _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk()));
+	  _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
 	  _chunks[cursor]->load(_codex);
 	}
     }
@@ -172,4 +175,57 @@ void		World::_loadChunks(void)
 const Player	&World::getPlayer() const
 {
   return _player;
+}
+
+bool	World::isChunkLoaded(const Vector2i &chunkPos) const
+{
+  auto	it = _chunks.find(chunkPos);
+
+  if (it == _chunks.end())
+    return false;
+  return it->second->isLoaded();
+}
+
+void			World::removeOldChunks()
+{
+  const Vector2i	&chunkPos = _player.getChunkId();
+  auto			itr = _chunks.begin();
+
+  while (itr != _chunks.end())
+    {
+      const Vector2i &pos = itr->second->getPosition();
+      if (itr->second->isLoaded() &&
+	  (std::abs(chunkPos.x - pos.x) > 1 ||
+	   std::abs(chunkPos.y - pos.y) > 1))
+	{
+	  std::cout << "Removing chunk at pos " << pos.x << " " << pos.y << std::endl;
+	  _chunks.erase(itr++);
+	}
+      else
+	++itr;
+    }
+}
+
+void			World::refreshChunks(std::vector<Vector2i> &chunks)
+{
+  const Vector2i	&chunkPos = _player.getChunkId();
+  Vector2u		sideSize;
+
+  std::cout << "Player idpos: " << chunkPos.x << " " << chunkPos.y << std::endl;
+  // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
+  sideSize.x =  1 + (std::stoi(_settings.getCvarList().getCvar("r_width"))
+  		     / Chunk::pWidth * 2) + 2;
+  sideSize.y = 1 + (std::stoi(_settings.getCvarList().getCvar("r_height"))
+  		    / Chunk::pHeight * 2) + 2;
+  for (int y = chunkPos.y - (sideSize.y - 1) / 2;
+       y <= chunkPos.y + (static_cast<int>(sideSize.y) - 1) / 2; ++y)
+    {
+      for (int x = chunkPos.x - (sideSize.x - 1) / 2;
+  	   x <= chunkPos.x + (static_cast<int>(sideSize.x) - 1) / 2; ++x)
+	{
+	  // std::cout << x << " " << y  << " Loaded-> " << (int)!isChunkLoaded({x, y}) << std::endl;
+	  if (!isChunkLoaded({x, y}))
+	    chunks.push_back({x, y});
+	}
+    }
 }

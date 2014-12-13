@@ -21,6 +21,14 @@ Chunk::Chunk(void) :
 {
 }
 
+Chunk::Chunk(const Vector2i &chunkPos) :
+  _tiles(width * height, TileType::Empty),
+  _bgTiles(width * height, TileType::Empty),
+  _pos(chunkPos),
+  _loaded(false)
+{
+}
+
 Chunk::~Chunk(void)
 {
 }
@@ -28,7 +36,6 @@ Chunk::~Chunk(void)
 void Chunk::load(const TileCodex& codex)
 {
   _generateVBO(codex);
-  _loaded = true;
   _tiles.clear();
   _bgTiles.clear();
 }
@@ -40,6 +47,7 @@ void	Chunk::fillTiles(const RepeatedField<uint32> &bgTiles,
   unsigned int y;
   unsigned int index;
 
+  std::cout << "Filling chunk at pos " << _pos.x << " " << _pos.y << std::endl;
   for (y = 0; y < Chunk::height; ++y)
     for (x = 0; x < Chunk::width; ++x)
       {
@@ -47,6 +55,7 @@ void	Chunk::fillTiles(const RepeatedField<uint32> &bgTiles,
 	_bgTiles[index] = static_cast<TileType>(bgTiles.Get(index));
 	_tiles[index] = static_cast<TileType>(fgTiles.Get(index));
       }
+  _loaded = true;
 }
 
 void Chunk::_generateVBO(const TileCodex& codex)
@@ -98,4 +107,9 @@ void	Chunk::draw(sf::RenderWindow& window,
 void		Chunk::setPosition(const Vector2i &vec)
 {
   _pos = vec;
+}
+
+const Vector2i	&Chunk::getPosition() const
+{
+  return _pos;
 }

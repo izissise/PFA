@@ -13,7 +13,7 @@ public:
   Player(Camera &camera);
   virtual ~Player();
 
-  void		move(const Vector2f &dir);
+  bool		move(const Vector2f &dir);
 
   Range2i	&getLoadedRange();
   Range2i	&getVisibleRange();

@@ -32,8 +32,8 @@ public:
   void			draw(sf::RenderWindow& window) const;
   void			load();
 
-  void			movePlayer(const Vector2f &dir);
-  void			movePlayer(const VectorInt &chunkId,
+  bool			movePlayer(const Vector2f &dir);
+  bool			movePlayer(const VectorInt &chunkId,
 				   const VectorFloat &pos);
   void			setPlayerPosition(const Vector2i &chunkId,
 					  const Vector2f &position);
@@ -44,9 +44,13 @@ public:
 		      Vector2f(position.x(), position.y()));
   }
   const Player		&getPlayer() const; // use world's setter to set the client's attr
+  bool			isLoaded() const	{ return _loaded; }
+  bool			isChunkLoaded(const Vector2i &chunkPos) const;
   void			fillChunkData(const VectorInt &pos,
 				      const RepeatedField<uint32> &bgTiles,
 				      const RepeatedField<uint32> &fgTiles);
+  void			refreshChunks(std::vector<Vector2i> &chunks);
+  void			removeOldChunks();
 
 protected:
 private:

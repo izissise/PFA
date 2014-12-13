@@ -26,6 +26,7 @@ public:
   static const unsigned pHeight = height * TileCodex::tileSize;
 
   Chunk(void);
+  Chunk(const Vector2i &chunkPos);
   virtual ~Chunk(void);
 
   Chunk(const Chunk& other) = delete;
@@ -52,6 +53,8 @@ public:
   void setTile(unsigned x, unsigned y, TileType val)	{ setTile(y * width + x, val); }
   TileType getBgTile(unsigned x, unsigned y) const	{ return getBgTile(y * width + x); }
   void setBgTile(unsigned x, unsigned y, TileType val)	{ setBgTile(y * width + x, val); }
+
+  const Vector2i	&getPosition() const;
 
 private:
   void _generateVBO(const TileCodex& codex);

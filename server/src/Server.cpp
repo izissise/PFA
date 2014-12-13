@@ -171,8 +171,10 @@ void	Server::saveClientId(Client *client)
   else
     content.push_back(newLine.str());
   for (auto &s : content)
-    file << s << std::endl;
-  std::cout << "write to file" << std::endl;
+    {
+      std::cout << "write to file " << s << std::endl;
+      file << s << std::endl;
+    }
   file.close();
 }
 

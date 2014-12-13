@@ -10,7 +10,7 @@ public:
   AMovable();
   virtual ~AMovable();
 
-  virtual void		move(const Vector2f &dir);
+  virtual bool		move(const Vector2f &dir);
   const Vector2f	&getPosition() const;
   const Vector2i	&getChunkId() const;
 

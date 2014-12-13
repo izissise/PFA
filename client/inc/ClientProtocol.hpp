@@ -30,6 +30,7 @@ private:
   void	handleDisplacements(const ProtocolMessage &packet);
   void	queryInitialChunks();
   void	queryChunks(const std::vector<Vector2i> &chunkIds) const;
+  void	getNewChunks();
 
   std::map<ProtocolMessage::PacketContent, func>	_func;
   std::shared_ptr<World>	_world;
