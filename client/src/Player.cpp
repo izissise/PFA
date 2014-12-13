@@ -8,19 +8,21 @@ Player::Player(Camera &camera) :
 Player::~Player()
 {
 }
-
+#include <iostream>
 void	Player::move(const Vector2f &dir)
 {
   _camera.translate(dir);
   calculateVisibleRange();
   AMovable::move(dir);
+  Vector2i mchunkId = getChunkId();
+  Vector2f mposition = getPosition();
+  std::cout << "Chunk: " << mchunkId.x << " " << mchunkId.y << " "
+	    << "Pos : " << mposition.x << " " << mposition.y << std::endl;
 }
-#include <iostream>
+
 void	Player::setPlayerPosition(const Vector2i &chunkId,
 				  const Vector2f &position)
 {
-  std::cout << "Chunk: " << chunkId.x << " " << chunkId.y << " "
-	    << "Pos : " << position.x << " " << position.y << std::endl;
   _camera.move(_camera.sToWPos(chunkId, position));
   calculateVisibleRange();
   _loadedRange =

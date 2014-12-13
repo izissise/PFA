@@ -39,9 +39,6 @@ auto	Camera::sToWPos(const screenPos &pos) const -> worldPos
 
 auto	Camera::sToWPos(const Vector2i &chunkId, const Vector2f &position) const -> worldPos
 {
-  float	x = chunkId.x * Chunk::pWidth + position.x;
-  float	y = chunkId.y * Chunk::pHeight + position.y;
-
-  return {x / static_cast<float>(Chunk::pWidth),
-      y / static_cast<float>(Chunk::pHeight)};
+  return worldPos(static_cast<float>(chunkId.x) + position.x,
+		  static_cast<float>(chunkId.y) + position.y);
 }

@@ -39,7 +39,7 @@ void		Server::run()
   std::cout << "Quiet => " << _arg.quiet << std::endl;
   std::cout << "Debug => " << _arg.debug << std::endl;
 
-  while ((enet_host_service(_server, &event, 1000)) >= 0)
+  while ((enet_host_service(_server, &event, 17)) >= 0)
     {
       switch (event.type)
         {
@@ -180,8 +180,8 @@ void		Server::actDisplacement(Client *client, Action act)
 {
   ClientEntity	&clEnt = client->getEntity();
 
-  clEnt.move(Vector2f(act == Action::Left ? -50 : act == Action::Right ? 50 : 0,
-		      act == Action::Forward ? 50 : act == Action::Back ? -50 : 0));
+  clEnt.move(Vector2f(act == Action::Left ? -0.01 : act == Action::Right ? 0.01 : 0,
+		      act == Action::Forward ? 0.01 : act == Action::Back ? -0.01 : 0));
 
 
   // petite partie en dur :D
@@ -218,7 +218,6 @@ void		Server::actDisplacement(Client *client, Action act)
   msg.set_allocated_displacement(displacement);
   msg.SerializeToString(&serialized);
   client->sendPacket(0, serialized);
-  std::cout << "Got action " << (int)act << std::endl;
 }
 
 void	Server::trigger(const t_event &event)

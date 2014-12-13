@@ -14,16 +14,16 @@ void	AMovable::move(const Vector2f &dir)
 
   _pos.x += dir.x;
   _pos.y += dir.y;
-  if (_pos.x >= CHUNKWIDTH || _pos.x < 0)
+  if (_pos.x >= 1 || _pos.x < 0)
     {
-      side = (_pos.x >= CHUNKWIDTH);
-      _pos.x += (side ? (-CHUNKWIDTH) : (CHUNKWIDTH));
+      side = (_pos.x >= 1);
+      _pos.x += (side ? (-1.f) : (1.f));
       _chunkId.x += (side ? 1 : -1);
     }
-  if (_pos.y >= CHUNKHEIGHT || _pos.y < 0)
+  if (_pos.y >= 1 || _pos.y < 0)
     {
-      side = (_pos.y >= CHUNKHEIGHT);
-      _pos.y += (side ? (-CHUNKHEIGHT) : (CHUNKHEIGHT));
+      side = (_pos.y >= 1);
+      _pos.y += (side ? (-1.f) : (1.f));
       _chunkId.y += (side ? 1 : -1);
     }
 }
