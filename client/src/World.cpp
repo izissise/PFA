@@ -75,8 +75,10 @@ bool		World::movePlayer(const Vector2f &dir)
 
   retVal = _player.move(dir);
   visibleRange = _player.getVisibleRange();
-  if (visibleRange != oldRange)
+  if (retVal)
     _loadChunks();
+  // if (visibleRange != oldRange)
+  //   _loadChunks();
   return retVal;
 }
 
@@ -146,49 +148,67 @@ void World::_drawChunk(sf::RenderWindow& window,
 */
 void		World::_loadChunks(void)
 {
-  const Range2i	&visibleRange = _player.getVisibleRange();
-  const Range2i	&loadedRange = _player.getLoadedRange();
-  Range2i	bufferRange({visibleRange.left() - 1, visibleRange.bottom() - 1},
-			    {visibleRange.right() + 1, visibleRange.top() + 1});
+  const Range2i		&visibleRange = _player.getVisibleRange();
+  Range2i		&loadedRange = _player.getLoadedRange(); // should be const
+  const	Vector2i	plChunkId = _player.getChunkId();
 
   std::cout << " -- LoadChunks -- " << std::endl;
-  std::vector<Vector2i>	added;
-  std::vector<Vector2i> removed;
-  Range2i	intersection =
+  removeOldChunks();
+  _player.setLoadedRange(Range2i({plChunkId.x - 1, plChunkId.y -1},
+				 {plChunkId.x + 1, plChunkId.y + 1}));
+  for (auto cursor : loadedRange) // be aware it has been updated just above
     {
-      {std::max(bufferRange.left(), loadedRange.left()),
-       std::max(bufferRange.bottom(), loadedRange.bottom())},
-      {std::min(bufferRange.right(), loadedRange.right()),
-       std::min(bufferRange.top(), loadedRange.top())}
-    };
-  auto		predicate = [intersection](Vector2i& v) {
-    return (std::find(intersection.cbegin(), intersection.cend(), v) != intersection.cend());
-  };
-
-  added.assign(bufferRange.begin(), bufferRange.end());
-  removed.assign(loadedRange.cbegin(), loadedRange.cend());
-  added.erase(std::remove_if(added.begin(), added.end(), predicate), added.end());
-  removed.erase(std::remove_if(removed.begin(), removed.end(), predicate), removed.end());
-
-  for (auto cursor : added)
-    {
-      if (_chunks.find(cursor) == _chunks.end())
+      if (!isChunkLoaded(cursor))
 	{
 	  std::cout << "Creating chunk at -> " << cursor.x << " " << cursor.y << std::endl;
 	  _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
-	  // _chunks[cursor]->load(_codex);
 	}
     }
-  for (auto cursor : removed)
-    {
-      std::cout << "Removing Chunk " << cursor.x << " " << cursor.y << std::endl;
-      _chunks.erase(cursor);
-    }
-  _player.setLoadedRange(bufferRange);
-  std::cout << "LoadedRange: " << loadedRange.left() << " " << loadedRange.top()
-	    << " / " << loadedRange.right() << " " << loadedRange.bottom() << std::endl;
   std::cout << "----" << std::endl;
 }
+
+
+//   Range2i	bufferRange({visibleRange.left() - 1, visibleRange.bottom() - 1},
+// 			    {visibleRange.right() + 1, visibleRange.top() + 1});
+
+
+//   std::vector<Vector2i>	added;
+//   std::vector<Vector2i> removed;
+//   Range2i	intersection =
+//     {
+//       {std::max(bufferRange.left(), loadedRange.left()),
+//        std::max(bufferRange.bottom(), loadedRange.bottom())},
+//       {std::min(bufferRange.right(), loadedRange.right()),
+//        std::min(bufferRange.top(), loadedRange.top())}
+//     };
+//   auto		predicate = [intersection](Vector2i& v) {
+//     return (std::find(intersection.cbegin(), intersection.cend(), v) != intersection.cend());
+//   };
+
+//   added.assign(bufferRange.begin(), bufferRange.end());
+//   removed.assign(loadedRange.cbegin(), loadedRange.cend());
+//   added.erase(std::remove_if(added.begin(), added.end(), predicate), added.end());
+//   removed.erase(std::remove_if(removed.begin(), removed.end(), predicate), removed.end());
+
+//   for (auto cursor : added)
+//     {
+//       if (_chunks.find(cursor) == _chunks.end())
+// 	{
+// 	  std::cout << "Creating chunk at -> " << cursor.x << " " << cursor.y << std::endl;
+// 	  _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
+// 	  // _chunks[cursor]->load(_codex);
+// 	}
+//     }
+//   for (auto cursor : removed)
+//     {
+//       std::cout << "Removing Chunk " << cursor.x << " " << cursor.y << std::endl;
+//       _chunks.erase(cursor);
+//     }
+//   _player.setLoadedRange(bufferRange);
+//   std::cout << "LoadedRange: " << loadedRange.left() << " " << loadedRange.top()
+// 	    << " / " << loadedRange.right() << " " << loadedRange.bottom() << std::endl;
+//   std::cout << "----" << std::endl;
+// }
 
 const Player	&World::getPlayer() const
 {
