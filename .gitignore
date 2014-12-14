@@ -84,5 +84,5 @@ install_manifest.txt
 
 message/*/*.pb.cc
 message/*/*.pb.h
-log/
+log/*
 guid.txt
