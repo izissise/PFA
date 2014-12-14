@@ -39,7 +39,7 @@ void		Server::run()
   std::cout << "Quiet => " << _arg.quiet << std::endl;
   std::cout << "Debug => " << _arg.debug << std::endl;
 
-  while ((enet_host_service(_server, &event, 17)) >= 0)
+  while ((enet_host_service(_server, &event, 30)) >= 0)
     {
       switch (event.type)
         {
