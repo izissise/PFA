@@ -17,6 +17,7 @@ using namespace noise;
 Chunk::Chunk(void) :
   _tiles(width * height, TileType::Empty),
   _bgTiles(width * height, TileType::Empty),
+  _generated(false),
   _loaded(false)
 {
 }
@@ -25,6 +26,7 @@ Chunk::Chunk(const Vector2i &chunkPos) :
   _tiles(width * height, TileType::Empty),
   _bgTiles(width * height, TileType::Empty),
   _pos(chunkPos),
+  _generated(false),
   _loaded(false)
 {
 }
@@ -36,6 +38,7 @@ Chunk::~Chunk(void)
 void Chunk::load(const TileCodex& codex)
 {
   _generateVBO(codex);
+  _loaded = true;
   _tiles.clear();
   _bgTiles.clear();
 }
@@ -55,7 +58,7 @@ void	Chunk::fillTiles(const RepeatedField<uint32> &bgTiles,
 	_bgTiles[index] = static_cast<TileType>(bgTiles.Get(index));
 	_tiles[index] = static_cast<TileType>(fgTiles.Get(index));
       }
-  _loaded = true;
+  _generated = true;
 }
 
 void Chunk::_generateVBO(const TileCodex& codex)

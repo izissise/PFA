@@ -31,6 +31,7 @@ public:
   void			update(void);
   void			draw(sf::RenderWindow& window) const;
   void			load();
+  void			loadRange();
 
   bool			movePlayer(const Vector2f &dir);
   bool			movePlayer(const VectorInt &chunkId,

@@ -45,6 +45,7 @@ public:
   TileType getBgTile(unsigned index) const	{ return _bgTiles[index]; }
   void setBgTile(unsigned index, TileType val)	{ _bgTiles[index] = val; }
   bool isLoaded(void) const			{ return _loaded; }
+  bool isGenerated() const			{ return _generated; }
 
   /*
   ** Conveniance wrappers
@@ -64,6 +65,7 @@ private:
   sf::VertexArray	_fgVertices;
   sf::VertexArray	_bgVertices;
   Vector2i		_pos;
+  bool			_generated;
   bool			_loaded;
 };
 

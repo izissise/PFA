@@ -132,7 +132,7 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
   unsigned int		nbChunk = fullChunk.chunkdata_size();
 
   std::cout << "FullChunk packet -> " << nbChunk << std::endl;
-  _world->removeOldChunks();
+  //  _world->removeOldChunks();
   for (unsigned int i = 0; i < nbChunk; ++i)
     {
       const ChunkData	&chunk = fullChunk.chunkdata(i);
@@ -144,6 +144,8 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
     }
   if (!_world->isLoaded())
     _world->load();
+  else
+    _world->loadRange();
 }
 
 void			ClientProtocol::getNewChunks()

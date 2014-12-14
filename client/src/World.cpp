@@ -22,11 +22,21 @@ World::World(Settings& settings) :
 
 void		World::load()
 {
+  loadRange();
+  _loaded = true;
+}
+
+void		World::loadRange()
+{
   Range2i	&loadedRange = _player.getLoadedRange();
 
+  std::cout << " -- LoadRange -- " << std::endl;
   for (auto &cursor : loadedRange)
-    _chunks[cursor]->load(_codex);
-  _loaded = true;
+    {
+      std::cout << cursor.x << " " << cursor.y << std::endl;
+      _chunks[cursor]->load(_codex);
+    }
+  std::cout << "-----" << std::endl;
 }
 
 void		World::setPlayerPosition(const Vector2i &chunkId,
@@ -141,6 +151,7 @@ void		World::_loadChunks(void)
   Range2i	bufferRange({visibleRange.left() - 1, visibleRange.bottom() - 1},
 			    {visibleRange.right() + 1, visibleRange.top() + 1});
 
+  std::cout << " -- LoadChunks -- " << std::endl;
   std::vector<Vector2i>	added;
   std::vector<Vector2i> removed;
   Range2i	intersection =
@@ -163,13 +174,20 @@ void		World::_loadChunks(void)
     {
       if (_chunks.find(cursor) == _chunks.end())
 	{
+	  std::cout << "Creating chunk at -> " << cursor.x << " " << cursor.y << std::endl;
 	  _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
-	  _chunks[cursor]->load(_codex);
+	  // _chunks[cursor]->load(_codex);
 	}
     }
   for (auto cursor : removed)
-    _chunks.erase(cursor);
+    {
+      std::cout << "Removing Chunk " << cursor.x << " " << cursor.y << std::endl;
+      _chunks.erase(cursor);
+    }
   _player.setLoadedRange(bufferRange);
+  std::cout << "LoadedRange: " << loadedRange.left() << " " << loadedRange.top()
+	    << " / " << loadedRange.right() << " " << loadedRange.bottom() << std::endl;
+  std::cout << "----" << std::endl;
 }
 
 const Player	&World::getPlayer() const
@@ -183,7 +201,7 @@ bool	World::isChunkLoaded(const Vector2i &chunkPos) const
 
   if (it == _chunks.end())
     return false;
-  return it->second->isLoaded();
+  return (it->second->isGenerated() || it->second->isLoaded());
 }
 
 void			World::removeOldChunks()
@@ -194,7 +212,7 @@ void			World::removeOldChunks()
   while (itr != _chunks.end())
     {
       const Vector2i &pos = itr->second->getPosition();
-      if (itr->second->isLoaded() &&
+      if (itr->second->isGenerated() &&
 	  (std::abs(chunkPos.x - pos.x) > 1 ||
 	   std::abs(chunkPos.y - pos.y) > 1))
 	{
