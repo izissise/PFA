@@ -30,8 +30,8 @@ void	Player::setPlayerPosition(const Vector2i &chunkId,
   calculateVisibleRange();
   _loadedRange =
     {
-      {_visibleRange.left() - 1, _visibleRange.bottom() - 1},
-      {_visibleRange.right() + 1, _visibleRange.top() + 1}
+      {chunkId.x - 1, chunkId.y - 1},
+      {chunkId.x + 1, chunkId.y + 1}
     };
   AMovable::setChunkId(chunkId);
   AMovable::setPosition(position);

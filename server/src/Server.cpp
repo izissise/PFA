@@ -85,8 +85,6 @@ void		Server::connectClient(ENetPeer * const peer)
 	    << peer->address.host << " : "
 	    << peer->address.port << std::endl;
   peer->data = newClient;
-  newClient->getEntity().setPosition({128, 128});
-  newClient->getEntity().setChunkId({0, 0});
   _clients.push_back(newClient);
   newClient->sendPacket(0, _set.serialize());
 }
