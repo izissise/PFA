@@ -41,7 +41,8 @@ private:
 
   void	loadClientProfile(Client *client, const std::string &userId);
   void	spawnClient(Client *Client);
-  void	sendClientProfile(Client *client);
+  void	sendClientProfile(Client *client, const std::string &newId);
+  void	generateNewId(std::string &guid);
 
   std::map<ClientMessage::PacketContent, parseFunc> _func;
   World		&_world;

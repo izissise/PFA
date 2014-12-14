@@ -2,4 +2,5 @@ import "Position.proto";
 
 message InitClient {
   required Position pos = 1;
+  required string guid = 2;
 }

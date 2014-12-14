@@ -1,3 +1,4 @@
+#include <fstream>
 #include "ClientProtocol.hpp"
 
 ClientProtocol::ClientProtocol(Network &net) :
@@ -72,11 +73,26 @@ void	ClientProtocol::initClient(const ProtocolMessage &packet)
   const	Position	&pos = initData.pos();
   const VectorInt	&chunkId = pos.chunkid();
   const VectorFloat	&playerPos = pos.pos();
+  const std::string	&guid = initData.guid();
 
   _world->setPlayerPosition(Vector2i(chunkId.x(), chunkId.y()),
 			    Vector2f(playerPos.x(),
 				     playerPos.y()));
+  if (!guid.empty())
+    writeNewGuid(guid);
   queryInitialChunks();
+}
+
+void		ClientProtocol::writeNewGuid(const std::string &guid) const
+{
+  std::ofstream	file;
+
+  file.open(GUIDFILE, std::ofstream::binary | std::ofstream::out | std::ofstream::trunc);
+  if (file)
+    {
+      file << guid << std::endl;
+      file.close();
+    }
 }
 
 void			ClientProtocol::queryInitialChunks()

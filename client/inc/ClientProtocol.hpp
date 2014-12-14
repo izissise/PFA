@@ -10,6 +10,8 @@
 # include "ProtocolMessage.pb.h"
 # include "ClientMessage.pb.h"
 
+# define GUIDFILE "../guid.txt"
+
 using namespace google::protobuf;
 
 class ClientProtocol
@@ -31,6 +33,7 @@ private:
   void	queryInitialChunks();
   void	queryChunks(const std::vector<Vector2i> &chunkIds) const;
   void	getNewChunks();
+  void	writeNewGuid(const std::string &guid) const;
 
   std::map<ProtocolMessage::PacketContent, func>	_func;
   std::shared_ptr<World>	_world;

@@ -1,6 +1,7 @@
 #include <fstream>
 #include "ServerProtocol.hpp"
 #include "StringUtils.hpp"
+#include "GuidGenerator.hpp"
 
 ServerProtocol::ServerProtocol(World &world) :
   _world(world)
@@ -40,8 +41,16 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
   ClientEntity			&clEnt = client->getEntity();
   const ConnectionMessage	&coInfo = message.co();
   const std::string		&userId = coInfo.userid();
+  std::string			newId;
 
-  client->getInfo().setId(userId);
+  std::cout << "USERID " << userId << std::endl;
+  if (userId.empty())
+    {
+      generateNewId(newId);
+      client->getInfo().setId(newId);
+    }
+  else
+    client->getInfo().setId(userId);
   auto it = std::find_if(clients.begin(), clients.end(), [client, &userId](Client *cl)
 			 {
 			   return (client != cl && cl->getInfo().getId() == userId);
@@ -52,7 +61,7 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
       return ;
     }
   loadClientProfile(client, userId);
-  sendClientProfile(client);
+  sendClientProfile(client, newId);
 }
 
 void	ServerProtocol::handleActions(ClientMessage &message,
@@ -93,6 +102,13 @@ void	ServerProtocol::queryChunks(ClientMessage &message,
   client->sendPacket(0, _world.serialize(newChunks));
 }
 
+void		ServerProtocol::generateNewId(std::string &guid)
+{
+  GuidGenerator	gen;
+
+  guid = gen.generate();
+}
+
 void	ServerProtocol::spawnClient(Client *client)
 {
   ClientEntity	&clEnt = client->getEntity();
@@ -111,6 +127,11 @@ void	ServerProtocol::loadClientProfile(Client *client, const std::string &userId
   std::vector<std::string>	vec;
   ClientEntity			&clEnt = client->getEntity();
 
+  if (userId.empty())
+    {
+      spawnClient(client);
+      return ;
+    }
   file.open(LOGFILE, std::ios::binary | std::ios::in);
   if (!file) // Can be the first client joining
     {
@@ -137,13 +158,15 @@ void	ServerProtocol::loadClientProfile(Client *client, const std::string &userId
   spawnClient(client);
 }
 
-void	ServerProtocol::sendClientProfile(Client *client)
+void	ServerProtocol::sendClientProfile(Client *client,
+					  const std::string &newId)
 {
   ProtocolMessage	msg;
   InitClient		*initInfo = new InitClient;
   Position		*pos = new Position;
   VectorInt		*chunkId = new VectorInt;
   VectorFloat		*clPos = new VectorFloat;
+  std::string		*guid = new std::string(newId);
   ClientEntity		&clEnt = client->getEntity();
   std::string		serialized;
 
@@ -156,6 +179,7 @@ void	ServerProtocol::sendClientProfile(Client *client)
   pos->set_allocated_pos(clPos);
 
   initInfo->set_allocated_pos(pos);
+  initInfo->set_allocated_guid(guid);
   msg.set_content(ProtocolMessage::CLINIT);
   msg.set_allocated_clinit(initInfo);
   msg.SerializeToString(&serialized);

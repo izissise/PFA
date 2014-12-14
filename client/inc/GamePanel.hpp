@@ -39,7 +39,8 @@ private:
   void		connectClient(ENetPeer * const peer, Settings &set);
   void		disconnectClient(ENetPeer * const peer);
 
-  void		sendConnectionInfo(Settings &set) const;
+  void		sendConnectionInfo() const;
+  void		getGuidFromFile(std::string *guid) const;
 
   int		_pad;
   int		_padup;

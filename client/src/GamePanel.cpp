@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <SFML/Audio.hpp>
 #include "GamePanel.hpp"
@@ -191,10 +192,10 @@ void	GamePanel::handlePackets(ENetEvent &event)
   enet_packet_destroy(event.packet);
 }
 
-void	GamePanel::connectClient(ENetPeer * const peer, Settings &set)
+void	GamePanel::connectClient(ENetPeer * const peer, Settings &set UNUSED)
 {
   peer->data = (char *)("Server");
-  sendConnectionInfo(set);
+  sendConnectionInfo();
 }
 
 void	GamePanel::disconnectClient(ENetPeer * const peer)
@@ -204,14 +205,26 @@ void	GamePanel::disconnectClient(ENetPeer * const peer)
   notify(t_event(wEvent::Hide | wEvent::Toggle));
 }
 
-void			GamePanel::sendConnectionInfo(Settings &set) const
+void			GamePanel::getGuidFromFile(std::string *guid) const
+{
+  std::ifstream		file;
+
+  file.open(GUIDFILE, std::ofstream::binary | std::ofstream::in);
+  if (file)
+    {
+      file >> (*guid);
+      file.close();
+    }
+}
+
+void			GamePanel::sendConnectionInfo() const
 {
   ClientMessage		msg;
   ConnectionMessage	*co = new ConnectionMessage;
   std::string		*userId = new std::string;
   std::string		serialized;
 
-  *userId = "toto"; //modify
+  getGuidFromFile(userId);
   co->set_allocated_userid(userId);
   msg.set_content(ClientMessage::CONNECTION);
   msg.set_allocated_co(co);
