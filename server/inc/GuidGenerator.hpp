@@ -12,6 +12,10 @@ public:
   std::string	generate();
 
 private:
+  void		generateUuid4(std::stringstream &ss);
+  void		formatCpuCycle(std::stringstream &ss);
+
+private:
   unsigned long long int	rdtsc();
 };
 
