@@ -139,10 +139,12 @@ void	Server::saveClientId(Client *client)
 
   std::fstream		file;
   std::ostringstream	newLine("");
+  std::vector<std::string> content;
   std::string		line;
   bool			found = false;
+  unsigned int		lineIdx = 0;
 
-  file.open(LOGFILE, std::ios::binary | std::ios::in | std::ios::out);
+  file.open(LOGFILE, std::ios::binary | std::ios::in);
   printv(newLine, "%;% %;% %",
 	  clId, chunkId.x, chunkId.y,
 	  position.x, position.y);
@@ -157,24 +159,22 @@ void	Server::saveClientId(Client *client)
     }
   while (getline(file, line))
     {
-      if (line.find(clId) != std::string::npos)
-	{
-	  found = true;
-	  break;
-	}
+      content.push_back(line);
+      if (!found && line.find(clId) != std::string::npos)
+	found = true;
+      else if (!found)
+	++lineIdx;
     }
   if (found)
-    {
-      file.seekp(-(line.size() + 1), ios_base::cur);
-      file << newLine.str() << std::endl;
-      std::cout << "Writing " << newLine.str() << std::endl;
-    }
+    content[lineIdx] = newLine.str();
   else
-    {
-      file.clear();
-      file << newLine.str() << std::endl;
-      std::cout << "Writing " << newLine.str() << std::endl;
-    }
+    content.push_back(newLine.str());
+  file.close();
+  file.open(LOGFILE, std::ios::binary | std::ios::out);
+  if (!file)
+    throw std::invalid_argument(std::string("Cannot acces to the file ") + LOGFILE);
+  for (auto it : content)
+    file << it << std::endl;
   file.close();
 }
 
