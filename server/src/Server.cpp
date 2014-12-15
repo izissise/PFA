@@ -138,9 +138,8 @@ void	Server::saveClientId(Client *client)
   const Vector2i	&chunkId = clEnt.getChunkId();
 
   std::fstream		file;
-  std::vector<std::string> content;
   std::ostringstream	newLine("");
-  unsigned int		foundId = 0;
+  std::string		line;
   bool			found = false;
 
   file.open(LOGFILE, std::ios::binary | std::ios::in | std::ios::out);
@@ -156,22 +155,25 @@ void	Server::saveClientId(Client *client)
       file.close();
       return ;
     }
-  for (std::string line; getline(file, line);)
+  while (getline(file, line))
     {
-      content.push_back(line);
-      if (!found && line.find(clId) != std::string::npos)
-	found = true;
-      if (!found)
-	++foundId;
+      if (line.find(clId) != std::string::npos)
+	{
+	  found = true;
+	  break;
+	}
     }
   if (found)
-    content[foundId] = newLine.str();
-  else
-    content.push_back(newLine.str());
-  for (auto &s : content)
     {
-      std::cout << "write to file " << s << std::endl;
-      file << s << std::endl;
+      file.seekp(-(line.size() + 1), ios_base::cur);
+      file << newLine.str() << std::endl;
+      std::cout << "Writing " << newLine.str() << std::endl;
+    }
+  else
+    {
+      file.clear();
+      file << newLine.str() << std::endl;
+      std::cout << "Writing " << newLine.str() << std::endl;
     }
   file.close();
 }
