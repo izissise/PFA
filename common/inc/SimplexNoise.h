@@ -12,14 +12,14 @@
 
 namespace noise
 {
-  float fbm_2d(int octaves,
+  float fbm_2d(unsigned int octaves,
 	       float lacunarity,
 	       float gain,
 	       float scale,
 	       float x,
 	       float y);
 
-  float fbm_3d(int octaves,
+  float fbm_3d(unsigned int octaves,
 	       float lacunarity,
 	       float gain,
 	       float scale,
@@ -27,7 +27,7 @@ namespace noise
 	       float y,
 	       float z);
 
-  float scaled_fbm_2d(int octaves,
+  float scaled_fbm_2d(unsigned int octaves,
 		      float lacunarity,
 		      float gain,
 		      float scale,
@@ -36,7 +36,7 @@ namespace noise
 		      float x,
 		      float y);
 
-  float scaled_fbm_3d(int octaves,
+  float scaled_fbm_3d(unsigned int octaves,
 		      float lacunarity,
 		      float gain,
 		      float scale,
@@ -57,21 +57,21 @@ namespace noise
 			    float y,
 			    float z);
 
-  float	turbulence_2d(int octaves, float lacunarity,
+  float	turbulence_2d(unsigned int octaves, float lacunarity,
 		      float gain, float scale,
 		      float x, float y);
 
-  float	turbulence_3d(int octaves, float lacunarity,
+  float	turbulence_3d(unsigned int octaves, float lacunarity,
 		      float gain, float scale,
 		      float x, float y, float z);
 
   float	ridge(float h, float offset);
-  float	ridged_mf(int octaves, float lacunarity,
+  float	ridged_mf(unsigned int octaves, float lacunarity,
 		  float gain, float scale,
 		  float offset,
 		  int x, int y);
 
-  float	ridged_mf3(int octaves, float lacunarity,
+  float	ridged_mf3(unsigned int octaves, float lacunarity,
 		   float gain, float scale,
 		   float offset,
 		   int x, int y, int z);

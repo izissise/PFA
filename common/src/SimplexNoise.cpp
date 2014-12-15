@@ -3,7 +3,7 @@
 
 using namespace noise;
 
-float	noise::fbm_2d(int octaves, float lacunarity,
+float	noise::fbm_2d(unsigned int octaves, float lacunarity,
 		      float gain, float scale,
 		      float x, float y)
 {
@@ -11,7 +11,7 @@ float	noise::fbm_2d(int octaves, float lacunarity,
   float amplitude = 1.f;
   float	max = 0.f;
 
-  for (int i = 0; i < octaves; ++i)
+  for (unsigned int i = 0; i < octaves; ++i)
     {
       max += amplitude;
       total += raw_noise_2d(x * scale, y * scale) * amplitude;
@@ -21,7 +21,7 @@ float	noise::fbm_2d(int octaves, float lacunarity,
   return total / max;
 }
 
-float	noise::fbm_3d(int octaves, float lacunarity,
+float	noise::fbm_3d(unsigned int octaves, float lacunarity,
 		      float gain, float scale,
 		      float x, float y, float z)
 {
@@ -29,7 +29,7 @@ float	noise::fbm_3d(int octaves, float lacunarity,
   float amplitude = 1.f;
   float	max = 0.f;
 
-  for (int i = 0; i < octaves; ++i)
+  for (unsigned int i = 0; i < octaves; ++i)
     {
       max += amplitude;
       total += raw_noise_3d(x * scale, y * scale, z * scale) * amplitude;
@@ -39,7 +39,7 @@ float	noise::fbm_3d(int octaves, float lacunarity,
   return total / max;
 }
 
-float	noise::turbulence_2d(int octaves, float lacunarity,
+float	noise::turbulence_2d(unsigned int octaves, float lacunarity,
 			     float gain, float scale,
 			     float x, float y)
 {
@@ -47,7 +47,7 @@ float	noise::turbulence_2d(int octaves, float lacunarity,
   float amplitude = 1.f;
   float	max = 0.f;
 
-  for(int i = 0; i < octaves; ++i)
+  for(unsigned int i = 0; i < octaves; ++i)
     {
       max += amplitude;
       total += fabs(raw_noise_2d(x * scale, y * scale)) * amplitude;
@@ -57,7 +57,7 @@ float	noise::turbulence_2d(int octaves, float lacunarity,
   return total / max;
 }
 
-float	noise::turbulence_3d(int octaves, float lacunarity,
+float	noise::turbulence_3d(unsigned int octaves, float lacunarity,
 			     float gain, float scale,
 			     float x, float y, float z)
 {
@@ -65,7 +65,7 @@ float	noise::turbulence_3d(int octaves, float lacunarity,
   float amplitude = 1.f;
   float	max = 0.f;
 
-  for(int i = 0; i < octaves; ++i)
+  for(unsigned int i = 0; i < octaves; ++i)
     {
       max += amplitude;
       total += fabs(raw_noise_3d(x * scale, y * scale, z * scale)) * amplitude;
@@ -83,7 +83,7 @@ float	noise::ridge(float h, float offset)
   return h;
 }
 
-float	noise::ridged_mf(int octaves, float lacunarity,
+float	noise::ridged_mf(unsigned int octaves, float lacunarity,
 			 float gain, float scale,
 			 float offset,
 			 int x, int y)
@@ -91,7 +91,7 @@ float	noise::ridged_mf(int octaves, float lacunarity,
   return ridge(0.3 + 0.5 * fbm_2d(octaves, lacunarity, gain, scale, x, y), offset);
 }
 
-float	noise::ridged_mf3(int octaves, float lacunarity,
+float	noise::ridged_mf3(unsigned int octaves, float lacunarity,
 			  float gain, float scale,
 			  float offset,
 			  int x, int y, int z)
@@ -99,7 +99,7 @@ float	noise::ridged_mf3(int octaves, float lacunarity,
   return ridge(0.3 + 0.5 * fbm_3d(octaves, lacunarity, gain, scale, x, y, z), offset);
 }
 
-float	noise::scaled_fbm_2d(int octaves, float lacunarity,
+float	noise::scaled_fbm_2d(unsigned int octaves, float lacunarity,
 			     float gain, float scale,
 			     float loBound, float hiBound,
 			     float x, float y)
@@ -112,7 +112,7 @@ float	noise::scaled_fbm_2d(int octaves, float lacunarity,
     * (hiBound - loBound) / 2 + (hiBound + loBound) / 2;
 }
 
-float	noise::scaled_fbm_3d(int octaves, float lacunarity,
+float	noise::scaled_fbm_3d(unsigned int octaves, float lacunarity,
 			     float gain, float scale,
 			     float loBound, float hiBound,
 			     float x, float y, float z)
