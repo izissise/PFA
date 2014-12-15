@@ -62,10 +62,10 @@ Thumbs.db
 obj/
 [Rr]elease*/
 _ReSharper*/
-[Tt]est[Rr]esult*                                                                                                                                                                                                                                                                                                                                       
-.#*                                                                                                                                                                                
-*.bin                                                                                                                                                                              
-.cproject                                                                                                                                                                          
+[Tt]est[Rr]esult*
+.#*
+*.bin
+.cproject
 .metadata/
 .project
 .settings/
@@ -78,3 +78,11 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 .idea/
+.DS_Store
+
+# Generated files
+
+message/*/*.pb.cc
+message/*/*.pb.h
+log/*
+guid.txt

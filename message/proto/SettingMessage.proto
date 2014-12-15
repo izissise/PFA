@@ -1,0 +1,15 @@
+message SettingMessage {
+  repeated group SettingEntry = 1
+  {
+
+    required string key = 2;
+
+    required group Cvar = 3 {
+      required string min = 4;
+      required string max = 5;
+      required string default = 6;
+      required string value = 7;
+      required int32  type = 8;
+    }
+  }
+}

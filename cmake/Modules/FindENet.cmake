@@ -18,13 +18,13 @@ FIND_PATH(ENet_INCLUDE_DIRS enet/enet.h
 			    )
 
 FIND_LIBRARY(ENet_LIBRARY
-				NAMES enet
-				PATHS
-				${ENV}${ENET_ROOT}
-				/usr/local
-				/usr
-				PATH_SUFFIXES lib
-				)
+  NAMES enet
+  PATHS
+  ${ENV}${ENET_ROOT}
+  /usr/local
+  /usr
+  PATH_SUFFIXES lib
+  )
 
 # handle the QUIETLY and REQUIRED arguments and set ENET_FOUND to TRUE if
 # all listed variables are TRUE

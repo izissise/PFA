@@ -2,6 +2,7 @@
 #define _PARSER_H_
 
 #include "Settings.hpp"
+#include "StringUtils.hpp"
 
 class Parser
 {
@@ -26,6 +27,7 @@ private:
 private:
   std::map<std::string, func>	_parseKey;
   std::vector<std::string>	_retVal;
+  StringUtils			_utils;
   Settings			*_set;
 };
 

@@ -1,0 +1,4 @@
+message ConnectionMessage
+{
+  required string userId = 1;
+}

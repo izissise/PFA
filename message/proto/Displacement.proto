@@ -1,0 +1,8 @@
+import "Vectors.proto";
+import "Position.proto";
+
+message Displacement {
+  required VectorFloat	acceleration = 1;
+  required VectorFloat	velocity = 2;
+  required Position	position = 3;
+}

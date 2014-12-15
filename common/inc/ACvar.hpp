@@ -1,5 +1,5 @@
-#ifndef _CVAR_H_
-#define _CVAR_H_
+#ifndef _ACVAR_H_
+#define _ACVAR_H_
 
 # include <map>
 # include <array>
@@ -24,19 +24,20 @@ typedef struct	s_cvar
   }
 }		t_cvar;
 
-class CvarList
+class ACvar
 {
 public:
-  CvarList();
-  virtual ~CvarList();
+  ACvar();
+  virtual ~ACvar();
+
+  virtual void	       	setCvar(const std::string &name, const std::string &value);
 
   bool	isCvar(const std::string &name) const;
   const std::array<std::string, 3>	&getCvarInfo(const std::string &name) const;
   const std::string	&getCvar(const std::string &name) const;
-  void			setCvar(const std::string &name, const std::string &value);
   bool			addCvar(const std::string &name, t_cvar *cvar);
 
-private:
+protected:
   std::map<std::string, t_cvar *>		_cvars;
 };
 

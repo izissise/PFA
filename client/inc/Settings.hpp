@@ -2,7 +2,7 @@
 # define _SETTINGS_H_
 
 #include <string>
-#include "Cvar.hpp"
+#include "CvarList.hpp"
 #include "Controls.hpp"
 
 class Console;

@@ -1,10 +1,13 @@
+#include <fstream>
 #include <iostream>
 #include <SFML/Audio.hpp>
 #include "GamePanel.hpp"
 #include "SimplexNoise.h"
 
 GamePanel::GamePanel(const sf::FloatRect &zone) :
-  APanelScreen(zone), _pad(0), _padup(0), _oldY(SHEIGHT), _dir(true), _world(nullptr)
+  APanelScreen(zone), _pad(0), _padup(0),
+  _oldY(SHEIGHT), _dir(true), _world(nullptr),
+  _socket(), _proto(_socket), _actAnalyzer()
 {
   addFont("default", "../client/assets/default.TTF");
   setHide(true);
@@ -12,10 +15,11 @@ GamePanel::GamePanel(const sf::FloatRect &zone) :
 
 GamePanel::~GamePanel()
 {
+  _socket.disconnect();
 }
 
 void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSED,
-			     const std::vector<APanelScreen *> &panels UNUSED)
+			     const std::vector<APanelScreen *> &panels)
 {
   Controls	&controls = set.getControls();
   float	gWidth = std::stof(set.getCvarList().getCvar("r_width"));
@@ -34,6 +38,7 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
   Widget	*wFourth = new Widget("sound4", {panZone.left, panZone.top + 228, panZone.width, 60},
 				      sf::Text("4.", _font["default"], 22));
 
+  addObserver(panels[0]);
   createButton(texture, wHeader);
   createVoiceButton(texture, wFirst, controls, sf::Keyboard::Num1);
   createVoiceButton(texture, wSecond, controls, sf::Keyboard::Num2);
@@ -50,6 +55,8 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
   addPanels({pSound});
   _world.reset(new World{set});
   resizeWidgets({gWidth, gHeight});
+  _proto.setSetting(&set);
+  _proto.setWorld(_world);
 }
 
 void	GamePanel::createButton(const sf::Texture &texture, Widget *w)
@@ -104,11 +111,37 @@ void	GamePanel::draw(sf::RenderWindow &window, bool toWin)
   drawHud(window, toWin);
 }
 
-int	GamePanel::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
+void	GamePanel::trigger(const t_event &event)
+{
+  if (event.e & wEvent::Hide)
+    {
+      if (event.e & wEvent::Toggle)
+	{
+	  _hide = !_hide;
+	  if (_hide == false)
+	    {
+	      try
+		{
+		  _socket.connect("127.0.0.1", "6060", 2);
+		}
+	      catch (NetworkException &e)
+		{
+		  std::cerr << e.what() << std::endl;
+		}
+	    }
+	}
+      else
+	_hide = true;
+    }
+  else
+    APanelScreen::trigger(event);
+}
+
+int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
 
-  (getSubPanels()[0])->setHide(!set.getControls().getActionState(Action::ToggleQuickMenu));
+  //  (getSubPanels()[0])->setHide(!set.getControls().getActionState(Action::ToggleQuickMenu));
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
       if ((*rit)->isHidden() == false)
@@ -120,6 +153,98 @@ int	GamePanel::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
       if ((retVal = (*rit)->update(event, ref, set)) != 0)
 	return retVal;
     }
+  return 0;
+}
+
+int		GamePanel::updateNetwork(Settings &set)
+{
+  ENetEvent	event;
+
+  try
+    {
+      if (_socket.pollEvent(&event, 1) < 0)
+	throw NetworkException("Connection problem");
+      switch (event.type)
+	{
+	case ENET_EVENT_TYPE_CONNECT:
+	  connectClient(event.peer, set);
+	  break;
+	case ENET_EVENT_TYPE_RECEIVE:
+	  handlePackets(event);
+	  break;
+	case ENET_EVENT_TYPE_DISCONNECT:
+	  disconnectClient(event.peer);
+	  break;
+	default:
+	  break;
+	}
+    }
+  catch (NetworkException &e)
+    {
+      std::cerr << e.what() << std::endl;
+    }
+  return 0;
+}
+
+void	GamePanel::handlePackets(ENetEvent &event)
+{
+  _proto.parseCmd(event.packet->data, event.packet->dataLength);
+  enet_packet_destroy(event.packet);
+}
+
+void	GamePanel::connectClient(ENetPeer * const peer, Settings &set UNUSED)
+{
+  peer->data = (char *)("Server");
+  sendConnectionInfo();
+}
+
+void	GamePanel::disconnectClient(ENetPeer * const peer)
+{
+  std::cout << "Disconnect Peer" << std::endl;
+  setHide(true);
+  notify(t_event(wEvent::Hide | wEvent::Toggle));
+}
+
+void			GamePanel::getGuidFromFile(std::string *guid) const
+{
+  std::ifstream		file;
+
+  file.open(GUIDFILE, std::ofstream::binary | std::ofstream::in);
+  if (file)
+    {
+      file >> (*guid);
+      file.close();
+    }
+}
+
+void			GamePanel::sendConnectionInfo() const
+{
+  ClientMessage		msg;
+  ConnectionMessage	*co = new ConnectionMessage;
+  std::string		*userId = new std::string;
+  std::string		serialized;
+
+  getGuidFromFile(userId);
+  co->set_allocated_userid(userId);
+  msg.set_content(ClientMessage::CONNECTION);
+  msg.set_allocated_co(co);
+  msg.SerializeToString(&serialized);
+
+  _socket.sendPacket(1, serialized);
+}
+
+int		GamePanel::update(const sf::Event &event,
+				  sf::RenderWindow &ref,
+				  Settings &set)
+{
+  int		retVal;
+
+  updateNetwork(set);
+  if (_actAnalyzer.getInputChanges(set))
+    {
+      _socket.sendPacket(1, _actAnalyzer.serialize());
+    }
+  retVal = updateHud(event, ref, set);
   _world->update();
   return retVal;
 }

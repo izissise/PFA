@@ -33,7 +33,7 @@ Menu::Menu(Settings &settings, Parser &parser) :
   optTabPanel->addPanels({optGamePanel, optKeyPanel});
 
   mainMenu->construct(_menuTexture, settings, {optTabPanel, gamePanel});
-  gamePanel->construct(_menuTexture, settings, {});
+  gamePanel->construct(_menuTexture, settings, {mainMenu});
   optTabPanel->construct(_menuTexture, settings, {optGamePanel, optKeyPanel});
   optGamePanel->construct(_menuTexture, settings, {});
   optKeyPanel->construct(_menuTexture, settings, {});

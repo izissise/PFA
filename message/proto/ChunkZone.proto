@@ -1,0 +1,12 @@
+import "Vectors.proto";
+
+message ChunkZone {
+  required VectorInt  id = 1;
+  required VectorUint position = 2;
+  required VectorUint size = 3;
+  repeated uint32 fgTiles = 5 [packed=true];
+}
+
+message WorldZone {
+  repeated ChunkZone chunkZone = 1;
+}

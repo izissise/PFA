@@ -1,10 +1,12 @@
 #ifndef _CONTROLS_H_
 #define _CONTROLS_H_
 
-# include <SFML/Window.hpp>
-# include <map>
-# include <array>
-# include <vector>
+#include <SFML/Window.hpp>
+#include <map>
+#include <array>
+#include <vector>
+
+#include "ActionEnum.hpp"
 
 namespace ctrl
 {
@@ -23,20 +25,10 @@ namespace ctrl
       };
 }
 
-enum class	Action
+inline Action	operator++(Action &x)
 {
-  Unknown = -1,
-    Forward = 0,
-    Back,
-    Right,
-    Left,
-    Use,
-    MoveUp,
-    MoveDown,
-    ToggleConsole,
-    ToggleQuickMenu,
-    Last
-    };
+  return (x = static_cast<Action>(static_cast<int>(x) + 1));
+}
 
 enum class	actionType
 {

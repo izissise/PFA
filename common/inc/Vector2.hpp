@@ -9,6 +9,12 @@ public:
   Vector2(const T& value) : x(value), y(value) {}
   Vector2(const T& p_x, const T& p_y) : x(p_x), y(p_y) {}
   Vector2(const Vector2& rhs) : x(rhs.x), y(rhs.y) {}
+  template <typename U>
+  explicit Vector2(const Vector2<U>& vec) :
+    x(static_cast<T>(vec.x)),
+    y(static_cast<T>(vec.y))
+  {
+  }
   Vector2&	operator=(const Vector2& rhs) {
     x = rhs.x;
     y = rhs.y;

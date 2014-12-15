@@ -7,17 +7,20 @@
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
-# include "Chunk.hpp"
-# include "Range2.hpp"
 # include "Settings.hpp"
-# include "TileCodex.hpp"
-# include "Vector2.hpp"
+# include "Camera.hpp"
+# include "Player.hpp"
 
 class WorldTester;
 
 class World
 {
   friend class WorldTester;
+
+private:
+  typedef Vector2f	worldPos;
+  typedef Vector2i	screenPos;
+  typedef Vector2i	chunkId;
 
 public:
   World(Settings& settings);
@@ -27,46 +30,31 @@ public:
 
   void			update(void);
   void			draw(sf::RenderWindow& window) const;
+  void			load();
+  void			loadRange();
 
-  void			translateCam(const sf::Vector2<float>& v);
-  void			moveCam(const sf::Vector2<float>& pos);
+  bool			movePlayer(const Vector2f &dir);
+  bool			movePlayer(const VectorInt &chunkId,
+				   const VectorFloat &pos);
+  void			setPlayerPosition(const Vector2i &chunkId,
+					  const Vector2f &position);
+  void			setPlayerPosition(const VectorInt &chunkId,
+					  const VectorFloat &position)
+  {
+    setPlayerPosition(Vector2i(chunkId.x(), chunkId.y()),
+		      Vector2f(position.x(), position.y()));
+  }
+  const Player		&getPlayer() const; // use world's setter to set the client's attr
+  bool			isLoaded() const	{ return _loaded; }
+  bool			isChunkLoaded(const Vector2i &chunkPos) const;
+  void			fillChunkData(const VectorInt &pos,
+				      const RepeatedField<uint32> &bgTiles,
+				      const RepeatedField<uint32> &fgTiles);
+  void			refreshChunks(std::vector<Vector2i> &chunks);
+  void			removeOldChunks();
 
 protected:
 private:
-  typedef Vector2f	worldPos;
-  typedef Vector2i	screenPos;
-  typedef Vector2i	chunkId;
-
-  class Camera
-  {
-  public:
-    Camera(void) = default;
-    ~Camera(void) = default;
-    Camera(const Camera& other) = default;
-    Camera&	operator=(const Camera& other) = default;
-
-    void	translate(const worldPos& v);
-    void	move(const worldPos& pos);
-
-    void	scale(const worldPos& s);
-    void	resize(const worldPos& s);
-
-    float	left(void) const	{ return _botLeft.x; }
-    float	right(void) const	{ return _botLeft.x + _size.w; }
-    float	top(void) const		{ return _botLeft.y + _size.h; }
-    float	bottom(void) const	{ return _botLeft.y; }
-    float	width(void) const	{ return _size.w; }
-    float	height(void) const	{ return _size.h; }
-    worldPos	center(void) const	{ return _center; }
-
-  private:
-    worldPos	_botLeft;
-    worldPos	_size;
-    worldPos	_center;
-  };
-
-  worldPos	_sToWPos(screenPos pos, bool noOffsets = false) const;
-  screenPos	_wToSPos(worldPos pos, bool noOffsets = false) const;
   float		_getGridOffset(float w) const;
 
   void		_calculateVisibleRange(void);
@@ -76,14 +64,15 @@ private:
 			   const chunkId& cursor,
 			   screenPos& windowCoord) const;
   void		_loadChunks(void);
+
 private:
   std::map<chunkId, std::unique_ptr<Chunk>>	_chunks;
   Settings&	_settings;
   screenPos	_screenSize;
   TileCodex	_codex;
   Camera	_camera;
-  Range2i	_loadedRange;
-  Range2i	_visibleRange;
+  Player	_player;
+  bool		_loaded;
 };
 
 #endif /* WORLD_H */

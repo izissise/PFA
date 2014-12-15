@@ -1,0 +1,17 @@
+import "ConnectionMessage.proto";
+import "QueryChunk.proto";
+import "ClientActions.proto";
+
+message ClientMessage {
+  enum PacketContent
+  {
+    CONNECTION = 0;
+    IDENTIFICATION = 1;
+    QUERYCHUNK = 2;
+    ACTION = 3;
+  }
+  required PacketContent content = 1;
+  optional ConnectionMessage co = 2;
+  optional QueryChunk queryChunk = 3;
+  optional ClientActions actions = 4;
+}

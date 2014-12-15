@@ -12,7 +12,7 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 
-#include "server.hpp"
+#include "Server.hpp"
 #include "Config.h"
 #include "Unused.hpp"
 #include "printv.hpp"

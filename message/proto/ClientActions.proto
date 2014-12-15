@@ -1,0 +1,8 @@
+message ClientAction {
+  required int32 name = 1;
+  required bool state = 2;
+}
+
+message ClientActions {
+  repeated ClientAction actions = 1;
+}

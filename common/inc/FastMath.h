@@ -3,6 +3,6 @@
 
 #include <complex>
 
-unsigned int	approx_distance(int dx, int dy);
+float	pointDist(unsigned int dx, unsigned int dy);
 
 #endif /* _FASTMATH_H_ */
