@@ -9,6 +9,7 @@
 # include "NetworkException.hpp"
 # include "ProtocolMessage.pb.h"
 # include "ClientMessage.pb.h"
+# include "ThreadPool.hpp"
 
 # define GUIDFILE "../guid.txt"
 
@@ -17,7 +18,7 @@ using namespace google::protobuf;
 class ClientProtocol
 {
 public:
-  ClientProtocol(Network &net);
+  ClientProtocol(Network &net, ThreadPool &tPool);
   ~ClientProtocol();
 
   void  parseCmd(const void *data, int size);
@@ -39,6 +40,7 @@ private:
   std::shared_ptr<World>	_world;
   Network			&_socket;
   Settings			*_set;
+  ThreadPool			&_threadPool;
 };
 
 #endif

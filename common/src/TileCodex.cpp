@@ -44,7 +44,7 @@ TileCodex::TileCodex(const std::string& path)
   _bgShader.setParameter("texture", _spriteSheet);
 }
 
-void TileCodex::applySpriteUV(const unsigned id, sf::Vertex *quad) const
+void	TileCodex::applySpriteUV(const unsigned id, sf::Vertex *quad) const
 {
   unsigned int pos = id * 4;
 

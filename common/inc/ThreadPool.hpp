@@ -39,7 +39,7 @@ auto	ThreadPool::addTask(F&& f, Args&&... args)
     std::unique_lock<std::mutex> lock(_qmutex);
     if (!_active)
       throw std::runtime_error("addTask on stopped ThreadPool");
-    _tasks.emplace([task]()
+   _tasks.emplace([task]()
 		   {
 		     (*task)();
 		   });

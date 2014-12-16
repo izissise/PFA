@@ -58,7 +58,7 @@ public:
   const Vector2i	&getPosition() const;
 
 private:
-  void _generateVBO(const TileCodex& codex);
+  void	_generateVBO(const TileCodex& codex);
 
   std::vector<TileType>	_tiles;
   std::vector<TileType> _bgTiles;

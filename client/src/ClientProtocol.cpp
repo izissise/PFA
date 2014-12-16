@@ -1,8 +1,8 @@
 #include <fstream>
 #include "ClientProtocol.hpp"
 
-ClientProtocol::ClientProtocol(Network &net) :
-  _socket(net)
+ClientProtocol::ClientProtocol(Network &net, ThreadPool &tPool) :
+  _socket(net), _threadPool(tPool)
 {
   _func[ProtocolMessage::SETTING] = &ClientProtocol::handleSetting;
   _func[ProtocolMessage::CLINIT] = &ClientProtocol::initClient;
@@ -34,7 +34,9 @@ void  ClientProtocol::parseCmd(const void *data, int size)
       auto it = _func.find(act);
 
       if (it != _func.end())
-	(this->*(it->second))(packet);
+	{
+	  (this->*(it->second))(packet);
+	}
     }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;

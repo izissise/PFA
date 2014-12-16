@@ -6,8 +6,9 @@
 
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
-  _oldY(SHEIGHT), _dir(true), _world(nullptr),
-  _socket(), _proto(_socket), _actAnalyzer()
+  _oldY(SHEIGHT), _dir(true),  _threadPool(15),
+  _world(nullptr), _socket(), _proto(_socket, _threadPool),
+  _actAnalyzer()
 {
   addFont("default", "../client/assets/default.TTF");
   setHide(true);

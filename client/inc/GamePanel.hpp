@@ -6,6 +6,7 @@
 #include "World.hpp"
 #include "ClientProtocol.hpp"
 #include "ActionAnalyzer.hpp"
+#include "GamePanel.hpp"
 
 #define ITERATIONS 5
 #define MHEIGHT 300
@@ -46,6 +47,7 @@ private:
   int		_padup;
   int		_oldY;
   bool		_dir;
+  ThreadPool		_threadPool;
   std::shared_ptr<World>	_world;
   Network		_socket;
   ClientProtocol	_proto;

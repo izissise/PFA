@@ -61,35 +61,47 @@ void	Chunk::fillTiles(const RepeatedField<uint32> &bgTiles,
   _generated = true;
 }
 
-void Chunk::_generateVBO(const TileCodex& codex)
+void		Chunk::_generateVBO(const TileCodex& codex)
 {
-  unsigned i;
-  float x;
-  std::pair<std::vector<TileType>&, sf::VertexArray&> layers[] =
+  int		y;
+  unsigned int	x;
+  unsigned int	idx = 0;
+
+  _fgVertices.setPrimitiveType(sf::Quads);
+  _bgVertices.setPrimitiveType(sf::Quads);
+  _fgVertices.resize(Chunk::width * Chunk::height * 4);
+  _bgVertices.resize(Chunk::width * Chunk::height * 4);
+  for (y = Chunk::height - 1; y >= 0; --y)
     {
-      {_bgTiles, _bgVertices},
-      {_tiles,   _fgVertices}
-    };
-  for (auto layer : layers)
-    {
-      i = 0;
-      layer.second.setPrimitiveType(sf::Quads);
-      layer.second.resize(Chunk::width * Chunk::height * 4);
-      for (float y = Chunk::height - 1; y >= 0; --y)
+      for (x = 0; x < Chunk::width; ++x)
 	{
-	  for (x = 0.f; x < Chunk::width; ++x)
+	  if (_bgTiles[idx] != TileType::Empty)
 	    {
-	      if (layer.first[i] != TileType::Empty)
-		{
-		  sf::Vertex *quad = &layer.second[i * 4];
-		  quad[0].position = {x * TileCodex::tileSize, y * TileCodex::tileSize};
-		  quad[1].position = {(x + 1.f) * TileCodex::tileSize, y * TileCodex::tileSize};
-		  quad[2].position = {(x + 1.f) * TileCodex::tileSize, (y + 1.f) * TileCodex::tileSize};
-		  quad[3].position = {x * TileCodex::tileSize, (y + 1.f) * TileCodex::tileSize};
-		  codex.applySpriteUV(static_cast<unsigned>(layer.first[i]), quad);
-		}
-	      ++i;
+	      unsigned int	vIdx = idx * 4;
+	      _bgVertices[vIdx].position = {static_cast<float>(x * TileCodex::tileSize),
+					    static_cast<float>(y * TileCodex::tileSize)};
+	      _bgVertices[vIdx + 1].position = {static_cast<float>((x + 1) * TileCodex::tileSize),
+						static_cast<float>(y * TileCodex::tileSize)};
+	      _bgVertices[vIdx + 2].position = {static_cast<float>((x + 1) * TileCodex::tileSize),
+						static_cast<float>((y + 1) * TileCodex::tileSize)};
+	      _bgVertices[vIdx + 3].position = {static_cast<float>(x * TileCodex::tileSize),
+						static_cast<float>((y + 1) * TileCodex::tileSize)};
+	      codex.applySpriteUV(static_cast<unsigned int>(_bgTiles[idx]), &_bgVertices[vIdx]);
 	    }
+	  if (_tiles[idx] != TileType::Empty)
+	    {
+	      unsigned int	vIdx = idx * 4;
+	      _fgVertices[vIdx].position = {static_cast<float>(x * TileCodex::tileSize),
+					    static_cast<float>(y * TileCodex::tileSize)};
+	      _fgVertices[vIdx + 1].position = {static_cast<float>((x + 1) * TileCodex::tileSize),
+						static_cast<float>(y * TileCodex::tileSize)};
+	      _fgVertices[vIdx + 2].position = {static_cast<float>((x + 1) * TileCodex::tileSize),
+						static_cast<float>((y + 1) * TileCodex::tileSize)};
+	      _fgVertices[vIdx + 3].position = {static_cast<float>(x * TileCodex::tileSize),
+						static_cast<float>((y + 1) * TileCodex::tileSize)};
+	      codex.applySpriteUV(static_cast<unsigned int>(_tiles[idx]), &_fgVertices[vIdx]);
+	    }
+	  ++idx;
 	}
     }
 }
