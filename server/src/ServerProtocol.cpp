@@ -60,7 +60,7 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
       enet_peer_disconnect(client->getPeer(), 0);
       return ;
     }
-  loadClientProfile(client, userId);
+  loadClientProfile(clients, client, userId);
   sendClientProfile(client, newId);
 }
 
@@ -109,17 +109,45 @@ void		ServerProtocol::generateNewId(std::string &guid)
   guid = gen.generate();
 }
 
-void	ServerProtocol::spawnClient(Client *client)
+bool			ServerProtocol::isChunkSpawnable(Chunk *chunk,
+							 const std::vector<Client *> &clients)
+{
+  for (unsigned int idx = 0; idx < Chunk::lod; ++idx)
+    {
+      const t_ChunkInfo	&cInfo = chunk->getChunkInfo(idx);
+
+      // if (cInfo.avHeight < (3 * Chunk::height) / 4)
+      // 	std::cout << "Chunk avH: " << cInfo.avHeight << std::endl;
+    }
+}
+
+void		ServerProtocol::spawnClient(const std::vector<Client *> &clients,
+					    Client *client)
 {
   ClientEntity	&clEnt = client->getEntity();
+  Vector2i	chunkId(0,0);
+  Chunk		*chunk;
 
   std::cout << "New client -> Spawn init" << std::endl;
+  for (int dist = 0; true; dist++)
+    {
+      for (int side = -dist; side <= dist; side += (dist * 2))
+	{
+	  chunkId.x = side;
+	  if (!_world.isChunkLoaded(chunkId))
+	    _world.loadChunk(chunkId, clients, chunkId);
+	  isChunkSpawnable(_world.getChunk(chunkId), clients);
+	  if (dist == 0)
+	    break ;
+	}
+    }
   //easy placement
   clEnt.setChunkId({0,0});
   clEnt.setPosition({0,0});
 }
 
-void	ServerProtocol::loadClientProfile(Client *client, const std::string &userId)
+void	ServerProtocol::loadClientProfile(const std::vector<Client *> &clients,
+					  Client *client, const std::string &userId)
 {
   std::fstream			file;
   StringUtils			utils;
@@ -129,14 +157,14 @@ void	ServerProtocol::loadClientProfile(Client *client, const std::string &userId
 
   if (userId.empty())
     {
-      spawnClient(client);
+      spawnClient(clients, client);
       return ;
     }
   file.open(LOGFILE, std::ios::binary | std::ios::in);
   if (!file) // Can be the first client joining
     {
       std::cout << "File doesnt exist yet" << std::endl;
-      spawnClient(client);
+      spawnClient(clients, client);
       return ;
     }
   for (std::string line; getline(file, line);)
@@ -155,7 +183,7 @@ void	ServerProtocol::loadClientProfile(Client *client, const std::string &userId
 	}
     }
   file.close();
-  spawnClient(client);
+  spawnClient(clients, client);
 }
 
 void	ServerProtocol::sendClientProfile(Client *client,

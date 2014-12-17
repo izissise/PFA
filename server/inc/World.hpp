@@ -14,8 +14,14 @@ public:
   ~World() = default;
 
   Chunk		*loadChunk(const std::vector<Client *> &clients, int x, int y);
+  Chunk		*loadChunk(const Vector2i &entId,
+			   const std::vector<Client *> &clients,
+			   int x, int y);
   inline Chunk	*loadChunk(const std::vector<Client *> &clients,
 			   const Vector2i &pos) { return loadChunk(clients, pos.x, pos.y); }
+  inline Chunk	*loadChunk(const Vector2i &entId,
+			   const std::vector<Client *> &clients,
+			   const Vector2i &pos) { return loadChunk(entId, clients, pos.x, pos.y); }
 
   Chunk		*getChunk(int x, int y) const;
   inline Chunk	*getChunk(const Vector2i &pos) const { return getChunk(pos.x, pos.y); }
@@ -38,6 +44,8 @@ private:
   float	getClosestPlayer(const std::vector<Client *> &clients,
 			 int x, int y) const;
   unsigned int	removeUnusedChunks(const std::vector<Client *> &clients);
+  unsigned int	removeUnusedChunks(const Vector2i &entId,
+				   const std::vector<Client *> &clients);
 
 private:
   ServerSettings	&_cvars;

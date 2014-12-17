@@ -3,7 +3,7 @@
 #include "Perlin.h"
 #include "FastMath.h"
 
-const float World::chunkDist = 2.f;
+const float World::chunkDist = 3.f;
 
 World::World(ServerSettings &cvars) :
   _cvars(cvars)
@@ -22,9 +22,22 @@ Chunk	*World::loadChunk(const std::vector<Client *> &clients, int x, int y)
   return chunk;
 }
 
+Chunk	*World::loadChunk(const Vector2i &entId,
+			  const std::vector<Client *> &clients,
+			  int x, int y)
+{
+  Chunk	*chunk = new Chunk;
+
+  chunk->load(x, y);
+  _loadedChunks.push_back(chunk);
+  removeUnusedChunks(entId, clients);
+  return chunk;
+}
+
 Chunk	*World::getChunk(int x, int y) const
 {
   Vector2i	pos(x, y);
+
   auto it = std::find_if(_loadedChunks.begin(), _loadedChunks.end(),
 			 [pos](Chunk *chunk)
 			 {
@@ -74,7 +87,8 @@ float	World::getClosestPlayer(const std::vector<Client *> &clients,
       chunkId = clEnt.getChunkId();
       chunkId.x *= Chunk::width;
       chunkId.y *= Chunk::height;
-      pos = Vector2f(chunkId.x + pos.x, chunkId.y - pos.y);
+      pos = Vector2f(chunkId.x + pos.x * Chunk::width,
+		     chunkId.y - pos.y * Chunk::height);
       distance = pointDist(std::abs(pos.x - x), std::abs(pos.y - y));
       if (closest == -1 || distance < closest)
 	closest = distance;
@@ -87,8 +101,8 @@ unsigned int	World::removeUnusedChunks(const std::vector<Client *> &clients)
   unsigned int	counter = 0;
   float		maxDist;
 
-  maxDist = pointDist(Chunk::width * TileCodex::tileSize,
-		      Chunk::height * TileCodex::tileSize)
+  maxDist = pointDist(Chunk::width,
+		      Chunk::height)
     * World::chunkDist;
   _loadedChunks.erase(std::remove_if(_loadedChunks.begin(), _loadedChunks.end(),
 				     [&](Chunk *chunk)
@@ -97,6 +111,34 @@ unsigned int	World::removeUnusedChunks(const std::vector<Client *> &clients)
 				       bool	removed;
 
 				       removed = (getClosestPlayer(clients, pos.x, pos.y) >= maxDist);
+				       counter += removed;
+				       return removed;
+				     }), _loadedChunks.end());
+  return counter;
+}
+
+unsigned int	World::removeUnusedChunks(const Vector2i &entId,
+					  const std::vector<Client *> &clients)
+{
+  unsigned int	counter = 0;
+  float		maxDist;
+
+  maxDist = pointDist(Chunk::width,
+		      Chunk::height)
+    * World::chunkDist;
+
+  _loadedChunks.erase(std::remove_if(_loadedChunks.begin(), _loadedChunks.end(),
+				     [&](Chunk *chunk)
+				     {
+				       Vector2i pos(chunk->getPosition());
+				       bool	removed;
+				       float	distance;
+
+				       distance = pointDist(std::abs(pos.x - entId.x) * Chunk::width,
+							    std::abs(pos.y - entId.y) * Chunk::height);
+				       distance = std::min(getClosestPlayer(clients, pos.x, pos.y),
+							   distance);
+				       removed = (distance >= maxDist);
 				       counter += removed;
 				       return removed;
 				     }), _loadedChunks.end());

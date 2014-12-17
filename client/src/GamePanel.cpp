@@ -171,7 +171,7 @@ int		GamePanel::updateNetwork(Settings &set)
 	  connectClient(event.peer, set);
 	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
-	  handlePackets(event);
+	  this->handlePackets(event);
 	  break;
 	case ENET_EVENT_TYPE_DISCONNECT:
 	  disconnectClient(event.peer);

@@ -1,3 +1,4 @@
+
 #ifndef	CHUNK_H
 # define CHUNK_H
 
@@ -18,13 +19,11 @@
 # define GAIN 0.6
 # define OFFSET 1.02
 # define SCALE 0.025f
-# define LINELENGHT 4
 # define MIDDLEHEIGHT 5000
 # define MAXVARIATION 3000.f
 # define MINVARIATION 500.f
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 600.0f
-# define LOD 15
 # define PSCALE 50.f
 # define HSCALE 25.f
 # define OREDIST 8
@@ -71,7 +70,9 @@ public:
   static const int	height = CHUNKHEIGHT;
   static const int	octaves = 2;
   static const int	iterations = 8;
-  static const int	biomeMixDist = (width * LINELENGHT) / LOD;
+  static const unsigned int lod = 15;
+  static const unsigned int lineLenght = 4;
+  static const int	biomeMixDist = (width * lineLenght) / lod;
 
   Chunk(void);
   Chunk(int xId, int yId);
@@ -123,7 +124,7 @@ private:
   int	_upScaleChunkPos(int num) const {
     return ((num >= 0 ?
 	     num :
-	     num + (_roundUpToMult(-num, LINELENGHT))) % LINELENGHT); }
+	     num + (_roundUpToMult(-num, Chunk::lineLenght))) % Chunk::lineLenght); }
   float	_maxNoise(float n1, float n2) const { return ((n1 > n2) ? (n1) : (n2)); }
   void _loadFromFile(void);
   void _fillVertex(Vector2f &prev, Vector2f &next, int x);
@@ -147,7 +148,7 @@ private:
   bool			_loaded;
   Vector2i		_pos;
   Lines			_line;
-  std::array<t_ChunkInfo, LOD>	_info;
+  std::array<t_ChunkInfo, Chunk::lod>	_info;
 };
 
 #endif		/* CHUNK_H */

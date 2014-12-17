@@ -180,7 +180,7 @@ void		Chunk::_fillVertex(Vector2f &prev, Vector2f &next, int x)
 {
   int		points = pow(2, Chunk::iterations);
   int		s = TileCodex::tileSize;
-  int		pos = (x * s) / ((static_cast<float>(LINELENGHT)
+  int		pos = (x * s) / ((static_cast<float>(Chunk::lineLenght)
 				  * static_cast<float>(Chunk::width)
 				  * static_cast<float>(s))
 				 / static_cast<float>(points));
@@ -239,7 +239,7 @@ void		Chunk::_completeField(void)
 
   Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
-  part = static_cast<float>(Chunk::width * LINELENGHT) / static_cast<float>(LOD);
+  part = static_cast<float>(Chunk::width * Chunk::lineLenght) / static_cast<float>(Chunk::lod);
   scaledPosX = _upScaleChunkPos(_pos.x);
 
   Chunk prevChunk;
@@ -324,7 +324,7 @@ void	Chunk::_determineBiome(unsigned int id)
 void		Chunk::_fillHeightMap()
 {
   unsigned int	size = _line.size();
-  float		part = static_cast<float>(size) / static_cast<float>(LOD);
+  float		part = static_cast<float>(size) / static_cast<float>(Chunk::lod);
   unsigned int	oldId = 0;
   unsigned int	id = 0;
   int		tHeight = 0;
@@ -350,10 +350,10 @@ void	Chunk::fillChunkInfo()
 {
   float	moistL;
   float moistR;
-  float	part = 1.f / static_cast<float>(LOD);
+  float	part = 1.f / static_cast<float>(Chunk::lod);
 
   _fillHeightMap();
-  for (unsigned int id = 0; id < LOD; ++id)
+  for (unsigned int id = 0; id < Chunk::lod; ++id)
     {
       moistL = _scaleNumber(raw_noise_2d(((static_cast<float>(_pos.x)
 					  + static_cast<float>(id) * part) / HSCALE), 0),
@@ -379,8 +379,8 @@ void	Chunk::constructLine()
   int		y;
   int		j;
 
-  int	leftPoint = _roundDownToMult(_pos.x, LINELENGHT);
-  int	rightPoint =  _roundUpToMult(_pos.x + 1, LINELENGHT);
+  int	leftPoint = _roundDownToMult(_pos.x, Chunk::lineLenght);
+  int	rightPoint =  _roundUpToMult(_pos.x + 1, Chunk::lineLenght);
   float	chunkWidth = Chunk::width * TileCodex::tileSize;
   float chunkHeight = Chunk::height * TileCodex::tileSize;
 
@@ -399,7 +399,7 @@ void	Chunk::constructLine()
     (0, MIDDLEHEIGHT + leftHeight
      - (chunkHeight * _pos.y));
   _line.points[size] = Vector2f
-    (LINELENGHT * chunkWidth,
+    (Chunk::lineLenght * chunkWidth,
      MIDDLEHEIGHT + rightHeight
      - (chunkHeight * _pos.y));
 
@@ -702,7 +702,7 @@ void		Chunk::setPosition(const Vector2i &vec)
 
 const t_ChunkInfo	&Chunk::getChunkInfo(unsigned int pos) const
 {
-  if (pos >= LOD)
+  if (pos >= Chunk::lod)
     throw (std::out_of_range(""));
   return _info[pos];
 }
