@@ -2,7 +2,8 @@
 
 Client::Client(ENetPeer *peer)
   : _peer(peer),
-    _actions(static_cast<int>(Action::Last), false)
+    _actions(static_cast<int>(Action::Last), false),
+    _initialized(false)
 {
   std::cout << peer << std::endl;
 }
@@ -39,9 +40,19 @@ const std::vector<bool>	&Client::getActions() const
   return _actions;
 }
 
+bool	Client::isInitialized() const
+{
+  return _initialized;
+}
+
 void	Client::setAction(unsigned int actionIdx, bool state)
 {
   if (actionIdx >= _actions.size())
     throw std::out_of_range("Action index is out of range");
   _actions[actionIdx] = state;
+}
+
+void	Client::initialize()
+{
+  _initialized = true;
 }

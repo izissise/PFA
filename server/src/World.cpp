@@ -82,6 +82,8 @@ float	World::getClosestPlayer(const std::vector<Client *> &clients,
   y -= Chunk::height / 2;
   for (const auto cl : clients)
     {
+      if (!cl->isInitialized())
+	continue ;
       clEnt = cl->getEntity();
       pos = clEnt.getPosition();
       chunkId = clEnt.getChunkId();

@@ -61,6 +61,7 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
       return ;
     }
   loadClientProfile(clients, client, userId);
+  client->initialize();
   sendClientProfile(client, newId);
 }
 
