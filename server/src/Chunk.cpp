@@ -199,7 +199,7 @@ void	Chunk::_choseBiome(Biome * const biome, t_tileType &tile,
 
   if (y == 0)
     dist = (dist + 1) % Chunk::biomeMixDist;
-  if (dist == 0)
+  if (dist == 0) // we have done the % loop
     {
       _getBiomeTile(biome[1], tile);
       biome[0] = biome[1];
@@ -708,6 +708,6 @@ void		Chunk::setPosition(const Vector2i &vec)
 const t_ChunkInfo	&Chunk::getChunkInfo(unsigned int pos) const
 {
   if (pos >= Chunk::lod)
-    throw (std::out_of_range(""));
+    throw (std::out_of_range("Chunk info index is higher than the lod"));
   return _info[pos];
 }

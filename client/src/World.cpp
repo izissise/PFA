@@ -152,19 +152,12 @@ void		World::_loadChunks(void)
   Range2i		&loadedRange = _player.getLoadedRange(); // should be const
   const	Vector2i	plChunkId = _player.getChunkId();
 
-  std::cout << " -- LoadChunks -- " << std::endl;
   removeOldChunks();
   _player.setLoadedRange(Range2i({plChunkId.x - 1, plChunkId.y -1},
 				 {plChunkId.x + 1, plChunkId.y + 1}));
   for (auto cursor : loadedRange) // be aware it has been updated just above
-    {
-      if (!isChunkLoaded(cursor))
-	{
-	  std::cout << "Creating chunk at -> " << cursor.x << " " << cursor.y << std::endl;
-	  _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
-	}
-    }
-  std::cout << "----" << std::endl;
+    if (!isChunkLoaded(cursor))
+      _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
 }
 
 
