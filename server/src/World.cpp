@@ -112,8 +112,12 @@ unsigned int	World::removeUnusedChunks(const std::vector<Client *> &clients)
 				       Vector2i pos(chunk->getPosition());
 				       bool	removed;
 
-				       removed = (getClosestPlayer(clients, pos.x, pos.y) >= maxDist);
+				       removed = (getClosestPlayer(clients,
+								   pos.x * Chunk::width,
+								   pos.y * Chunk::height) >= maxDist);
 				       counter += removed;
+				       if (removed)
+					 std::cout << "remove " << pos.x << " " << pos.y << std::endl;
 				       return removed;
 				     }), _loadedChunks.end());
   return counter;
@@ -138,10 +142,14 @@ unsigned int	World::removeUnusedChunks(const Vector2i &entId,
 
 				       distance = pointDist(std::abs(pos.x - entId.x) * Chunk::width,
 							    std::abs(pos.y - entId.y) * Chunk::height);
-				       distance = std::min(getClosestPlayer(clients, pos.x, pos.y),
+				       distance = std::min(getClosestPlayer(clients,
+									    pos.x * Chunk::width,
+									    pos.y * Chunk::height),
 							   distance);
 				       removed = (distance >= maxDist);
 				       counter += removed;
+				       if (removed)
+					 std::cout << "remove " << pos.x << " " << pos.y << std::endl;
 				       return removed;
 				     }), _loadedChunks.end());
   return counter;

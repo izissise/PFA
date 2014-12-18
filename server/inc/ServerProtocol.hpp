@@ -43,8 +43,11 @@ private:
 			  Client *client, const std::string &userId);
   void	spawnClient(const std::vector<Client *> &clients,
 		    Client *Client);
-  bool	isChunkSpawnable(Chunk *chunk,
+  int	isChunkSpawnable(Chunk *chunk,
 			 const std::vector<Client *> &clients);
+  bool	placePlayerOnSurface(Chunk *chunk,
+			     unsigned int chunkPart,
+			     Vector2u &chunkPos);
   void	sendClientProfile(Client *client, const std::string &newId);
   void	generateNewId(std::string &guid);
 

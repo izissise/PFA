@@ -110,24 +110,58 @@ void		ServerProtocol::generateNewId(std::string &guid)
   guid = gen.generate();
 }
 
-bool			ServerProtocol::isChunkSpawnable(Chunk *chunk,
+int			ServerProtocol::isChunkSpawnable(Chunk *chunk,
 							 const std::vector<Client *> &clients)
 {
   for (unsigned int idx = 0; idx < Chunk::lod; ++idx)
     {
       const t_ChunkInfo	&cInfo = chunk->getChunkInfo(idx);
 
-      // if (cInfo.avHeight < (3 * Chunk::height) / 4)
-      // 	std::cout << "Chunk avH: " << cInfo.avHeight << std::endl;
+      if (cInfo.avHeight < (3 * Chunk::height) / 4)
+	return idx;
     }
+  return -1;
+}
+
+bool		ServerProtocol::placePlayerOnSurface(Chunk *chunk,
+						     unsigned int chunkPart,
+						     Vector2u &chunkPos)
+{
+  const std::vector<TileType>	&tiles = chunk->getTiles();
+  unsigned int	xPad;
+  unsigned int	lodSize;
+
+  lodSize = (Chunk::width * Chunk::lineLenght) / Chunk::lod;
+  xPad = chunkPart * lodSize;
+  std::cout << "XPAD: " << xPad << std::endl;
+  for (unsigned int pos = xPad; pos < xPad + lodSize; ++pos)
+    {
+      if (tiles[pos] != TileType::Empty)
+	continue ;
+      for (unsigned int y = Chunk::height - 1; y > 0; --y)
+	{
+	  std::cout << "Chunk Tiles pos " << pos << " " << y << " -> "
+		    << (int)tiles[y * Chunk::width + pos] << " "
+		    << (int)tiles[(y - 1) * Chunk::width + pos] << std::endl;
+	  if (tiles[y * Chunk::width + pos] == TileType::Empty &&
+	      tiles[(y - 1) * Chunk::width + pos] != TileType::Empty)
+	    {
+	      chunkPos = {pos, y};
+	      return true;
+	    }
+	}
+    }
+  return false;
 }
 
 void		ServerProtocol::spawnClient(const std::vector<Client *> &clients,
 					    Client *client)
 {
   ClientEntity	&clEnt = client->getEntity();
-  Vector2i	chunkId(0,0);
+  Vector2i	chunkId(0,1);
+  Vector2u	plPos;
   Chunk		*chunk;
+  int		chunkPart;
 
   std::cout << "New client -> Spawn init" << std::endl;
   for (int dist = 0; true; dist++)
@@ -136,15 +170,21 @@ void		ServerProtocol::spawnClient(const std::vector<Client *> &clients,
 	{
 	  chunkId.x = side;
 	  if (!_world.isChunkLoaded(chunkId))
-	    _world.loadChunk(chunkId, clients, chunkId);
-	  isChunkSpawnable(_world.getChunk(chunkId), clients);
+	    chunk = _world.loadChunk(chunkId, clients, chunkId);
+	  else
+	    chunk = _world.getChunk(chunkId);
+	  if ((chunkPart = isChunkSpawnable(chunk, clients)) != -1)
+	    if (placePlayerOnSurface(chunk, chunkPart, plPos) == true)
+	      {
+		clEnt.setChunkId(chunk->getPosition());
+		clEnt.setPosition(Vector2f(static_cast<float>(plPos.x) / Chunk::width,
+					   static_cast<float>(plPos.y) / Chunk::height));
+		return ;
+	      }
 	  if (dist == 0)
 	    break ;
 	}
     }
-  //easy placement
-  clEnt.setChunkId({0,0});
-  clEnt.setPosition({0,0});
 }
 
 void	ServerProtocol::loadClientProfile(const std::vector<Client *> &clients,

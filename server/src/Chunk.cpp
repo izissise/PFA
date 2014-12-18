@@ -695,6 +695,11 @@ const Lines	&Chunk::getLine() const
   return _line;
 }
 
+const std::vector<TileType>	&Chunk::getTiles() const
+{
+  return _tiles;
+}
+
 void		Chunk::setPosition(const Vector2i &vec)
 {
   _pos = vec;

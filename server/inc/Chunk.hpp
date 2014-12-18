@@ -83,7 +83,7 @@ public:
 
   void load(int x, int y);
   const Lines	&getLine() const;
-  const Vector2i &getPosition() const	{ return _pos; }
+  const Vector2i &getPosition() const		{ return _pos; }
   void		setPosition(const Vector2i &vec);
 
   TileType getTile(unsigned index) const	{ return _tiles[index]; }
@@ -102,7 +102,8 @@ public:
 
   void		constructLine();
   void		fillChunkInfo();
-  const t_ChunkInfo	&getChunkInfo(unsigned int pos) const;
+  const t_ChunkInfo		&getChunkInfo(unsigned int pos) const;
+  const std::vector<TileType>	&getTiles() const;
 
 protected:
 private:
