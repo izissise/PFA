@@ -117,7 +117,7 @@ int			ServerProtocol::isChunkSpawnable(Chunk *chunk,
     {
       const t_ChunkInfo	&cInfo = chunk->getChunkInfo(idx);
 
-      if (cInfo.avHeight < (3 * Chunk::height) / 4)
+      if (cInfo.avHeight > 0 && cInfo.avHeight < (3 * Chunk::height) / 4)
 	return idx;
     }
   return -1;

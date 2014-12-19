@@ -20,8 +20,8 @@
 # define OFFSET 1.02
 # define SCALE 0.025f
 # define MIDDLEHEIGHT 5000
-# define MAXVARIATION 3000.f
-# define MINVARIATION 500.f
+# define MAXVARIATION 4000.f
+# define MINVARIATION 1000.f
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 600.0f
 # define PSCALE 50.f

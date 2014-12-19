@@ -170,8 +170,8 @@ void			ClientProtocol::getNewChunks()
 {
   std::vector<Vector2i>	chunks;
 
-  _world->refreshChunks(chunks);
-  queryChunks(chunks);
+  if (_world->getNewChunks(chunks))
+    queryChunks(chunks);
 }
 
 void	ClientProtocol::handleDisplacements(const ProtocolMessage &packet)

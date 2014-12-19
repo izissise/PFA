@@ -221,13 +221,14 @@ void			World::removeOldChunks()
 {
   const Vector2i	&chunkPos = _player.getChunkId();
   auto			itr = _chunks.begin();
+  unsigned int		radius = 1 + World::cacheSize;
 
   while (itr != _chunks.end())
     {
       const Vector2i &pos = itr->second->getPosition();
       if (itr->second->isGenerated() &&
-	  (std::abs(chunkPos.x - pos.x) > 1 ||
-	   std::abs(chunkPos.y - pos.y) > 1))
+	  (std::abs(chunkPos.x - pos.x) > radius ||
+	   std::abs(chunkPos.y - pos.y) > radius))
 	{
 	  std::cout << "Removing chunk at pos " << pos.x << " " << pos.y << std::endl;
 	  _chunks.erase(itr++);
@@ -237,7 +238,7 @@ void			World::removeOldChunks()
     }
 }
 
-void			World::refreshChunks(std::vector<Vector2i> &chunks)
+bool			World::getNewChunks(std::vector<Vector2i> &chunks)
 {
   const Vector2i	&chunkPos = _player.getChunkId();
   Vector2u		sideSize;
@@ -259,4 +260,5 @@ void			World::refreshChunks(std::vector<Vector2i> &chunks)
 	    chunks.push_back({x, y});
 	}
     }
+  return !chunks.empty();
 }

@@ -17,6 +17,9 @@ class World
 {
   friend class WorldTester;
 
+public:
+  const unsigned int	cacheSize = 1;
+
 private:
   typedef Vector2f	worldPos;
   typedef Vector2i	screenPos;
@@ -50,7 +53,7 @@ public:
   void			fillChunkData(const VectorInt &pos,
 				      const RepeatedField<uint32> &bgTiles,
 				      const RepeatedField<uint32> &fgTiles);
-  void			refreshChunks(std::vector<Vector2i> &chunks);
+  bool			getNewChunks(std::vector<Vector2i> &chunks);
   void			removeOldChunks();
 
 protected:
