@@ -239,21 +239,19 @@ void		Chunk::_completeField(void)
 
   Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
-  part = static_cast<float>(Chunk::width * Chunk::lineLenght) / static_cast<float>(Chunk::lod);
+  part = static_cast<float>(Chunk::width) / static_cast<float>(Chunk::lod);
   scaledPosX = _upScaleChunkPos(_pos.x);
 
   Chunk prevChunk;
   prevChunk.setPosition({_pos.x - 1, _pos.y});
   prevChunk.constructLine();
   prevChunk.fillChunkInfo();
-  biome[0] = prevChunk.getChunkInfo((static_cast<float>(_upScaleChunkPos(scaledPosX - 1)
-							* Chunk::width)
-				     + (Chunk::width - 1)) / part).biome;
+  biome[0] = prevChunk.getChunkInfo(Chunk::lod - 1).biome;
 
   for (int x = 0; x < Chunk::width; ++x)
     {
       y = 0;
-      biome[1] = _info[static_cast<float>(x + scaledPosX * Chunk::width) / part].biome;
+      biome[1] = _info[static_cast<float>(x) / part].biome;
       _fillVertex(prev, next, x + scaledPosX * Chunk::width);
       a = (next.y - prev.y) / (next.x - prev.x);
       b = next.y - a * next.x;
@@ -324,26 +322,34 @@ void	Chunk::_determineBiome(unsigned int id)
 void		Chunk::_fillHeightMap()
 {
   unsigned int	size = _line.size();
-  float		part = static_cast<float>(size) / static_cast<float>(Chunk::lod);
+  float		part;
   unsigned int	oldId = 0;
   unsigned int	id = 0;
   int		tHeight = 0;
   Vector2f	vertex;
+  unsigned int	pass = 0;
+  unsigned int	chunkPt = size / Chunk::lineLenght;
+  unsigned int	offsetX = static_cast<float>(_upScaleChunkPos(_pos.x))
+    * static_cast<float>(size) / Chunk::lineLenght;
 
-  for (unsigned int i = 0; i < size; ++i)
+  part = (static_cast<float>(size) / static_cast<float>(Chunk::lineLenght))
+    / static_cast<float>(Chunk::lod);
+  for (unsigned int i = 0; i < chunkPt; ++i)
     {
       id = static_cast<float>(i) / part;
       if (id > oldId)
 	{
-	  _info[oldId].avHeight = static_cast<float>(tHeight) / part;
+	  _info[oldId].avHeight = static_cast<float>(tHeight) / static_cast<float>(pass);
 	  oldId = id;
 	  tHeight = 0;
+	  pass = 0;
 	}
-      vertex = _line.getPoint(i);
+      vertex = _line.getPoint(offsetX + i);
       tHeight += (vertex.y - MIDDLEHEIGHT
 		  + (Chunk::height * TileCodex::tileSize * _pos.y));
+      ++pass;
     }
-  _info[oldId].avHeight = static_cast<float>(tHeight) / part;
+  _info[oldId].avHeight = static_cast<float>(tHeight) / static_cast<float>(pass);
 }
 
 void	Chunk::fillChunkInfo()

@@ -25,7 +25,7 @@
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 600.0f
 # define PSCALE 50.f
-# define HSCALE 25.f
+# define HSCALE 15.f
 # define OREDIST 8
 # define SEED 15
 
@@ -70,9 +70,9 @@ public:
   static const int	height = CHUNKHEIGHT;
   static const int	octaves = 2;
   static const int	iterations = 8;
-  static const unsigned int lod = 15;
+  static const unsigned int lod = 4;
   static const unsigned int lineLenght = 4;
-  static const int	biomeMixDist = (width * lineLenght) / lod;
+  static const int	biomeMixDist = (width) / lod;
 
   Chunk(void);
   Chunk(int xId, int yId);
