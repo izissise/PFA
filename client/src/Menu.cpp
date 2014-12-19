@@ -6,6 +6,7 @@
 #include "Menu.hpp"
 #include "Exception.hpp"
 #include "MainMenu.hpp"
+#include "ServerMenu.hpp"
 #include "GamePanel.hpp"
 #include "OptionTabPanel.hpp"
 #include "OptionGamePanel.hpp"
@@ -21,18 +22,21 @@ Menu::Menu(Settings &settings, Parser &parser) :
     throw (Exception("Can't load Menu texture"));
 
   MainMenu		*mainMenu = new MainMenu(sf::FloatRect(0,0,SIZEX,SIZEY));
+  ServerMenu		*serverMenu = new ServerMenu(sf::FloatRect(0,0,SIZEX,SIZEY));
   GamePanel		*gamePanel = new GamePanel(sf::FloatRect(0,0,SIZEX,SIZEY));
   OptionTabPanel	*optTabPanel = new OptionTabPanel(sf::FloatRect(380,50,1115,50));
   OptionGamePanel	*optGamePanel = new OptionGamePanel(sf::FloatRect(380,100,1130,730));
   OptionKeyPanel	*optKeyPanel = new OptionKeyPanel(sf::FloatRect(380,100,1130,730));
 
-  _panels.push_back(gamePanel);
   _panels.push_back(mainMenu);
+  _panels.push_back(serverMenu);
+  _panels.push_back(gamePanel);
 
   mainMenu->addPanels({optTabPanel});
   optTabPanel->addPanels({optGamePanel, optKeyPanel});
 
-  mainMenu->construct(_menuTexture, settings, {optTabPanel, gamePanel});
+  mainMenu->construct(_menuTexture, settings, {optTabPanel, serverMenu});
+  serverMenu->construct(_menuTexture, settings, {mainMenu, gamePanel});
   gamePanel->construct(_menuTexture, settings, {mainMenu});
   optTabPanel->construct(_menuTexture, settings, {optGamePanel, optKeyPanel});
   optGamePanel->construct(_menuTexture, settings, {});
