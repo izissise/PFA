@@ -18,18 +18,30 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 				     sf::Text("Server List", _font["default"], 40));
   Widget	*wFooter = new Widget("Footer", {_zone.left, _zone.height - 70, _zone.width, 70},
 				      sf::Text());
-  Widget	*wBack = new Widget("Back", {_zone.left + 10, _zone.height - 57, _zone.width / 3, 44},
-				    sf::Text("Back to Menu", _font["default"], 20));
+  Widget	*wBack = new Widget("Back", {_zone.left + 10, _zone.height - 57,
+					(_zone.width - 60) / 3, 44},
+					sf::Text("Back to Menu", _font["default"], 20));
+  Widget	*wConnectIp = new Widget("cIp", {_zone.left + 10 + (_zone.width - 60) / 3 + 20,
+	_zone.height - 57, (_zone.width - 60) / 3, 44},
+    sf::Text("Connect to Ip", _font["default"], 20));
+  Widget	*wJoin = new Widget("join", {_zone.left + 10 +  2 * ((_zone.width - 60) / 3 + 20),
+	_zone.height - 57, (_zone.width - 60) / 3, 44},
+    sf::Text("Join Server", _font["default"], 20));
 
   createTitle(wTitle);
   createContPanel(set, texture);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
+  createButtonCip(wConnectIp, texture);
+  createButtonJoin(wJoin, texture);
   wBack->addObserver({this, panels[0]});
+  wJoin->addObserver({this, panels[1]});
 
   _widgets.push_back(wTitle);
   _widgets.push_back(wFooter);
   _widgets.push_back(wBack);
+  _widgets.push_back(wConnectIp);
+  _widgets.push_back(wJoin);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
@@ -64,9 +76,22 @@ void	ServerMenu::createFooter(Widget *footer)
   footer->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
 }
 
-void	ServerMenu::createButtonBack(Widget *widget, const sf::Texture &texture)
+void	ServerMenu::createButtonStyle(Widget *widget, const sf::Texture &texture)
 {
   sf::FloatRect zone = widget->getZone();
+
+  widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+  widget->addSprite(texture, sf::IntRect(5, 1085, 250, 50));
+  widget->addSprite(texture, sf::IntRect(265, 1085, 250, 50), false);
+  widget->setSpriteSize(0, zone.width, zone.height);
+  widget->setSpriteSize(1, zone.width, zone.height);
+  widget->setEdge(std::unique_ptr<sf::RectangleShape>
+		  (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+		  2.f);
+}
+
+void	ServerMenu::createButtonBack(Widget *widget, const sf::Texture &texture)
+{
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
 
@@ -88,10 +113,60 @@ void	ServerMenu::createButtonBack(Widget *widget, const sf::Texture &texture)
 	}
       return 0;
     };
-  widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
-  widget->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
-  widget->addSprite(texture, sf::IntRect(260, 1080, 260, 60), false);
-  widget->setSpriteSize(0, zone.width, zone.height);
-  widget->setSpriteSize(1, zone.width, zone.height);
+  createButtonStyle(widget, texture);
+  widget->setUpdate(updateFunc);
+}
+
+void	ServerMenu::createButtonCip(Widget *widget, const sf::Texture &texture)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      lwidget.setSpriteAttr(0, !isOver);
+      lwidget.setSpriteAttr(1, isOver);
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
+	      return 0;
+	    }
+	}
+      return 0;
+    };
+  createButtonStyle(widget, texture);
+  widget->setUpdate(updateFunc);
+}
+
+void	ServerMenu::createButtonJoin(Widget *widget, const sf::Texture &texture)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      lwidget.setSpriteAttr(0, !isOver);
+      lwidget.setSpriteAttr(1, isOver);
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
+	      return 0;
+	    }
+	}
+      return 0;
+    };
+  createButtonStyle(widget, texture);
   widget->setUpdate(updateFunc);
 }

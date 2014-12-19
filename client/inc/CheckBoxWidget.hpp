@@ -1,3 +1,4 @@
+
 #ifndef _CHECKBOXWIDGET_H_
 #define _CHECKBOXWIDGET_H_
 

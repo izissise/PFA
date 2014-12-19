@@ -6,6 +6,7 @@
 #include <map>
 #include <functional>
 #include <list>
+#include <memory>
 #include "Observer.hpp"
 #include "Settings.hpp"
 #include "Unused.hpp"
@@ -238,6 +239,11 @@ public:
    *
    * This method will resize all the widget's attributes
    */
+
+  void		setEdge(std::unique_ptr<sf::RectangleShape> edgeShape,
+			float thickness, const sf::Color &outColor = {0,0,0,255});
+  sf::Shape	*getEdge();
+
   virtual void		scale(const sf::Vector2f &size);
 
   /**
@@ -373,6 +379,7 @@ protected:
   std::vector<t_sprite>		_sprites;
   sf::Text			_text;
   wFlag				_flag;
+  std::unique_ptr<sf::RectangleShape>	_edge;
   std::function
   <int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)> _update;
   std::function

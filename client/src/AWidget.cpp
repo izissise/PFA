@@ -11,11 +11,15 @@ AWidget::~AWidget()
 {
 }
 
-void	AWidget::draw(sf::RenderTexture &window) const
+void		AWidget::draw(sf::RenderTexture &window) const
 {
+  sf::Shape	*edge = _edge.get();
+
   for (auto &elem : _sprites)
     if (elem.draw)
       window.draw(elem.sprite);
+  if (edge)
+    window.draw(*edge);
   window.draw(_text);
 }
 
@@ -102,6 +106,22 @@ void		AWidget::setTrigger(const std::function
 				    <void (const t_event &event)> &func)
 {
   _event = func;
+}
+
+void		AWidget::setEdge(std::unique_ptr<sf::RectangleShape> edgeShape,
+				 float thickness,
+				 const sf::Color &outColor)
+{
+  _edge = std::move(edgeShape);
+  _edge->setPosition(_zone.left, _zone.top);
+  _edge->setFillColor(sf::Color(127,127,127,0));
+  _edge->setOutlineColor(outColor);
+  _edge->setOutlineThickness(thickness);
+}
+
+sf::Shape	*AWidget::getEdge()
+{
+  return _edge.get();
 }
 
 bool		AWidget::isOver(const sf::RenderWindow &ref) const
