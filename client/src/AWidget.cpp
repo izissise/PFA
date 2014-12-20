@@ -181,6 +181,11 @@ void	AWidget::scale(const sf::Vector2f &size)
   textPos.x *= ratioX;
   textPos.y *= ratioY;
   _text.setPosition(textPos);
+  if (_edge)
+    {
+      _edge->setSize({_zone.width, _zone.height});
+      _edge->setPosition({_zone.left, _zone.top});
+    }
 }
 
 void	AWidget::resize(float pX, float pY)
