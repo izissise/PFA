@@ -30,7 +30,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 
   createTitle(wTitle);
   createContPanel(set, texture, panels);
-  createCoPopup(set, texture, panels);
+  createCoPopup(set, texture, panels, wConnectIp);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
   createButtonCip(wConnectIp, texture);
@@ -63,7 +63,8 @@ void	ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
 }
 
 void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
-				  const std::vector<APanelScreen *> &panels)
+				  const std::vector<APanelScreen *> &panels,
+				  Widget *linkWidget)
 {
   Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 150,
 	_zone.top + _zone.height / 2 - 65, 300, 130});
@@ -81,10 +82,13 @@ void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
 					popupZone.top + 70, popupZone.width / 2 - 17, 45},
 					sf::Text("Connect", _font["default"], 20));
 
+  popup->setState(APanelScreen::Leader);
+  popup->setHide(true);
   addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {popupZone.width, popupZone.height});
   createCancelButton(caButton, texture);
   createConnectButton(coButton, texture);
   createTextWidget(input, texture);
+  linkWidget->addObserver(popup);
   caButton->addObserver(popup);
   coButton->addObserver({popup, this, panels[1]}); // popup, serverMenu, gamePanel
   popup->addWidget({bgWidget, input, caButton, coButton});

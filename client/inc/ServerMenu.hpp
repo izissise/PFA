@@ -20,7 +20,8 @@ private:
   void		createContPanel(Settings &set, const sf::Texture &texture,
 				const std::vector<APanelScreen *> &panels);
   void		createCoPopup(Settings &set, const sf::Texture &texture,
-			      const std::vector<APanelScreen *> &panels);
+			      const std::vector<APanelScreen *> &panels,
+			      Widget *linkWidget);
   void		createButtonStyle(Widget *widget, const sf::Texture &texture);
   void		createButtonBack(Widget *widget, const sf::Texture &texture);
   void		createButtonJoin(Widget *widget, const sf::Texture &texture);

@@ -7,6 +7,13 @@
 class APanelScreen : public IObserver, public Observable
 {
 public:
+  enum	State
+    {
+      None = 0,
+      Leader = 1
+    };
+
+public:
   APanelScreen(const sf::FloatRect &zone);
   virtual ~APanelScreen() = 0;
 
@@ -70,6 +77,8 @@ public:
    *
    */
   void		setHide(bool hide);
+  void		setState(APanelScreen::State state);
+  APanelScreen::State	getState() const;
   void		setTrigger(const std::function<void (const t_event &event)> &func);
   void	       	addPanels(const std::initializer_list<APanelScreen * const> &panels);
   virtual void	addWidget(AWidget * const widget);
@@ -195,6 +204,7 @@ private:
 protected:
   bool					_hide;
   sf::FloatRect				_zone;
+  State					_state;
   sf::RenderTexture			_rt;
   std::map<std::string, sf::Font>	_font;
   std::function<void (const t_event &event)>	_trigger;

@@ -1,7 +1,7 @@
 #include "APanelScreen.hpp"
 
 APanelScreen::APanelScreen(const sf::FloatRect &zone) :
-  _hide(false), _zone(zone)
+  _hide(false), _zone(zone), _state(APanelScreen::None)
 {
 }
 
@@ -110,6 +110,16 @@ void	APanelScreen::setHide(bool hide)
   _hide = hide;
 }
 
+void	APanelScreen::setState(APanelScreen::State state)
+{
+  _state = state;
+}
+
+APanelScreen::State	APanelScreen::getState() const
+{
+  return _state;
+}
+
 bool	APanelScreen::checkPanelBounds(AWidget * const widget) const
 {
   sf::FloatRect	wZone = widget->getZone();
@@ -127,8 +137,12 @@ int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
       if ((*rit)->isHidden() == false)
-	if ((retVal = (*rit)->update(event, ref, set)) != 0)
-	  return retVal;
+	{
+	  if ((retVal = (*rit)->update(event, ref, set)) != 0)
+	    return retVal;
+	  else if ((*rit)->getState() == APanelScreen::Leader)
+	    return 1;
+	}
     }
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
     {
