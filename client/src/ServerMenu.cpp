@@ -67,31 +67,35 @@ void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
 				  Widget *linkWidget)
 {
   Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 150,
-	_zone.top + _zone.height / 2 - 65, 300, 130});
+	_zone.top + _zone.height / 2 - 85, 300, 170});
   sf::FloatRect	popupZone = popup->getZone();
   Widget	*bgWidget = new Widget("bg", {popupZone.left, popupZone.top,
 				popupZone.width, popupZone.height}, sf::Text());
-  TextWidget	*input = new TextWidget("ip", {popupZone.left + 10, popupZone.top + 10,
+  Widget	*header = new Widget("header", {popupZone.left, popupZone.top,
+					popupZone.width, 40},
+					sf::Text("Connect to Ip", _font["default"], 20));
+  TextWidget	*input = new TextWidget("ip", {popupZone.left + 10, popupZone.top + 50,
 					popupZone.width - 20, 45},
 					sf::Text("", _font["default"], 20),
 					sf::Text("Ip", _font["default"], 20), 30);
-  Widget	*caButton = new Widget("ca", {popupZone.left + 10, popupZone.top + 70,
+  Widget	*caButton = new Widget("ca", {popupZone.left + 10, popupZone.top + 110,
 					popupZone.width / 2 - 17, 45},
 					sf::Text("Cancel", _font["default"], 20));
   Widget	*coButton = new Widget("co", {popupZone.left + popupZone.width / 2 + 7,
-					popupZone.top + 70, popupZone.width / 2 - 17, 45},
+					popupZone.top + 110, popupZone.width / 2 - 17, 45},
 					sf::Text("Connect", _font["default"], 20));
 
   popup->setState(APanelScreen::Leader);
   popup->setHide(true);
   addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {popupZone.width, popupZone.height});
+  createPopupHeader(header);
   createCancelButton(caButton, texture);
   createConnectButton(coButton, texture);
   createTextWidget(input, texture);
   linkWidget->addObserver(popup);
   caButton->addObserver(popup);
   coButton->addObserver({popup, this, panels[1]}); // popup, serverMenu, gamePanel
-  popup->addWidget({bgWidget, input, caButton, coButton});
+  popup->addWidget({bgWidget, header, input, caButton, coButton});
   popup->construct(texture, set, {});
   addPanels({popup});
 }
@@ -102,6 +106,14 @@ void	ServerMenu::createTitle(Widget *title)
 
   addSpriteForWidget(title, sf::Color(50, 30, 60, 255), {zone.width, zone.height});
   title->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
+}
+
+void	ServerMenu::createPopupHeader(Widget *widget)
+{
+  sf::FloatRect zone = widget->getZone();
+
+  addSpriteForWidget(widget, sf::Color(50, 30, 60, 255), {zone.width, zone.height});
+  widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
 }
 
 void	ServerMenu::createFooter(Widget *footer)

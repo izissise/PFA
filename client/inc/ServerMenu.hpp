@@ -16,6 +16,7 @@ public:
 
 private:
   void		createTitle(Widget *title);
+  void		createPopupHeader(Widget *widget);
   void		createFooter(Widget *footer);
   void		createContPanel(Settings &set, const sf::Texture &texture,
 				const std::vector<APanelScreen *> &panels);
