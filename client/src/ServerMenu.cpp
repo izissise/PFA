@@ -29,7 +29,8 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
     sf::Text("Join Server", _font["default"], 20));
 
   createTitle(wTitle);
-  createContPanel(set, texture);
+  createContPanel(set, texture, panels);
+  createCoPopup(set, texture, panels);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
   createButtonCip(wConnectIp, texture);
@@ -46,7 +47,8 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void	ServerMenu::createContPanel(Settings &set, const sf::Texture &texture)
+void	ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
+				    const std::vector<APanelScreen *> &panels)
 {
   Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 70,
 	_zone.width, _zone.height - 140});
@@ -58,6 +60,36 @@ void	ServerMenu::createContPanel(Settings &set, const sf::Texture &texture)
   content->addWidget({bgWidget});
   content->construct(texture, set, {});
   addPanels({content});
+}
+
+void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
+				  const std::vector<APanelScreen *> &panels)
+{
+  Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 150,
+	_zone.top + _zone.height / 2 - 65, 300, 130});
+  sf::FloatRect	popupZone = popup->getZone();
+  Widget	*bgWidget = new Widget("bg", {popupZone.left, popupZone.top,
+				popupZone.width, popupZone.height}, sf::Text());
+  TextWidget	*input = new TextWidget("ip", {popupZone.left + 10, popupZone.top + 10,
+					popupZone.width - 20, 45},
+					sf::Text("", _font["default"], 20),
+					sf::Text("Ip", _font["default"], 20), 30);
+  Widget	*caButton = new Widget("ca", {popupZone.left + 10, popupZone.top + 70,
+					popupZone.width / 2 - 17, 45},
+					sf::Text("Cancel", _font["default"], 20));
+  Widget	*coButton = new Widget("co", {popupZone.left + popupZone.width / 2 + 7,
+					popupZone.top + 70, popupZone.width / 2 - 17, 45},
+					sf::Text("Connect", _font["default"], 20));
+
+  addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {popupZone.width, popupZone.height});
+  createCancelButton(caButton, texture);
+  createConnectButton(coButton, texture);
+  createTextWidget(input, texture);
+  caButton->addObserver(popup);
+  coButton->addObserver({popup, this, panels[1]}); // popup, serverMenu, gamePanel
+  popup->addWidget({bgWidget, input, caButton, coButton});
+  popup->construct(texture, set, {});
+  addPanels({popup});
 }
 
 void	ServerMenu::createTitle(Widget *title)
@@ -145,6 +177,84 @@ void	ServerMenu::createButtonCip(Widget *widget, const sf::Texture &texture)
 }
 
 void	ServerMenu::createButtonJoin(Widget *widget, const sf::Texture &texture)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      lwidget.setSpriteAttr(0, !isOver);
+      lwidget.setSpriteAttr(1, isOver);
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
+	      return 0;
+	    }
+	}
+      return 0;
+    };
+  createButtonStyle(widget, texture);
+  widget->setUpdate(updateFunc);
+}
+
+void	ServerMenu::createTextWidget(TextWidget *wTextWidget, const sf::Texture &texture)
+{
+  sf::FloatRect	zone = wTextWidget->getZone();
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &widget, const sf::Event &event UNUSED, sf::RenderWindow &ref UNUSED)
+    -> int
+    {
+      sf::FloatRect wZone = widget.getZone();
+
+      widget.alignText({wZone.left,wZone.top}, {wZone.width, wZone.height}, 50, 50);
+      return 0;
+    };
+  addSpriteForWidget(wTextWidget, sf::Color(255, 255, 255, 200), {zone.width, zone.height});
+  wTextWidget->setUpdate(updateFunc);
+  wTextWidget->setColor(sf::Color(0,0,0));
+  wTextWidget->setDefaultColor(sf::Color(60,60,60));
+  wTextWidget->getCursor().setColor(sf::Color(0,0,0));
+  wTextWidget->setEdge(std::unique_ptr<sf::RectangleShape>
+		       (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+		       2.f);
+}
+
+void	ServerMenu::createCancelButton(Widget *widget, const sf::Texture &texture)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      lwidget.setSpriteAttr(0, !isOver);
+      lwidget.setSpriteAttr(1, isOver);
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
+	      return 0;
+	    }
+	}
+      return 0;
+    };
+  createButtonStyle(widget, texture);
+  widget->setUpdate(updateFunc);
+}
+
+void	ServerMenu::createConnectButton(Widget *widget, const sf::Texture &texture)
 {
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateFunc;
