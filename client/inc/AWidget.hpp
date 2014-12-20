@@ -22,7 +22,8 @@ enum class	wEvent
     Show = 4,
     SetSprite = 16,
     UpdateText = 32,
-    Update = 64
+    Update = 64,
+    Reset = 128
     };
 
 enum class	wFlag
@@ -44,11 +45,6 @@ typedef struct	s_event
     e(event), idx(add), value(v), strText(s)
   {
   }
-
-  // s_event(wEvent event = wEvent::None, const std::string &s) :
-  //   e(event), idx(0), value(0), strText(s)
-  // {
-  // }
 }		t_event;
 
 typedef struct	s_sprite

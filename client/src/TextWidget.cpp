@@ -153,3 +153,17 @@ void	TextWidget::resize(float pX, float pY)
       elem.sprite.scale(pX, pY);
     }
 }
+
+void	TextWidget::trigger(const t_event &event)
+{
+  if (event.e & wEvent::Reset)
+    {
+      _textContent.setString("");
+      _text.setString("");
+      clear(); // clear userInput
+      _cursor.update();
+      _cursor.setCursorPos(_text);
+    }
+  else
+    AWidget::trigger(event);
+}

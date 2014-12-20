@@ -164,7 +164,7 @@ void	APanelScreen::addPanels(const std::initializer_list<APanelScreen * const>  
     _panels.push_back(panel);
 }
 
-void	APanelScreen::trigger(const t_event &event)
+void		APanelScreen::trigger(const t_event &event)
 {
   if (event.e & wEvent::Hide)
     {
@@ -172,6 +172,14 @@ void	APanelScreen::trigger(const t_event &event)
 	_hide = !_hide;
       else
 	_hide = true;
+    }
+  if (event.e & wEvent::Reset)
+    {
+      t_event	evt = event;
+
+      evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Reset;
+      for (AWidget *widget : _widgets)
+	widget->trigger(evt);
     }
 }
 

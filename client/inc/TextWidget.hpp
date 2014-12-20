@@ -19,6 +19,7 @@ public:
   void		setColor(const sf::Color &color);
   void		setDefaultColor(const sf::Color &color);
   Cursor	&getCursor();
+  void		trigger(const t_event &event);
 
 private:
   void	setDrawableText();

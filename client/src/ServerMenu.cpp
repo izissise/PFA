@@ -248,7 +248,7 @@ void	ServerMenu::createCancelButton(Widget *widget, const sf::Texture &texture)
 	{
 	  if (lwidget.isClicked(event, sf::Mouse::Left))
 	    {
-	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
+	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle | wEvent::Reset));
 	      return 0;
 	    }
 	}
