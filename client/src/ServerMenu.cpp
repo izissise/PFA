@@ -69,8 +69,8 @@ void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
   Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 150,
 	_zone.top + _zone.height / 2 - 85, 300, 170});
   sf::FloatRect	popupZone = popup->getZone();
-  Widget	*bgWidget = new Widget("bg", {popupZone.left, popupZone.top,
-				popupZone.width, popupZone.height}, sf::Text());
+  Widget	*bgWidget = new Widget("bg", {popupZone.left + 2, popupZone.top,
+				popupZone.width - 4, popupZone.height - 2}, sf::Text());
   Widget	*header = new Widget("header", {popupZone.left, popupZone.top,
 					popupZone.width, 40},
 					sf::Text("Connect to Ip", _font["default"], 20));
@@ -88,6 +88,9 @@ void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
   popup->setState(APanelScreen::Leader);
   popup->setHide(true);
   addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {popupZone.width, popupZone.height});
+  bgWidget->setEdge(std::unique_ptr<sf::RectangleShape>
+		    (new sf::RectangleShape(sf::Vector2f(popupZone.width, popupZone.height))),
+		    2.f);
   createPopupHeader(header);
   createCancelButton(caButton, texture);
   createConnectButton(coButton, texture);

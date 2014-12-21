@@ -2,8 +2,9 @@
 #define _KEYWIDGET_H_
 
 #include "AWidget.hpp"
+#include "BlinkText.hpp"
 
-class KeyWidget : public AWidget
+class KeyWidget : public AWidget, public BlinkText
 {
 public:
   KeyWidget(const std::string &id, const sf::FloatRect &zone,
@@ -12,6 +13,7 @@ public:
 
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		trigger(const t_event &event);
+  void		draw(sf::RenderTexture &window) const;
 
 private:
   void	bindKey(Settings &set);

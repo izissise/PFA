@@ -49,8 +49,7 @@ int	KeyWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 {
   int	retVal = 0;
 
-  if (_hide)
-    return 0;
+  BlinkText::update();
   if (isClicked(event, sf::Mouse::Left) && !_isActive)
     {
       _isActive = isOver(ref);
@@ -58,7 +57,7 @@ int	KeyWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 	{
 	  retVal = _isActive;
 	  _entry.key = sf::Keyboard::Unknown;
-	  _text.setString("");
+	  // _text.setString("");
 	}
     }
   else if (_isActive)
@@ -87,6 +86,24 @@ int	KeyWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 	_update(*this, event, ref);
     }
   return retVal;
+}
+
+void	KeyWidget::draw(sf::RenderTexture &window) const
+{
+  sf::Shape	*edge = _edge.get();
+
+  for (auto &elem : _sprites)
+    if (elem.draw)
+      window.draw(elem.sprite);
+  if (edge)
+    window.draw(*edge);
+  if (_isActive)
+    {
+      if (getDisplayState())
+	window.draw(_text);
+    }
+  else
+    window.draw(_text);
 }
 
 void	KeyWidget::trigger(const t_event &event)

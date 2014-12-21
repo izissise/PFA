@@ -3,10 +3,12 @@
 
 #include <SFML/Graphics.hpp>
 
-class Cursor
+#include "BlinkText.hpp"
+
+class Cursor : public BlinkText
 {
 public:
-  Cursor(const sf::Text &text = sf::Text(), float blink = 700);
+  Cursor(const sf::Text &text = sf::Text(), unsigned int blinkTime = 700);
   virtual ~Cursor();
 
   void		setCursorPos(float x, float y);
@@ -22,9 +24,6 @@ public:
 
 private:
   sf::Text	_cursor;
-  sf::Clock	_time;
-  float		_blinkTime;
-  bool		_display;
 };
 
 #endif /* _CURSOR_H_ */
