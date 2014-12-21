@@ -1,4 +1,5 @@
 #include "AWidget.hpp"
+#include "FastMath.h"
 
 AWidget::AWidget(const std::string &id, const sf::FloatRect &zone,
 		 const sf::Text &text, wFlag flg) :
@@ -167,8 +168,9 @@ void	AWidget::scale(const sf::Vector2f &size)
 {
   float	ratioX = size.x / SIZEX;
   float	ratioY = size.y / SIZEY;
-  sf::Vector2f textPos(_text.getPosition());
-  sf::Vector2f spritePos;
+  sf::Vector2f	textPos(_text.getPosition());
+  sf::Vector2f	spritePos;
+  float		thickness;
 
   _zone.left *= ratioX;
   _zone.top *= ratioY;
@@ -190,6 +192,11 @@ void	AWidget::scale(const sf::Vector2f &size)
     {
       _edge->setSize({_zone.width, _zone.height});
       _edge->setPosition({_zone.left, _zone.top});
+      thickness = std::round(_edge->getOutlineThickness()
+			     * (pointDistf(ratioX, ratioY) / pointDistf(1, 1)));
+      if (thickness <= 0)
+	thickness = 0.5f;
+      _edge->setOutlineThickness(thickness);
     }
 }
 
