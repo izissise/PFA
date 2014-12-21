@@ -16,9 +16,10 @@ public:
 private:
   void		createBgPanel(const sf::Texture &texture, Widget *wBackground,
 			      Widget *wMback, Widget *wMenuTitle);
-  void		createPlayButton(const sf::Texture &texture, Widget *);
-  void		createOptButton(const sf::Texture &texture, Widget *);
-  void		createQuitButton(const sf::Texture &texture, Widget *);
+  void		createPlayButton(Widget *);
+  void		createOptButton(Widget *);
+  void		createQuitButton(Widget *);
+  void		createButtonStyle(Widget *);
 };
 
 #endif /* _MAINMENU_H_ */
