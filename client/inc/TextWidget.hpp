@@ -25,6 +25,7 @@ private:
   void	setDrawableText();
   void	scaleText(sf::Text &text, float ratioX, float ratioY);
   int	setToDefault(const sf::Event &event, sf::RenderWindow &ref);
+  void	clearWidget();
 
 private:
   Cursor	_cursor;

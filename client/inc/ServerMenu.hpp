@@ -30,6 +30,7 @@ private:
   void		createTextWidget(TextWidget *widget, const sf::Texture &texture);
   void		createCancelButton(Widget *widget, const sf::Texture &texture);
   void		createConnectButton(Widget *widget, const sf::Texture &texture);
+  void		setPopupTrigger(Panel *panel);
 };
 
 #endif /* _SERVERMENU_H_ */

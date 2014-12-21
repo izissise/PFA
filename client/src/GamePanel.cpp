@@ -114,25 +114,24 @@ void	GamePanel::draw(sf::RenderWindow &window, bool toWin)
 
 void	GamePanel::trigger(const t_event &event)
 {
-  if (event.e & wEvent::Hide)
+  if (event.e & wEvent::Update)
     {
-      if (event.e & wEvent::Toggle)
+      _hide = false;
+      try
 	{
-	  _hide = !_hide;
-	  if (_hide == false)
-	    {
-	      try
-		{
-		  _socket.connect("127.0.0.1", "6060", 2);
-		}
-	      catch (NetworkException &e)
-		{
-		  std::cerr << e.what() << std::endl;
-		}
-	    }
+	  std::string	ip(event.str);
+	  std::size_t	pos = ip.find(':');
+
+	  std::cout << "GamePanel trigger " << ip.substr(0, pos) << " "
+		    << ip.substr(pos + 1) << std::endl;
+	  _socket.connect(ip.substr(0, pos), ip.substr(pos + 1), 2);
 	}
-      else
-	_hide = true;
+      catch (NetworkException &e)
+	{
+	  std::cerr << "Cannot connect to ip : " << e.what() << std::endl;
+	  setHide(true);
+	  notify(t_event(wEvent::Hide | wEvent::Toggle));
+	}
     }
   else
     APanelScreen::trigger(event);

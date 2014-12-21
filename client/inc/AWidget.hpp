@@ -30,7 +30,8 @@ enum class	wFlag
 {
   None = 0,
     Movable = 1,
-    Resizable = 2
+    Resizable = 2,
+    Getable = 4
     };
 
 typedef struct	s_event
@@ -38,11 +39,11 @@ typedef struct	s_event
   wEvent	e;
   int		idx;
   int		value;
-  const std::string	&strText;
+  const std::string	&str;
 
   s_event(wEvent event = wEvent::None, int add = 0, int v = 0,
 	  const std::string &s = "") :
-    e(event), idx(add), value(v), strText(s)
+    e(event), idx(add), value(v), str(s)
   {
   }
 }		t_event;

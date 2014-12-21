@@ -154,16 +154,19 @@ void	TextWidget::resize(float pX, float pY)
     }
 }
 
+void	TextWidget::clearWidget()
+{
+  _textContent.setString("");
+  _text.setString("");
+  UserInput::clear(); // clear userInput
+  _cursor.update();
+  _cursor.setCursorPos(_text);
+}
+
 void	TextWidget::trigger(const t_event &event)
 {
   if (event.e & wEvent::Reset)
-    {
-      _textContent.setString("");
-      _text.setString("");
-      clear(); // clear userInput
-      _cursor.update();
-      _cursor.setCursorPos(_text);
-    }
+    clearWidget();
   else
     AWidget::trigger(event);
 }

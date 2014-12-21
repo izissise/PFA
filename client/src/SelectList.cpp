@@ -62,7 +62,7 @@ void	SelectList::trigger(const t_event &event)
     }
   else if (event.e & wEvent::UpdateText)
     {
-      _widgets[0]->setTextContent(event.strText); // widget[0] is the Header
+      _widgets[0]->setTextContent(event.str); // widget[0] is the Header
       notify(t_event(wEvent::Hide));
     }
 }

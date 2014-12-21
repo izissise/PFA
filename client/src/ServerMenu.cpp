@@ -92,12 +92,47 @@ void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
   createCancelButton(caButton, texture);
   createConnectButton(coButton, texture);
   createTextWidget(input, texture);
+  popup->addObserver({panels[1], this}); // gamePanel
+  setPopupTrigger(popup);
   linkWidget->addObserver(popup);
   caButton->addObserver(popup);
-  coButton->addObserver({popup, this, panels[1]}); // popup, serverMenu, gamePanel
+  coButton->addObserver({popup});
   popup->addWidget({bgWidget, header, input, caButton, coButton});
   popup->construct(texture, set, {});
   addPanels({popup});
+}
+
+void	ServerMenu::setPopupTrigger(Panel *panel)
+{
+  std::function<void (const t_event &event)>  func;
+
+  func = [panel](const t_event &event) // cannot call APanelScreen::trigger
+    {
+      if (event.e & wEvent::Hide)
+	{
+	  if (event.e & wEvent::Toggle)
+	    panel->setHide(!panel->isHidden());
+	  else
+	    panel->setHide(true);
+	}
+      if (event.e & wEvent::Update)
+	{
+	  t_event	evt = event;
+
+	  evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Update;
+	  panel->notify(event);
+	}
+      if (event.e & wEvent::Reset)
+	{
+	  t_event	evt = event;
+	  const std::vector<AWidget *>	&widgets = panel->getWidgets();
+
+	  evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Reset;
+	  for (AWidget *widget : widgets)
+	    widget->trigger(evt);
+	}
+    };
+  panel->setTrigger(func);
 }
 
 void	ServerMenu::createTitle(Widget *title)
@@ -287,7 +322,7 @@ void	ServerMenu::createConnectButton(Widget *widget, const sf::Texture &texture)
 	{
 	  if (lwidget.isClicked(event, sf::Mouse::Left))
 	    {
-	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
+	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle | wEvent::Update));
 	      return 0;
 	    }
 	}
