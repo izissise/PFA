@@ -23,6 +23,11 @@ void		AWidget::draw(sf::RenderTexture &window) const
   window.draw(_text);
 }
 
+std::string	AWidget::getContent() const
+{
+  return (std::string());
+}
+
 void	AWidget::addSprite(t_sprite &elem)
 {
   elem.sprite.setPosition(_zone.left, _zone.top);

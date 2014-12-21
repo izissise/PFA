@@ -117,10 +117,15 @@ void	ServerMenu::setPopupTrigger(Panel *panel)
 	}
       if (event.e & wEvent::Update)
 	{
+	  const std::vector<AWidget *> &widgets = panel->getWidgets();
 	  t_event	evt = event;
+	  std::string	ip;
 
-	  evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Update;
-	  panel->notify(event);
+	  for (AWidget *widget : widgets)
+	    if (widget->getFlag() & wFlag::Getable)
+	      ip = widget->getContent();
+	  evt.str = ip;
+	  panel->notify(evt);
 	}
       if (event.e & wEvent::Reset)
 	{

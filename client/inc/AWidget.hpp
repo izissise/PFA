@@ -1,4 +1,3 @@
-
 #ifndef _AWIDGET_H_
 #define _AWIDGET_H_
 
@@ -39,10 +38,10 @@ typedef struct	s_event
   wEvent	e;
   int		idx;
   int		value;
-  const std::string	&str;
+  std::string	str;
 
   s_event(wEvent event = wEvent::None, int add = 0, int v = 0,
-	  const std::string &s = "") :
+	  const std::string &s = std::string()) :
     e(event), idx(add), value(v), str(s)
   {
   }
@@ -97,6 +96,8 @@ public:
    *
    */
   virtual void		draw(sf::RenderTexture &window) const;
+
+  virtual std::string	getContent() const;
 
   /**
    * \fn void addSprite(sf::Sprite &sprite)
@@ -391,6 +392,11 @@ inline int	operator&(wEvent a, wEvent b)
 inline wEvent	operator|(wEvent a, wEvent b)
 {
   return (static_cast<wEvent>(static_cast<int>(a) | static_cast<int>(b)));
+}
+
+inline wEvent	operator~(wEvent a)
+{
+  return (static_cast<wEvent>(~static_cast<int>(a)));
 }
 
 #endif /* _AWIDGET_H_ */

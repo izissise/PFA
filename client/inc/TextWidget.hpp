@@ -10,10 +10,12 @@ class TextWidget : public AWidget, public UserInput
 public:
   TextWidget(const std::string &id, const sf::FloatRect &zone,
 	     const sf::Text &text = sf::Text(), const sf::Text &def = sf::Text(),
-	     int maxSize = 2048);
+	     int maxSize = 2048,
+	     wFlag flg = wFlag::Movable | wFlag::Resizable | wFlag::Getable);
 
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		draw(sf::RenderTexture &window) const;
+  std::string	getContent() const;
   void		scale(const sf::Vector2f &size);
   void		resize(float pX, float pY);
   void		setColor(const sf::Color &color);

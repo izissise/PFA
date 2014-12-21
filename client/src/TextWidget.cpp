@@ -4,8 +4,8 @@
 
 TextWidget::TextWidget(const std::string &id, const sf::FloatRect &zone,
 		       const sf::Text &text, const sf::Text &def,
-		       int maxSize) :
-  AWidget(id, zone, text), UserInput(maxSize), _isActive(false),
+		       int maxSize, wFlag flg) :
+  AWidget(id, zone, text, flg), UserInput(maxSize), _isActive(false),
   _textContent(text), _default(def)
 {
   sf::Text	curText(text);
@@ -105,6 +105,11 @@ void		TextWidget::draw(sf::RenderTexture &window) const
   AWidget::draw(window);
   if (_isActive)
     _cursor.draw(window);
+}
+
+std::string	TextWidget::getContent() const
+{
+  return _text.getString().toAnsiString();
 }
 
 void		TextWidget::scaleText(sf::Text &text, float ratioX, float ratioY)

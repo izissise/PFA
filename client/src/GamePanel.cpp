@@ -114,6 +114,8 @@ void	GamePanel::draw(sf::RenderWindow &window, bool toWin)
 
 void	GamePanel::trigger(const t_event &event)
 {
+  if (event.e & ~wEvent::Update) // importent to switch the hide state before connecting
+    APanelScreen::trigger(event);
   if (event.e & wEvent::Update)
     {
       _hide = false;
@@ -122,7 +124,7 @@ void	GamePanel::trigger(const t_event &event)
 	  std::string	ip(event.str);
 	  std::size_t	pos = ip.find(':');
 
-	  std::cout << "GamePanel trigger " << ip.substr(0, pos) << " "
+	  std::cout << "GamePanel trigger " <<  ip.substr(0, pos) << ":"
 		    << ip.substr(pos + 1) << std::endl;
 	  _socket.connect(ip.substr(0, pos), ip.substr(pos + 1), 2);
 	}
@@ -133,8 +135,6 @@ void	GamePanel::trigger(const t_event &event)
 	  notify(t_event(wEvent::Hide | wEvent::Toggle));
 	}
     }
-  else
-    APanelScreen::trigger(event);
 }
 
 int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
