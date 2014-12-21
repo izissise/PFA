@@ -31,8 +31,8 @@ private:
 private:
   Settings	_settings;
   Parser	_parser;
-  sf::RenderWindow _window;
   Menu		_menu;
+  sf::RenderWindow _window;
   bool		_showMenu;
   std::thread	_updateThread;
 };

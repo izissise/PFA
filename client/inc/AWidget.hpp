@@ -10,8 +10,8 @@
 #include "Settings.hpp"
 #include "Unused.hpp"
 
-#define SIZEX 1600.0
-#define SIZEY 900.0
+#define SIZEX 1600.f
+#define SIZEY 900.f
 
 enum class	wEvent
 {

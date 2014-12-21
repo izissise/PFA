@@ -1,10 +1,11 @@
 #include "ClientMain.hpp"
 
 ClientMain::ClientMain()
-  : _settings(), _parser(&_settings),
+  : _settings(),
+    _parser(&_settings),
+    _menu(_settings, _parser),
     _window(sf::VideoMode(std::stoi(_settings.getCvarList().getCvar("r_width")),
                           std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
-    _menu(_settings, _parser),
   _showMenu(false)//,
     //_updateThread(std::bind(&ClientMain::update, this))
 {
