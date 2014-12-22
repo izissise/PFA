@@ -20,6 +20,8 @@ private:
   void		createFooter(Widget *footer);
   void		createContPanel(Settings &set, const sf::Texture &texture,
 				const std::vector<APanelScreen *> &panels);
+  void		createFavPanel(Settings &set, const sf::Texture &texture,
+			       const std::vector<APanelScreen *> &panels);
   void		createCoPopup(Settings &set, const sf::Texture &texture,
 			      const std::vector<APanelScreen *> &panels,
 			      Widget *linkWidget);

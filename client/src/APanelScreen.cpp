@@ -115,6 +115,37 @@ void	APanelScreen::setState(APanelScreen::State state)
   _state = state;
 }
 
+void	APanelScreen::moveWidgets(APanelScreen * const pan,
+				  const sf::Vector2f &displacement)
+{
+  auto	vec = pan->getWidgets();
+
+  for (auto &it : vec)
+    it->move(displacement.x, displacement.y);
+}
+
+void	APanelScreen::move(const sf::Vector2f &displacement)
+{
+  for (auto &pit : _panels)
+    {
+      if (!pit->getSubPanels().empty())
+	pit->move(displacement);
+      else
+	pit->moveWidgets(pit, displacement);
+    }
+  moveWidgets(this, displacement);
+  _zone.top += displacement.y;
+  _zone.left += displacement.x;
+}
+
+void	APanelScreen::setPosition(const sf::Vector2f &position)
+{
+  sf::Vector2f	displacement(position.x - _zone.left,
+			     position.y - _zone.top);
+
+  move(displacement);
+}
+
 APanelScreen::State	APanelScreen::getState() const
 {
   return _state;

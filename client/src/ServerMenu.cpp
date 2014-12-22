@@ -30,6 +30,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 
   createTitle(wTitle);
   createContPanel(set, texture, panels);
+  createFavPanel(set, texture, panels);
   createCoPopup(set, texture, panels, wConnectIp);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
@@ -37,6 +38,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
   createButtonJoin(wJoin, texture);
   wBack->addObserver({this, panels[0]});
   wJoin->addObserver({this, panels[1]});
+
 
   _widgets.push_back(wTitle);
   _widgets.push_back(wFooter);
@@ -60,6 +62,22 @@ void	ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
   content->addWidget({bgWidget});
   content->construct(texture, set, {});
   addPanel({content});
+}
+
+void	ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
+				    const std::vector<APanelScreen *> &panels)
+{
+  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 0* 70,
+	_zone.width, _zone.height - 140});
+  sf::FloatRect	contZone = content->getZone();
+  Widget	*bgWidget = new Widget("bg", {contZone.left, contZone.top,
+				contZone.width, contZone.height}, sf::Text());
+
+  addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 255), {contZone.width, contZone.height});
+  content->addWidget({bgWidget});
+  content->construct(texture, set, {});
+  content->setPosition({_zone.left, _zone.top + 70});
+  // addPanel({content});
 }
 
 void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,

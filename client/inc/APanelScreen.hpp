@@ -78,6 +78,8 @@ public:
    */
   void		setHide(bool hide);
   void		setState(APanelScreen::State state);
+  void		move(const sf::Vector2f &displacement);
+  void		setPosition(const sf::Vector2f &position);
   APanelScreen::State	getState() const;
   void		setTrigger(const std::function<void (const t_event &event)> &func);
   void		addPanel(APanelScreen * const panel);
@@ -201,6 +203,8 @@ private:
    *
    */
   const sf::RenderTexture	&getRT() const;
+  void	moveWidgets(APanelScreen * const pan,
+		    const sf::Vector2f &displacement);
 
 protected:
   bool					_hide;
