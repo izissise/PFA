@@ -14,12 +14,12 @@ TileCodex::TileCodex(const std::string& path)
   }
 
   // generate sprites
-  Vector2f	tile(0.0f, 0.0f);
+  Vector2u	tile(0, 0);
   _texSize.x = _spriteSheet.getSize().x;
   _texSize.y = _spriteSheet.getSize().y;
 
   for (; tile.y < _texSize.y; tile.y += tileSize) {
-    for (tile.x = 0.0f; tile.x < _texSize.x; tile.x += tileSize) {
+    for (tile.x = 0; tile.x < _texSize.x; tile.x += tileSize) {
       _spriteUVs.emplace_back(tile.x, tile.y);
       _spriteUVs.emplace_back((tile.x + tileSize), tile.y);
       _spriteUVs.emplace_back((tile.x + tileSize), (tile.y + tileSize));

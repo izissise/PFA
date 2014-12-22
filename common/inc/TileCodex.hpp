@@ -32,7 +32,7 @@ private:
   std::vector<sf::Vector2f>	_spriteUVs;
   sf::Texture			_spriteSheet;
   sf::Shader			_bgShader;
-  sf::Vector2i			_texSize;
+  sf::Vector2u			_texSize;
 };
 
 #endif /* TILECODEX_H */

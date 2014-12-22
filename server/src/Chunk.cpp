@@ -219,6 +219,32 @@ void	Chunk::_choseBiome(Biome * const biome, t_tileType &tile,
     }
 }
 
+void		Chunk::_generateBackground(unsigned int x, unsigned int y,
+					   float lineY, const t_tileType &tile)
+{
+  unsigned int	surfaceY = _pos.y * Chunk::height + lineY;
+  unsigned int	scaledY = _pos.y * Chunk::height + y;
+  float		ratio = (static_cast<float>(surfaceY - scaledY) / surfaceY);
+  unsigned int	randNb;
+
+  if (ratio < 0.5)
+    {
+      if (ratio >= 0.2) // then rand
+	{
+	  ratio = _scaleNumber(ratio, 0.2, 0.5, 0, 100);
+	  randNb = _scaleNumber(std::rand(), 0, RAND_MAX, 0, 100);
+	  if (randNb > ratio)
+	    _bgTiles[y * Chunk::width + x] = tile.ground;
+	  else
+	    _bgTiles[y * Chunk::width + x] = TileType::Ground;
+	}
+      else
+	_bgTiles[y * Chunk::width + x] = tile.ground;
+    }
+  else
+    _bgTiles[y * Chunk::width + x] = TileType::Ground;
+}
+
 void		Chunk::_completeField(void)
 {
   Vector2f	prev;
@@ -267,6 +293,7 @@ void		Chunk::_completeField(void)
 	      // 	_generateTree(x, y);
 	      if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
+		  _generateBackground(x, y, lineY, tile);
 		  off = OFFSET + 0.4 - ((fabs(lineY * TileCodex::tileSize
 					      + offset.y * TileCodex::tileSize
 					      - (y + offset.y) * TileCodex::tileSize) >= FADEH) ?
@@ -663,6 +690,7 @@ void	Chunk::_generate(void)
   std::fill(_tiles.begin(), _tiles.end(), TileType::Empty);
   if (_pos.y >= 0)
     {
+      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Ground);
       constructLine();
       fillChunkInfo();
       _completeField();
