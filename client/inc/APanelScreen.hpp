@@ -80,7 +80,8 @@ public:
   void		setState(APanelScreen::State state);
   APanelScreen::State	getState() const;
   void		setTrigger(const std::function<void (const t_event &event)> &func);
-  void	       	addPanels(const std::initializer_list<APanelScreen * const> &panels);
+  void		addPanel(APanelScreen * const panel);
+  void	       	addPanel(const std::initializer_list<APanelScreen * const> &panels);
   virtual void	addWidget(AWidget * const widget);
   virtual void	addWidget(const std::initializer_list<AWidget * const> &widgets);
   void		addFont(const std::string &fontName, const std::string &fontPath);

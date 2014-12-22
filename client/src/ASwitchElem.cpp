@@ -18,7 +18,7 @@ void	ASwitchElem::construct(const sf::Texture &texture, Settings &set,
   _content->construct(texture, set, panels);
   _leftSide->construct(texture, set, panels);
   _rightSide->construct(texture, set, panels);
-  addPanels({_leftSide, _rightSide});
+  addPanel({_leftSide, _rightSide});
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }

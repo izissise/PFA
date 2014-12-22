@@ -158,7 +158,12 @@ void	APanelScreen::setTrigger(const std::function<void (const t_event &event)> &
   _trigger = func;
 }
 
-void	APanelScreen::addPanels(const std::initializer_list<APanelScreen * const>  &panels)
+void	APanelScreen::addPanel(APanelScreen * const panel)
+{
+  _panels.push_back(panel);
+}
+
+void	APanelScreen::addPanel(const std::initializer_list<APanelScreen * const>  &panels)
 {
   for (auto &panel : panels)
     _panels.push_back(panel);

@@ -44,7 +44,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
   _widgets.push_back(wBarWidget);
   wSelectList->construct(texture, set, {});
   pSwitch->construct(texture, set, {});
-  addPanels({wSelectList, pSwitch});
+  addPanel({wSelectList, pSwitch});
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
   	std::stof(set.getCvarList().getCvar("r_height"))});
 }

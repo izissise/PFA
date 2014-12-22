@@ -59,7 +59,7 @@ void	ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
   addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {contZone.width, contZone.height});
   content->addWidget({bgWidget});
   content->construct(texture, set, {});
-  addPanels({content});
+  addPanel({content});
 }
 
 void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
@@ -102,7 +102,7 @@ void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
   coButton->addObserver({popup});
   popup->addWidget({bgWidget, header, input, caButton, coButton});
   popup->construct(texture, set, {});
-  addPanels({popup});
+  addPanel({popup});
 }
 
 void	ServerMenu::setPopupTrigger(Panel *panel)
