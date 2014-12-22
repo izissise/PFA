@@ -25,13 +25,13 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 					    Scroll::Vertical, this,
 					    sf::Text(), wFlag::None);
   SelectList	*wSelectList = new SelectList(sf::FloatRect{1000, 200, 260, 231});
-  SwitchPanel	*pSwitch = new SwitchPanel(sf::FloatRect{1000, 600, 260, 50}, {1050, 600, 160, 50});
+  SwitchWidget	*pSwitch = new SwitchWidget(sf::FloatRect{1000, 600, 260, 50}, {1050, 600, 160, 50});
 
   createOptPanel(texture, wPanOption);
   createCheckBox(texture, wCheckBox);
   createTextWidget(texture, wTextWidget);
   createScrollWidget(texture, wScroll);
-  createSwitchPanel(texture, pSwitch);
+  createSwitchWidget(texture, pSwitch);
 
   wBarWidget->addSprite(texture, sf::IntRect(970, 1080, 549, 5));
   wBarWidget->resize(0.5, 1.0);
@@ -93,7 +93,7 @@ void	OptionGamePanel::createScrollWidget(const sf::Texture &texture, ScrollWidge
   wScroll->toSize(0, 13, 730);
 }
 
-void	OptionGamePanel::createSwitchPanel(const sf::Texture &texture UNUSED, SwitchPanel *pSwitch)
+void	OptionGamePanel::createSwitchWidget(const sf::Texture &texture UNUSED, SwitchWidget *pSwitch)
 {
   sf::FloatRect	lZone = pSwitch->getLeftZone();
   sf::FloatRect	rZone = pSwitch->getRightZone();

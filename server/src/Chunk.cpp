@@ -227,11 +227,11 @@ void		Chunk::_generateBackground(unsigned int x, unsigned int y,
   float		ratio = (static_cast<float>(surfaceY - scaledY) / surfaceY);
   unsigned int	randNb;
 
-  if (ratio < 0.5)
+  if (ratio < 0.8)
     {
       if (ratio >= 0.2) // then rand
 	{
-	  ratio = _scaleNumber(ratio, 0.2, 0.5, 0, 100);
+	  ratio = _scaleNumber(ratio, 0.2, 0.8, 0, 100);
 	  randNb = _scaleNumber(std::rand(), 0, RAND_MAX, 0, 100);
 	  if (randNb > ratio)
 	    _bgTiles[y * Chunk::width + x] = tile.ground;

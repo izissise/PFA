@@ -7,7 +7,7 @@
 #include "ScrollWidget.hpp"
 #include "SelectList.hpp"
 #include "CheckBoxWidget.hpp"
-#include "SwitchPanel.hpp"
+#include "SwitchWidget.hpp"
 
 class OptionGamePanel : public APanelScreen
 {
@@ -23,7 +23,7 @@ private:
   void		createCheckBox(const sf::Texture &texture, CheckBoxWidget *);
   void		createTextWidget(const sf::Texture &texture, TextWidget *);
   void		createScrollWidget(const sf::Texture &texture, ScrollWidget *wScroll);
-  void		createSwitchPanel(const sf::Texture &texture, SwitchPanel *pSwitch);
+  void		createSwitchWidget(const sf::Texture &texture, SwitchWidget *pSwitch);
 };
 
 #endif /* _OPTIONGAMEPANEL_H_ */
