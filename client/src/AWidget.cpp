@@ -192,10 +192,11 @@ void	AWidget::scale(const sf::Vector2f &size)
     {
       _edge->setSize({_zone.width, _zone.height});
       _edge->setPosition({_zone.left, _zone.top});
-      thickness = std::round(_edge->getOutlineThickness()
-			     * (pointDistf(ratioX, ratioY) / pointDistf(1, 1)));
+      thickness = _edge->getOutlineThickness()
+      	* (pointDistf(ratioX, ratioY) / pointDistf(1, 1));
+      thickness = std::round(thickness);
       if (thickness <= 0)
-	thickness = 0.5f;
+      	thickness = 0.5f;
       _edge->setOutlineThickness(thickness);
     }
 }
