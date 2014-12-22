@@ -14,7 +14,7 @@ ServerMenu::~ServerMenu()
 void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels)
 {
-  Widget	*wTitle = new Widget("title", {_zone.left, _zone.top, _zone.width, 70},
+  Widget	*wTitle = new Widget("title", {_zone.left, _zone.top, _zone.width, 140},
 				     sf::Text("Server List", _font["default"], 40));
   Widget	*wFooter = new Widget("Footer", {_zone.left, _zone.height - 70, _zone.width, 70},
 				      sf::Text());
@@ -29,8 +29,9 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
     sf::Text("Join Server", _font["default"], 20));
 
   createTitle(wTitle);
-  createContPanel(set, texture, panels);
-  createFavPanel(set, texture, panels);
+  Panel *cont = createContPanel(set, texture, panels);
+  Panel *fav = createFavPanel(set, texture, panels);
+  createTabBar(set, texture, {cont, fav});
   createCoPopup(set, texture, panels, wConnectIp);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
@@ -49,11 +50,11 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void	ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
+Panel	*ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
 				    const std::vector<APanelScreen *> &panels)
 {
-  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 70,
-	_zone.width, _zone.height - 140});
+  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
+	_zone.width, _zone.height - 210});
   sf::FloatRect	contZone = content->getZone();
   Widget	*bgWidget = new Widget("bg", {contZone.left, contZone.top,
 				contZone.width, contZone.height}, sf::Text());
@@ -62,13 +63,14 @@ void	ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
   content->addWidget({bgWidget});
   content->construct(texture, set, {});
   addPanel({content});
+  return content;
 }
 
-void	ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
-				    const std::vector<APanelScreen *> &panels)
+Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
+				   const std::vector<APanelScreen *> &panels)
 {
-  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 0* 70,
-	_zone.width, _zone.height - 140});
+  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
+	_zone.width, _zone.height - 210});
   sf::FloatRect	contZone = content->getZone();
   Widget	*bgWidget = new Widget("bg", {contZone.left, contZone.top,
 				contZone.width, contZone.height}, sf::Text());
@@ -76,8 +78,35 @@ void	ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
   addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 255), {contZone.width, contZone.height});
   content->addWidget({bgWidget});
   content->construct(texture, set, {});
-  content->setPosition({_zone.left, _zone.top + 70});
-  // addPanel({content});
+  content->setHide(true);
+  addPanel({content});
+  return content;
+}
+
+void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
+				 const std::vector<APanelScreen *> &panels)
+{
+  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 100,
+	_zone.width, 40});
+  sf::FloatRect	contZone = content->getZone();
+  TabWidget	*tabServer = new TabWidget("bg", {contZone.left, contZone.top,
+					150, contZone.height},
+				sf::Text("Server List", _font["default"], 20),
+				panels[0]);
+  TabWidget	*tabFav = new TabWidget("bg", {contZone.left + 150, contZone.top,
+					150, contZone.height},
+				sf::Text("Favorite List", _font["default"], 20),
+				panels[1]);
+
+  createTabButton(tabServer);
+  createTabButton(tabFav);
+  tabServer->setSpriteAttr(0, false);
+  tabServer->setSpriteAttr(1, true);
+  tabServer->addObserver(tabFav);
+  tabFav->addObserver(tabServer);
+  content->addWidget({tabServer, tabFav});
+  content->construct(texture, set, {});
+  addPanel({content});
 }
 
 void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
@@ -166,7 +195,7 @@ void	ServerMenu::createTitle(Widget *title)
   sf::FloatRect zone = title->getZone();
 
   addSpriteForWidget(title, sf::Color(50, 30, 60, 255), {zone.width, zone.height});
-  title->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
+  title->alignText({zone.left, zone.top}, {zone.width, 100}, 50, 50);
 }
 
 void	ServerMenu::createPopupHeader(Widget *widget)
@@ -183,6 +212,16 @@ void	ServerMenu::createFooter(Widget *footer)
 
   addSpriteForWidget(footer, sf::Color(50, 30, 60, 255), {zone.width, zone.height});
   footer->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
+}
+
+void	ServerMenu::createTabButton(TabWidget *widget)
+{
+  sf::FloatRect	zone = widget->getZone();
+
+  addSpriteForWidget(widget, sf::Color(200, 200, 200, 100), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(200, 200, 200, 200), {zone.width, zone.height});
+  widget->setSpriteAttr(1, false);
+  widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
 }
 
 void	ServerMenu::createButtonStyle(Widget *widget, const sf::Texture &texture)

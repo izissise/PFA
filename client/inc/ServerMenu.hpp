@@ -4,6 +4,7 @@
 #include "Panel.hpp"
 #include "Widget.hpp"
 #include "TextWidget.hpp"
+#include "TabWidget.hpp"
 
 class ServerMenu : public APanelScreen
 {
@@ -18,13 +19,16 @@ private:
   void		createTitle(Widget *title);
   void		createPopupHeader(Widget *widget);
   void		createFooter(Widget *footer);
-  void		createContPanel(Settings &set, const sf::Texture &texture,
+  Panel		*createContPanel(Settings &set, const sf::Texture &texture,
 				const std::vector<APanelScreen *> &panels);
-  void		createFavPanel(Settings &set, const sf::Texture &texture,
+  Panel		*createFavPanel(Settings &set, const sf::Texture &texture,
 			       const std::vector<APanelScreen *> &panels);
+  void		createTabBar(Settings &set, const sf::Texture &texture,
+			     const std::vector<APanelScreen *> &panels);
   void		createCoPopup(Settings &set, const sf::Texture &texture,
 			      const std::vector<APanelScreen *> &panels,
 			      Widget *linkWidget);
+  void		createTabButton(TabWidget *widget);
   void		createButtonStyle(Widget *widget, const sf::Texture &texture);
   void		createButtonBack(Widget *widget, const sf::Texture &texture);
   void		createButtonJoin(Widget *widget, const sf::Texture &texture);
