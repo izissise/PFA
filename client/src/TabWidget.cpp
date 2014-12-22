@@ -14,12 +14,28 @@ APanelScreen	*TabWidget::getPanel() const
 
 int	TabWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set UNUSED)
 {
-  if (_hide)
-    return 0;
+  bool	over;
+
   if (_update)
     {
       if (_update(*this, event, ref) != 0)
 	return 1;
+    }
+  else
+    {
+      over = isOver(ref);
+      if (over)
+	{
+	  if (isClicked(event, sf::Mouse::Left) && getSpriteAttr(0).draw == true)
+	    {
+	      toggleSpriteAttr(0);
+	      toggleSpriteAttr(1);
+	      getPanel()->setHide(false);
+	      notify(t_event(wEvent::SetSprite, 0, 1));
+	      notify(t_event(wEvent::SetSprite, 1, 0));
+	      return 1;
+	    }
+	}
     }
   return 0;
 }
