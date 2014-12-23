@@ -35,6 +35,7 @@ void	OptionGamePanel::construct(const sf::Texture &texture UNUSED, Settings &set
 
   wBarWidget->addSprite(texture, sf::IntRect(970, 1080, 549, 5));
   wBarWidget->resize(0.5, 1.0);
+
   wBarWidget->addSprite(texture, sf::IntRect(990, 1085, 20, 21));
 
   _widgets.push_back(wPanOption);
