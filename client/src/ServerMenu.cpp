@@ -93,19 +93,8 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
 
   addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
   content->addWidget({bgWidget});
-  Panel *pan = createServerPanel(set, texture, {},
-				 {zone.left, zone.top, zone.width, 30},
-				 "127.0.0.1:6060");
-  Panel *pan1 = createServerPanel(set, texture, {},
-				 {zone.left, zone.top + 30, zone.width, 30},
-				 "127.0.0.1:6060");
-  Panel *pan2 = createServerPanel(set, texture, {},
-				 {zone.left, zone.top + 60, zone.width, 30},
-				 "127.0.0.1:6060");
-  Panel *pan3 = createServerPanel(set, texture, {},
-				 {zone.left, zone.top + 90, zone.width, 30},
-				 "127.0.0.1:6060");
-  content->addPanel({pan, pan1, pan2, pan3});
+  for (unsigned int i = 0; i < 10; ++i)
+    addServerToList(content, set, texture, "127.0.0.1");
   content->construct(texture, set, {});
   return content;
 }
@@ -136,7 +125,10 @@ Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
   Panel			*style = new Panel(zone);
   // have to create a panel cause widgets are drawn after, causing overlaping
   Widget		*wBg = new Widget("bg", zone);
+  unsigned int		nbElem = 0;
 
+  for (APanelScreen *pan : panels[0]->getSubPanels())
+    ++nbElem;
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateDisplay =
     [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
@@ -186,6 +178,24 @@ void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
   content->addWidget({tabServer, tabFav});
   content->construct(texture, set, {});
   addPanel({content});
+}
+
+void	ServerMenu::addServerToList(APanelScreen *list,
+				    Settings &set,
+				    const sf::Texture &texture,
+				    const std::string &ip)
+{
+  sf::FloatRect zone = list->getZone();
+  sf::FloatRect	widgetZone(zone.left, 0, zone.width, 30);
+  unsigned int	nbElem = 0;
+
+  for (APanelScreen *pan : list->getSubPanels())
+    ++nbElem;
+  widgetZone.top = zone.top + nbElem * widgetZone.height;
+  Panel *pan = createServerPanel(set, texture, {list},
+				 widgetZone,
+				 "127.0.0.1:6060");
+  list->addPanel(pan);
 }
 
 Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
