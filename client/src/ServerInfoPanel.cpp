@@ -31,6 +31,8 @@ void	ServerInfoPanel::construct(const sf::Texture &texture UNUSED, Settings &set
   applyButtonStyle(wPlayers);
   applyButtonStyle(wPing);
   addWidget({wName, wCountry, wPlayers, wPing});
+  resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
+	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
 void	ServerInfoPanel::createNameWidget(Widget *widget)
@@ -89,5 +91,5 @@ void	ServerInfoPanel::applyButtonStyle(Widget *widget)
 {
   sf::FloatRect zone = widget->getZone();
 
-  widget->alignText({zone.left, zone.top}, {zone.width, 100}, 50, 50);
+  widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
 }

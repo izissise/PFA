@@ -105,14 +105,6 @@ bool	APanelScreen::isHidden() const
   return _hide;
 }
 
-void		APanelScreen::setUpdate(const std::function
-					<int (const sf::Event &event,
-					      sf::RenderWindow &ref,
-					      Settings &set)> &func)
-{
-  _update = func;
-}
-
 void	APanelScreen::setHide(bool hide)
 {
   _hide = hide;

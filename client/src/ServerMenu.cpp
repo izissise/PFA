@@ -58,10 +58,10 @@ Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
 {
   Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
 	_zone.width, _zone.height - 210});
+  sf::FloatRect zone = content->getZone();
   std::function<void (const t_event &event)>	triggerFunc;
 
   content->addPanel({panels[0], panels[1]});
-  content->construct(texture, set, {});
   triggerFunc = [this](const t_event &event)
     {
       if (event.e & wEvent::Update) // Means a connect to ip
@@ -76,8 +76,8 @@ Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
 	      }
 	}
     };
-
   content->setTrigger(triggerFunc);
+  content->construct(texture, set, {});
   addPanel(content);
   return content;
 }
@@ -87,12 +87,25 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
 {
   Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
 	_zone.width, _zone.height - 210});
-  sf::FloatRect	contZone = content->getZone();
-  Widget	*bgWidget = new Widget("bg", {contZone.left, contZone.top,
-				contZone.width, contZone.height}, sf::Text());
+  sf::FloatRect	zone = content->getZone();
+  Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
+				zone.width, zone.height}, sf::Text());
 
-  addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {contZone.width, contZone.height});
+  addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
   content->addWidget({bgWidget});
+  Panel *pan = createServerPanel(set, texture, {},
+				 {zone.left, zone.top, zone.width, 30},
+				 "127.0.0.1:6060");
+  Panel *pan1 = createServerPanel(set, texture, {},
+				 {zone.left, zone.top + 30, zone.width, 30},
+				 "127.0.0.1:6060");
+  Panel *pan2 = createServerPanel(set, texture, {},
+				 {zone.left, zone.top + 60, zone.width, 30},
+				 "127.0.0.1:6060");
+  Panel *pan3 = createServerPanel(set, texture, {},
+				 {zone.left, zone.top + 90, zone.width, 30},
+				 "127.0.0.1:6060");
+  content->addPanel({pan, pan1, pan2, pan3});
   content->construct(texture, set, {});
   return content;
 }
@@ -122,24 +135,31 @@ Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
   ServerInfoPanel	*serverInfoPanel = new ServerInfoPanel(zone, ip);
   Panel			*style = new Panel(zone);
   // have to create a panel cause widgets are drawn after, causing overlaping
-  Widget		*bg = new Widget("bg", zone);
-  std::function<void (const t_event &event)> triggerFunc = [bg]
-    (const t_event &event)
+  Widget		*wBg = new Widget("bg", zone);
+
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateDisplay =
+    [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
     {
-      if (event.e & wEvent::SetSprite)
-	bg->setSpriteAttr(event.idx, event.value);
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      lwidget.setSpriteAttr(0, !isOver);
+      lwidget.setSpriteAttr(1, isOver);
+      return 0;
     };
-  Widget		*wControler = new Widget("controler", zone); // cause widget handle events, not panels
-  // std::function<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)> =
-  //   [](int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref))
-  //   {
 
-  //   }
-  // std::function<void ()> panelUpdate = [bg]
+  wBg->setUpdate(updateDisplay);
+  addSpriteForWidget(wBg, sf::Color(100, 100, 100, 255), {zone.width, zone.height});
+  addSpriteForWidget(wBg, sf::Color(0x31, 0x5D, 0x2A, 255), {zone.width, zone.height});
+  wBg->setSpriteAttr(1, false);
 
-  bg->setTrigger(triggerFunc);
-  serverInfoPanel->construct(texture, set, {});
+  style->addWidget(wBg);
   style->construct(texture, set, {});
+  serverInfoPanel->construct(texture, set, {});
+  controler->addPanel({style, serverInfoPanel});
+  controler->construct(texture, set, {});
+  return controler;
 }
 
 void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,

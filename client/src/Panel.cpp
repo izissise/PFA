@@ -23,10 +23,3 @@ void		Panel::trigger(const t_event &event)
   else
     APanelScreen::trigger(event);
 }
-
-int	Panel::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
-{
-  if (_update)
-    return _update(event, ref, set);
-  return APanelScreen::update(event, ref, set);
-}
