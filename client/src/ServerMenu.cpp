@@ -29,10 +29,12 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
     sf::Text("Join Server", _font["default"], 20));
 
   createTitle(wTitle);
-  Panel *cont = createContPanel(set, texture, panels);
+  Panel *serv = createServListPanel(set, texture, panels);
   Panel *fav = createFavPanel(set, texture, panels);
-  createTabBar(set, texture, {cont, fav});
-  createCoPopup(set, texture, panels, wConnectIp);
+  Panel *cont = createContPanel(set, texture, {serv, fav});
+  createTabBar(set, texture, {serv, fav});
+  Panel *popup = createCoPopup(set, texture, panels);
+  wConnectIp->addObserver(popup);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
   createButtonCip(wConnectIp, texture);
@@ -50,8 +52,37 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-Panel	*ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
-				    const std::vector<APanelScreen *> &panels)
+Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
+				   const std::vector<APanelScreen *> &panels)
+{
+  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
+	_zone.width, _zone.height - 210});
+  std::function<void (const t_event &event)>	triggerFunc;
+
+  content->addPanel({panels[0], panels[1]});
+  content->construct(texture, set, {});
+  triggerFunc = [this](const t_event &event)
+    {
+      if (event.e & wEvent::Update) // Means a connect to ip
+	{
+	  APanelScreen	*shownPanel = nullptr; // Should not be null after the loop
+
+	  for (APanelScreen *pan : _panels)
+	    if (pan->isHidden() == false)
+	      {
+		shownPanel = pan;
+		break ;
+	      }
+	}
+    };
+
+  content->setTrigger(triggerFunc);
+  addPanel(content);
+  return content;
+}
+
+Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture,
+					 const std::vector<APanelScreen *> &panels)
 {
   Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
 	_zone.width, _zone.height - 210});
@@ -62,7 +93,6 @@ Panel	*ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
   addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {contZone.width, contZone.height});
   content->addWidget({bgWidget});
   content->construct(texture, set, {});
-  addPanel({content});
   return content;
 }
 
@@ -79,7 +109,6 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
   content->addWidget({bgWidget});
   content->construct(texture, set, {});
   content->setHide(true);
-  addPanel({content});
   return content;
 }
 
@@ -109,9 +138,8 @@ void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
   addPanel({content});
 }
 
-void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
-				  const std::vector<APanelScreen *> &panels,
-				  Widget *linkWidget)
+Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
+				   const std::vector<APanelScreen *> &panels)
 {
   Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 150,
 	_zone.top + _zone.height / 2 - 85, 300, 170});
@@ -144,12 +172,12 @@ void	ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
   createTextWidget(input, texture);
   popup->addObserver({panels[1], this}); // gamePanel
   setPopupTrigger(popup);
-  linkWidget->addObserver(popup);
   caButton->addObserver(popup);
   coButton->addObserver({popup});
   popup->addWidget({bgWidget, header, input, caButton, coButton});
   popup->construct(texture, set, {});
   addPanel({popup});
+  return popup;
 }
 
 void	ServerMenu::setPopupTrigger(Panel *panel)
@@ -315,6 +343,7 @@ void	ServerMenu::createButtonJoin(Widget *widget, const sf::Texture &texture)
 	}
       return 0;
     };
+  // set a trigger so everyone can observ him and send him the ip
   createButtonStyle(widget, texture);
   widget->setUpdate(updateFunc);
 }

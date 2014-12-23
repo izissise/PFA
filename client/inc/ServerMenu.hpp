@@ -20,14 +20,15 @@ private:
   void		createPopupHeader(Widget *widget);
   void		createFooter(Widget *footer);
   Panel		*createContPanel(Settings &set, const sf::Texture &texture,
-				const std::vector<APanelScreen *> &panels);
+				 const std::vector<APanelScreen *> &panels);
+  Panel		*createServListPanel(Settings &set, const sf::Texture &texture,
+				     const std::vector<APanelScreen *> &panels);
   Panel		*createFavPanel(Settings &set, const sf::Texture &texture,
 			       const std::vector<APanelScreen *> &panels);
   void		createTabBar(Settings &set, const sf::Texture &texture,
 			     const std::vector<APanelScreen *> &panels);
-  void		createCoPopup(Settings &set, const sf::Texture &texture,
-			      const std::vector<APanelScreen *> &panels,
-			      Widget *linkWidget);
+  Panel		*createCoPopup(Settings &set, const sf::Texture &texture,
+			      const std::vector<APanelScreen *> &panels);
   void		createTabButton(TabWidget *widget);
   void		createButtonStyle(Widget *widget, const sf::Texture &texture);
   void		createButtonBack(Widget *widget, const sf::Texture &texture);
