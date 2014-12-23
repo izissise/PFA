@@ -1,4 +1,5 @@
 #include "ServerMenu.hpp"
+#include "ServerInfoPanel.hpp"
 
 ServerMenu::ServerMenu(const sf::FloatRect &zone) :
   APanelScreen(zone)
@@ -110,6 +111,35 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
   content->construct(texture, set, {});
   content->setHide(true);
   return content;
+}
+
+Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
+				       const std::vector<APanelScreen *> &panels,
+				       const sf::FloatRect &zone,
+				       const std::string &ip)
+{
+  Panel			*controler = new Panel(zone);
+  ServerInfoPanel	*serverInfoPanel = new ServerInfoPanel(zone, ip);
+  Panel			*style = new Panel(zone);
+  // have to create a panel cause widgets are drawn after, causing overlaping
+  Widget		*bg = new Widget("bg", zone);
+  std::function<void (const t_event &event)> triggerFunc = [bg]
+    (const t_event &event)
+    {
+      if (event.e & wEvent::SetSprite)
+	bg->setSpriteAttr(event.idx, event.value);
+    };
+  Widget		*wControler = new Widget("controler", zone); // cause widget handle events, not panels
+  // std::function<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)> =
+  //   [](int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref))
+  //   {
+
+  //   }
+  // std::function<void ()> panelUpdate = [bg]
+
+  bg->setTrigger(triggerFunc);
+  serverInfoPanel->construct(texture, set, {});
+  style->construct(texture, set, {});
 }
 
 void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,

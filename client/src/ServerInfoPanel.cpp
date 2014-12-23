@@ -1,14 +1,14 @@
 #include "ServerInfoPanel.hpp"
 
 ServerInfoPanel::ServerInfoPanel(const sf::FloatRect &zone,
-			 const std::string &ip) :
+				 const std::string &ip) :
   APanelScreen(zone), _ip(ip)
 {
   addFont("default", "../client/assets/default.TTF");
 }
 
-void	ServerInfoPanel::construct(const sf::Texture &texture, Settings &set,
-			       const std::vector<APanelScreen *> &panels)
+void	ServerInfoPanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSED,
+				   const std::vector<APanelScreen *> &panels UNUSED)
 {
   Widget	*wName = new Widget("Name", {_zone.left, _zone.top, 25.f * _zone.width / 100.f, 30},
 				    sf::Text("Server's Name", _font["default"], 20));

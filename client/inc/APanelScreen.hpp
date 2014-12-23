@@ -87,6 +87,10 @@ public:
   virtual void	addWidget(AWidget * const widget);
   virtual void	addWidget(const std::initializer_list<AWidget * const> &widgets);
   void		addFont(const std::string &fontName, const std::string &fontPath);
+  void		setUpdate(const std::function
+			  <int (const sf::Event &event, sf::RenderWindow &ref, Settings &set)>
+			  &func);
+
 
   /**
    * \fn const sf::Texture *addSpriteForWidget(AWidget * const widget, const sf::Color &color, const sf::Vector2f &size)
@@ -213,6 +217,8 @@ protected:
   sf::RenderTexture			_rt;
   std::map<std::string, sf::Font>	_font;
   std::function<void (const t_event &event)>	_trigger;
+  std::function
+  <int (const sf::Event &event, sf::RenderWindow &ref, Settings &set)> _update;
   std::vector<const sf::Texture *>	_textures;
   std::vector<APanelScreen *>		_panels;
   std::vector<AWidget *>		_widgets;

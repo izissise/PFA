@@ -29,6 +29,10 @@ private:
 			     const std::vector<APanelScreen *> &panels);
   Panel		*createCoPopup(Settings &set, const sf::Texture &texture,
 			      const std::vector<APanelScreen *> &panels);
+  Panel		*createServerPanel(Settings &set, const sf::Texture &texture,
+				   const std::vector<APanelScreen *> &panels,
+				   const sf::FloatRect &zone,
+				   const std::string &ip);
   void		createTabButton(TabWidget *widget);
   void		createButtonStyle(Widget *widget, const sf::Texture &texture);
   void		createButtonBack(Widget *widget, const sf::Texture &texture);
