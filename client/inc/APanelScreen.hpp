@@ -7,10 +7,15 @@
 class APanelScreen : public IObserver, public Observable
 {
 public:
-  enum	State
+  enum class	State
     {
       None = 0,
       Leader = 1
+    };
+  enum class	Display
+    {
+      None = 0,
+      Overlap = 1
     };
 
 public:
@@ -37,7 +42,7 @@ public:
    *
    * The panel's draw method will call every widget's draw method
    */
-  virtual void	draw(sf::RenderWindow &window, bool toWin);
+  virtual void	draw(sf::RenderTarget &window, bool toWin);
 
   bool	checkPanelBounds(AWidget * const widget) const;
   /**
@@ -47,7 +52,7 @@ public:
    *
    * print cut a sprite out of the panel texture to apply it on the main texture
    */
-  void	print(sf::RenderTexture &rt) const;
+  void	print(sf::RenderWindow &rt) const;
 
   /**
    * \fn void construct(const sf::Texture &texture, Settings &set, const std::vector<APanelScreen *> &panels) = 0;
@@ -76,6 +81,7 @@ public:
    * \param[in] hide The hide state
    *
    */
+  void		setDisplayFlag(APanelScreen::Display flag);
   void		setHide(bool hide);
   void		setState(APanelScreen::State state);
   void		move(const sf::Vector2f &displacement);
@@ -202,7 +208,7 @@ private:
    * \return Return a const reference to the panel's renderTexture
    *
    */
-  const sf::RenderTexture	&getRT() const;
+  sf::RenderTexture	&getRT();
   void	moveWidgets(APanelScreen * const pan,
 		    const sf::Vector2f &displacement);
 
@@ -210,12 +216,18 @@ protected:
   bool					_hide;
   sf::FloatRect				_zone;
   State					_state;
+  Display				_flag;
   sf::RenderTexture			_rt;
   std::map<std::string, sf::Font>	_font;
   std::function<void (const t_event &event)>	_trigger;
   std::vector<const sf::Texture *>	_textures;
   std::vector<APanelScreen *>		_panels;
   std::vector<AWidget *>		_widgets;
+};
+
+inline int	operator&(APanelScreen::Display a, APanelScreen::Display b)
+{
+  return (static_cast<int>(a) & static_cast<int>(b));
 };
 
 #endif /* _APANELSCREEN_H_ */

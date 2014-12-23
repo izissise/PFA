@@ -220,7 +220,7 @@ Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
 					popupZone.top + 110, popupZone.width / 2 - 17, 45},
 					sf::Text("Connect", _font["default"], 20));
 
-  popup->setState(APanelScreen::Leader);
+  popup->setState(APanelScreen::State::Leader);
   popup->setHide(true);
   addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {popupZone.width, popupZone.height});
   bgWidget->setEdge(std::unique_ptr<sf::RectangleShape>

@@ -12,7 +12,7 @@ AWidget::~AWidget()
 {
 }
 
-void		AWidget::draw(sf::RenderTexture &window) const
+void		AWidget::draw(sf::RenderTarget &window) const
 {
   sf::Shape	*edge = _edge.get();
 

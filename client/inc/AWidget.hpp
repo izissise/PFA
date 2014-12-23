@@ -95,7 +95,7 @@ public:
    * \param[in] window The render window
    *
    */
-  virtual void		draw(sf::RenderTexture &window) const;
+  virtual void		draw(sf::RenderTarget &window) const;
 
   virtual std::string	getContent() const;
 

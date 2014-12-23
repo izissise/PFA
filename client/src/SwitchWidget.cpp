@@ -24,30 +24,35 @@ int	SwitchWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   return retVal;
 }
 
-void		SwitchWidget::draw(sf::RenderWindow &window, bool toWin)
+void		SwitchWidget::draw(sf::RenderTarget &window, bool toWin)
 {
-  sf::Sprite	tmp;
-  sf::IntRect	tmpZone;
   const std::vector<AWidget *> &content = _content->getWidgets();
+  sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);
+  // here i get the target to draw into
 
-  _rt.clear(sf::Color(127,127,127,0));
+  if (&target != &window)	 // then we get a new RenderTarget
+    target.clear(sf::Color(127,127,127,0));	// clear it before any usage
   if (!content.empty())
-      content[_idx]->draw(_rt);
+      content[_idx]->draw(target);
   for (auto &widget : _widgets)
     if (!widget->isHidden())
-      widget->draw(_rt);
+      widget->draw(target);
   for (auto &panel : _panels)
     if (!panel->isHidden())
-      panel->draw(window, false);
-  _rt.display();
+      panel->draw(target, false);
   if (toWin)
     {
-      print(_rt);
-      _rt.display();
-      tmp.setPosition(_zone.left, _zone.top);
-      tmp.setTexture(_rt.getTexture());
-      tmp.setTextureRect(static_cast<sf::IntRect>(_zone));
-      window.draw(tmp);
+      if (&target != &window) // need to draw the renderTexture
+	{
+	  sf::Sprite	sprite;
+
+	  dynamic_cast<sf::RenderTexture *>(&target)->display(); // Must refresh before drawing
+	  sprite.setPosition(_zone.left, _zone.top);
+	  sprite.setTexture(_rt.getTexture());
+	  sprite.setTextureRect(static_cast<sf::IntRect>(_zone));
+	  window.draw(sprite);
+	}
+      print(*dynamic_cast<sf::RenderWindow *>(&window));
     }
 }
 
