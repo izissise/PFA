@@ -101,7 +101,7 @@ void	OptionGamePanel::createSwitchWidget(const sf::Texture &texture UNUSED, Swit
   sf::FloatRect	cZone = pSwitch->getContentZone();
   Widget	*lSide = new Widget("lSide", lZone, sf::Text("<", _font["default"], 40));
   Widget	*rSide = new Widget("rSide", rZone, sf::Text(">", _font["default"], 40));
-  Widget	*content1 = new Widget("c1", cZone, sf::Text("Low", _font["default"], 20));
+  Widget	*content1 = new Widget("c1fezjhkfenzjkfrejlfrjfelzfjeiolfjekmfez", cZone, sf::Text("Low", _font["default"], 20));
   Widget	*content2 = new Widget("c2", cZone, sf::Text("Med", _font["default"], 20));
   Widget	*content3 = new Widget("c3", cZone, sf::Text("High", _font["default"], 20));
   TextWidget	*wTextWidget = new TextWidget("nameText", cZone,

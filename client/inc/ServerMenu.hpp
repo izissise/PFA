@@ -34,6 +34,8 @@ private:
 				   const std::vector<APanelScreen *> &panels,
 				   const sf::FloatRect &zone,
 				   const std::string &ip);
+  Panel		*createServerPopup(Settings &set, const sf::Texture &texture,
+				   const std::vector<APanelScreen *> &panels);
   void		addServerToList(APanelScreen *list,
 				Settings &set,
 				const sf::Texture &texture,
@@ -48,6 +50,7 @@ private:
   void		createConnectButton(Widget *widget, const sf::Texture &texture);
   void		createScrollBar(ScrollWidget *widget, const sf::Texture &texture);
   void		setPopupTrigger(Panel *panel);
+  void		setServerPopupTrigger(Panel *panel);
 };
 
 #endif /* _SERVERMENU_H_ */

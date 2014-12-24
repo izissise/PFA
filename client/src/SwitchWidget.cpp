@@ -30,30 +30,10 @@ void		SwitchWidget::draw(sf::RenderTarget &window, bool first)
   sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);
   // here i get the target to draw into
 
-  if (&target != &window)	 // then we get a new RenderTarget
+  if (&target != &window)			// then we get a new RenderTarget
     target.clear(sf::Color(127,127,127,0));	// clear it before any usage
   if (!content.empty())
-      content[_idx]->draw(target);
-  for (auto &widget : _widgets)
-    if (!widget->isHidden())
-      widget->draw(target);
-  for (auto &panel : _panels)
-    if (!panel->isHidden())
-      panel->draw(target, false);
-  if (first)
-    {
-      if (&target != &window) // need to draw the renderTexture
-	{
-	  sf::Sprite	sprite;
-
-	  dynamic_cast<sf::RenderTexture *>(&target)->display(); // Must refresh before drawing
-	  sprite.setPosition(_zone.left, _zone.top);
-	  sprite.setTexture(_rt.getTexture());
-	  sprite.setTextureRect(static_cast<sf::IntRect>(_zone));
-	  window.draw(sprite);
-	}
-      print(*dynamic_cast<sf::RenderWindow *>(&window));
-    }
+    content.at(_idx)->draw(target);
 }
 
 void	SwitchWidget::addContent(AWidget * const widget)

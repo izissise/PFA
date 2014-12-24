@@ -18,49 +18,41 @@ void         APanelScreen::draw(sf::RenderTarget &window, bool first)
   sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);
   // here i get the target to draw into
 
-  if (&target != &window)	 // then we get a new RenderTarget
+  if (&target != &window)			// then we get a new RenderTarget
     target.clear(sf::Color(127,127,127,0));	// clear it before any usage
-  for (auto &widget : _widgets)
-    if (!widget->isHidden())
-      widget->draw(target);
+  if (dynamic_cast<sf::RenderTexture *>(&target) != nullptr) // draw content into the renderTexture
+    {
+      for (auto &widget : _widgets)
+	if (!widget->isHidden())
+	  widget->draw(target);
+    }
   for (auto &panel : _panels)
     if (!panel->isHidden())
       panel->draw(target, false);
   if (first)
-    {
-      if (&target != &window) // need to draw the renderTexture
-	{
-	  sf::RenderTexture	*rt = dynamic_cast<sf::RenderTexture *>(&target);
-	  rt->display();	// Must refresh before drawing
-	  sf::Sprite		sprite(rt->getTexture(), static_cast<sf::IntRect>(_zone));
-
-	  sprite.setPosition(_zone.left, _zone.top);
-	  window.draw(sprite);
-	}
-      print(window);
-    }
+    print(window, false);
 }
 
-void	APanelScreen::print(sf::RenderTarget &window) const
+void	APanelScreen::print(sf::RenderTarget &window, bool isTextured)
 {
-  for (auto &panel : _panels)
-    if (!panel->isHidden())
-      {
-	sf::RenderTexture *target = nullptr;
-	if (panel->getDisplayFlag() & APanelScreen::Display::Overlap)
-	  target = &(panel->getRT());
-	if (target != nullptr && target != static_cast<void *>(&window)) // then it's a renderTexture
-	  {
-	    target->display();	// Must refresh before drawing
-	    sf::IntRect		spriteZone = static_cast<sf::IntRect>(panel->getZone());
-	    sf::Sprite		sprite(target->getTexture(), spriteZone);
+  isTextured = (isTextured || _flag & APanelScreen::Display::Overlap);
+  if (!isTextured)
+    {
+      for (auto widget : _widgets)
+	if (!widget->isHidden())
+	  widget->draw(window);
+    }
+  else if (_flag & APanelScreen::Display::Overlap) // means it is the main RenderTexture
+    {
+      _rt.display();		// Must refresh before drawing
+      sf::Sprite		sprite(_rt.getTexture(), static_cast<sf::IntRect>(_zone));
 
-	    sprite.setPosition(spriteZone.left, spriteZone.top);
-	    window.draw(sprite);
-	  }
-	// panels are drawn to the renderTexture, but there might be a panel overlaping above
-	panel->print(window);
-      }
+      sprite.setPosition(_zone.left, _zone.top);
+      window.draw(sprite);
+    }
+  for (auto panel : _panels)
+    if (!panel->isHidden())
+      panel->print(window, isTextured);
 }
 
 sf::Vector2f	APanelScreen::toPixel(const sf::Vector2f &perCent,

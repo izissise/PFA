@@ -30,12 +30,13 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
     sf::Text("Join Server", _font["default"], 20));
 
   createTitle(wTitle);
+  // Panel	*serverPopup = createServerPopup(server, texture, {});
   Panel *serv = createServListPanel(set, texture, panels);
   Panel *fav = createFavPanel(set, texture, panels);
   Panel *cont = createContPanel(set, texture, {serv, fav});
-  createTabBar(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
   wConnectIp->addObserver(popup);
+  createTabBar(set, texture, {serv, fav});
   createFooter(wFooter);
   createButtonBack(wBack, texture);
   createButtonCip(wConnectIp, texture);
@@ -144,7 +145,6 @@ Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
   Panel			*controler = new Panel(zone);
   ServerInfoPanel	*serverInfoPanel = new ServerInfoPanel(zone, ip);
   Panel			*style = new Panel(zone);
-  // have to create a panel cause widgets are drawn after, causing overlaping
   Widget		*wBg = new Widget("bg", zone);
   unsigned int		nbElem = 0;
 
@@ -223,33 +223,104 @@ void	ServerMenu::addServerToList(APanelScreen *list,
   list->addPanel(pan);
 }
 
+Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
+				       const std::vector<APanelScreen *> &panels)
+{
+  Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 200,
+	_zone.top + _zone.height / 2 - 85, 400, 170});
+  sf::FloatRect	zone = popup->getZone();
+  Widget	*bgWidget = new Widget("bg", {zone.left + 2, zone.top,
+				zone.width - 4, zone.height - 2}, sf::Text());
+  Widget	*header = new Widget("header", {zone.left, zone.top,
+					zone.width, 40},
+					sf::Text("Server's Options", _font["default"], 20));
+
+  Widget	*serverName = new Widget("", {zone.left + 10, zone.top + 10,
+				zone.width / 2, 25},
+				sf::Text("Server Name", _font["default"], 20));
+  Widget	*serverIp = new Widget("", {zone.left + 10, zone.top + 10,
+					zone.width / 2, 25},
+					sf::Text("Cancel", _font["default"], 20));
+  Widget	*caButton = new Widget("ca", {zone.left + 10, zone.top + 110,
+					zone.width / 2 - 17, 45},
+					sf::Text("Cancel", _font["default"], 20));
+  Widget	*coButton = new Widget("co", {zone.left + zone.width / 2 + 7,
+					zone.top + 110, zone.width / 2 - 17, 45},
+					sf::Text("Connect", _font["default"], 20));
+
+  popup->setState(APanelScreen::State::Leader);
+  popup->setHide(true);
+  createPopupHeader(header);
+  createCancelButton(caButton, texture);
+  createConnectButton(coButton, texture);
+  //  popup->addObserver({panels[1], this}); // gamePanel
+  setServerPopupTrigger(popup);
+  caButton->addObserver(popup);
+  coButton->addObserver({popup});
+  popup->addWidget({bgWidget, header, caButton, coButton});
+  popup->construct(texture, set, {});
+  addPanel({popup});
+  return popup;
+}
+
+void	ServerMenu::setServerPopupTrigger(Panel *panel)
+{
+  std::function<void (const t_event &event)>  func;
+
+  func = [panel](const t_event &event) // cannot call APanelScreen::trigger
+    {
+      if (event.e & wEvent::Hide)
+	{
+	  if (event.e & wEvent::Toggle)
+	    panel->setHide(!panel->isHidden());
+	  else
+	    panel->setHide(true);
+	}
+      if (event.e & wEvent::UpdateText)
+	{
+	  const std::vector<AWidget *> &widgets = panel->getWidgets();
+	  //treatment here
+	}
+      if (event.e & wEvent::Reset)
+	{
+	  t_event	evt = event;
+	  const std::vector<AWidget *>	&widgets = panel->getWidgets();
+
+	  evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Reset;
+	  for (AWidget *widget : widgets)
+	    widget->trigger(evt);
+	}
+    };
+  panel->setTrigger(func);
+}
+
 Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
 				   const std::vector<APanelScreen *> &panels)
 {
   Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 150,
 	_zone.top + _zone.height / 2 - 85, 300, 170});
-  sf::FloatRect	popupZone = popup->getZone();
-  Widget	*bgWidget = new Widget("bg", {popupZone.left + 2, popupZone.top,
-				popupZone.width - 4, popupZone.height - 2}, sf::Text());
-  Widget	*header = new Widget("header", {popupZone.left, popupZone.top,
-					popupZone.width, 40},
+  sf::FloatRect	zone = popup->getZone();
+  Widget	*bgWidget = new Widget("bg", {zone.left + 2, zone.top,
+				zone.width - 4, zone.height - 2}, sf::Text());
+  Widget	*header = new Widget("header", {zone.left, zone.top,
+					zone.width, 40},
 					sf::Text("Connect to Ip", _font["default"], 20));
-  TextWidget	*input = new TextWidget("ip", {popupZone.left + 10, popupZone.top + 50,
-					popupZone.width - 20, 45},
+  TextWidget	*input = new TextWidget("ip", {zone.left + 10, zone.top + 50,
+					zone.width - 20, 45},
 					sf::Text("", _font["default"], 20),
 					sf::Text("Ip", _font["default"], 20), 30);
-  Widget	*caButton = new Widget("ca", {popupZone.left + 10, popupZone.top + 110,
-					popupZone.width / 2 - 17, 45},
+  Widget	*caButton = new Widget("ca", {zone.left + 10, zone.top + 110,
+					zone.width / 2 - 17, 45},
 					sf::Text("Cancel", _font["default"], 20));
-  Widget	*coButton = new Widget("co", {popupZone.left + popupZone.width / 2 + 7,
-					popupZone.top + 110, popupZone.width / 2 - 17, 45},
+  Widget	*coButton = new Widget("co", {zone.left + zone.width / 2 + 7,
+					zone.top + 110, zone.width / 2 - 17, 45},
 					sf::Text("Connect", _font["default"], 20));
 
   popup->setState(APanelScreen::State::Leader);
   popup->setHide(true);
-  addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {popupZone.width, popupZone.height});
+  addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {zone.width, zone.height});
   bgWidget->setEdge(std::unique_ptr<sf::RectangleShape>
-		    (new sf::RectangleShape(sf::Vector2f(popupZone.width, popupZone.height))),
+		    (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
 		    2.f);
   createPopupHeader(header);
   createCancelButton(caButton, texture);
