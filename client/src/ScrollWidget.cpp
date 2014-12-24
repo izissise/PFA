@@ -27,6 +27,8 @@ void		ScrollWidget::moveSubPanels(APanelScreen * const pan,
 
   for (auto &pit : panels)
     {
+      if (!(pit->getState() & APanelScreen::State::Static))
+	pit->moveZone({-moveSize.x, -moveSize.y});
       if (!pit->getSubPanels().empty())
 	moveSubPanels(pit, moveSize);
       else

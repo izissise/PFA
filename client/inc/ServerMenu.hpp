@@ -5,6 +5,7 @@
 #include "Widget.hpp"
 #include "TextWidget.hpp"
 #include "TabWidget.hpp"
+#include "ScrollWidget.hpp"
 
 class ServerMenu : public APanelScreen
 {
@@ -45,6 +46,7 @@ private:
   void		createTextWidget(TextWidget *widget, const sf::Texture &texture);
   void		createCancelButton(Widget *widget, const sf::Texture &texture);
   void		createConnectButton(Widget *widget, const sf::Texture &texture);
+  void		createScrollBar(ScrollWidget *widget, const sf::Texture &texture);
   void		setPopupTrigger(Panel *panel);
 };
 

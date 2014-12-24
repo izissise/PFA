@@ -61,7 +61,7 @@ Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
   sf::FloatRect zone = content->getZone();
   std::function<void (const t_event &event)>	triggerFunc;
 
-  content->addPanel({panels[0], panels[1]});
+  content->setDisplayFlag(APanelScreen::Display::Overlap);
   triggerFunc = [this](const t_event &event)
     {
       if (event.e & wEvent::Update) // Means a connect to ip
@@ -77,6 +77,7 @@ Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
 	}
     };
   content->setTrigger(triggerFunc);
+  content->addPanel({panels[0], panels[1]});
   content->construct(texture, set, {});
   addPanel(content);
   return content;
@@ -90,11 +91,21 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
   sf::FloatRect	zone = content->getZone();
   Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
 				zone.width, zone.height}, sf::Text());
+  ScrollWidget	*wScroll = new ScrollWidget("scroll",
+					    {zone.left + zone.width - 13, zone.top, 13, zone.height},
+					    Scroll::Vertical, content,
+					    sf::Text(), wFlag::None);
+  Panel		*capsule = encapsulate(wScroll);
+
+  createScrollBar(wScroll, texture);
+  capsule->setState(APanelScreen::State::Static);
+  capsule->construct(texture, set, {});
 
   addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
   content->addWidget({bgWidget});
-  for (unsigned int i = 0; i < 10; ++i)
+  for (unsigned int i = 0; i < 50; ++i)
     addServerToList(content, set, texture, "127.0.0.1");
+  content->addPanel({capsule});
   content->construct(texture, set, {});
   return content;
 }
@@ -104,12 +115,22 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 {
   Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
 	_zone.width, _zone.height - 210});
-  sf::FloatRect	contZone = content->getZone();
-  Widget	*bgWidget = new Widget("bg", {contZone.left, contZone.top,
-				contZone.width, contZone.height}, sf::Text());
+  sf::FloatRect	zone = content->getZone();
+  Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
+				zone.width, zone.height}, sf::Text());
+  ScrollWidget	*wScroll = new ScrollWidget("scroll",
+					    {zone.left + zone.width - 13, zone.top, 13, zone.height},
+					    Scroll::Vertical, content,
+					    sf::Text(), wFlag::None);
+  Panel		*capsule = encapsulate(wScroll);
 
-  addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 255), {contZone.width, contZone.height});
+  createScrollBar(wScroll, texture);
+  capsule->setState(APanelScreen::State::Static);
+  capsule->construct(texture, set, {});
+
+  addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
   content->addWidget({bgWidget});
+  content->addPanel({capsule});
   content->construct(texture, set, {});
   content->setHide(true);
   return content;
@@ -142,8 +163,11 @@ Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
     };
 
   wBg->setUpdate(updateDisplay);
-  addSpriteForWidget(wBg, sf::Color(100, 100, 100, 255), {zone.width, zone.height});
-  addSpriteForWidget(wBg, sf::Color(0x31, 0x5D, 0x2A, 255), {zone.width, zone.height});
+  if (nbElem % 2)
+    addSpriteForWidget(wBg, sf::Color(100, 100, 100, 255), {zone.width, zone.height});
+  else
+    addSpriteForWidget(wBg, sf::Color(130, 130, 130, 255), {zone.width, zone.height});
+  addSpriteForWidget(wBg, sf::Color(0x40, 0x6F, 0x39, 255), {zone.width, zone.height});
   wBg->setSpriteAttr(1, false);
 
   style->addWidget(wBg);
@@ -159,13 +183,13 @@ void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
 {
   Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 100,
 	_zone.width, 40});
-  sf::FloatRect	contZone = content->getZone();
-  TabWidget	*tabServer = new TabWidget("bg", {contZone.left, contZone.top,
-					150, contZone.height},
+  sf::FloatRect	zone = content->getZone();
+  TabWidget	*tabServer = new TabWidget("bg", {zone.left, zone.top,
+					150, zone.height},
 				sf::Text("Server List", _font["default"], 20),
 				panels[0]);
-  TabWidget	*tabFav = new TabWidget("bg", {contZone.left + 150, contZone.top,
-					150, contZone.height},
+  TabWidget	*tabFav = new TabWidget("bg", {zone.left + 150, zone.top,
+					150, zone.height},
 				sf::Text("Favorite List", _font["default"], 20),
 				panels[1]);
 
@@ -186,7 +210,8 @@ void	ServerMenu::addServerToList(APanelScreen *list,
 				    const std::string &ip)
 {
   sf::FloatRect zone = list->getZone();
-  sf::FloatRect	widgetZone(zone.left, 0, zone.width, 30);
+  sf::FloatRect	widgetZone(zone.left, 0, zone.width - 13, 30);
+  // -13 for the scrollbar so it doesnt overlap
   unsigned int	nbElem = 0;
 
   for (APanelScreen *pan : list->getSubPanels())
@@ -306,8 +331,8 @@ void	ServerMenu::createTabButton(TabWidget *widget)
 {
   sf::FloatRect	zone = widget->getZone();
 
-  addSpriteForWidget(widget, sf::Color(200, 200, 200, 100), {zone.width, zone.height});
-  addSpriteForWidget(widget, sf::Color(200, 200, 200, 200), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(100, 100, 100, 100), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(100, 100, 100, 200), {zone.width, zone.height});
   widget->setSpriteAttr(1, false);
   widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
 }
@@ -484,4 +509,14 @@ void	ServerMenu::createConnectButton(Widget *widget, const sf::Texture &texture)
     };
   createButtonStyle(widget, texture);
   widget->setUpdate(updateFunc);
+}
+
+void	ServerMenu::createScrollBar(ScrollWidget *widget, const sf::Texture &texture)
+{
+  sf::FloatRect zone = widget->getZone();
+
+  widget->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
+  widget->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
+  widget->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
+  widget->toSize(0, 13, zone.height);
 }

@@ -4,13 +4,16 @@
 #include <vector>
 #include "AWidget.hpp"
 
+class Panel;
+
 class APanelScreen : public IObserver, public Observable
 {
 public:
   enum class	State
     {
       None = 0,
-      Leader = 1
+      Leader = 1,
+      Static = 2
     };
   enum class	Display
     {
@@ -86,9 +89,11 @@ public:
   void		setHide(bool hide);
   void		setState(APanelScreen::State state);
   void		move(const sf::Vector2f &displacement);
+  void		moveZone(const sf::Vector2f &displacement);
   void		setPosition(const sf::Vector2f &position);
   APanelScreen::State	getState() const;
   void		setTrigger(const std::function<void (const t_event &event)> &func);
+  Panel		*encapsulate(AWidget *widget) const;
   void		addPanel(APanelScreen * const panel);
   void	       	addPanel(const std::initializer_list<APanelScreen * const> &panels);
   virtual void	addWidget(AWidget * const widget);
@@ -227,6 +232,10 @@ protected:
 };
 
 inline int	operator&(APanelScreen::Display a, APanelScreen::Display b)
+{
+  return (static_cast<int>(a) & static_cast<int>(b));
+};
+inline int	operator&(APanelScreen::State a, APanelScreen::State b)
 {
   return (static_cast<int>(a) & static_cast<int>(b));
 };

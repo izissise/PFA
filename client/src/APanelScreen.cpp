@@ -1,4 +1,5 @@
 #include "APanelScreen.hpp"
+#include "Panel.hpp"
 
 APanelScreen::APanelScreen(const sf::FloatRect &zone) :
   _hide(false),
@@ -147,6 +148,12 @@ void	APanelScreen::moveWidgets(APanelScreen * const pan,
     it->move(displacement.x, displacement.y);
 }
 
+void	APanelScreen::moveZone(const sf::Vector2f &displacement)
+{
+  _zone.top += displacement.y;
+  _zone.left += displacement.x;
+}
+
 void	APanelScreen::move(const sf::Vector2f &displacement)
 {
   for (auto &pit : _panels)
@@ -157,8 +164,7 @@ void	APanelScreen::move(const sf::Vector2f &displacement)
 	pit->moveWidgets(pit, displacement);
     }
   moveWidgets(this, displacement);
-  _zone.top += displacement.y;
-  _zone.left += displacement.x;
+  moveZone(displacement);
 }
 
 void	APanelScreen::setPosition(const sf::Vector2f &position)
@@ -210,6 +216,15 @@ int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings
 void	APanelScreen::setTrigger(const std::function<void (const t_event &event)> &func)
 {
   _trigger = func;
+}
+
+Panel	*APanelScreen::encapsulate(AWidget *widget) const
+{
+  sf::FloatRect zone = widget->getZone();
+  Panel		*panel = new Panel(zone);
+
+  panel->addWidget(widget);
+  return panel;
 }
 
 void	APanelScreen::addPanel(APanelScreen * const panel)
