@@ -109,7 +109,6 @@ void	OptionGamePanel::createSwitchWidget(const sf::Texture &texture UNUSED, Swit
 					      sf::Text("Name", _font["default"], 20), 30);
 
 
-  pSwitch->setDisplayFlag(APanelScreen::Display::Overlap);
   pSwitch->addSpriteForWidget(lSide, sf::Color(150,150,150,150), {lZone.width, lZone.height});
   pSwitch->addSpriteForWidget(rSide, sf::Color(150,150,150,150), {rZone.width, rZone.height});
   pSwitch->addSpriteForWidget(content1, sf::Color(0,0,255), {cZone.width, cZone.height});

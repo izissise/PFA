@@ -24,7 +24,7 @@ int	SwitchWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   return retVal;
 }
 
-void		SwitchWidget::draw(sf::RenderTarget &window, bool toWin)
+void		SwitchWidget::draw(sf::RenderTarget &window, bool first)
 {
   const std::vector<AWidget *> &content = _content->getWidgets();
   sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);
@@ -40,7 +40,7 @@ void		SwitchWidget::draw(sf::RenderTarget &window, bool toWin)
   for (auto &panel : _panels)
     if (!panel->isHidden())
       panel->draw(target, false);
-  if (toWin)
+  if (first)
     {
       if (&target != &window) // need to draw the renderTexture
 	{

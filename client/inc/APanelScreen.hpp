@@ -52,7 +52,7 @@ public:
    *
    * print cut a sprite out of the panel texture to apply it on the main texture
    */
-  void	print(sf::RenderWindow &rt) const;
+  void	print(sf::RenderTarget &rt) const;
 
   /**
    * \fn void construct(const sf::Texture &texture, Settings &set, const std::vector<APanelScreen *> &panels) = 0;
@@ -82,6 +82,7 @@ public:
    *
    */
   void		setDisplayFlag(APanelScreen::Display flag);
+  APanelScreen::Display	getDisplayFlag() const;
   void		setHide(bool hide);
   void		setState(APanelScreen::State state);
   void		move(const sf::Vector2f &displacement);

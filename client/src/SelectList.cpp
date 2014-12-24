@@ -41,6 +41,7 @@ void	SelectList::construct(const sf::Texture &texture, Settings &set,
   addObserver(container);
 
   _widgets.push_back(wHeader);
+  container->setDisplayFlag(APanelScreen::Display::Overlap);
   container->addWidget({wFirst, wSecond, wThird, wFourth, wScroll});
   container->construct(texture, set, panels);
   container->setHide(true);

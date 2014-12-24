@@ -29,85 +29,38 @@ void         APanelScreen::draw(sf::RenderTarget &window, bool first)
     {
       if (&target != &window) // need to draw the renderTexture
 	{
-	  sf::Sprite	sprite;
+	  sf::RenderTexture	*rt = dynamic_cast<sf::RenderTexture *>(&target);
+	  rt->display();	// Must refresh before drawing
+	  sf::Sprite		sprite(rt->getTexture(), static_cast<sf::IntRect>(_zone));
 
-	  dynamic_cast<sf::RenderTexture *>(&target)->display(); // Must refresh before drawing
 	  sprite.setPosition(_zone.left, _zone.top);
-	  sprite.setTexture(_rt.getTexture());
-	  sprite.setTextureRect(static_cast<sf::IntRect>(_zone));
 	  window.draw(sprite);
 	}
-      print(*dynamic_cast<sf::RenderWindow *>(&window));
+      print(window);
     }
 }
 
-void	APanelScreen::print(sf::RenderWindow &window) const
+void	APanelScreen::print(sf::RenderTarget &window) const
 {
-  sf::Sprite	sprite;
-  sf::IntRect	spriteZone;
-
   for (auto &panel : _panels)
     if (!panel->isHidden())
       {
-	sf::RenderTarget *target;
-	if (_flag & APanelScreen::Display::Overlap)
-	  target = &panel->getRT();
-	else
-	  target = &window;
-	if (target != &window) // then it's a renderTexture
+	sf::RenderTexture *target = nullptr;
+	if (panel->getDisplayFlag() & APanelScreen::Display::Overlap)
+	  target = &(panel->getRT());
+	if (target != nullptr && target != static_cast<void *>(&window)) // then it's a renderTexture
 	  {
-	    sf::RenderTexture *rt = dynamic_cast<sf::RenderTexture *>(target);
-	    rt->display(); // Must refresh before drawing
-	    spriteZone = static_cast<sf::IntRect>(panel->getZone());
+	    target->display();	// Must refresh before drawing
+	    sf::IntRect		spriteZone = static_cast<sf::IntRect>(panel->getZone());
+	    sf::Sprite		sprite(target->getTexture(), spriteZone);
+
 	    sprite.setPosition(spriteZone.left, spriteZone.top);
-	    sprite.setTexture(rt->getTexture());
-	    sprite.setTextureRect(spriteZone);
 	    window.draw(sprite);
 	  }
+	// panels are drawn to the renderTexture, but there might be a panel overlaping above
 	panel->print(window);
       }
 }
-
-// void		APanelScreen::draw(sf::RenderWindow &window, bool toWin)
-// {
-//   sf::Sprite	tmp;
-//   sf::IntRect	tmpZone;
-
-//   _rt.clear(sf::Color(127,127,127,0));
-//   for (auto &widget : _widgets)
-//     if (!widget->isHidden())
-//       widget->draw(_rt);
-//   for (auto &panel : _panels)
-//     if (!panel->isHidden())
-//       panel->draw(window, false);
-//   _rt.display();
-//   if (toWin)
-//     {
-//       print(_rt);
-//       _rt.display();
-//       tmp.setPosition(_zone.left, _zone.top);
-//       tmp.setTexture(_rt.getTexture());
-//       tmp.setTextureRect(static_cast<sf::IntRect>(_zone));
-//       window.draw(tmp);
-//     }
-// }
-
-// void	APanelScreen::print(sf::RenderTexture &rt) const
-// {
-//   sf::Sprite	tmp;
-//   sf::IntRect	tmpZone;
-
-//   for (auto &panel : _panels)
-//     if (!panel->isHidden())
-//       {
-// 	tmpZone = static_cast<sf::IntRect>(panel->getZone());
-// 	tmp.setPosition(tmpZone.left, tmpZone.top);
-// 	tmp.setTexture(panel->getRT().getTexture());
-// 	tmp.setTextureRect(tmpZone);
-// 	rt.draw(tmp);
-// 	panel->print(rt);
-//       }
-// }
 
 sf::Vector2f	APanelScreen::toPixel(const sf::Vector2f &perCent,
 				      const sf::Vector2f &size) const
@@ -168,6 +121,11 @@ bool	APanelScreen::isHidden() const
 void	APanelScreen::setDisplayFlag(APanelScreen::Display flag)
 {
   _flag = flag;
+}
+
+auto	APanelScreen::getDisplayFlag() const -> APanelScreen::Display
+{
+  return _flag;
 }
 
 void	APanelScreen::setHide(bool hide)
