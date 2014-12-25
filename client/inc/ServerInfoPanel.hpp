@@ -13,6 +13,7 @@ public:
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
 
+  const std::string	&getIp() const;
 private:
   void		createNameWidget(Widget *widget);
   void		createCountryWidget(Widget *widget);

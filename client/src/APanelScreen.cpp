@@ -270,6 +270,28 @@ void		APanelScreen::addFont(const std::string &fontName,
   _font.insert(std::pair<std::string, sf::Font>(fontName, font));
 }
 
+const AWidget	*APanelScreen::getWidget(const std::string &id) const
+{
+  auto it = std::find_if(_widgets.begin(), _widgets.end(), [&id](AWidget *widget)
+			 {
+			   return (widget->getId() == id);
+			 });
+  if (it == _widgets.end())
+    throw (std::runtime_error(id + " not found"));
+  return (*it);
+}
+
+AWidget		*APanelScreen::getWidget(const std::string &id)
+{
+  auto it = std::find_if(_widgets.begin(), _widgets.end(), [&id](AWidget *widget)
+			 {
+			   return (widget->getId() == id);
+			 });
+  if (it == _widgets.end())
+    throw (std::runtime_error(id + " not found"));
+  return (*it);
+}
+
 const std::vector<AWidget *>	&APanelScreen::getWidgets() const
 {
   return _widgets;

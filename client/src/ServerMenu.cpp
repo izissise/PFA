@@ -1,5 +1,6 @@
 #include "ServerMenu.hpp"
 #include "ServerInfoPanel.hpp"
+#include "printv.hpp"
 
 ServerMenu::ServerMenu(const sf::FloatRect &zone) :
   APanelScreen(zone)
@@ -32,11 +33,11 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
   createTitle(wTitle);
   Panel *serv = createServListPanel(set, texture, panels);
   Panel *fav = createFavPanel(set, texture, panels);
+  createTabBar(set, texture, {serv, fav});
   Panel *cont = createContPanel(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
   Panel	*serverPopup = createServerPopup(set, texture, {});
   wConnectIp->addObserver(popup);
-  createTabBar(set, texture, {serv, fav});
   createFooter(wFooter);
   createButtonBack(wBack, texture);
   createButtonCip(wConnectIp, texture);
@@ -44,6 +45,8 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
   wBack->addObserver({this, panels[0]});
   wJoin->addObserver({this, panels[1]});
 
+  for (unsigned int i = 0; i < 50; ++i)
+    addServerToList(serv, set, texture, "127.0.0.1");
 
   _widgets.push_back(wTitle);
   _widgets.push_back(wFooter);
@@ -104,8 +107,6 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
 
   addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
   content->addWidget({bgWidget});
-  for (unsigned int i = 0; i < 50; ++i)
-    addServerToList(content, set, texture, "127.0.0.1");
   content->addPanel({capsule});
   content->construct(texture, set, {});
   return content;
@@ -146,10 +147,23 @@ Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
   ServerInfoPanel	*serverInfoPanel = new ServerInfoPanel(zone, ip);
   Panel			*style = new Panel(zone);
   Widget		*wBg = new Widget("bg", zone);
-  unsigned int		nbElem = 0;
 
-  for (APanelScreen *pan : panels[0]->getSubPanels())
-    ++nbElem;
+  createPopupControler(wBg, panels);
+  wBg->addObserver(controler);		// to signal the events
+  setControlerTrigger(controler);
+  style->addWidget(wBg);
+  style->construct(texture, set, {});
+  serverInfoPanel->construct(texture, set, {});
+  controler->addPanel({style, serverInfoPanel});
+  controler->construct(texture, set, {});
+  return controler;
+}
+
+void	ServerMenu::createPopupControler(Widget *widget,
+					 const std::vector<APanelScreen *> &panels)
+{
+  unsigned int		nbElem = 0;
+  sf::FloatRect		zone = widget->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateDisplay =
     [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
@@ -159,23 +173,48 @@ Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
       isOver = lwidget.isOver(ref);
       lwidget.setSpriteAttr(0, !isOver);
       lwidget.setSpriteAttr(1, isOver);
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Right))
+	    {
+	      lwidget.notify(t_event(wEvent::Update | wEvent::Hide | wEvent::Toggle));
+	      return 1;
+	    }
+	}
       return 0;
     };
 
-  wBg->setUpdate(updateDisplay);
+  for (APanelScreen *pan : panels[0]->getSubPanels()) // the container
+    ++nbElem;
+  widget->setUpdate(updateDisplay);
   if (nbElem % 2)
-    addSpriteForWidget(wBg, sf::Color(100, 100, 100, 255), {zone.width, zone.height});
+    addSpriteForWidget(widget, sf::Color(100, 100, 100, 255), {zone.width, zone.height});
   else
-    addSpriteForWidget(wBg, sf::Color(130, 130, 130, 255), {zone.width, zone.height});
-  addSpriteForWidget(wBg, sf::Color(0x40, 0x6F, 0x39, 255), {zone.width, zone.height});
-  wBg->setSpriteAttr(1, false);
+    addSpriteForWidget(widget, sf::Color(130, 130, 130, 255), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(0x40, 0x6F, 0x39, 255), {zone.width, zone.height});
+  widget->setSpriteAttr(1, false);
+}
 
-  style->addWidget(wBg);
-  style->construct(texture, set, {});
-  serverInfoPanel->construct(texture, set, {});
-  controler->addPanel({style, serverInfoPanel});
-  controler->construct(texture, set, {});
-  return controler;
+void	ServerMenu::setControlerTrigger(Panel *panel)
+{
+  std::function<void (const t_event &event)>  func;
+
+  func = [panel](const t_event &event) // cannot call APanelScreen::trigger
+    {
+      if (event.e & wEvent::Update && event.e & wEvent::Hide)
+	{
+	  t_event	evt;
+	  const ServerInfoPanel *info = dynamic_cast<ServerInfoPanel *>(panel->getSubPanels().at(1));
+	  std::ostringstream	newLine;
+
+	  printv(newLine, "%\n%", info->getWidget("Name")->getContent(), info->getIp());
+	  evt.str = newLine.str();
+	  evt.e = wEvent::UpdateText;
+	  panel->notify(evt);
+	  panel->notify(event);
+	}
+    };
+  panel->setTrigger(func);
 }
 
 void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
@@ -216,12 +255,16 @@ void	ServerMenu::addServerToList(APanelScreen *list,
 
   for (APanelScreen *pan : list->getSubPanels())
     ++nbElem;
+  nbElem -= 1; // substract the background;
   widgetZone.top = zone.top + nbElem * widgetZone.height;
   Panel *pan = createServerPanel(set, texture, {list},
 				 widgetZone,
 				 "127.0.0.1:6060");
+  pan->addObserver({_panels.at(_panels.size() - 1)}); // serverPopup
   list->addPanel(pan);
 }
+
+// Server Popup
 
 Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
 				       const std::vector<APanelScreen *> &panels)
@@ -230,15 +273,15 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
 	_zone.top + _zone.height / 2 - 110, 400, 220});
   sf::FloatRect	zone = popup->getZone();
   Widget	*bgWidget = new Widget("bg", {zone.left + 2, zone.top,
-				zone.width - 4, zone.height - 2}, sf::Text());
+				zone.width - 4, zone.height}, sf::Text());
   Widget	*header = new Widget("header", {zone.left, zone.top,
 					zone.width, 40},
 					sf::Text("Server's Options", _font["default"], 20));
 
-  Widget	*serverName = new Widget("", {zone.left + 10, zone.top + 10,
+  Widget	*serverName = new Widget("serverName", {zone.left + 10, zone.top + 50,
 				zone.width / 2, 25},
 				sf::Text("Server Name", _font["default"], 20));
-  Widget	*serverIp = new Widget("", {zone.left + 10, zone.top + 10,
+  Widget	*serverIp = new Widget("serverIp", {zone.left + 10, zone.top + 75,
 					zone.width / 2, 25},
 					sf::Text("Cancel", _font["default"], 20));
   Widget	*caButton = new Widget("ca", {zone.left + 10, zone.top + 110,
@@ -248,15 +291,20 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
 					zone.top + 110, zone.width / 2 - 17, 45},
 					sf::Text("Connect", _font["default"], 20));
   Widget	*addFav = new Widget("co", {zone.left + 10,
-					zone.top + 150, zone.width / 2 - 17, 45},
-					sf::Text("Add to Favorite", _font["default"], 20));
+					zone.top + 166, zone.width / 2 - 17, 45},
+					sf::Text("Fav", _font["default"], 20));
   Widget	*remFav = new Widget("co", {zone.left + zone.width / 2 + 7,
-					zone.top + 150, zone.width / 2 - 17, 45},
-					sf::Text("Remove From Favorite", _font["default"], 20));
+					zone.top + 166, zone.width / 2 - 17, 45},
+					sf::Text("unFav", _font["default"], 20));
 
   popup->setState(APanelScreen::State::Leader);
-  // popup->setHide(true);
-  addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {zone.width, zone.height});
+  popup->setHide(true);
+  addSpriteForWidget(bgWidget, sf::Color(80, 80, 80, 240), {zone.width - 2, zone.height});
+  bgWidget->setEdge(std::unique_ptr<sf::RectangleShape>
+		    (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+		    2.f);
+  createServerPopupText(serverName);
+  createServerPopupText(serverIp);
   createPopupHeader(header);
   createCancelButton(caButton, texture);
   createConnectButton(coButton, texture);
@@ -266,7 +314,7 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
   setServerPopupTrigger(popup);
   caButton->addObserver(popup);
   coButton->addObserver({popup});
-  popup->addWidget({bgWidget, header, caButton, coButton, addFav, remFav});
+  popup->addWidget({bgWidget, serverName, serverIp, header, caButton, coButton, addFav, remFav});
   popup->construct(texture, set, {});
   addPanel({popup});
   return popup;
@@ -287,7 +335,15 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
 	}
       if (event.e & wEvent::UpdateText)
 	{
-	  const std::vector<AWidget *> &widgets = panel->getWidgets();
+	  std::string	ip;
+	  std::string	servName;
+	  std::size_t	pos;
+
+	  pos = event.str.find("\n");
+	  if (pos == std::string::npos)
+	    throw std::runtime_error("Missing arguments"); // no internet atm
+	  panel->getWidget("serverName")->setTextContent(event.str.substr(0, pos));
+	  panel->getWidget("serverIp")->setTextContent(event.str.substr(pos + 1));
 	  //treatment here
 	}
       if (event.e & wEvent::Reset)
@@ -302,6 +358,8 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
     };
   panel->setTrigger(func);
 }
+
+// -- end
 
 Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
 				   const std::vector<APanelScreen *> &panels)
@@ -381,6 +439,13 @@ void	ServerMenu::setPopupTrigger(Panel *panel)
 	}
     };
   panel->setTrigger(func);
+}
+
+void	ServerMenu::createServerPopupText(Widget *widget)
+{
+  sf::FloatRect zone = widget->getZone();
+
+  widget->alignTextLeft({zone.left, zone.top}, {zone.width, zone.height}, 0, 50);
 }
 
 void	ServerMenu::createTitle(Widget *title)
@@ -476,7 +541,7 @@ void	ServerMenu::createButtonCip(Widget *widget, const sf::Texture &texture)
 	  if (lwidget.isClicked(event, sf::Mouse::Left))
 	    {
 	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
-	      return 0;
+	      return 1;
 	    }
 	}
       return 0;

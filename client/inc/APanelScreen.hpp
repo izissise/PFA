@@ -117,6 +117,8 @@ public:
 					    const sf::Color &color,
 					    const sf::Vector2f &size,
 					    bool display = true);
+  const AWidget		*getWidget(const std::string &id) const;
+  AWidget		*getWidget(const std::string &id);
 
   /**
    * \fn const std::vector<AWidget *> &getWidgets() const;

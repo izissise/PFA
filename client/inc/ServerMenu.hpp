@@ -36,6 +36,9 @@ private:
 				   const std::string &ip);
   Panel		*createServerPopup(Settings &set, const sf::Texture &texture,
 				   const std::vector<APanelScreen *> &panels);
+  void		createServerPopupText(Widget *widget);
+  void		createPopupControler(Widget *widget, const std::vector<APanelScreen *> &panels);
+  void		setControlerTrigger(Panel *controler);
   void		addServerToList(APanelScreen *list,
 				Settings &set,
 				const sf::Texture &texture,

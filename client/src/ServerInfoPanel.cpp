@@ -93,3 +93,8 @@ void	ServerInfoPanel::applyButtonStyle(Widget *widget)
 
   widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
 }
+
+const std::string	&ServerInfoPanel::getIp() const
+{
+  return _ip;
+}

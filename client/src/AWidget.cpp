@@ -26,7 +26,7 @@ void		AWidget::draw(sf::RenderTarget &window) const
 
 std::string	AWidget::getContent() const
 {
-  return (std::string());
+  return (getTextContent().toAnsiString());
 }
 
 void	AWidget::addSprite(t_sprite &elem)
