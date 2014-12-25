@@ -39,10 +39,10 @@ private:
   void		createServerPopupText(Widget *widget);
   void		createPopupControler(Widget *widget, const std::vector<APanelScreen *> &panels);
   void		setControlerTrigger(Panel *controler);
-  void		addServerToList(APanelScreen *list,
-				Settings &set,
+  void		addServerToList(Settings &set,
 				const sf::Texture &texture,
-				const std::string &ip);
+				const std::string &ip,
+				const std::vector<APanelScreen *> &panels);
   void		createTabButton(TabWidget *widget);
   void		createButtonStyle(Widget *widget, const sf::Texture &texture);
   void		createButtonBack(Widget *widget, const sf::Texture &texture);

@@ -182,23 +182,37 @@ bool	APanelScreen::checkPanelBounds(AWidget * const widget) const
 	  && wZone.top < _zone.top + _zone.height);
 }
 
+bool	APanelScreen::checkPanelBounds(APanelScreen * const panel) const
+{
+  sf::FloatRect	wZone = panel->getZone();
+
+  return (wZone.left + wZone.width > _zone.left
+	  && wZone.top + wZone.height > _zone.top
+	  && wZone.left < _zone.left + _zone.width
+	  && wZone.top < _zone.top + _zone.height);
+}
+
 int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
+  bool	overlap = _flag & APanelScreen::Display::Overlap;
 
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
-      if ((*rit)->isHidden() == false)
+      if (!(*rit)->isHidden())
 	{
-	  if ((retVal = (*rit)->update(event, ref, set)) != 0)
-	    return retVal;
-	  else if ((*rit)->getState() == APanelScreen::State::Leader)
-	    return 1;
+	  if (!(overlap) || (overlap && checkPanelBounds(*rit)))
+	    {
+	      if ((retVal = (*rit)->update(event, ref, set)) != 0)
+		return retVal;
+	      else if ((*rit)->getState() == APanelScreen::State::Leader)
+		return 1;
+	    }
 	}
     }
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
     {
-      if (checkPanelBounds(*rit))
+      if (checkPanelBounds(*rit)) // update widget even if hidden
 	if ((retVal = (*rit)->update(event, ref, set)) != 0)
 	  return retVal;
     }

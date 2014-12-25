@@ -4,7 +4,7 @@ ScrollWidget::ScrollWidget(const std::string &id, const sf::FloatRect &zone,
 			   Scroll dir, APanelScreen *panel,
 			   const sf::Text &text, wFlag flg) :
   AWidget(id, zone, text, flg), _active(false), _autoHide(false),
-  _dir(dir), _panel(panel), _ratio(1)
+  _dir(dir), _panel(panel), _ratio(0)
 {
 }
 
@@ -25,7 +25,7 @@ void		ScrollWidget::moveSubPanels(APanelScreen * const pan,
 {
   auto		panels = pan->getSubPanels();
 
-  for (auto &pit : panels)
+  for (auto pit : panels)
     {
       if (!(pit->getState() & APanelScreen::State::Static))
 	pit->moveZone({-moveSize.x, -moveSize.y});
@@ -67,6 +67,7 @@ void		ScrollWidget::movePicker(sf::Sprite &sprite, float x, float y)
   else
     moveSize.x = 0;
   moveSubPanels(_panel, moveSize);
+  updateButtonPos();
 }
 
 void		ScrollWidget::updateButtonPos()
@@ -150,19 +151,24 @@ void		ScrollWidget::updateScrollSize()
   sf::FloatRect	picZone = getSprite(1).sprite.getGlobalBounds();
   unsigned int	biggest;
   float		diff;
+  float		ratio;
+  float		oldRatio = _ratio;
 
+  ratio = (_ratio >= 1 ? _ratio : 1);
   if (_dir == Scroll::Vertical)
-    diff = (picZone.top - barZone.top) * _ratio;
+    diff = (picZone.top - barZone.top) * ratio;
   else
-    diff = (picZone.left - barZone.left) * _ratio;
+    diff = (picZone.left - barZone.left) * ratio;
   biggest = calcPanelSize(_panel, diff, barZone);
   if (biggest <= (_dir == Scroll::Vertical ? barZone.height : barZone.width))
     _ratio = 1;
   else
     _ratio = biggest / (_dir == Scroll::Vertical ? barZone.height : barZone.width);
-  toSize(1, _dir == Scroll::Vertical ? -1 : barZone.width / _ratio,
-	 _dir == Scroll::Vertical ? barZone.height / _ratio : -1);
-  updateButtonPos();
+  if (_ratio != oldRatio)
+    {
+      toSize(1, _dir == Scroll::Vertical ? -1 : barZone.width / _ratio,
+	     _dir == Scroll::Vertical ? barZone.height / _ratio : -1);
+    }
 }
 
 int		ScrollWidget::handleMouse(int pX, int pY)
@@ -217,7 +223,7 @@ int	ScrollWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   if (_update)
     {
       if (_update(*this, event, ref) != 0)
-	retVal = 1;
+  	retVal = 1;
     }
   updateScrollSize();
   return retVal;
@@ -246,6 +252,7 @@ void	ScrollWidget::addSprite(t_sprite &elem)
     movePicker(elem.sprite, 0, 0);
   else
     elem.sprite.setPosition(_zone.left, _zone.top);
+
   _sprites.push_back(elem);
 }
 

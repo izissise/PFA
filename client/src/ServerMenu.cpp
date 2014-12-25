@@ -31,10 +31,15 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
     sf::Text("Join Server", _font["default"], 20));
 
   createTitle(wTitle);
-  Panel *serv = createServListPanel(set, texture, panels);
-  Panel *fav = createFavPanel(set, texture, panels);
+
+  Panel *cont = createContPanel(set, texture, {});
+  Panel *serv = createServListPanel(set, texture, {cont});
+  Panel *fav = createFavPanel(set, texture, {cont});
+  cont->addPanel({serv, fav});
+  cont->construct(texture, set, {});
+  addPanel(cont);
+
   createTabBar(set, texture, {serv, fav});
-  Panel *cont = createContPanel(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
   Panel	*serverPopup = createServerPopup(set, texture, {});
   wConnectIp->addObserver(popup);
@@ -46,7 +51,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
   wJoin->addObserver({this, panels[1]});
 
   for (unsigned int i = 0; i < 50; ++i)
-    addServerToList(serv, set, texture, "127.0.0.1");
+    addServerToList(set, texture, "127.0.0.1", {serv});
 
   _widgets.push_back(wTitle);
   _widgets.push_back(wFooter);
@@ -65,7 +70,6 @@ Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
   sf::FloatRect zone = content->getZone();
   std::function<void (const t_event &event)>	triggerFunc;
 
-  content->setDisplayFlag(APanelScreen::Display::Overlap);
   triggerFunc = [this](const t_event &event)
     {
       if (event.e & wEvent::Update) // Means a connect to ip
@@ -81,18 +85,14 @@ Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
 	}
     };
   content->setTrigger(triggerFunc);
-  content->addPanel({panels[0], panels[1]});
-  content->construct(texture, set, {});
-  addPanel(content);
   return content;
 }
 
 Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture,
 					 const std::vector<APanelScreen *> &panels)
 {
-  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
-	_zone.width, _zone.height - 210});
-  sf::FloatRect	zone = content->getZone();
+  sf::FloatRect	zone = panels[0]->getZone();
+  Panel	*content = new Panel(zone);
   Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
 				zone.width, zone.height}, sf::Text());
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
@@ -101,6 +101,8 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
 					    sf::Text(), wFlag::None);
   Panel		*capsule = encapsulate(wScroll);
 
+  content->setDisplayFlag(APanelScreen::Display::Overlap);
+  content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
   capsule->setState(APanelScreen::State::Static);
   capsule->construct(texture, set, {});
@@ -115,9 +117,8 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
 Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 				   const std::vector<APanelScreen *> &panels)
 {
-  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
-	_zone.width, _zone.height - 210});
-  sf::FloatRect	zone = content->getZone();
+  sf::FloatRect	zone = panels[0]->getZone();
+  Panel	*content = new Panel(zone);
   Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
 				zone.width, zone.height}, sf::Text());
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
@@ -126,6 +127,8 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 					    sf::Text(), wFlag::None);
   Panel		*capsule = encapsulate(wScroll);
 
+  content->setDisplayFlag(APanelScreen::Display::Overlap);
+  content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
   capsule->setState(APanelScreen::State::Static);
   capsule->construct(texture, set, {});
@@ -180,6 +183,12 @@ void	ServerMenu::createPopupControler(Widget *widget,
 	      lwidget.notify(t_event(wEvent::Update | wEvent::Hide | wEvent::Toggle));
 	      return 1;
 	    }
+	  else if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      std::cout << "left click" << std::endl;
+	      lwidget.notify(t_event(wEvent::Update));
+	      return 1;
+	    }
 	}
       return 0;
     };
@@ -201,17 +210,32 @@ void	ServerMenu::setControlerTrigger(Panel *panel)
 
   func = [panel](const t_event &event) // cannot call APanelScreen::trigger
     {
-      if (event.e & wEvent::Update && event.e & wEvent::Hide)
+      if (event.e & wEvent::Update)
 	{
-	  t_event	evt;
-	  const ServerInfoPanel *info = dynamic_cast<ServerInfoPanel *>(panel->getSubPanels().at(1));
-	  std::ostringstream	newLine;
+	  const ServerInfoPanel *info = dynamic_cast<ServerInfoPanel *>
+	  (panel->getSubPanels().at(1));
+	  if (event.e & wEvent::Hide) // right click
+	    {
+	      t_event	evt;
+	      std::ostringstream	newLine;
 
-	  printv(newLine, "%\n%", info->getWidget("Name")->getContent(), info->getIp());
-	  evt.str = newLine.str();
-	  evt.e = wEvent::UpdateText;
-	  panel->notify(evt);
-	  panel->notify(event);
+	      printv(newLine, "%\n%", info->getWidget("Name")->getContent(), info->getIp());
+	      evt.str = newLine.str();
+	      evt.e = wEvent::UpdateText;
+	      panel->notify(evt);
+	      panel->notify(event);
+	    }
+	  else // left click, connect to the game
+	    {
+	      return ;
+	      t_event	connectEvent;
+
+	      connectEvent = event;
+	      connectEvent.e = wEvent::Update;
+	      connectEvent.str = info->getIp();
+	      panel->notify(t_event(wEvent::Hide | wEvent::Toggle)); // hide this, show gamePanel
+	      panel->notify(connectEvent); // send him the ip to connect to;
+	    }
 	}
     };
   panel->setTrigger(func);
@@ -243,11 +267,12 @@ void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
   addPanel({content});
 }
 
-void	ServerMenu::addServerToList(APanelScreen *list,
-				    Settings &set,
+void	ServerMenu::addServerToList(Settings &set,
 				    const sf::Texture &texture,
-				    const std::string &ip)
+				    const std::string &ip,
+				    const std::vector<APanelScreen *> &panels)
 {
+  APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
   sf::FloatRect	widgetZone(zone.left, 0, zone.width - 13, 30);
   // -13 for the scrollbar so it doesnt overlap
