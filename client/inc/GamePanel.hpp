@@ -21,7 +21,7 @@ public:
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
 
-  void		draw(sf::RenderWindow &window, bool toWin);
+  void		draw(sf::RenderTarget &window, bool toWin);
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		trigger(const t_event &event);
 
@@ -32,7 +32,7 @@ private:
   void		constructLine();
   void		completeField(sf::RenderWindow &window);
   void		fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
-  void		drawHud(sf::RenderWindow &window, bool toWin);
+  void		drawHud(sf::RenderTarget &window, bool toWin);
   int		updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 
   int		updateNetwork(Settings &set);

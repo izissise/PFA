@@ -35,7 +35,7 @@ public:
   void load(const TileCodex& codex);
   void fillTiles(const RepeatedField<uint32> &bgTiles,
 		 const RepeatedField<uint32> &fgTiles);
-  void draw(sf::RenderWindow& window,
+  void draw(sf::RenderTarget& window,
 	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;
 

@@ -101,12 +101,12 @@ void	GamePanel::createVoiceButton(const sf::Texture &texture, Widget *w,
   w->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
 }
 
-void	GamePanel::drawHud(sf::RenderWindow &window, bool toWin)
+void	GamePanel::drawHud(sf::RenderTarget &window, bool toWin)
 {
   APanelScreen::draw(window, toWin);
 }
 
-void	GamePanel::draw(sf::RenderWindow &window, bool toWin)
+void	GamePanel::draw(sf::RenderTarget &window, bool toWin)
 {
   _world->draw(window);
   drawHud(window, toWin);

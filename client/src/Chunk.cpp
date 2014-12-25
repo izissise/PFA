@@ -106,7 +106,7 @@ void		Chunk::_generateVBO(const TileCodex& codex)
     }
 }
 
-void	Chunk::draw(sf::RenderWindow& window,
+void	Chunk::draw(sf::RenderTarget& window,
 		    Vector2i& windowCoord,
 		    const TileCodex& codex) const
 {

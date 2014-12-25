@@ -103,7 +103,7 @@ auto World::_getScreenOrigin(void) const -> screenPos
   return _camera.wToSPos(worldOrigin);
 }
 
-void	World::draw(sf::RenderWindow& window) const
+void	World::draw(sf::RenderTarget &window) const
 {
   screenPos	screenOrigin = _getScreenOrigin();
   screenPos	screenCoord = screenOrigin;
@@ -127,15 +127,14 @@ float World::_getGridOffset(float w) const
   return -(w - std::floor(w));
 }
 
-void World::_drawChunk(sf::RenderWindow& window,
+void World::_drawChunk(sf::RenderTarget& window,
 		       const chunkId& cursor,
 		       screenPos& windowCoord) const
 {
   try {
     const Chunk& target = *_chunks.at(cursor);
-    if (target.isLoaded()) {
+    if (target.isLoaded())
       target.draw(window, windowCoord, _codex);
-    }
   } catch (const std::out_of_range& e) {
     // this means the chunk isn't loaded so we do nothing and skip it
     return ;

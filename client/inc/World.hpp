@@ -32,7 +32,7 @@ public:
   World&		operator=(const World& other) = delete;
 
   void			update(void);
-  void			draw(sf::RenderWindow& window) const;
+  void			draw(sf::RenderTarget& window) const;
   void			load();
   void			loadRange();
 
@@ -63,7 +63,7 @@ private:
   void		_calculateVisibleRange(void);
 
   screenPos	_getScreenOrigin(void) const;
-  void		_drawChunk(sf::RenderWindow& window,
+  void		_drawChunk(sf::RenderTarget &window,
 			   const chunkId& cursor,
 			   screenPos& windowCoord) const;
   void		_loadChunks(void);
