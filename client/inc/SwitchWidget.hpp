@@ -12,7 +12,7 @@ public:
   int	update(const sf::Event &event,
 	       sf::RenderWindow &ref,
 	       Settings &set);
-  void	draw(sf::RenderTarget &window, bool toWin);
+  void	print(sf::RenderTarget &window, bool isTextured);
   void	addContent(AWidget * const widget);
   void	addContent(const std::initializer_list<AWidget * const> &widgets);
 

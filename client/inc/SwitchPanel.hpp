@@ -12,6 +12,7 @@ public:
   int	update(const sf::Event &event,
 	       sf::RenderWindow &ref,
 	       Settings &set);
+  void	print(sf::RenderTarget &window, bool isTextured);
   void	addContent(APanelScreen * const widget);
   void	addContent(const std::initializer_list<APanelScreen * const> &widgets);
 

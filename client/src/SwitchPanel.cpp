@@ -24,6 +24,31 @@ int	SwitchPanel::update(const sf::Event &event, sf::RenderWindow &ref,
   return retVal;
 }
 
+void	SwitchPanel::print(sf::RenderTarget &window, bool isTextured)
+{
+  const std::vector<APanelScreen *> &content = _content->getSubPanels();
+  // here i get the target to draw into
+
+  isTextured = (isTextured || _flag & APanelScreen::Display::Overlap);
+  if (!isTextured)
+    {
+      for (auto widget : _widgets)
+	if (!widget->isHidden())
+	  widget->draw(window);
+    }
+  else if (_flag & APanelScreen::Display::Overlap) // means it is the main RenderTexture
+    {
+      _rt.display();		// Must refresh before drawing
+      sf::Sprite		sprite(_rt.getTexture(), static_cast<sf::IntRect>(_zone));
+
+      sprite.setPosition(_zone.left, _zone.top);
+      window.draw(sprite);
+    }
+  if (!content.empty())
+    content.at(_idx)->print(window, isTextured);
+}
+
+
 void	SwitchPanel::addContent(APanelScreen * const panel)
 {
   _content->addPanel(panel);

@@ -24,16 +24,28 @@ int	SwitchWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   return retVal;
 }
 
-void		SwitchWidget::draw(sf::RenderTarget &window, bool first)
+void		SwitchWidget::print(sf::RenderTarget &window, bool isTextured)
 {
   const std::vector<AWidget *> &content = _content->getWidgets();
-  sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);
   // here i get the target to draw into
 
-  if (&target != &window)			// then we get a new RenderTarget
-    target.clear(sf::Color(127,127,127,0));	// clear it before any usage
-  if (!content.empty())
-    content.at(_idx)->draw(target);
+  isTextured = (isTextured || _flag & APanelScreen::Display::Overlap);
+  if (!isTextured)
+    {
+      if (!content.empty())
+	content.at(_idx)->draw(window);
+    }
+  else if (_flag & APanelScreen::Display::Overlap) // means it is the main RenderTexture
+    {
+      _rt.display();		// Must refresh before drawing
+      sf::Sprite		sprite(_rt.getTexture(), static_cast<sf::IntRect>(_zone));
+
+      sprite.setPosition(_zone.left, _zone.top);
+      window.draw(sprite);
+    }
+  for (auto panel : _panels)
+    if (!panel->isHidden())
+      panel->print(window, isTextured);
 }
 
 void	SwitchWidget::addContent(AWidget * const widget)

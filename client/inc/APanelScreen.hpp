@@ -55,7 +55,7 @@ public:
    *
    * print cut a sprite out of the panel texture to apply it on the main texture
    */
-  void	print(sf::RenderTarget &rt, bool isTextured);
+  virtual void	print(sf::RenderTarget &rt, bool isTextured);
 
   /**
    * \fn void construct(const sf::Texture &texture, Settings &set, const std::vector<APanelScreen *> &panels) = 0;

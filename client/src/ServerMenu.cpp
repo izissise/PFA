@@ -30,11 +30,11 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
     sf::Text("Join Server", _font["default"], 20));
 
   createTitle(wTitle);
-  // Panel	*serverPopup = createServerPopup(server, texture, {});
   Panel *serv = createServListPanel(set, texture, panels);
   Panel *fav = createFavPanel(set, texture, panels);
   Panel *cont = createContPanel(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
+  Panel	*serverPopup = createServerPopup(set, texture, {});
   wConnectIp->addObserver(popup);
   createTabBar(set, texture, {serv, fav});
   createFooter(wFooter);
@@ -227,7 +227,7 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
 				       const std::vector<APanelScreen *> &panels)
 {
   Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 200,
-	_zone.top + _zone.height / 2 - 85, 400, 170});
+	_zone.top + _zone.height / 2 - 110, 400, 220});
   sf::FloatRect	zone = popup->getZone();
   Widget	*bgWidget = new Widget("bg", {zone.left + 2, zone.top,
 				zone.width - 4, zone.height - 2}, sf::Text());
@@ -247,17 +247,26 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
   Widget	*coButton = new Widget("co", {zone.left + zone.width / 2 + 7,
 					zone.top + 110, zone.width / 2 - 17, 45},
 					sf::Text("Connect", _font["default"], 20));
+  Widget	*addFav = new Widget("co", {zone.left + 10,
+					zone.top + 150, zone.width / 2 - 17, 45},
+					sf::Text("Add to Favorite", _font["default"], 20));
+  Widget	*remFav = new Widget("co", {zone.left + zone.width / 2 + 7,
+					zone.top + 150, zone.width / 2 - 17, 45},
+					sf::Text("Remove From Favorite", _font["default"], 20));
 
   popup->setState(APanelScreen::State::Leader);
-  popup->setHide(true);
+  // popup->setHide(true);
+  addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {zone.width, zone.height});
   createPopupHeader(header);
   createCancelButton(caButton, texture);
   createConnectButton(coButton, texture);
+  createCancelButton(addFav, texture);
+  createCancelButton(remFav, texture);
   //  popup->addObserver({panels[1], this}); // gamePanel
   setServerPopupTrigger(popup);
   caButton->addObserver(popup);
   coButton->addObserver({popup});
-  popup->addWidget({bgWidget, header, caButton, coButton});
+  popup->addWidget({bgWidget, header, caButton, coButton, addFav, remFav});
   popup->construct(texture, set, {});
   addPanel({popup});
   return popup;
