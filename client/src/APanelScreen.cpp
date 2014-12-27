@@ -128,7 +128,14 @@ void	APanelScreen::setHide(bool hide)
 
 void	APanelScreen::setState(APanelScreen::State state)
 {
-  _state = state;
+  if (state & APanelScreen::State::Inactive)
+    _countdown.start(sf::milliseconds(InactiveTime));
+  _state = static_cast<APanelScreen::State>(_state | state);
+}
+
+void	APanelScreen::removeState(APanelScreen::State state)
+{
+  _state = static_cast<APanelScreen::State>(_state & static_cast<APanelScreen::State>(~(state)));
 }
 
 void	APanelScreen::moveWidgets(APanelScreen * const pan,
@@ -197,6 +204,13 @@ int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings
   int	retVal = 0;
   bool	overlap = _flag & APanelScreen::Display::Overlap;
 
+  if (_state & APanelScreen::State::Inactive)
+    {
+      if (_countdown.update() == false)
+	return 0;
+      else
+	removeState(APanelScreen::State::Inactive);
+    }
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
       if (!(*rit)->isHidden())

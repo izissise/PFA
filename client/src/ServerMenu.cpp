@@ -32,7 +32,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 
   createTitle(wTitle);
 
-  Panel *cont = createContPanel(set, texture, {});
+  Panel *cont = createContPanel(set, texture, {panels.at(1)}); // pass the gamepanel
   Panel *serv = createServListPanel(set, texture, {cont});
   Panel *fav = createFavPanel(set, texture, {cont});
   cont->addPanel({serv, fav});
@@ -51,7 +51,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
   wJoin->addObserver({this, panels[1]});
 
   for (unsigned int i = 0; i < 50; ++i)
-    addServerToList(set, texture, "127.0.0.1", {serv});
+    addServerToList(set, texture, "127.0.0.1", {serv, cont});
 
   _widgets.push_back(wTitle);
   _widgets.push_back(wFooter);
@@ -70,20 +70,16 @@ Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
   sf::FloatRect zone = content->getZone();
   std::function<void (const t_event &event)>	triggerFunc;
 
-  triggerFunc = [this](const t_event &event)
+  triggerFunc = [content](const t_event &event)
     {
       if (event.e & wEvent::Update) // Means a connect to ip
 	{
-	  APanelScreen	*shownPanel = nullptr; // Should not be null after the loop
-
-	  for (APanelScreen *pan : _panels)
-	    if (pan->isHidden() == false)
-	      {
-		shownPanel = pan;
-		break ;
-	      }
+	  content->notify(t_event(wEvent::Hide | wEvent::Toggle)); // swap the panels
+	  content->notify(event); // connect to ip
 	}
     };
+  content->addObserver(panels.at(0)); // gamepanel
+  content->addObserver(this);
   content->setTrigger(triggerFunc);
   return content;
 }
@@ -204,6 +200,30 @@ void	ServerMenu::createPopupControler(Widget *widget,
   widget->setSpriteAttr(1, false);
 }
 
+void	ServerMenu::trigger(const t_event &event)
+{
+  if (event.e & wEvent::Hide)
+    {
+      if (event.e & wEvent::Toggle)
+	_hide = !_hide;
+      else
+	_hide = true;
+      if (_hide == false)
+	{
+	  for (APanelScreen *pan : _panels)
+	    pan->setState(APanelScreen::State::Inactive);
+	}
+    }
+  if (event.e & wEvent::Reset)
+    {
+      t_event	evt = event;
+
+      evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Reset;
+      for (AWidget *widget : _widgets)
+	widget->trigger(evt);
+    }
+}
+
 void	ServerMenu::setControlerTrigger(Panel *panel)
 {
   std::function<void (const t_event &event)>  func;
@@ -227,13 +247,12 @@ void	ServerMenu::setControlerTrigger(Panel *panel)
 	    }
 	  else // left click, connect to the game
 	    {
-	      return ;
 	      t_event	connectEvent;
 
 	      connectEvent = event;
 	      connectEvent.e = wEvent::Update;
 	      connectEvent.str = info->getIp();
-	      panel->notify(t_event(wEvent::Hide | wEvent::Toggle)); // hide this, show gamePanel
+	      //notify(t_event(wEvent::Hide | wEvent::Toggle)); // hide this, show gamePanel
 	      panel->notify(connectEvent); // send him the ip to connect to;
 	    }
 	}
@@ -285,7 +304,7 @@ void	ServerMenu::addServerToList(Settings &set,
   Panel *pan = createServerPanel(set, texture, {list},
 				 widgetZone,
 				 "127.0.0.1:6060");
-  pan->addObserver({_panels.at(_panels.size() - 1)}); // serverPopup
+  pan->addObserver({_panels.at(_panels.size() - 1), panels.at(1)}); // serverPopup , contPanel
   list->addPanel(pan);
 }
 

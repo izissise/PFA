@@ -3,6 +3,9 @@
 
 #include <vector>
 #include "AWidget.hpp"
+#include "Countdown.hpp"
+
+#define InactiveTime 100
 
 class Panel;
 
@@ -13,7 +16,8 @@ public:
     {
       None = 0,
       Leader = 1,
-      Static = 2
+      Static = 2,
+      Inactive = 4
     };
   enum class	Display
     {
@@ -89,6 +93,7 @@ public:
   APanelScreen::Display	getDisplayFlag() const;
   void		setHide(bool hide);
   void		setState(APanelScreen::State state);
+  void		removeState(APanelScreen::State state);
   void		move(const sf::Vector2f &displacement);
   void		moveZone(const sf::Vector2f &displacement);
   void		setPosition(const sf::Vector2f &position);
@@ -226,6 +231,7 @@ protected:
   sf::FloatRect				_zone;
   State					_state;
   Display				_flag;
+  Countdown				_countdown;
   sf::RenderTexture			_rt;
   std::map<std::string, sf::Font>	_font;
   std::function<void (const t_event &event)>	_trigger;
@@ -241,6 +247,14 @@ inline int	operator&(APanelScreen::Display a, APanelScreen::Display b)
 inline int	operator&(APanelScreen::State a, APanelScreen::State b)
 {
   return (static_cast<int>(a) & static_cast<int>(b));
+};
+inline int	operator|(APanelScreen::State a, APanelScreen::State b)
+{
+  return (static_cast<int>(a) | static_cast<int>(b));
+};
+inline int	operator~(APanelScreen::State a)
+{
+  return ~static_cast<int>(a);
 };
 
 #endif /* _APANELSCREEN_H_ */
