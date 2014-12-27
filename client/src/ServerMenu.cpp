@@ -41,7 +41,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 
   createTabBar(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
-  Panel	*serverPopup = createServerPopup(set, texture, {});
+  Panel	*serverPopup = createServerPopup(set, texture, {cont});
   wConnectIp->addObserver(popup);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
@@ -78,8 +78,7 @@ Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
 	  content->notify(event); // connect to ip
 	}
     };
-  content->addObserver(panels.at(0)); // gamepanel
-  content->addObserver(this);
+  content->addObserver({this, panels.at(0)}); // this & gamepanel
   content->setTrigger(triggerFunc);
   return content;
 }
@@ -181,7 +180,6 @@ void	ServerMenu::createPopupControler(Widget *widget,
 	    }
 	  else if (lwidget.isClicked(event, sf::Mouse::Left))
 	    {
-	      std::cout << "left click" << std::endl;
 	      lwidget.notify(t_event(wEvent::Update));
 	      return 1;
 	    }
@@ -198,6 +196,41 @@ void	ServerMenu::createPopupControler(Widget *widget,
     addSpriteForWidget(widget, sf::Color(130, 130, 130, 255), {zone.width, zone.height});
   addSpriteForWidget(widget, sf::Color(0x40, 0x6F, 0x39, 255), {zone.width, zone.height});
   widget->setSpriteAttr(1, false);
+}
+
+void	ServerMenu::setControlerTrigger(Panel *panel)
+{
+  std::function<void (const t_event &event)>  func;
+
+  func = [panel](const t_event &event) // cannot call APanelScreen::trigger
+    {
+      if (event.e & wEvent::Update)
+	{
+	  const ServerInfoPanel *info = dynamic_cast<ServerInfoPanel *>
+	  (panel->getSubPanels().at(1));
+	  if (event.e & wEvent::Hide) // right click
+	    {
+	      t_event	evt;
+	      std::ostringstream	newLine;
+
+	      printv(newLine, "%\n%", info->getWidget("Name")->getContent(), info->getIp());
+	      evt.str = newLine.str();
+	      evt.e = wEvent::UpdateText;
+	      panel->notify(evt);
+	      panel->notify(t_event(wEvent::Hide | wEvent::Toggle));
+	    }
+	  else // left click, connect to the game
+	    {
+	      t_event	connectEvent;
+
+	      connectEvent = event;
+	      connectEvent.e = wEvent::Update;
+	      connectEvent.str = info->getIp();
+	      panel->notify(connectEvent); // send him the ip to connect to;
+	    }
+	}
+    };
+  panel->setTrigger(func);
 }
 
 void	ServerMenu::trigger(const t_event &event)
@@ -222,42 +255,6 @@ void	ServerMenu::trigger(const t_event &event)
       for (AWidget *widget : _widgets)
 	widget->trigger(evt);
     }
-}
-
-void	ServerMenu::setControlerTrigger(Panel *panel)
-{
-  std::function<void (const t_event &event)>  func;
-
-  func = [panel](const t_event &event) // cannot call APanelScreen::trigger
-    {
-      if (event.e & wEvent::Update)
-	{
-	  const ServerInfoPanel *info = dynamic_cast<ServerInfoPanel *>
-	  (panel->getSubPanels().at(1));
-	  if (event.e & wEvent::Hide) // right click
-	    {
-	      t_event	evt;
-	      std::ostringstream	newLine;
-
-	      printv(newLine, "%\n%", info->getWidget("Name")->getContent(), info->getIp());
-	      evt.str = newLine.str();
-	      evt.e = wEvent::UpdateText;
-	      panel->notify(evt);
-	      panel->notify(event);
-	    }
-	  else // left click, connect to the game
-	    {
-	      t_event	connectEvent;
-
-	      connectEvent = event;
-	      connectEvent.e = wEvent::Update;
-	      connectEvent.str = info->getIp();
-	      //notify(t_event(wEvent::Hide | wEvent::Toggle)); // hide this, show gamePanel
-	      panel->notify(connectEvent); // send him the ip to connect to;
-	    }
-	}
-    };
-  panel->setTrigger(func);
 }
 
 void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
@@ -354,7 +351,7 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
   createConnectButton(coButton, texture);
   createCancelButton(addFav, texture);
   createCancelButton(remFav, texture);
-  //  popup->addObserver({panels[1], this}); // gamePanel
+  popup->addObserver({panels.at(0)}); // container
   setServerPopupTrigger(popup);
   caButton->addObserver(popup);
   coButton->addObserver({popup});
@@ -385,10 +382,18 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
 
 	  pos = event.str.find("\n");
 	  if (pos == std::string::npos)
-	    throw std::runtime_error("Missing arguments"); // no internet atm
+	    throw std::runtime_error("Missing arguments");
 	  panel->getWidget("serverName")->setTextContent(event.str.substr(0, pos));
 	  panel->getWidget("serverIp")->setTextContent(event.str.substr(pos + 1));
 	  //treatment here
+	}
+      if (event.e & wEvent::Update && event.e & wEvent::Hide) // means the connect button is clicked
+	{
+	  t_event evt;
+
+	  evt.e = wEvent::Update;
+	  evt.str = panel->getWidget("serverIp")->getTextContent();
+	  panel->notify(evt);
 	}
       if (event.e & wEvent::Reset)
 	{
