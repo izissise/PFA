@@ -380,8 +380,8 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
   createPopupHeader(header);
   createCancelButton(caButton, texture);
   createConnectButton(coButton, texture);
-  createCancelButton(addFav, texture);
-  createCancelButton(remFav, texture);
+  createAddFavButton(serverIp->getTextContent(), addFav, texture);
+  createRemFavButton(serverIp->getTextContent(), remFav, texture);
   popup->addObserver({panels.at(0)}); // container
   setServerPopupTrigger(popup);
   caButton->addObserver(popup);
@@ -426,7 +426,7 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
 	  evt.str = panel->getWidget("serverIp")->getTextContent();
 	  panel->notify(evt);
 	}
-      if (event.e & wEvent::Reset)
+      if (event.e & wEvent::Reset || event.e & wEvent::Hide)
 	{
 	  t_event	evt = event;
 	  const std::vector<AWidget *>	&widgets = panel->getWidgets();
@@ -437,6 +437,132 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
 	}
     };
   panel->setTrigger(func);
+}
+
+void	ServerMenu::createAddFavButton(const sf::String &ip, Widget *widget,
+				       const sf::Texture &texture)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [&](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      lwidget.setSpriteAttr(0, !isOver);
+      lwidget.setSpriteAttr(1, isOver);
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      if (this->addServerToFav(ip))
+		{
+		  sf::FloatRect zone = lwidget.getZone();
+
+		  lwidget.setTextContent("Done");
+		  lwidget.alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+		}
+	      // lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle | wEvent::Reset));
+	      return 0;
+	    }
+	}
+      return 0;
+    };
+
+  std::function<void (const t_event &event)>  tfunc;
+
+  tfunc = [widget](const t_event &event) // cannot call APanelScreen::trigger
+    {
+      if (event.e & wEvent::Reset)
+	{
+	  sf::FloatRect zone = widget->getZone();
+
+	  widget->setTextContent("Fav");
+	  widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+	}
+    };
+  createButtonStyle(widget, texture);
+  widget->setUpdate(updateFunc);
+  widget->setTrigger(tfunc);
+}
+
+void	ServerMenu::createRemFavButton(const sf::String &ip, Widget *widget,
+				       const sf::Texture &texture)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [&](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      lwidget.setSpriteAttr(0, !isOver);
+      lwidget.setSpriteAttr(1, isOver);
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      if (this->removeServerFromFav(ip))
+		{
+		  sf::FloatRect zone = lwidget.getZone();
+
+		  lwidget.setTextContent("Done");
+		  lwidget.alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+		}
+	      // lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle | wEvent::Reset));
+	      return 0;
+	    }
+	}
+      return 0;
+    };
+
+  std::function<void (const t_event &event)>  tfunc;
+
+  tfunc = [widget](const t_event &event) // cannot call APanelScreen::trigger
+    {
+      if (event.e & wEvent::Reset)
+	{
+	  sf::FloatRect zone = widget->getZone();
+
+	  widget->setTextContent("unFav");
+	  widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+	}
+    };
+  createButtonStyle(widget, texture);
+  widget->setUpdate(updateFunc);
+  widget->setTrigger(tfunc);
+}
+
+bool	ServerMenu::addServerToFav(const std::string &ip) const
+{
+  File	file;
+  std::vector<std::string> content;
+
+  file.readFile(FavFile, content);
+  if (std::find(content.begin(), content.end(), ip) != content.end())
+    return false;
+  content.push_back(ip);
+  file.writeFile(FavFile, content);
+  return true;
+}
+
+bool	ServerMenu::removeServerFromFav(const std::string &ip) const
+{
+  File	file;
+  std::vector<std::string> content;
+
+  file.readFile(FavFile, content);
+  auto it = std::find(content.begin(), content.end(), ip);
+
+  if (it == content.end())
+    return false;
+  content.erase(it);
+  file.writeFile(FavFile, content);
+  return true;
 }
 
 // -- end

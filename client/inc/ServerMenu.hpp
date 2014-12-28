@@ -46,6 +46,8 @@ private:
 			      Panel *panel, APanelScreen *container);
   void		loadFavServers(Settings &set, const sf::Texture &texture,
 			       Panel *panel, APanelScreen *container);
+  bool		addServerToFav(const std::string &ip) const;
+  bool		removeServerFromFav(const std::string &ip) const;
   void		addServerToList(Settings &set,
 				const sf::Texture &texture,
 				const std::string &ip,
@@ -58,6 +60,10 @@ private:
   void		createTextWidget(TextWidget *widget, const sf::Texture &texture);
   void		createCancelButton(Widget *widget, const sf::Texture &texture);
   void		createConnectButton(Widget *widget, const sf::Texture &texture);
+  void		createAddFavButton(const sf::String &ip, Widget *widget,
+				   const sf::Texture &texture);
+  void		createRemFavButton(const sf::String &ip, Widget *widget,
+				   const sf::Texture &texture);
   void		createScrollBar(ScrollWidget *widget, const sf::Texture &texture);
   void		setPopupTrigger(Panel *panel);
   void		setServerPopupTrigger(Panel *panel);
