@@ -18,6 +18,7 @@ void		Panel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSED,
 
 void		Panel::trigger(const t_event &event)
 {
+  std::cout << "got trigger " << this << " " << (int)(_trigger ? true : false) << std::endl;
   if (_trigger)
     _trigger(event);
   else

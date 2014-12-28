@@ -1,6 +1,8 @@
+#include <functional>
 #include "ServerMenu.hpp"
 #include "ServerInfoPanel.hpp"
 #include "printv.hpp"
+#include "File.hpp"
 
 ServerMenu::ServerMenu(const sf::FloatRect &zone) :
   APanelScreen(zone)
@@ -87,53 +89,83 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
 					 const std::vector<APanelScreen *> &panels)
 {
   sf::FloatRect	zone = panels[0]->getZone();
-  Panel	*content = new Panel(zone);
+  Panel		*content = new Panel(zone);
   Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
 				zone.width, zone.height}, sf::Text());
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
 					    {zone.left + zone.width - 13, zone.top, 13, zone.height},
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
-  Panel		*capsule = encapsulate(wScroll);
 
   content->setDisplayFlag(APanelScreen::Display::Overlap);
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
-  capsule->setState(APanelScreen::State::Static);
-  capsule->construct(texture, set, {});
 
   addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
-  content->addWidget({bgWidget});
-  content->addPanel({capsule});
+  content->addWidget({bgWidget, wScroll});
   content->construct(texture, set, {});
   return content;
 }
+
+// Fav
 
 Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 				   const std::vector<APanelScreen *> &panels)
 {
   sf::FloatRect	zone = panels[0]->getZone();
-  Panel	*content = new Panel(zone);
+  Panel		*content = new Panel(zone);
   Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
 				zone.width, zone.height}, sf::Text());
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
 					    {zone.left + zone.width - 13, zone.top, 13, zone.height},
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
-  Panel		*capsule = encapsulate(wScroll);
 
+  setFavTrigger(set, texture, content, panels[0]); // container
   content->setDisplayFlag(APanelScreen::Display::Overlap);
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
-  capsule->setState(APanelScreen::State::Static);
-  capsule->construct(texture, set, {});
 
   addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
-  content->addWidget({bgWidget});
-  content->addPanel({capsule});
+  content->addWidget({bgWidget, wScroll});
   content->construct(texture, set, {});
   content->setHide(true);
   return content;
+}
+
+void	ServerMenu::setFavTrigger(Settings &set, const sf::Texture &texture,
+				  Panel *panel, APanelScreen *container)
+{
+  std::function<void (const t_event &event)>  func;
+
+  func = [&, panel, container](const t_event &event)
+    {
+      if (event.e & wEvent::Hide)
+  	{
+  	  if (event.e & wEvent::Toggle)
+  	    panel->setHide(!(panel->isHidden()));
+  	  else
+	    panel->setHide(true);
+  	}
+      if (!panel->isHidden()) // the panel get displayed
+  	loadFavServers(set, texture, panel, container);
+    };
+  panel->setTrigger(func);
+}
+
+void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
+				   Panel *panel, APanelScreen *container)
+{
+  std::vector<std::string>	content;
+  File	file;
+
+  file.readFile(FavFile, content);
+  panel->getSubPanels().clear();
+  for (const std::string &s : content)
+    {
+      addServerToList(set, texture, s, {panel, container});
+    }
+  panel->construct(texture, set, {});
 }
 
 Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
@@ -296,7 +328,6 @@ void	ServerMenu::addServerToList(Settings &set,
 
   for (APanelScreen *pan : list->getSubPanels())
     ++nbElem;
-  nbElem -= 1; // substract the background;
   widgetZone.top = zone.top + nbElem * widgetZone.height;
   Panel *pan = createServerPanel(set, texture, {list},
 				 widgetZone,

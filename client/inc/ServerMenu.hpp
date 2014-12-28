@@ -7,6 +7,8 @@
 #include "TabWidget.hpp"
 #include "ScrollWidget.hpp"
 
+#define FavFile "../favlist.txt"
+
 class ServerMenu : public APanelScreen
 {
 public:
@@ -40,6 +42,10 @@ private:
   void		createServerPopupText(Widget *widget);
   void		createPopupControler(Widget *widget, const std::vector<APanelScreen *> &panels);
   void		setControlerTrigger(Panel *controler);
+  void		setFavTrigger(Settings &set, const sf::Texture &texture,
+			      Panel *panel, APanelScreen *container);
+  void		loadFavServers(Settings &set, const sf::Texture &texture,
+			       Panel *panel, APanelScreen *container);
   void		addServerToList(Settings &set,
 				const sf::Texture &texture,
 				const std::string &ip,

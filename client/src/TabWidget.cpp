@@ -30,7 +30,7 @@ int	TabWidget::update(const sf::Event &event, sf::RenderWindow &ref, Settings &s
 	    {
 	      toggleSpriteAttr(0);
 	      toggleSpriteAttr(1);
-	      getPanel()->setHide(false);
+	      getPanel()->trigger(t_event(wEvent::Hide | wEvent::Toggle));
 	      notify(t_event(wEvent::SetSprite, 0, 1));
 	      notify(t_event(wEvent::SetSprite, 1, 0));
 	      return 1;

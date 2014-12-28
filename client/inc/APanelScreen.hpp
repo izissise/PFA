@@ -158,6 +158,17 @@ public:
    */
   const sf::FloatRect		&getZone() const;
 
+  /**
+   * \fn void trigger(const t_event &event)
+   * \brief Trigger the panel from an event
+   * \param[in] event A structure containing the event's informations
+   *
+   * This allow a widget to update a status of a panel.
+   * Example: click on a button -> display the panel
+   *
+   */
+  virtual void		trigger(const t_event &event);
+
 protected:
   /**
    * \fn void toPixel(const sf::Vector2f &perCent, const sf::Vector2f &size)
@@ -203,17 +214,6 @@ protected:
    *
    */
   void			saveTexture(sf::Texture * const texture);
-
-  /**
-   * \fn void trigger(const t_event &event)
-   * \brief Trigger the panel from an event
-   * \param[in] event A structure containing the event's informations
-   *
-   * This allow a widget to update a status of a panel.
-   * Example: click on a button -> display the panel
-   *
-   */
-  virtual void		trigger(const t_event &event);
 
 private:
   /**
