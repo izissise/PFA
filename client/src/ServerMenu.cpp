@@ -43,7 +43,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 
   createTabBar(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
-  Panel	*serverPopup = createServerPopup(set, texture, {cont});
+  Panel	*serverPopup = createServerPopup(set, texture, {cont, fav});
   wConnectIp->addObserver(popup);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
@@ -146,9 +146,14 @@ void	ServerMenu::setFavTrigger(Settings &set, const sf::Texture &texture,
   	    panel->setHide(!(panel->isHidden()));
   	  else
 	    panel->setHide(true);
-  	}
-      if (!panel->isHidden()) // the panel get displayed
-  	loadFavServers(set, texture, panel, container);
+	  if (!panel->isHidden()) // load the panel content
+	    loadFavServers(set, texture, panel, container);
+	}
+      if (event.e & wEvent::Reset)
+	{
+	  if (!panel->isHidden()) // refresh the panel content
+	    loadFavServers(set, texture, panel, container);
+	}
     };
   panel->setTrigger(func);
 }
@@ -159,7 +164,13 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
   std::vector<std::string>	content;
   File	file;
 
-  file.readFile(FavFile, content);
+  try
+    {
+      file.readFile(FavFile, content);
+    }
+  catch (const std::invalid_argument &e)
+    { // Do nothing, file just doesnt exist
+    }
   panel->getSubPanels().clear();
   for (const std::string &s : content)
     {
@@ -371,7 +382,7 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
 
   popup->setState(APanelScreen::State::Leader);
   popup->setHide(true);
-  addSpriteForWidget(bgWidget, sf::Color(80, 80, 80, 240), {zone.width - 2, zone.height});
+  addSpriteForWidget(bgWidget, sf::Color(0x11, 0x1E, 0x5E, 240), {zone.width - 2, zone.height});
   bgWidget->setEdge(std::unique_ptr<sf::RectangleShape>
 		    (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
 		    2.f);
@@ -382,6 +393,7 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
   createConnectButton(coButton, texture);
   createAddFavButton(serverIp->getTextContent(), addFav, texture);
   createRemFavButton(serverIp->getTextContent(), remFav, texture);
+  remFav->addObserver(panels.at(1)); // fav Panel
   popup->addObserver({panels.at(0)}); // container
   setServerPopupTrigger(popup);
   caButton->addObserver(popup);
@@ -512,6 +524,7 @@ void	ServerMenu::createRemFavButton(const sf::String &ip, Widget *widget,
 
 		  lwidget.setTextContent("Done");
 		  lwidget.alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
+		  lwidget.notify(wEvent::Reset);
 		}
 	      // lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle | wEvent::Reset));
 	      return 0;
@@ -542,7 +555,12 @@ bool	ServerMenu::addServerToFav(const std::string &ip) const
   File	file;
   std::vector<std::string> content;
 
-  file.readFile(FavFile, content);
+  try
+    {
+      file.readFile(FavFile, content);
+    }
+  catch (const std::invalid_argument &e)
+    {}
   if (std::find(content.begin(), content.end(), ip) != content.end())
     return false;
   content.push_back(ip);
@@ -578,8 +596,8 @@ Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
   Widget	*header = new Widget("header", {zone.left, zone.top,
 					zone.width, 40},
 					sf::Text("Connect to Ip", _font["default"], 20));
-  TextWidget	*input = new TextWidget("ip", {zone.left + 10, zone.top + 50,
-					zone.width - 20, 45},
+  TextWidget	*input = new TextWidget("ip", {zone.left + 10, zone.top + 57,
+					zone.width - 20, 35},
 					sf::Text("", _font["default"], 20),
 					sf::Text("Ip", _font["default"], 20), 30);
   Widget	*caButton = new Widget("ca", {zone.left + 10, zone.top + 110,
@@ -591,7 +609,7 @@ Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
 
   popup->setState(APanelScreen::State::Leader);
   popup->setHide(true);
-  addSpriteForWidget(bgWidget, sf::Color(100, 100, 100, 150), {zone.width, zone.height});
+  addSpriteForWidget(bgWidget, sf::Color(0x11, 0x1E, 0x5E, 240), {zone.width - 4, zone.height});
   bgWidget->setEdge(std::unique_ptr<sf::RectangleShape>
 		    (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
 		    2.f);
@@ -666,8 +684,11 @@ void	ServerMenu::createPopupHeader(Widget *widget)
 {
   sf::FloatRect zone = widget->getZone();
 
-  addSpriteForWidget(widget, sf::Color(50, 30, 60, 255), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(0x91, 0x4D, 0x03, 255), {zone.width, zone.height});
   widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
+  widget->setEdge(std::unique_ptr<sf::RectangleShape>
+	  (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+	  2.f);
 }
 
 void	ServerMenu::createFooter(Widget *footer)
