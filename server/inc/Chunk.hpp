@@ -1,4 +1,3 @@
-
 #ifndef	CHUNK_H
 # define CHUNK_H
 
@@ -133,6 +132,7 @@ private:
   void _choseBiome(Biome * const biome, t_tileType &tile,
 		 int x, int y, int &dist);
   void _completeField(void);
+  void _generateFieldBackground(int x, int y);
   void _generateBackground(unsigned int x, unsigned int y,
 			   float lineY, const t_tileType &tile);
   void _generateOres();

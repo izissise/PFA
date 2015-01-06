@@ -222,6 +222,7 @@ void	Chunk::_choseBiome(Biome * const biome, t_tileType &tile,
 void		Chunk::_generateBackground(unsigned int x, unsigned int y,
 					   float lineY, const t_tileType &tile)
 {
+  return ;
   unsigned int	surfaceY = _pos.y * Chunk::height + lineY;
   unsigned int	scaledY = _pos.y * Chunk::height + y;
   float		ratio = (static_cast<float>(surfaceY - scaledY) / surfaceY);
@@ -243,6 +244,21 @@ void		Chunk::_generateBackground(unsigned int x, unsigned int y,
     }
   else
     _bgTiles[y * Chunk::width + x] = TileType::Ground;
+}
+
+void		Chunk::_generateFieldBackground(int x, int y)
+{
+  float		hVal;
+  float		nVal;
+
+  if (_pos.y > 0)
+    return ;
+  hVal = 0.3f
+    - (static_cast<float>(Chunk::height) - static_cast<float>(y))
+    / (static_cast<float>(Chunk::height) / 1.5f);
+  nVal = ridge(0.3 + hVal / 10.f + fbm_2d(1, 2, 0.5, 0.1, x, y), hVal);
+  if (!(nVal >= 0 && nVal <= 1))
+    _tiles[y * Chunk::width + x] = TileType::Ground;
 }
 
 void		Chunk::_completeField(void)
@@ -309,7 +325,10 @@ void		Chunk::_completeField(void)
 		      if (y + 1 >= lineY)
 			_tiles[y * Chunk::width + x] = tile.surface;
 		      else
-			_tiles[y * Chunk::width + x] = tile.ground;
+			{
+			  _tiles[y * Chunk::width + x] = tile.ground;
+			  _generateFieldBackground(x, y);
+			}
 		    }
 		}
 	    }
