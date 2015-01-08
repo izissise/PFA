@@ -3,7 +3,7 @@
 #include "Perlin.h"
 #include "FastMath.h"
 
-const float World::chunkDist = 3.f;
+const float World::removeDist = 1024.f; // keep X tiles around him
 
 World::World(ServerSettings &cvars) :
   _cvars(cvars)
@@ -101,20 +101,17 @@ float	World::getClosestPlayer(const std::vector<Client *> &clients,
 unsigned int	World::removeUnusedChunks(const std::vector<Client *> &clients)
 {
   unsigned int	counter = 0;
-  float		maxDist;
 
-  maxDist = pointDist(Chunk::width,
-		      Chunk::height)
-    * World::chunkDist;
   _loadedChunks.erase(std::remove_if(_loadedChunks.begin(), _loadedChunks.end(),
 				     [&](Chunk *chunk)
 				     {
 				       Vector2i pos(chunk->getPosition());
 				       bool	removed;
 
-				       removed = (getClosestPlayer(clients,
-								   pos.x * Chunk::width,
-								   pos.y * Chunk::height) >= maxDist);
+				       removed = (getClosestPlayer
+						  (clients,
+						   pos.x * Chunk::width,
+						   pos.y * Chunk::height) >= World::removeDist);
 				       counter += removed;
 				       if (removed)
 					 std::cout << "remove " << pos.x << " " << pos.y << std::endl;
@@ -127,11 +124,6 @@ unsigned int	World::removeUnusedChunks(const Vector2i &entId,
 					  const std::vector<Client *> &clients)
 {
   unsigned int	counter = 0;
-  float		maxDist;
-
-  maxDist = pointDist(Chunk::width,
-		      Chunk::height)
-    * World::chunkDist;
 
   _loadedChunks.erase(std::remove_if(_loadedChunks.begin(), _loadedChunks.end(),
 				     [&](Chunk *chunk)
@@ -146,7 +138,7 @@ unsigned int	World::removeUnusedChunks(const Vector2i &entId,
 									    pos.x * Chunk::width,
 									    pos.y * Chunk::height),
 							   distance);
-				       removed = (distance >= maxDist);
+				       removed = (distance >= World::removeDist);
 				       counter += removed;
 				       if (removed)
 					 std::cout << "remove " << pos.x << " " << pos.y << std::endl;

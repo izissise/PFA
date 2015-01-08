@@ -1,3 +1,4 @@
+#include <functional>
 #include "Player.hpp"
 
 Player::Player(Camera &camera) :
@@ -28,9 +29,14 @@ void	Player::setPlayerPosition(const Vector2i &chunkId,
 				  float rWidth, float rHeight)
 {
   Vector2i	sideSize;
+  std::function<int (int num, int factor)> roundFunc = [](int num, int factor)
+    -> int
+    {
+      return (num == 0 ? 0 : num + factor - 1 - (num - 1) % factor);
+    };
 
-  sideSize.x = 2 + std::ceil(rWidth / Chunk::pWidth);
-  sideSize.y = 2 + std::ceil(rHeight / Chunk::pHeight);
+  sideSize.x = 2 + roundFunc(rWidth / Chunk::pWidth, 2) + 1;
+  sideSize.y = 2 + roundFunc(rHeight / Chunk::pHeight, 2) + 1;
   _camera.move(_camera.sToWPos(chunkId, position));
   calculateVisibleRange();
   _loadedRange =
@@ -38,10 +44,6 @@ void	Player::setPlayerPosition(const Vector2i &chunkId,
       {chunkId.x - (sideSize.x - 1) / 2, chunkId.y - (sideSize.y - 1) / 2},
       {chunkId.x + (sideSize.x - 1) / 2, chunkId.y + (sideSize.y - 1) / 2}
     };
-  std::cout << "Loaded from " << chunkId.x - (sideSize.x - 1) / 2
-	    << " " << chunkId.y - (sideSize.y - 1) / 2 << " To "
-	    << chunkId.x + (sideSize.x - 1) / 2 << " "
-	    << chunkId.y + (sideSize.y - 1) / 2 << std::endl;
   AMovable::setChunkId(chunkId);
   AMovable::setPosition(position);
 }
@@ -64,6 +66,8 @@ const Range2i	&Player::getVisibleRange() const
 void	Player::setLoadedRange(const Range2i &range)
 {
   _loadedRange = range;
+  std::cout << "SetLoaded: " << _loadedRange.left() << " " << _loadedRange.top() << " -> "
+	    << _loadedRange.right() << " " << _loadedRange.bottom() << std::endl;
 }
 
 void	Player::calculateVisibleRange()

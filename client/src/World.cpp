@@ -147,57 +147,26 @@ void		World::_loadChunks(void)
   const Range2i		&visibleRange = _player.getVisibleRange();
   Range2i		&loadedRange = _player.getLoadedRange(); // should be const
   const	Vector2i	plChunkId = _player.getChunkId();
+  Vector2i		sideSize;
+  Vector2i		res(std::stoi(_settings.getCvarList().getCvar("r_width")),
+			    std::stoi(_settings.getCvarList().getCvar("r_height")));
+  std::function<int (int num, int factor)> roundFunc = [](int num, int factor)
+    -> int
+    {
+      return (num == 0 ? 0 : num + factor - 1 - (num - 1) % factor);
+    };
 
+  sideSize.x = 2 + roundFunc(res.x / Chunk::pWidth, 2) + 1;
+  sideSize.y = 2 + roundFunc(res.y / Chunk::pHeight, 2) + 1;
   removeOldChunks();
-  _player.setLoadedRange(Range2i({plChunkId.x - 1, plChunkId.y -1},
-				 {plChunkId.x + 1, plChunkId.y + 1}));
+  _player.setLoadedRange(Range2i({plChunkId.x - (sideSize.x - 1) / 2,
+				plChunkId.y - (sideSize.y - 1) / 2},
+				{plChunkId.x + (sideSize.x - 1) / 2,
+				 plChunkId.y + (sideSize.y - 1) / 2}));
   for (auto cursor : loadedRange) // be aware it has been updated just above
     if (!isChunkLoaded(cursor))
       _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
 }
-
-
-//   Range2i	bufferRange({visibleRange.left() - 1, visibleRange.bottom() - 1},
-// 			    {visibleRange.right() + 1, visibleRange.top() + 1});
-
-
-//   std::vector<Vector2i>	added;
-//   std::vector<Vector2i> removed;
-//   Range2i	intersection =
-//     {
-//       {std::max(bufferRange.left(), loadedRange.left()),
-//        std::max(bufferRange.bottom(), loadedRange.bottom())},
-//       {std::min(bufferRange.right(), loadedRange.right()),
-//        std::min(bufferRange.top(), loadedRange.top())}
-//     };
-//   auto		predicate = [intersection](Vector2i& v) {
-//     return (std::find(intersection.cbegin(), intersection.cend(), v) != intersection.cend());
-//   };
-
-//   added.assign(bufferRange.begin(), bufferRange.end());
-//   removed.assign(loadedRange.cbegin(), loadedRange.cend());
-//   added.erase(std::remove_if(added.begin(), added.end(), predicate), added.end());
-//   removed.erase(std::remove_if(removed.begin(), removed.end(), predicate), removed.end());
-
-//   for (auto cursor : added)
-//     {
-//       if (_chunks.find(cursor) == _chunks.end())
-// 	{
-// 	  std::cout << "Creating chunk at -> " << cursor.x << " " << cursor.y << std::endl;
-// 	  _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
-// 	  // _chunks[cursor]->load(_codex);
-// 	}
-//     }
-//   for (auto cursor : removed)
-//     {
-//       std::cout << "Removing Chunk " << cursor.x << " " << cursor.y << std::endl;
-//       _chunks.erase(cursor);
-//     }
-//   _player.setLoadedRange(bufferRange);
-//   std::cout << "LoadedRange: " << loadedRange.left() << " " << loadedRange.top()
-// 	    << " / " << loadedRange.right() << " " << loadedRange.bottom() << std::endl;
-//   std::cout << "----" << std::endl;
-// }
 
 const Player	&World::getPlayer() const
 {
@@ -215,6 +184,7 @@ bool	World::isChunkLoaded(const Vector2i &chunkPos) const
 
 void			World::removeOldChunks()
 {
+  return ;
   const Vector2i	&chunkPos = _player.getChunkId();
   auto			itr = _chunks.begin();
   unsigned int		radius = 1 + World::cacheSize;
@@ -238,28 +208,22 @@ bool			World::getNewChunks(std::vector<Vector2i> &chunks)
 {
   const Vector2i	&chunkPos = _player.getChunkId();
   Vector2u		sideSize;
+  Vector2i		res(std::stoi(_settings.getCvarList().getCvar("r_width")),
+			    std::stoi(_settings.getCvarList().getCvar("r_height")));
   float			rWidth;
   float			rHeight;
 
-  rWidth = std::stof(_settings.getCvarList().getCvar("r_width"));
-  rHeight = std::stof(_settings.getCvarList().getCvar("r_height"));
-
   std::cout << "Player idpos: " << chunkPos.x << " " << chunkPos.y << std::endl;
   // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
-  sideSize.x = 2 + std::ceil(rWidth / Chunk::pWidth);
-  sideSize.y = 2 + std::ceil(rHeight / Chunk::pHeight);
+  sideSize.x = 2 + std::ceil(res.x / Chunk::pWidth) + 1;
+  sideSize.y = 2 + std::ceil(res.y / Chunk::pHeight) + 1;
 
-  // sideSize.x =  1 + (std::stoi(_settings.getCvarList().getCvar("r_width"))
-  // 		     / Chunk::pWidth * 2) + 2;
-  // sideSize.y = 1 + (std::stoi(_settings.getCvarList().getCvar("r_height"))
-  // 		    / Chunk::pHeight * 2) + 2;
   for (int y = chunkPos.y - (sideSize.y - 1) / 2;
        y <= chunkPos.y + (static_cast<int>(sideSize.y) - 1) / 2; ++y)
     {
       for (int x = chunkPos.x - (sideSize.x - 1) / 2;
   	   x <= chunkPos.x + (static_cast<int>(sideSize.x) - 1) / 2; ++x)
 	{
-	  // std::cout << x << " " << y  << " Loaded-> " << (int)!isChunkLoaded({x, y}) << std::endl;
 	  if (!isChunkLoaded({x, y}))
 	    chunks.push_back({x, y});
 	}

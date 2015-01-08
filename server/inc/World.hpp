@@ -36,7 +36,7 @@ public:
 			  const std::vector<Vector2i> &sizes);
 
 public:
-  static const float	chunkDist;
+  static const float	removeDist;
 
 private:
   void	releaseChunk(int x, int y);

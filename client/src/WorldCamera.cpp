@@ -10,8 +10,8 @@ void Camera::translate(const worldPos& v)
 void Camera::move(const worldPos& pos)
 {
   _center = pos;
-  _botLeft.x = _center.x - _size.w / 2.0f;
-  _botLeft.y = _center.y - _size.h / 2.0f;
+  _botLeft.x = _center.x - _size.w / 2.f;
+  _botLeft.y = _center.y - _size.h / 2.f;
 }
 
 void Camera::scale(const worldPos& s)

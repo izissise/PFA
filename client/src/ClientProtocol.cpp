@@ -102,20 +102,18 @@ void			ClientProtocol::queryInitialChunks()
   Vector2u		sideSize;
   std::vector<Vector2i>	chunks;
   const Player		&player = _world->getPlayer();
-  float			rWidth;
-  float			rHeight;
+  Vector2i		res(std::stoi(_set->getCvarList().getCvar("r_width")),
+			    std::stoi(_set->getCvarList().getCvar("r_height")));
+  std::function<int (int num, int factor)> roundFunc = [](int num, int factor)
+    -> int
+    {
+      return (num == 0 ? 0 : num + factor - 1 - (num - 1) % factor);
+    };
 
-  rWidth = std::stof(_set->getCvarList().getCvar("r_width"));
-  rHeight = std::stof(_set->getCvarList().getCvar("r_height"));
-  // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
   chunkPos = player.getChunkId();
-  sideSize.x = 2 + std::ceil(rWidth / Chunk::pWidth);
-  sideSize.y = 2 + std::ceil(rHeight / Chunk::pHeight);
+  sideSize.x = 2 + roundFunc(res.x / Chunk::pWidth, 2) + 1;
+  sideSize.y = 2 + roundFunc(res.y / Chunk::pHeight, 2) + 1;
 
-  // sideSize.x =  1 + (std::stoi(_set->getCvarList().getCvar("r_width"))
-  // 		     / Chunk::pWidth * 2) + 2;
-  // sideSize.y = 1 + (std::stoi(_set->getCvarList().getCvar("r_height"))
-  // 		    / Chunk::pHeight * 2) + 2;
   std::cout << "Plpos: " << chunkPos.x << " " << chunkPos.y << std::endl;
   std::cout << "W/H: " << sideSize.x  << " " << sideSize.y << std::endl;
   for (int y = chunkPos.y - (sideSize.y - 1) / 2;
@@ -123,10 +121,7 @@ void			ClientProtocol::queryInitialChunks()
     {
       for (int x = chunkPos.x - (sideSize.x - 1) / 2;
   	   x <= chunkPos.x + (static_cast<int>(sideSize.x) - 1) / 2; ++x)
-	{
-	  std::cout << "creating chunks " << x << " " << y << std::endl;
-	  chunks.push_back({x, y});
-	}
+	chunks.push_back({x, y});
     }
   queryChunks(chunks);
 }
