@@ -181,9 +181,15 @@ void	Server::saveClientId(Client *client)
 void		Server::actDisplacement(Client *client, Action act)
 {
   ClientEntity	&clEnt = client->getEntity();
+  Vector2f	ratio = {CHUNKWIDTH / 256.f, CHUNKHEIGHT / 256.f};
+  // to remove, let me maintain the speed
 
-  clEnt.move(Vector2f(act == Action::Left ? -0.01 : act == Action::Right ? 0.01 : 0,
-		      act == Action::Forward ? 0.01 : act == Action::Back ? -0.01 : 0));
+  clEnt.move(Vector2f(act == Action::Left ? -0.01 / ratio.x :
+		      act == Action::Right ? 0.01 / ratio.x :
+		      0,
+		      act == Action::Forward ? 0.01 / ratio.y :
+		      act == Action::Back ? -0.01 / ratio.y :
+		      0));
 
 
   // petite partie en dur :D

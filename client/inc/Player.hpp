@@ -22,7 +22,8 @@ public:
 
   void		setLoadedRange(const Range2i &range);
   void		setPlayerPosition(const Vector2i &chunkId,
-				  const Vector2f &position);
+				  const Vector2f &position,
+				  float rWidth, float rHeight);
 
 private:
   Range2i	_loadedRange;

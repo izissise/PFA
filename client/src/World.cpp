@@ -44,7 +44,9 @@ void		World::setPlayerPosition(const Vector2i &chunkId,
 {
   Range2i	loadedRange;
 
-  _player.setPlayerPosition(chunkId, position);
+  _player.setPlayerPosition(chunkId, position,
+			    std::stof(_settings.getCvarList().getCvar("r_width")),
+			    std::stof(_settings.getCvarList().getCvar("r_height")));
   loadedRange = _player.getLoadedRange();
   for (const auto &cursor : loadedRange)
     {
@@ -61,7 +63,7 @@ void   	World::fillChunkData(const VectorInt &pos,
 
   if (chunk == _chunks.end())
     {
-      std::cout << "Could not find Chunks at pos y: " << pos.y() << " x: " << pos.x() << std::endl;
+      std::cout << "Could not find Chunks at pos " << pos.x() << " " << pos.y() << std::endl;
       return ;
     }
   (chunk->second)->fillTiles(bgTiles, fgTiles);
@@ -69,16 +71,11 @@ void   	World::fillChunkData(const VectorInt &pos,
 
 bool		World::movePlayer(const Vector2f &dir)
 {
-  Range2i	oldRange = _player.getVisibleRange();
-  Range2i	visibleRange;
   bool		retVal;
 
   retVal = _player.move(dir);
-  visibleRange = _player.getVisibleRange();
   if (retVal)
     _loadChunks();
-  // if (visibleRange != oldRange)
-  //   _loadChunks();
   return retVal;
 }
 
@@ -241,13 +238,21 @@ bool			World::getNewChunks(std::vector<Vector2i> &chunks)
 {
   const Vector2i	&chunkPos = _player.getChunkId();
   Vector2u		sideSize;
+  float			rWidth;
+  float			rHeight;
+
+  rWidth = std::stof(_settings.getCvarList().getCvar("r_width"));
+  rHeight = std::stof(_settings.getCvarList().getCvar("r_height"));
 
   std::cout << "Player idpos: " << chunkPos.x << " " << chunkPos.y << std::endl;
   // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
-  sideSize.x =  1 + (std::stoi(_settings.getCvarList().getCvar("r_width"))
-  		     / Chunk::pWidth * 2) + 2;
-  sideSize.y = 1 + (std::stoi(_settings.getCvarList().getCvar("r_height"))
-  		    / Chunk::pHeight * 2) + 2;
+  sideSize.x = 2 + std::ceil(rWidth / Chunk::pWidth);
+  sideSize.y = 2 + std::ceil(rHeight / Chunk::pHeight);
+
+  // sideSize.x =  1 + (std::stoi(_settings.getCvarList().getCvar("r_width"))
+  // 		     / Chunk::pWidth * 2) + 2;
+  // sideSize.y = 1 + (std::stoi(_settings.getCvarList().getCvar("r_height"))
+  // 		    / Chunk::pHeight * 2) + 2;
   for (int y = chunkPos.y - (sideSize.y - 1) / 2;
        y <= chunkPos.y + (static_cast<int>(sideSize.y) - 1) / 2; ++y)
     {

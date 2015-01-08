@@ -9,7 +9,7 @@
 
 # define DEMANGLE_ABI @DEMANGLE_ABI@
 
-# define CHUNKWIDTH 256
+# define CHUNKWIDTH 128
 # define CHUNKHEIGHT 256
 
 #endif

@@ -24,15 +24,24 @@ bool	Player::move(const Vector2f &dir)
 }
 
 void	Player::setPlayerPosition(const Vector2i &chunkId,
-				  const Vector2f &position)
+				  const Vector2f &position,
+				  float rWidth, float rHeight)
 {
+  Vector2i	sideSize;
+
+  sideSize.x = 2 + std::ceil(rWidth / Chunk::pWidth);
+  sideSize.y = 2 + std::ceil(rHeight / Chunk::pHeight);
   _camera.move(_camera.sToWPos(chunkId, position));
   calculateVisibleRange();
   _loadedRange =
     {
-      {chunkId.x - 1, chunkId.y - 1},
-      {chunkId.x + 1, chunkId.y + 1}
+      {chunkId.x - (sideSize.x - 1) / 2, chunkId.y - (sideSize.y - 1) / 2},
+      {chunkId.x + (sideSize.x - 1) / 2, chunkId.y + (sideSize.y - 1) / 2}
     };
+  std::cout << "Loaded from " << chunkId.x - (sideSize.x - 1) / 2
+	    << " " << chunkId.y - (sideSize.y - 1) / 2 << " To "
+	    << chunkId.x + (sideSize.x - 1) / 2 << " "
+	    << chunkId.y + (sideSize.y - 1) / 2 << std::endl;
   AMovable::setChunkId(chunkId);
   AMovable::setPosition(position);
 }
