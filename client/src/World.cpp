@@ -32,10 +32,13 @@ void		World::loadRange()
   Range2i	&loadedRange = _player.getLoadedRange();
 
   std::cout << " -- LoadRange -- " << std::endl;
-  for (auto &cursor : loadedRange)
+  for (auto cursor : loadedRange)
     {
-      std::cout << cursor.x << " " << cursor.y << std::endl;
-      _chunks[cursor]->load(_codex);
+      if (!_chunks[cursor]->isLoaded())
+      	{
+	  std::cout << cursor.x << " " << cursor.y << std::endl;
+	  _chunks[cursor]->load(_codex);
+	}
     }
   std::cout << "-----" << std::endl;
 }
