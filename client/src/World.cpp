@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <ctgmath>
 #include <stdexcept>
+#include <complex>
 
 #include "World.hpp"
 #include "Perlin.h"
@@ -193,8 +194,8 @@ void			World::removeOldChunks()
     {
       const Vector2i &pos = itr->second->getPosition();
       if (itr->second->isGenerated() &&
-	  (std::abs(chunkPos.x - pos.x) > radius ||
-	   std::abs(chunkPos.y - pos.y) > radius))
+	  (static_cast<unsigned int>(std::abs(chunkPos.x - pos.x)) > radius ||
+	   static_cast<unsigned int>(std::abs(chunkPos.y - pos.y)) > radius))
 	{
 	  std::cout << "Removing chunk at pos " << pos.x << " " << pos.y << std::endl;
 	  _chunks.erase(itr++);
@@ -210,13 +211,17 @@ bool			World::getNewChunks(std::vector<Vector2i> &chunks)
   Vector2u		sideSize;
   Vector2i		res(std::stoi(_settings.getCvarList().getCvar("r_width")),
 			    std::stoi(_settings.getCvarList().getCvar("r_height")));
-  float			rWidth;
-  float			rHeight;
+  std::function<int (int num, int factor)> roundFunc = [](int num, int factor)
+    -> int
+    {
+      return (num == 0 ? 0 : num + factor - 1 - (num - 1) % factor);
+    };
+
 
   std::cout << "Player idpos: " << chunkPos.x << " " << chunkPos.y << std::endl;
   // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
-  sideSize.x = 2 + std::ceil(res.x / Chunk::pWidth) + 1;
-  sideSize.y = 2 + std::ceil(res.y / Chunk::pHeight) + 1;
+  sideSize.x = 2 + roundFunc(res.x / Chunk::pWidth, 2) + 1;
+  sideSize.y = 2 + roundFunc(res.y / Chunk::pHeight, 2) + 1;
 
   for (int y = chunkPos.y - (sideSize.y - 1) / 2;
        y <= chunkPos.y + (static_cast<int>(sideSize.y) - 1) / 2; ++y)
