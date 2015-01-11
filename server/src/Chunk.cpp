@@ -246,16 +246,18 @@ void		Chunk::_generateBackground(unsigned int x, unsigned int y,
     _bgTiles[y * Chunk::width + x] = TileType::Ground;
 }
 
-void		Chunk::_generateFieldBackground(int x, int y)
+void		Chunk::_generateFieldBackground(int x, int y, int lineY)
 {
   float		hVal;
   float		nVal;
 
-  if (_pos.y > 0)
-    return ;
-  hVal = 0.3f
-    - (static_cast<float>(Chunk::height) - static_cast<float>(y))
-    / (static_cast<float>(Chunk::height) / 1.5f);
+  if (std::abs(lineY - y) > GROUND_T_HEIGHT)
+    _tiles[y * Chunk::width + x] = TileType::Ground;
+
+  hVal = 0.15f // Adjust the height land padding
+    - static_cast<float>(std::abs(lineY - y))
+       / (static_cast<float>(GROUND_T_HEIGHT) / 1.5f);
+
   nVal = ridge(0.3 + hVal / 10.f + fbm_2d(1, 2, 0.5, 0.1, x, y), hVal);
   if (!(nVal >= 0 && nVal <= 1))
     _tiles[y * Chunk::width + x] = TileType::Ground;
@@ -324,10 +326,10 @@ void		Chunk::_completeField(void)
 		    {
 		      if (y + 1 >= lineY)
 			_tiles[y * Chunk::width + x] = tile.surface;
-		      else
+		      else if (y <= lineY)
 			{
 			  _tiles[y * Chunk::width + x] = tile.ground;
-			  _generateFieldBackground(x, y);
+			  _generateFieldBackground(x, y, lineY);
 			}
 		    }
 		}

@@ -19,14 +19,15 @@
 # define OFFSET 1.02
 # define SCALE 0.025f
 # define MIDDLEHEIGHT 5000
-# define MAXVARIATION 4000.f
-# define MINVARIATION 1000.f
+# define MAXVARIATION 2000.f
+# define MINVARIATION 500.f
 # define ROUGHNESS 0.5f // [0 - 1]
 # define FADEH 600.0f
 # define PSCALE 50.f
 # define HSCALE 15.f
 # define OREDIST 8
-# define SEED 15
+
+# define GROUND_T_HEIGHT 256 // max transition height
 
 enum class	Ore
 {
@@ -132,7 +133,7 @@ private:
   void _choseBiome(Biome * const biome, t_tileType &tile,
 		 int x, int y, int &dist);
   void _completeField(void);
-  void _generateFieldBackground(int x, int y);
+  void _generateFieldBackground(int x, int y, int lineY);
   void _generateBackground(unsigned int x, unsigned int y,
 			   float lineY, const t_tileType &tile);
   void _generateOres();
