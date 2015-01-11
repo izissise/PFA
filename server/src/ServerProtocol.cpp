@@ -67,7 +67,7 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
 
 void	ServerProtocol::handleActions(ClientMessage &message,
 				      Client *client,
-				      const std::vector<Client *> &clients)
+				      const std::vector<Client *> &clients UNUSED)
 {
   const ClientActions	&clientActions = message.actions();
   unsigned int		nbActions = clientActions.actions_size();

@@ -1,6 +1,7 @@
 #include "Cursor.hpp"
 
 Cursor::Cursor(const sf::Text &text, unsigned int blinkTime) :
+  BlinkText(blinkTime),
   _cursor(text)
 {
 }

@@ -43,7 +43,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 
   createTabBar(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
-  Panel	*serverPopup = createServerPopup(set, texture, {cont, fav});
+  createServerPopup(set, texture, {cont, fav});
   wConnectIp->addObserver(popup);
   createFooter(wFooter);
   createButtonBack(wBack, texture);
@@ -53,7 +53,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
   wJoin->addObserver({this, panels[1]});
 
   for (unsigned int i = 0; i < 50; ++i)
-    addServerToList(set, texture, "127.0.0.1", {serv, cont});
+    addServerToList(set, texture, "127.0.0.1:6060", {serv, cont});
 
   _widgets.push_back(wTitle);
   _widgets.push_back(wFooter);
@@ -64,12 +64,12 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-Panel *ServerMenu::createContPanel(Settings &set, const sf::Texture &texture,
+Panel *ServerMenu::createContPanel(Settings &set UNUSED,
+				   const sf::Texture &texture UNUSED,
 				   const std::vector<APanelScreen *> &panels)
 {
   Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
 	_zone.width, _zone.height - 210});
-  sf::FloatRect zone = content->getZone();
   std::function<void (const t_event &event)>	triggerFunc;
 
   triggerFunc = [content](const t_event &event)
@@ -203,7 +203,7 @@ Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
 void	ServerMenu::createPopupControler(Widget *widget,
 					 const std::vector<APanelScreen *> &panels)
 {
-  unsigned int		nbElem = 0;
+  unsigned int		nbElem = panels[0]->getSubPanels().size();
   sf::FloatRect		zone = widget->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateDisplay =
@@ -230,8 +230,6 @@ void	ServerMenu::createPopupControler(Widget *widget,
       return 0;
     };
 
-  for (APanelScreen *pan : panels[0]->getSubPanels()) // the container
-    ++nbElem;
   widget->setUpdate(updateDisplay);
   if (nbElem % 2)
     addSpriteForWidget(widget, sf::Color(100, 100, 100, 255), {zone.width, zone.height});
@@ -335,14 +333,12 @@ void	ServerMenu::addServerToList(Settings &set,
   sf::FloatRect zone = list->getZone();
   sf::FloatRect	widgetZone(zone.left, 0, zone.width - 13, 30);
   // -13 for the scrollbar so it doesnt overlap
-  unsigned int	nbElem = 0;
+  unsigned int	nbElem = list->getSubPanels().size();
 
-  for (APanelScreen *pan : list->getSubPanels())
-    ++nbElem;
   widgetZone.top = zone.top + nbElem * widgetZone.height;
   Panel *pan = createServerPanel(set, texture, {list},
 				 widgetZone,
-				 "127.0.0.1:6060");
+				 ip);
   pan->addObserver({_panels.at(_panels.size() - 1), panels.at(1)}); // serverPopup , contPanel
   list->addPanel(pan);
 }
@@ -805,7 +801,7 @@ void	ServerMenu::createButtonJoin(Widget *widget, const sf::Texture &texture)
   widget->setUpdate(updateFunc);
 }
 
-void	ServerMenu::createTextWidget(TextWidget *wTextWidget, const sf::Texture &texture)
+void	ServerMenu::createTextWidget(TextWidget *wTextWidget, const sf::Texture &texture UNUSED)
 {
   sf::FloatRect	zone = wTextWidget->getZone();
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>

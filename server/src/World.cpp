@@ -18,7 +18,7 @@ Chunk	*World::loadChunk(const std::vector<Client *> &clients, int x, int y)
 
   chunk->load(x, y);
   _loadedChunks.push_back(chunk);
-  // removeUnusedChunks(clients);
+  removeUnusedChunks(clients);
   return chunk;
 }
 

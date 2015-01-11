@@ -13,7 +13,7 @@ BlinkText::~BlinkText()
 
 void	BlinkText::update()
 {
-  if (_time.getElapsedTime().asMilliseconds() > _blinkTime)
+  if (_time.getElapsedTime().asMilliseconds() > static_cast<int>(_blinkTime))
     {
       if (_time.getElapsedTime().asMilliseconds() > 2.0 * _blinkTime)
 	{
