@@ -113,11 +113,15 @@ void		ServerProtocol::generateNewId(std::string &guid)
 int			ServerProtocol::isChunkSpawnable(Chunk *chunk,
 							 const std::vector<Client *> &clients)
 {
+  return 0;
+  std::cout << " --------- " << std::endl;
   for (unsigned int idx = 0; idx < Chunk::lod; ++idx)
     {
       const t_ChunkInfo	&cInfo = chunk->getChunkInfo(idx);
 
-      if (cInfo.avHeight > 0 && cInfo.avHeight < (3 * Chunk::height) / 4)
+      // std::cout << "Height: " << cInfo.avHeight
+      // 		<< " pos: " << chunk->getPosition().x << " " << chunk->getPosition().y << std::endl;
+      if (cInfo.avHeight > 0 && cInfo.avHeight < (3 * Chunk::height * TileCodex::tileSize) / 4)
 	return idx;
     }
   return -1;
@@ -131,7 +135,7 @@ bool		ServerProtocol::placePlayerOnSurface(Chunk *chunk,
   unsigned int	xPad;
   unsigned int	lodSize;
 
-  lodSize = (Chunk::width * Chunk::lineLenght) / Chunk::lod;
+  lodSize = Chunk::width / Chunk::lod;
   xPad = chunkPart * lodSize;
   std::cout << "XPAD: " << xPad << std::endl;
   for (unsigned int pos = xPad; pos < xPad + lodSize; ++pos)
@@ -140,9 +144,11 @@ bool		ServerProtocol::placePlayerOnSurface(Chunk *chunk,
 	continue ;
       for (unsigned int y = Chunk::height - 1; y > 0; --y)
 	{
-	  std::cout << "Chunk Tiles pos " << pos << " " << y << " -> "
-		    << (int)tiles[y * Chunk::width + pos] << " "
-		    << (int)tiles[(y - 1) * Chunk::width + pos] << std::endl;
+	  chunkPos = {0,0};
+	  return true;
+	  // std::cout << "Chunk Tiles pos " << pos << " " << y << " -> "
+	  // 	    << (int)tiles[y * Chunk::width + pos] << " "
+	  // 	    << (int)tiles[(y - 1) * Chunk::width + pos] << std::endl;
 	  if (tiles[y * Chunk::width + pos] == TileType::Empty &&
 	      tiles[(y - 1) * Chunk::width + pos] != TileType::Empty)
 	    {
@@ -158,7 +164,7 @@ void		ServerProtocol::spawnClient(const std::vector<Client *> &clients,
 					    Client *client)
 {
   ClientEntity	&clEnt = client->getEntity();
-  Vector2i	chunkId(0,1);
+  Vector2i	chunkId(0,0);
   Vector2u	plPos;
   Chunk		*chunk;
   int		chunkPart;

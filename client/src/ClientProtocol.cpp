@@ -114,7 +114,8 @@ void			ClientProtocol::queryInitialChunks()
   sideSize.x = 2 + roundFunc(res.x / Chunk::pWidth, 2) + 1;
   sideSize.y = 2 + roundFunc(res.y / Chunk::pHeight, 2) + 1;
 
-  std::cout << "Plpos: " << chunkPos.x << " " << chunkPos.y << std::endl;
+  std::cout << "Plpos: " << chunkPos.x << " " << chunkPos.y
+	    << " | " << player.getPosition().x << " " << player.getPosition().y << std::endl;
   std::cout << "W/H: " << sideSize.x  << " " << sideSize.y << std::endl;
   for (int y = chunkPos.y - (sideSize.y - 1) / 2;
        y <= chunkPos.y + (static_cast<int>(sideSize.y) - 1) / 2; ++y)

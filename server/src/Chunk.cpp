@@ -246,17 +246,17 @@ void		Chunk::_generateBackground(unsigned int x, unsigned int y,
     _bgTiles[y * Chunk::width + x] = TileType::Ground;
 }
 
-void		Chunk::_generateFieldBackground(int x, int y, int lineY)
+void		Chunk::_generateFieldBackground(int x, int y, int distance)
 {
   float		hVal;
   float		nVal;
 
-  if (std::abs(lineY - y) > GROUND_T_HEIGHT)
+  if (distance > GROUND_T_HEIGHT)
     _tiles[y * Chunk::width + x] = TileType::Ground;
 
   hVal = 0.15f // Adjust the height land padding
-    - static_cast<float>(std::abs(lineY - y))
-       / (static_cast<float>(GROUND_T_HEIGHT) / 1.5f);
+    - static_cast<float>(distance)
+    / (static_cast<float>(GROUND_T_HEIGHT) / 1.5f);
 
   nVal = ridge(0.3 + hVal / 10.f + fbm_2d(1, 2, 0.5, 0.1, x, y), hVal);
   if (!(nVal >= 0 && nVal <= 1))
@@ -283,6 +283,9 @@ void		Chunk::_completeField(void)
 
   Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
+  int		realY;
+  float		surfaceDistance;
+
   part = static_cast<float>(Chunk::width) / static_cast<float>(Chunk::lod);
   scaledPosX = _upScaleChunkPos(_pos.x);
 
@@ -302,34 +305,34 @@ void		Chunk::_completeField(void)
       lineY = a * (x + scaledPosX * Chunk::width) + b;
       for (; y < Chunk::height; ++y)
 	{
+	  realY = y + offset.y;
 	  // second condition is to fill the tile if the border's biome are equal
 	  if (biome[0] != biome[1] || (y == 0 && x == 0))
 	    _choseBiome(biome, tile, x, y, changeX);
-	  if (y < prev.y || y < next.y)
+	  if (realY < prev.y || realY < next.y)
 	    {
 	      // if (x == Chunk::width / 2.f && y >= lineY && y - 1 < lineY)
 	      // 	_generateTree(x, y);
-	      if (y < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
+	      if (realY < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
-		  _generateBackground(x, y, lineY, tile);
-		  off = OFFSET + 0.4 - ((fabs(lineY * TileCodex::tileSize
-					      + offset.y * TileCodex::tileSize
-					      - (y + offset.y) * TileCodex::tileSize) >= FADEH) ?
-					(FADEH) :
-					fabs(lineY * TileCodex::tileSize
-					     + offset.y * TileCodex::tileSize
-					     - (y + offset.y) * TileCodex::tileSize)) / FADEH / 2.5;
+		  // _generateBackground(x, y, lineY, tile);
+		  surfaceDistance = lineY - realY;
+		  if (surfaceDistance >= FADEH)
+		    off = 0.f;
+		  else
+		    off = 0.33f - surfaceDistance / FADEH / 3.f;
+		  off += OFFSET;
 		  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, off,
-				x + offset.x, y + offset.y);
+				x + offset.x, realY);
 		  _chunkMap[y * Chunk::width + x] = p;
 		  if (p >= 0.5)
 		    {
-		      if (y + 1 >= lineY)
+		      if (realY + 1 >= lineY)
 			_tiles[y * Chunk::width + x] = tile.surface;
-		      else if (y <= lineY)
+		      else if (realY <= lineY)
 			{
 			  _tiles[y * Chunk::width + x] = tile.ground;
-			  _generateFieldBackground(x, y, lineY);
+			  _generateFieldBackground(x, y, surfaceDistance);
 			}
 		    }
 		}
@@ -380,6 +383,7 @@ void		Chunk::_fillHeightMap()
   unsigned int	offsetX = static_cast<float>(_upScaleChunkPos(_pos.x))
     * static_cast<float>(size) / Chunk::lineLenght;
 
+  std::cout << "---------" << std::endl;
   part = (static_cast<float>(size) / static_cast<float>(Chunk::lineLenght))
     / static_cast<float>(Chunk::lod);
   for (unsigned int i = 0; i < chunkPt; ++i)
@@ -388,16 +392,18 @@ void		Chunk::_fillHeightMap()
       if (id > oldId)
 	{
 	  _info[oldId].avHeight = static_cast<float>(tHeight) / static_cast<float>(pass);
+	  std::cout << _pos.x << " " << _pos.y << " avH: " << _info[oldId].avHeight
+		    << " tH: " << tHeight << " / " << pass << std::endl;
 	  oldId = id;
 	  tHeight = 0;
 	  pass = 0;
 	}
       vertex = _line.getPoint(offsetX + i);
-      tHeight += (vertex.y - MIDDLEHEIGHT
-		  + (Chunk::height * TileCodex::tileSize * _pos.y));
+      tHeight += vertex.y - MIDDLEHEIGHT;
       ++pass;
     }
   _info[oldId].avHeight = static_cast<float>(tHeight) / static_cast<float>(pass);
+  std::cout << _pos.x << " " << _pos.y << " avH: " << _info[oldId].avHeight << std::endl;
 }
 
 void	Chunk::fillChunkInfo()
@@ -450,12 +456,10 @@ void	Chunk::constructLine()
 			 MINVARIATION, MAXVARIATION);
 
   _line.points[0] = Vector2f
-    (0, MIDDLEHEIGHT + leftHeight
-     - (chunkHeight * _pos.y));
+    (0, MIDDLEHEIGHT + leftHeight);
   _line.points[size] = Vector2f
     (Chunk::lineLenght * chunkWidth,
-     MIDDLEHEIGHT + rightHeight
-     - (chunkHeight * _pos.y));
+     MIDDLEHEIGHT + rightHeight);
 
   for (unsigned int i = 0; i < Chunk::iterations; ++i)
     {

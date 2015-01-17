@@ -16,13 +16,13 @@
 
 # define LACUNARITY 2.5f
 # define GAIN 0.6
-# define OFFSET 1.02
+# define OFFSET 1.f
 # define SCALE 0.025f
 # define MIDDLEHEIGHT 5000
 # define MAXVARIATION 2000.f
 # define MINVARIATION 500.f
 # define ROUGHNESS 0.5f // [0 - 1]
-# define FADEH 600.0f
+# define FADEH 75.f // in Tile
 # define PSCALE 50.f
 # define HSCALE 15.f
 # define OREDIST 8
@@ -68,6 +68,8 @@ class Chunk
 public:
   static const int	width = CHUNKWIDTH;
   static const int	height = CHUNKHEIGHT;
+  static const unsigned	pWidth = width * TileCodex::tileSize;
+  static const unsigned pHeight = height * TileCodex::tileSize;
   static const int	octaves = 2;
   static const int	iterations = 8;
   static const unsigned int lod = 4;
@@ -133,7 +135,7 @@ private:
   void _choseBiome(Biome * const biome, t_tileType &tile,
 		 int x, int y, int &dist);
   void _completeField(void);
-  void _generateFieldBackground(int x, int y, int lineY);
+  void _generateFieldBackground(int x, int y, int distance);
   void _generateBackground(unsigned int x, unsigned int y,
 			   float lineY, const t_tileType &tile);
   void _generateOres();
