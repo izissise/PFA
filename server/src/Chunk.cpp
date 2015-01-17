@@ -383,7 +383,6 @@ void		Chunk::_fillHeightMap()
   unsigned int	offsetX = static_cast<float>(_upScaleChunkPos(_pos.x))
     * static_cast<float>(size) / Chunk::lineLenght;
 
-  std::cout << "---------" << std::endl;
   part = (static_cast<float>(size) / static_cast<float>(Chunk::lineLenght))
     / static_cast<float>(Chunk::lod);
   for (unsigned int i = 0; i < chunkPt; ++i)
@@ -392,8 +391,6 @@ void		Chunk::_fillHeightMap()
       if (id > oldId)
 	{
 	  _info[oldId].avHeight = static_cast<float>(tHeight) / static_cast<float>(pass);
-	  std::cout << _pos.x << " " << _pos.y << " avH: " << _info[oldId].avHeight
-		    << " tH: " << tHeight << " / " << pass << std::endl;
 	  oldId = id;
 	  tHeight = 0;
 	  pass = 0;
@@ -403,7 +400,6 @@ void		Chunk::_fillHeightMap()
       ++pass;
     }
   _info[oldId].avHeight = static_cast<float>(tHeight) / static_cast<float>(pass);
-  std::cout << _pos.x << " " << _pos.y << " avH: " << _info[oldId].avHeight << std::endl;
 }
 
 void	Chunk::fillChunkInfo()

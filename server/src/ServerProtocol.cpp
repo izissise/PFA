@@ -113,15 +113,15 @@ void		ServerProtocol::generateNewId(std::string &guid)
 int			ServerProtocol::isChunkSpawnable(Chunk *chunk,
 							 const std::vector<Client *> &clients)
 {
-  return 0;
-  std::cout << " --------- " << std::endl;
+  const Vector2i	&pos = chunk->getPosition();
+
   for (unsigned int idx = 0; idx < Chunk::lod; ++idx)
     {
       const t_ChunkInfo	&cInfo = chunk->getChunkInfo(idx);
+      int		dist = (cInfo.avHeight + MIDDLEHEIGHT)
+	- (pos.y * static_cast<int>(Chunk::pHeight));
 
-      // std::cout << "Height: " << cInfo.avHeight
-      // 		<< " pos: " << chunk->getPosition().x << " " << chunk->getPosition().y << std::endl;
-      if (cInfo.avHeight > 0 && cInfo.avHeight < (3 * Chunk::height * TileCodex::tileSize) / 4)
+      if (dist >= 0 && dist < static_cast<int>(Chunk::pHeight))
 	return idx;
     }
   return -1;
@@ -144,11 +144,6 @@ bool		ServerProtocol::placePlayerOnSurface(Chunk *chunk,
 	continue ;
       for (unsigned int y = Chunk::height - 1; y > 0; --y)
 	{
-	  chunkPos = {0,0};
-	  return true;
-	  // std::cout << "Chunk Tiles pos " << pos << " " << y << " -> "
-	  // 	    << (int)tiles[y * Chunk::width + pos] << " "
-	  // 	    << (int)tiles[(y - 1) * Chunk::width + pos] << std::endl;
 	  if (tiles[y * Chunk::width + pos] == TileType::Empty &&
 	      tiles[(y - 1) * Chunk::width + pos] != TileType::Empty)
 	    {
@@ -158,6 +153,41 @@ bool		ServerProtocol::placePlayerOnSurface(Chunk *chunk,
 	}
     }
   return false;
+}
+
+void		ServerProtocol::moveToSurface(Vector2i &chunkId,
+					      const std::vector<Client *> &clients) const
+{
+  Chunk		*chunk;
+  float		chunkMidDist;
+  int		dist;
+
+  while (true)
+    {
+      if (!_world.isChunkLoaded(chunkId))
+	chunk = _world.loadChunk(chunkId, clients, chunkId);
+      else
+	chunk = _world.getChunk(chunkId);
+      chunkMidDist = 0;
+
+      for (unsigned int idx = 0; idx < Chunk::lod; ++idx)
+	{
+	  const t_ChunkInfo	&cInfo = chunk->getChunkInfo(idx);
+
+	  dist = (cInfo.avHeight + MIDDLEHEIGHT)
+	    - (chunkId.y * static_cast<int>(Chunk::pHeight));
+	  chunkMidDist += dist;
+	  if (dist >= 0 && dist < static_cast<int>(Chunk::pHeight))
+	    return ;
+	}
+      chunkMidDist /= static_cast<float>(Chunk::lod);
+      chunkMidDist /= static_cast<float>(Chunk::pHeight);
+      if (chunkMidDist < 0)
+	chunkMidDist -= 1;
+      chunkMidDist = std::ceil(chunkMidDist);
+      chunkId.y += chunkMidDist;
+      std::cout << chunkId.y << " " << chunkMidDist << std::endl;
+    }
 }
 
 void		ServerProtocol::spawnClient(const std::vector<Client *> &clients,
@@ -175,10 +205,8 @@ void		ServerProtocol::spawnClient(const std::vector<Client *> &clients,
       for (int side = -dist; side <= dist; side += (dist * 2))
 	{
 	  chunkId.x = side;
-	  if (!_world.isChunkLoaded(chunkId))
-	    chunk = _world.loadChunk(chunkId, clients, chunkId);
-	  else
-	    chunk = _world.getChunk(chunkId);
+	  moveToSurface(chunkId, clients);
+	  chunk = _world.getChunk(chunkId);
 	  if ((chunkPart = isChunkSpawnable(chunk, clients)) != -1)
 	    if (placePlayerOnSurface(chunk, chunkPart, plPos) == true)
 	      {

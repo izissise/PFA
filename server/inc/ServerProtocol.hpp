@@ -43,6 +43,8 @@ private:
 			  Client *client, const std::string &userId);
   void	spawnClient(const std::vector<Client *> &clients,
 		    Client *Client);
+  void	moveToSurface(Vector2i &chunkId,
+		      const std::vector<Client *> &clients) const;
   int	isChunkSpawnable(Chunk *chunk,
 			 const std::vector<Client *> &clients);
   bool	placePlayerOnSurface(Chunk *chunk,
