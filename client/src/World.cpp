@@ -142,11 +142,36 @@ void World::_drawChunk(sf::RenderTarget& window,
   }
 }
 
-/*
-** This method probably needs refactoring. It doesn't seem very optimal
-** even though for now it works and that's currently good enough.
-*/
-void		World::_loadChunks(void)
+void		World::_unloadChunks()
+{
+  Range2i	&loadedRange = _player.getLoadedRange();
+  bool		found;
+  auto		it = std::begin(_chunks);
+
+  while (it != std::end(_chunks))
+    {
+      if (it->second->isGenerated() == false)
+	{
+	  ++it;
+	  continue;
+	}
+      found = false;
+      for (auto &cursor : loadedRange)
+	{
+	  if (cursor == it->first)
+	    {
+	      found = true;
+	      break ;
+	    }
+	}
+      if (!found)
+	it = _chunks.erase(it);
+      else
+	++it;
+    }
+}
+
+void		World::_loadChunks()
 {
   const Range2i		&visibleRange = _player.getVisibleRange();
   Range2i		&loadedRange = _player.getLoadedRange(); // should be const
@@ -162,11 +187,11 @@ void		World::_loadChunks(void)
 
   sideSize.x = 2 + roundFunc(res.x / Chunk::pWidth, 2) + 1;
   sideSize.y = 2 + roundFunc(res.y / Chunk::pHeight, 2) + 1;
-  removeOldChunks();
   _player.setLoadedRange(Range2i({plChunkId.x - (sideSize.x - 1) / 2,
 				plChunkId.y - (sideSize.y - 1) / 2},
 				{plChunkId.x + (sideSize.x - 1) / 2,
 				 plChunkId.y + (sideSize.y - 1) / 2}));
+  _unloadChunks();
   for (auto cursor : loadedRange) // be aware it has been updated just above
     if (!isChunkLoaded(cursor))
       _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
@@ -184,28 +209,6 @@ bool	World::isChunkLoaded(const Vector2i &chunkPos) const
   if (it == _chunks.end())
     return false;
   return (it->second->isGenerated() || it->second->isLoaded());
-}
-
-void			World::removeOldChunks()
-{
-  return ;
-  const Vector2i	&chunkPos = _player.getChunkId();
-  auto			itr = _chunks.begin();
-  unsigned int		radius = 1 + World::cacheSize;
-
-  while (itr != _chunks.end())
-    {
-      const Vector2i &pos = itr->second->getPosition();
-      if (itr->second->isGenerated() &&
-	  (static_cast<unsigned int>(std::abs(chunkPos.x - pos.x)) > radius ||
-	   static_cast<unsigned int>(std::abs(chunkPos.y - pos.y)) > radius))
-	{
-	  std::cout << "Removing chunk at pos " << pos.x << " " << pos.y << std::endl;
-	  _chunks.erase(itr++);
-	}
-      else
-	++itr;
-    }
 }
 
 bool			World::getNewChunks(std::vector<Vector2i> &chunks)

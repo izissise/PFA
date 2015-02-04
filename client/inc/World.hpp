@@ -54,7 +54,6 @@ public:
 				      const RepeatedField<uint32> &bgTiles,
 				      const RepeatedField<uint32> &fgTiles);
   bool			getNewChunks(std::vector<Vector2i> &chunks);
-  void			removeOldChunks();
 
 protected:
 private:
@@ -66,7 +65,8 @@ private:
   void		_drawChunk(sf::RenderTarget &window,
 			   const chunkId& cursor,
 			   screenPos& windowCoord) const;
-  void		_loadChunks(void);
+  void		_loadChunks();
+  void		_unloadChunks();
 
 private:
   std::map<chunkId, std::unique_ptr<Chunk>>	_chunks;
