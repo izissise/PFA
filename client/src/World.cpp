@@ -21,28 +21,6 @@ World::World(Settings& settings) :
   _camera.resize(_camera.sToWPos(_screenSize));
 }
 
-void		World::load()
-{
-  loadRange();
-  _loaded = true;
-}
-
-void		World::loadRange()
-{
-  Range2i	&loadedRange = _player.getLoadedRange();
-
-  std::cout << " -- LoadRange -- " << std::endl;
-  for (auto cursor : loadedRange)
-    {
-      if (!_chunks[cursor]->isLoaded())
-      	{
-	  std::cout << cursor.x << " " << cursor.y << std::endl;
-	  _chunks[cursor]->load(_codex);
-	}
-    }
-  std::cout << "-----" << std::endl;
-}
-
 void		World::setPlayerPosition(const Vector2i &chunkId,
 					 const Vector2f &position)
 {
@@ -58,7 +36,6 @@ void		World::setPlayerPosition(const Vector2i &chunkId,
       _chunks[cursor]->setPosition({cursor.x, cursor.y});
     }
 }
-
 void   	World::fillChunkData(const VectorInt &pos,
 			     const RepeatedField<uint32> &bgTiles,
 			     const RepeatedField<uint32> &fgTiles)
@@ -71,6 +48,8 @@ void   	World::fillChunkData(const VectorInt &pos,
       return ;
     }
   (chunk->second)->fillTiles(bgTiles, fgTiles);
+  (chunk->second)->load(_codex);
+  _loaded = true;
 }
 
 bool		World::movePlayer(const Vector2f &dir)

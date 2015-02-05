@@ -35,7 +35,11 @@ void  ClientProtocol::parseCmd(const void *data, int size)
 
       if (it != _func.end())
 	{
-	  (this->*(it->second))(packet);
+	  if (act == ProtocolMessage::CHUNK)
+	    _threadPool.addTask([&, packet, it]()
+				{ (this->*(it->second))(packet); });
+	  else
+	    (this->*(it->second))(packet);
 	}
     }
   else
@@ -155,7 +159,7 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
   const FullChunk	&fullChunk = packet.fullchunk();
   unsigned int		nbChunk = fullChunk.chunkdata_size();
 
-  std::cout << "FullChunk packet -> " << nbChunk << std::endl;
+  std::cout << "FullChunk packet -> " << nbChunk << " sizeof: " << sizeof(FullChunk) << std::endl;
   //  _world->removeOldChunks();
   for (unsigned int i = 0; i < nbChunk; ++i)
     {
@@ -166,10 +170,6 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
 
       _world->fillChunkData(chunkId, bgTiles, fgTiles);
     }
-  if (!_world->isLoaded())
-    _world->load();
-  else
-    _world->loadRange();
 }
 
 void			ClientProtocol::getNewChunks()
