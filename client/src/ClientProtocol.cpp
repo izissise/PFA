@@ -128,7 +128,10 @@ void			ClientProtocol::queryInitialChunks()
   	   x <= chunkPos.x + (static_cast<int>(sideSize.x) - 1) / 2; ++x)
 	chunks.push_back({x, y});
     }
-  queryChunks(chunks);
+  _threadPool.addTask([this, chunks]()
+		      {
+			queryChunks(chunks);
+		      });
 }
 
 void			ClientProtocol::queryChunks(const std::vector<Vector2i> &chunkIds) const
@@ -177,7 +180,10 @@ void			ClientProtocol::getNewChunks()
   std::vector<Vector2i>	chunks;
 
   if (_world->getNewChunks(chunks))
-    queryChunks(chunks);
+      _threadPool.addTask([this, chunks]()
+			  {
+			    queryChunks(chunks);
+			  });
 }
 
 void	ClientProtocol::handleDisplacements(const ProtocolMessage &packet)
