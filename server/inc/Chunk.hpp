@@ -133,8 +133,12 @@ private:
   void _fillVertex(Vector2f &prev, Vector2f &next, int x);
   void _getBiomeTile(Biome biome, t_tileType &tile);
   void _choseBiome(Biome * const biome, t_tileType &tile,
-		 int x, int y, int &dist);
+		   int x, int y, int &dist);
   void _completeField(void);
+  void _fillSurface(const Vector2f &offset,
+		    float lineY, int realY,
+		    const t_tileType &tile,
+		    unsigned int x, unsigned int y);
   void _generateFieldBackground(int x, int y, int distance);
   void _generateBackground(unsigned int x, unsigned int y,
 			   float lineY, const t_tileType &tile);

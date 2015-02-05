@@ -263,14 +263,43 @@ void		Chunk::_generateFieldBackground(int x, int y, int distance)
     _tiles[y * Chunk::width + x] = TileType::Ground;
 }
 
+void		Chunk::_fillSurface(const Vector2f &offset,
+				    float lineY, int realY,
+				    const t_tileType &tile,
+				    unsigned int x, unsigned int y)
+{
+  float		off;
+  float		surfaceDistance;
+  float		p;
+
+  // _generateBackground(x, y, lineY, tile);
+  surfaceDistance = lineY - realY;
+  if (surfaceDistance >= FADEH)
+    off = 0.f;
+  else
+    off = 0.33f - surfaceDistance / FADEH / 3.f;
+  off += OFFSET;
+  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, off,
+		static_cast<int>(x) + offset.x, realY);
+  _chunkMap[y * Chunk::width + x] = p;
+  if (p >= 0.5)
+    {
+      if (realY + 1 >= lineY)
+	_tiles[y * Chunk::width + x] = tile.surface;
+      else if (realY <= lineY)
+	{
+	  _tiles[y * Chunk::width + x] = tile.ground;
+	  _generateFieldBackground(x, y, surfaceDistance);
+	}
+    }
+}
+
 void		Chunk::_completeField(void)
 {
   Vector2f	prev;
   Vector2f	next;
   float		a;
   float		b;
-  float		p;
-  float		off;
 
   float		lineY;
   t_tileType	tile;
@@ -279,12 +308,11 @@ void		Chunk::_completeField(void)
   unsigned int	scaledPosX;
   Biome		biome[2];
   int		changeX = 0;
-  float		y = 0;
+  unsigned int	y = 0;
 
   Vector2f	offset = {static_cast<float>(Chunk::width) * _pos.x,
 			  static_cast<float>(Chunk::height) * _pos.y};
   int		realY;
-  float		surfaceDistance;
 
   part = static_cast<float>(Chunk::width) / static_cast<float>(Chunk::lod);
   scaledPosX = _upScaleChunkPos(_pos.x);
@@ -305,7 +333,7 @@ void		Chunk::_completeField(void)
       lineY = a * (x + scaledPosX * Chunk::width) + b;
       for (; y < Chunk::height; ++y)
 	{
-	  realY = y + offset.y;
+	  realY = static_cast<float>(y) + offset.y;
 	  // second condition is to fill the tile if the border's biome are equal
 	  if (biome[0] != biome[1] || (y == 0 && x == 0))
 	    _choseBiome(biome, tile, x, y, changeX);
@@ -315,26 +343,7 @@ void		Chunk::_completeField(void)
 	      // 	_generateTree(x, y);
 	      if (realY < lineY && _tiles[y * Chunk::width + x] == TileType::Empty)
 		{
-		  // _generateBackground(x, y, lineY, tile);
-		  surfaceDistance = lineY - realY;
-		  if (surfaceDistance >= FADEH)
-		    off = 0.f;
-		  else
-		    off = 0.33f - surfaceDistance / FADEH / 3.f;
-		  off += OFFSET;
-		  p = ridged_mf(Chunk::octaves, LACUNARITY, GAIN, SCALE, off,
-				x + offset.x, realY);
-		  _chunkMap[y * Chunk::width + x] = p;
-		  if (p >= 0.5)
-		    {
-		      if (realY + 1 >= lineY)
-			_tiles[y * Chunk::width + x] = tile.surface;
-		      else if (realY <= lineY)
-			{
-			  _tiles[y * Chunk::width + x] = tile.ground;
-			  _generateFieldBackground(x, y, surfaceDistance);
-			}
-		    }
+		  _fillSurface(offset, lineY, realY, tile, x, y);
 		}
 	    }
 	}
