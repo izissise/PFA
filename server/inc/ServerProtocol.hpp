@@ -9,6 +9,7 @@
 #include "Client.hpp"
 #include "Unused.hpp"
 #include "ActionEnum.hpp"
+#include "ThreadPool.hpp"
 
 #define LOGFILE "../log/ClientInfo.txt"
 
@@ -17,7 +18,7 @@ using namespace google::protobuf;
 class ServerProtocol
 {
 public:
-  ServerProtocol(World &world);
+  ServerProtocol(World &world, ThreadPool &threadPool);
   ~ServerProtocol();
 
   void  parseCmd(const void *data, int size,
@@ -25,17 +26,17 @@ public:
 		 const std::vector<Client *> &clients);
 
 private:
-  typedef void (ServerProtocol::*parseFunc)(ClientMessage &message,
+  typedef void (ServerProtocol::*parseFunc)(const ClientMessage &message,
 					    Client *client,
 					    const std::vector<Client *> &clients);
 
-  void  handleConnection(ClientMessage &message,
+  void  handleConnection(const ClientMessage &message,
 			 Client *client,
 			 const std::vector<Client *> &clients);
-  void	handleActions(ClientMessage &message,
+  void	handleActions(const ClientMessage &message,
 		      Client *client,
 		      const std::vector<Client *> &clients);
-  void	queryChunks(ClientMessage &message,
+  void	queryChunks(const ClientMessage &message,
 		    Client *client,
 		    const std::vector<Client *> &clients);
   void	spawnClient(const std::vector<Client *> &clients,
@@ -47,6 +48,7 @@ private:
 
   std::map<ClientMessage::PacketContent, parseFunc> _func;
   World		&_world;
+  ThreadPool	&_threadPool;
 };
 
 #endif

@@ -4,8 +4,8 @@
 #include "GuidGenerator.hpp"
 #include "Spawner.hpp"
 
-ServerProtocol::ServerProtocol(World &world) :
-  _world(world)
+ServerProtocol::ServerProtocol(World &world, ThreadPool &threadPool) :
+  _world(world), _threadPool(threadPool)
 {
   _func[ClientMessage::CONNECTION] = &ServerProtocol::handleConnection;
   _func[ClientMessage::ACTION] = &ServerProtocol::handleActions;
@@ -28,13 +28,22 @@ void	ServerProtocol::parseCmd(const void *data, int size,
     auto it = _func.find(act);
 
     if (it != _func.end())
-      (this->*(it->second))(packet, client, clients);
+      {
+	std::cout << (int)act << std::endl;
+	if (act == ClientMessage::QUERYCHUNK)
+	  _threadPool.addTask([this, &clients, packet, client]()
+			      {
+				queryChunks(packet, client, clients);
+			      });
+	else
+	  (this->*(it->second))(packet, client, clients);
+      }
   }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;
 }
 
-void  ServerProtocol::handleConnection(ClientMessage &message,
+void  ServerProtocol::handleConnection(const ClientMessage &message,
 				       Client *client,
 				       const std::vector<Client *> &clients)
 {
@@ -66,7 +75,7 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
   sendClientProfile(client, newId);
 }
 
-void	ServerProtocol::handleActions(ClientMessage &message,
+void	ServerProtocol::handleActions(const ClientMessage &message,
 				      Client *client,
 				      const std::vector<Client *> &clients UNUSED)
 {
@@ -81,7 +90,7 @@ void	ServerProtocol::handleActions(ClientMessage &message,
     }
 }
 
-void	ServerProtocol::queryChunks(ClientMessage &message,
+void	ServerProtocol::queryChunks(const ClientMessage &message,
 				    Client *client,
 				    const std::vector<Client *> &clients)
 {
@@ -101,7 +110,7 @@ void	ServerProtocol::queryChunks(ClientMessage &message,
       newChunks.emplace(newChunks.begin() + idx, pos);
       ++idx;
     }
-  client->sendPacket(0, _world.serialize(newChunks));
+  client->sendPacket(2, _world.serialize(newChunks)); // send on 2 because it's a huge transfer
 }
 
 void		ServerProtocol::generateNewId(std::string &guid)

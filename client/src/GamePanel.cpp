@@ -127,7 +127,7 @@ void	GamePanel::trigger(const t_event &event)
 	  std::cout << "GamePanel trigger " <<  ip.substr(0, pos) << ":"
 		    << ip.substr(pos + 1) << std::endl;
 	  _adjustedNet = false;
-	  _socket.connect(ip.substr(0, pos), ip.substr(pos + 1), 2);
+	  _socket.connect(ip.substr(0, pos), ip.substr(pos + 1), 3);
 	}
       catch (NetworkException &e)
 	{
@@ -199,6 +199,7 @@ int		GamePanel::updateNetwork(Settings &set)
 
 void	GamePanel::handlePackets(ENetEvent &event)
 {
+  std::cout << "packet received on channel " << (int)event.channelID << std::endl;
   _proto.parseCmd(event.packet->data, event.packet->dataLength);
   enet_packet_destroy(event.packet);
 }

@@ -7,14 +7,16 @@
 
 Server::Server(t_arg &arg)
   : _arg(arg), _set(),
-    _world(_set), _proto(_world), _clients()
+    _threadPool(200),
+    _world(_set), _proto(_world, _threadPool),
+    _clients()
 {
   if (enet_initialize() != 0)
     throw (NetworkException("An error occurred while initializing ENet."));
 
   _address.host = ENET_HOST_ANY;
   _address.port = _arg.port;
-  _server = enet_host_create(&_address, 128, 2, 0, 0);
+  _server = enet_host_create(&_address, 128, 3, 0, 0);
 
   if (_server == NULL)
     throw (NetworkException("An error occurred while trying to create an ENet server host."));
@@ -64,15 +66,17 @@ void	Server::handlePackets(ENetEvent &event)
   Client	*client = static_cast<Client *>(peer->data);
   ENetPacket	*packet = event.packet;
 
-  std::cout << "A packet of length "
-	    << packet->dataLength << " containing ["
-	    << packet->data
-	    << "] was received from "
-	    << peer->data
-	    << " user id -> "
-	    << peer->connectID
-	    << " on channel "
-	    << (int)event.channelID << std::endl;
+  // std::cout << "A packet of length "
+  // 	    << packet->dataLength << " containing ["
+  // 	    << packet->data
+  // 	    << "] was received from "
+  // 	    << peer->data
+  // 	    << " user id -> "
+  // 	    << peer->connectID
+  // 	    << " on channel "
+  // 	    << (int)event.channelID << std::endl;
+  // if ((int)event.channelID == 2)
+  //   std::cout << std::endl << std::endl;
   _proto.parseCmd(packet->data, packet->dataLength, client, _clients);
   enet_packet_destroy(packet);
 }

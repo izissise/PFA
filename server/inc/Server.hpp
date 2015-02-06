@@ -10,6 +10,7 @@
 # include "Observer.hpp"
 # include "ServerSettings.hpp"
 # include "ServerProtocol.hpp"
+# include "ThreadPool.hpp"
 
 #define DEFAULT_PORT 6060
 
@@ -45,11 +46,12 @@ private:
 private:
   t_arg			_arg;
   ServerSettings	_set;
+  ThreadPool		_threadPool;
   ENetAddress		_address;
   ENetHost*		_server;
   World			_world;
   ServerProtocol	_proto;
-  std::vector<Client *>		_clients;
+  std::vector<Client *>	_clients;
 };
 
 #endif

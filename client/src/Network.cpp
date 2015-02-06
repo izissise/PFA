@@ -25,7 +25,7 @@ void	Network::connect(const std::string &address, const std::string &port, int n
     throw NetworkException("An error occurred while trying to create an ENet client host.");
   enet_address_set_host(&addr, address.c_str());
   ss >> addr.port;
-  _peer = enet_host_connect(_host, &addr, 2, 0);
+  _peer = enet_host_connect(_host, &addr, nbChannel, 0);
   if (_peer == NULL)
     throw NetworkException("No available peers for initiating an ENet connection.");
 }
