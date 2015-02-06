@@ -199,7 +199,6 @@ int		GamePanel::updateNetwork(Settings &set)
 
 void	GamePanel::handlePackets(ENetEvent &event)
 {
-  std::cout << "packet received on channel " << (int)event.channelID << std::endl;
   _proto.parseCmd(event.packet->data, event.packet->dataLength);
   enet_packet_destroy(event.packet);
 }
