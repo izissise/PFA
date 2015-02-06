@@ -21,7 +21,7 @@ void	Network::connect(const std::string &address, const std::string &port, int n
   if (_host || _peer)
     disconnect();
 
-  if ((_host = enet_host_create(NULL, 1, nbChannel, 57600 / 8, 14400 / 8)) == NULL)
+  if ((_host = enet_host_create(NULL, 1, nbChannel, 0, 0)) == NULL)
     throw NetworkException("An error occurred while trying to create an ENet client host.");
   enet_address_set_host(&addr, address.c_str());
   ss >> addr.port;
@@ -54,4 +54,10 @@ int	Network::pollEvent(ENetEvent *event, int timeout)
   if (_host && _peer)
     return (enet_host_service(_host, event, timeout));
   return (-1);
+}
+
+void	Network::adjustNetworkSettings(enet_uint32 incomingBandwidth,
+				       enet_uint32 outgoingBandwidth)
+{
+  enet_host_bandwidth_limit(_host, incomingBandwidth, outgoingBandwidth);
 }

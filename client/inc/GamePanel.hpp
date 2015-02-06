@@ -29,12 +29,10 @@ private:
   void		createButton(const sf::Texture &texture, Widget *w);
   void		createVoiceButton(const sf::Texture &texture, Widget *w,
 				  Controls &controls, int idx);
-  void		constructLine();
-  void		completeField(sf::RenderWindow &window);
-  void		fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
   void		drawHud(sf::RenderTarget &window, bool toWin);
   int		updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 
+  void		adjustNetworkSettings(Settings &set);
   int		updateNetwork(Settings &set);
   void		handlePackets(ENetEvent &event);
   void		connectClient(ENetPeer * const peer, Settings &set);
@@ -52,6 +50,7 @@ private:
   Network		_socket;
   ClientProtocol	_proto;
   ActionAnalyzer	_actAnalyzer;
+  bool			_adjustedNet;
 };
 
 #endif /* _GAMEPANEL_H_ */

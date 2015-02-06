@@ -17,7 +17,8 @@ public:
   void	disconnect();
   void	sendPacket(enet_uint8 chan, const std::string &message) const;
   int	pollEvent(ENetEvent *event, int timeout);
-
+  void	adjustNetworkSettings(enet_uint32 incomingBandwidth,
+			      enet_uint32 outgoingBandwidth);
 private:
   ENetHost	*_host;
   ENetPeer	*_peer;

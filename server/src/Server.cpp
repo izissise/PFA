@@ -14,7 +14,7 @@ Server::Server(t_arg &arg)
 
   _address.host = ENET_HOST_ANY;
   _address.port = _arg.port;
-  _server = enet_host_create(&_address, 128, 2, 10, 10);
+  _server = enet_host_create(&_address, 128, 2, 0, 0);
 
   if (_server == NULL)
     throw (NetworkException("An error occurred while trying to create an ENet server host."));

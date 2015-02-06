@@ -162,7 +162,6 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
   const FullChunk	&fullChunk = packet.fullchunk();
   unsigned int		nbChunk = fullChunk.chunkdata_size();
 
-  std::cout << "FullChunk packet -> " << nbChunk << " sizeof: " << sizeof(FullChunk) << std::endl;
   //  _world->removeOldChunks();
   for (unsigned int i = 0; i < nbChunk; ++i)
     {

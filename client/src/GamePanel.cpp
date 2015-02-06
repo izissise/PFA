@@ -8,7 +8,7 @@ GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
   _oldY(SHEIGHT), _dir(true),  _threadPool(15),
   _world(nullptr), _socket(), _proto(_socket, _threadPool),
-  _actAnalyzer()
+  _actAnalyzer(), _adjustedNet(false)
 {
   addFont("default", "../client/assets/default.TTF");
   setHide(true);
@@ -126,6 +126,7 @@ void	GamePanel::trigger(const t_event &event)
 
 	  std::cout << "GamePanel trigger " <<  ip.substr(0, pos) << ":"
 		    << ip.substr(pos + 1) << std::endl;
+	  _adjustedNet = false;
 	  _socket.connect(ip.substr(0, pos), ip.substr(pos + 1), 2);
 	}
       catch (NetworkException &e)
@@ -154,6 +155,16 @@ int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings
 	return retVal;
     }
   return 0;
+}
+
+void		GamePanel::adjustNetworkSettings(Settings &set)
+{
+  const CvarList	&cvars = set.getCvarList();
+  unsigned int		upBandwidth = std::stoul(cvars.getCvar("net_upBandwidth"));
+  unsigned int		downBandwidth = std::stoul(cvars.getCvar("net_downBandwidth"));
+
+  _socket.adjustNetworkSettings(downBandwidth, upBandwidth);
+  _adjustedNet = true;
 }
 
 int		GamePanel::updateNetwork(Settings &set)
@@ -239,6 +250,8 @@ int		GamePanel::update(const sf::Event &event,
 {
   int		retVal;
 
+  if (_adjustedNet == false)
+    adjustNetworkSettings(set);
   updateNetwork(set);
   if (_actAnalyzer.getInputChanges(set))
     {
