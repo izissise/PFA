@@ -18,45 +18,25 @@ ServerMenu::~ServerMenu()
 void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels)
 {
-  Widget	*wFooter = new Widget("Footer", {_zone.left, _zone.height - 70, _zone.width, 70},
-				      sf::Text());
-  Widget	*wBack = new Widget("Back", {_zone.left + 10, _zone.height - 57,
-					(_zone.width - 60) / 3, 44},
-					sf::Text("Back to Menu", _font["default"], 20));
-  Widget	*wConnectIp = new Widget("cIp", {_zone.left + 10 + (_zone.width - 60) / 3 + 20,
-	_zone.height - 57, (_zone.width - 60) / 3, 44},
-    sf::Text("Connect to Ip", _font["default"], 20));
-  Widget	*wJoin = new Widget("join", {_zone.left + 10 +  2 * ((_zone.width - 60) / 3 + 20),
-	_zone.height - 57, (_zone.width - 60) / 3, 44},
-    sf::Text("Join Server", _font["default"], 20));
-
-  createHeader(set, texture, {});
-
   Panel *cont = createContPanel(set, texture, {panels.at(1)}); // pass the gamepanel
   Panel *serv = createServListPanel(set, texture, {cont});
   Panel *fav = createFavPanel(set, texture, {cont});
+  Widget	*bgWidget = new Widget("bg", _zone, sf::Text(), wFlag::None);
   cont->addPanel({serv, fav});
   cont->construct(texture, set, {});
   addPanel(cont);
 
+  addSpriteForWidget(bgWidget, sf::Color(39, 43, 42, 255), {_zone.width, _zone.height});
   createTabBar(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
+  createHeader(set, texture, {panels[0], popup});
+  createListHeader(set, texture, {cont});
   createServerPopup(set, texture, {cont, fav});
-  wConnectIp->addObserver(popup);
-  createFooter(wFooter);
-  createButtonBack(wBack, texture);
-  createButtonCip(wConnectIp, texture);
-  createButtonJoin(wJoin, texture);
-  wBack->addObserver({this, panels[0]});
-  wJoin->addObserver({this, panels[1]});
 
   for (unsigned int i = 0; i < 50; ++i)
     addServerToList(set, texture, "127.0.0.1:6060", {serv, cont});
 
-  _widgets.push_back(wFooter);
-  _widgets.push_back(wBack);
-  _widgets.push_back(wConnectIp);
-  _widgets.push_back(wJoin);
+  _widgets.push_back(bgWidget);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
@@ -123,21 +103,49 @@ void	ServerMenu::createHeader(Settings &set UNUSED,
 				     sf::Text("Server List", _font["default"], 30));
   Widget	*wHome = new Widget("home", {0,0,0,0}, // will be cropped
 				     sf::Text("Home", _font["default"], 30));
+  Widget	*wConnectIp = new Widget("cIp",
+					 sf::FloatRect(0,0,0,0),
+					 sf::Text("Ip", _font["default"], 30));
 
   addSpriteForWidget(wBg, sf::Color(27, 32, 26, 255), {zone.width, zone.height});
   createTitle(wTitle, zone);
   createHome(wHome, zone);
-  header->addWidget({wBg, wHome, wTitle});
+  createIp(wConnectIp, zone);
+  wHome->addObserver({this, panels[0]});
+  wConnectIp->addObserver(panels[1]); // popup
+  header->addWidget({wBg, wHome, wTitle, wConnectIp});
   header->construct(texture, set, {});
   addPanel(header);
+}
+
+void	ServerMenu::createListHeader(Settings &set, const sf::Texture &texture,
+				     const std::vector<APanelScreen *> &panels)
+{
+  const sf::FloatRect	&listZone = panels[0]->getZone();
+  Panel		*cont = new Panel(sf::FloatRect(listZone.left + listZone.width / 4.f,
+						listZone.top - 43,
+						listZone.width / 2.f, 40));
+  const sf::FloatRect	&zone = cont->getZone();
+  Widget	*wBg = new Widget("", zone);
+  Widget	*wServ = new Widget("", zone, sf::Text("server name", _font["default"], 20));
+  Widget	*wPl = new Widget("", zone, sf::Text("players", _font["default"], 20));
+  Widget	*wPing = new Widget("", zone, sf::Text("ping", _font["default"], 20));
+
+  addSpriteForWidget(wBg, sf::Color(42, 46, 45, 255), {zone.width, zone.height});
+  wServ->alignText({zone.left,zone.top}, {zone.width, zone.height}, 30, 50);
+  wPl->alignText({zone.left,zone.top}, {zone.width, zone.height}, 70, 50);
+  wPing->alignText({zone.left,zone.top}, {zone.width, zone.height}, 90, 50);
+  cont->addWidget({wBg, wServ, wPl, wPing});
+  cont->construct(texture, set, {});
+  addPanel(cont);
 }
 
 Panel *ServerMenu::createContPanel(Settings &set UNUSED,
 				   const sf::Texture &texture UNUSED,
 				   const std::vector<APanelScreen *> &panels)
 {
-  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 80,
-	_zone.width, _zone.height - 150});
+  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
+	_zone.width, _zone.height - 190});
   std::function<void (const t_event &event)>	triggerFunc;
 
   triggerFunc = [content](const t_event &event)
@@ -158,7 +166,6 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
 {
   sf::FloatRect	zone = panels[0]->getZone(); // cont's zone
   Panel		*content = new Panel(zone);
-  Widget	*bgWidget = new Widget("bg", zone, sf::Text(), wFlag::None);
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
 					    sf::FloatRect(zone.left + zone.width * 3.f / 4.f + 8,
 							  zone.top, 16, zone.height),
@@ -168,8 +175,7 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
   content->setDisplayFlag(APanelScreen::Display::Overlap);
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
-  addSpriteForWidget(bgWidget, sf::Color(39, 43, 42, 255), {zone.width, zone.height});
-  content->addWidget({bgWidget, wScroll});
+  content->addWidget({wScroll});
   content->construct(texture, set, {});
   return content;
 }
@@ -181,7 +187,6 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 {
   sf::FloatRect	zone = panels[0]->getZone();
   Panel		*content = new Panel(zone);
-  Widget	*bgWidget = new Widget("bg", zone, sf::Text(), wFlag::None);
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
 					    sf::FloatRect(zone.left + zone.width * 3.f / 4.f + 8,
 							  zone.top, 16, zone.height),
@@ -193,8 +198,7 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
 
-  addSpriteForWidget(bgWidget, sf::Color(39, 43, 42, 255), {zone.width, zone.height});
-  content->addWidget({bgWidget, wScroll});
+  content->addWidget({wScroll});
   content->construct(texture, set, {});
   content->setHide(true);
   return content;
@@ -300,7 +304,7 @@ void	ServerMenu::createPopupControler(Widget *widget,
   widget->setUpdate(updateDisplay);
   widget->setEdge(sf::Vector2f(zone.width, zone.height), 3.f,
 		  sf::Color(46, 50, 49, 255));
-  addSpriteForWidget(widget, sf::Color(58, 62, 61, 255), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(59, 63, 62, 255), {zone.width, zone.height});
   addSpriteForWidget(widget, sf::Color(91, 111, 58, 255), {zone.width, zone.height});
   widget->setSpriteAttr(1, false);
 }
@@ -367,15 +371,15 @@ void	ServerMenu::trigger(const t_event &event)
 void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
 				 const std::vector<APanelScreen *> &panels)
 {
-  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 100,
-	_zone.width, 40});
+  Panel	*content = new Panel(sf::FloatRect{_zone.left + 100, _zone.top + 140,
+	150, 2 * 40});
   sf::FloatRect	zone = content->getZone();
   TabWidget	*tabServer = new TabWidget("bg", {zone.left, zone.top,
-					150, zone.height},
+					150, 40},
 				sf::Text("Server List", _font["default"], 20),
 				panels[0]);
-  TabWidget	*tabFav = new TabWidget("bg", {zone.left + 150, zone.top,
-					150, zone.height},
+  TabWidget	*tabFav = new TabWidget("bg", {zone.left, zone.top + 1 * 40,
+					150, 40},
 				sf::Text("Favorite List", _font["default"], 20),
 				panels[1]);
 
@@ -750,12 +754,15 @@ void	ServerMenu::createHome(Widget *widget, const sf::FloatRect &zone)
       isOver = lwidget.isOver(ref);
       if (isOver)
 	{
-	  lwidget.setColor(sf::Color(240, 234, 221, 255));
 	  if (lwidget.isClicked(event, sf::Mouse::Left))
 	    {
+	      // so we don't se the flickering when getting back to the menu
+	      lwidget.setColor(sf::Color(83, 85, 82, 255));
 	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
 	      return 0;
 	    }
+	  else
+	    lwidget.setColor(sf::Color(240, 234, 221, 255));
 	}
       else
 	lwidget.setColor(sf::Color(83, 85, 82, 255));
@@ -764,6 +771,38 @@ void	ServerMenu::createHome(Widget *widget, const sf::FloatRect &zone)
   widget->setUpdate(updateFunc);
   widget->crop();
   widget->setPosition({zone.left, zone.top}, {zone.width, zone.height}, 33, 45);
+  widget->setColor(sf::Color(83, 85, 82, 255));
+}
+
+void	ServerMenu::createIp(Widget *widget, const sf::FloatRect &zone)
+{
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      lwidget.setColor(sf::Color(83, 85, 82, 255));
+	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
+	      return 1;
+	    }
+	  else
+	    lwidget.setColor(sf::Color(240, 234, 221, 255));
+	}
+      else
+	lwidget.setColor(sf::Color(83, 85, 82, 255));
+      return 0;
+    };
+  widget->setUpdate(updateFunc);
+  widget->crop();
+  widget->setPosition({zone.left, zone.top}, {zone.width, zone.height}, 66, 45);
   widget->setColor(sf::Color(83, 85, 82, 255));
 }
 
@@ -777,20 +816,12 @@ void	ServerMenu::createPopupHeader(Widget *widget)
 		  2.f);
 }
 
-void	ServerMenu::createFooter(Widget *footer)
-{
-  sf::FloatRect zone = footer->getZone();
-
-  addSpriteForWidget(footer, sf::Color(50, 30, 60, 255), {zone.width, zone.height});
-  footer->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
-}
-
 void	ServerMenu::createTabButton(TabWidget *widget)
 {
   sf::FloatRect	zone = widget->getZone();
 
-  addSpriteForWidget(widget, sf::Color(100, 100, 100, 100), {zone.width, zone.height});
-  addSpriteForWidget(widget, sf::Color(100, 100, 100, 200), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(59, 63, 62, 255), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(91, 111, 58, 255), {zone.width, zone.height});
   widget->setSpriteAttr(1, false);
   widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
 }
@@ -806,88 +837,6 @@ void	ServerMenu::createButtonStyle(Widget *widget, const sf::Texture &texture)
   widget->setSpriteSize(1, zone.width, zone.height);
   widget->setEdge(sf::Vector2f(zone.width, zone.height),
 		  2.f);
-}
-
-void	ServerMenu::createButtonBack(Widget *widget, const sf::Texture &texture)
-{
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-    updateFunc;
-
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
-    -> int
-    {
-      bool	isOver;
-
-      isOver = lwidget.isOver(ref);
-      lwidget.setSpriteAttr(0, !isOver);
-      lwidget.setSpriteAttr(1, isOver);
-      if (isOver)
-	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
-	    {
-	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
-	      return 0;
-	    }
-	}
-      return 0;
-    };
-  createButtonStyle(widget, texture);
-  widget->setUpdate(updateFunc);
-}
-
-void	ServerMenu::createButtonCip(Widget *widget, const sf::Texture &texture)
-{
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-    updateFunc;
-
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
-    -> int
-    {
-      bool	isOver;
-
-      isOver = lwidget.isOver(ref);
-      lwidget.setSpriteAttr(0, !isOver);
-      lwidget.setSpriteAttr(1, isOver);
-      if (isOver)
-	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
-	    {
-	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
-	      return 1;
-	    }
-	}
-      return 0;
-    };
-  createButtonStyle(widget, texture);
-  widget->setUpdate(updateFunc);
-}
-
-void	ServerMenu::createButtonJoin(Widget *widget, const sf::Texture &texture)
-{
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-    updateFunc;
-
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
-    -> int
-    {
-      bool	isOver;
-
-      isOver = lwidget.isOver(ref);
-      lwidget.setSpriteAttr(0, !isOver);
-      lwidget.setSpriteAttr(1, isOver);
-      if (isOver)
-	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
-	    {
-	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
-	      return 0;
-	    }
-	}
-      return 0;
-    };
-  // set a trigger so everyone can observ him and send him the ip
-  createButtonStyle(widget, texture);
-  widget->setUpdate(updateFunc);
 }
 
 void	ServerMenu::createTextWidget(TextWidget *wTextWidget, const sf::Texture &texture UNUSED)

@@ -27,8 +27,10 @@ private:
 			     const std::vector<APanelScreen *> &panels);
   void		createTitle(Widget *title, const sf::FloatRect &zone);
   void		createHome(Widget *home, const sf::FloatRect &zone);
+  void		createIp(Widget *widget, const sf::FloatRect &zone);
+  void		createListHeader(Settings &set, const sf::Texture &texture,
+				 const std::vector<APanelScreen *> &panels);
   void		createPopupHeader(Widget *widget);
-  void		createFooter(Widget *footer);
   Panel		*createContPanel(Settings &set, const sf::Texture &texture,
 				 const std::vector<APanelScreen *> &panels);
   Panel		*createServListPanel(Settings &set, const sf::Texture &texture,
@@ -60,9 +62,6 @@ private:
 				const std::vector<APanelScreen *> &panels);
   void		createTabButton(TabWidget *widget);
   void		createButtonStyle(Widget *widget, const sf::Texture &texture);
-  void		createButtonBack(Widget *widget, const sf::Texture &texture);
-  void		createButtonJoin(Widget *widget, const sf::Texture &texture);
-  void		createButtonCip(Widget *widget, const sf::Texture &texture);
   void		createTextWidget(TextWidget *widget, const sf::Texture &texture);
   void		createCancelButton(Widget *widget, const sf::Texture &texture);
   void		createConnectButton(Widget *widget, const sf::Texture &texture);
