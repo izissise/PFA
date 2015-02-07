@@ -15,12 +15,18 @@ public:
   ServerMenu(const sf::FloatRect &zone);
   virtual ~ServerMenu();
 
+  int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
   void		trigger(const t_event &event);
 
 private:
-  void		createTitle(Widget *title);
+  int		updateView(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  void		updateContent();
+  void		createHeader(Settings &set, const sf::Texture &texture,
+			     const std::vector<APanelScreen *> &panels);
+  void		createTitle(Widget *title, const sf::FloatRect &zone);
+  void		createHome(Widget *home, const sf::FloatRect &zone);
   void		createPopupHeader(Widget *widget);
   void		createFooter(Widget *footer);
   Panel		*createContPanel(Settings &set, const sf::Texture &texture,
@@ -67,6 +73,9 @@ private:
   void		createScrollBar(ScrollWidget *widget, const sf::Texture &texture);
   void		setPopupTrigger(Panel *panel);
   void		setServerPopupTrigger(Panel *panel);
+
+private:
+  unsigned int	_frameCount;
 };
 
 #endif /* _SERVERMENU_H_ */

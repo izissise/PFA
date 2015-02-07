@@ -133,6 +133,9 @@ public:
    */
   void		alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
 			  float xPercent, float yPercent);
+
+  void		setPosition(const sf::Vector2f &pos, const sf::Vector2f &size,
+			    float xPercent, float yPercent);
   /**
    * \fn void alignTextLeft(const sf::Vector2f &pos, const sf::Vector2f &size, float xPercent, float yPercent);
    * \brief Align Text from it's top / left corner
@@ -262,6 +265,7 @@ public:
    * This method will set the widget's size to pX, pY
    */
   virtual void		setSize(float pX, float pY);
+  void			crop();
 
   /**
    * \fn void setSpriteSize(unsigned int spritePos, float pX, float pY)

@@ -66,6 +66,13 @@ void	AWidget::alignTextLeft(const sf::Vector2f &pos, const sf::Vector2f &size,
   _text.setPosition(npos.x, npos.y);
 }
 
+void	AWidget::setPosition(const sf::Vector2f &pos, const sf::Vector2f &size,
+			     float xPercent, float yPercent)
+{
+  move(pos.x + size.x * xPercent / 100.f - _zone.left - _zone.width / 2.f,
+       pos.y + size.y * yPercent / 100.f - _zone.top - _zone.height / 2.f);
+}
+
 void	AWidget::setTextPosition(int x, int y)
 {
   _text.setPosition(x, y);
@@ -217,6 +224,30 @@ void	AWidget::resize(float pX, float pY)
       elem.sprite.scale(pX, pY);
     }
   _text.scale(pX, pY);
+}
+
+void		AWidget::crop()
+{
+  sf::Vector2f	tl(0,0);
+  sf::Vector2f	br(0,0);
+
+  for (auto &elem: _sprites)
+    {
+      const sf::Sprite &sprite = elem.sprite;
+      const sf::FloatRect &spriteBounds = sprite.getGlobalBounds();
+
+      tl.y = std::min(tl.y, spriteBounds.top);
+      tl.x = std::min(tl.x, spriteBounds.left);
+      br.y = std::max(br.y, spriteBounds.top + spriteBounds.height);
+      br.x = std::max(br.x, spriteBounds.left + spriteBounds.width);
+    }
+  const sf::FloatRect &textBounds = _text.getGlobalBounds();
+
+  tl.y = std::min(tl.y, textBounds.top);
+  tl.x = std::min(tl.x, textBounds.left);
+  br.y = std::max(br.y, textBounds.top + textBounds.height);
+  br.x = std::max(br.x, textBounds.left + textBounds.width);
+  _zone = sf::FloatRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
 }
 
 void		AWidget::setSize(float pX, float pY)
