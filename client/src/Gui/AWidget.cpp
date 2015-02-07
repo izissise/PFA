@@ -243,9 +243,9 @@ void		AWidget::crop()
     }
   const sf::FloatRect &textBounds = _text.getGlobalBounds();
 
-  tl.y = std::min(tl.y, textBounds.top);
+  tl.y = std::min(tl.y, textBounds.top + 5);
   tl.x = std::min(tl.x, textBounds.left);
-  br.y = std::max(br.y, textBounds.top + textBounds.height);
+  br.y = std::max(br.y, textBounds.top + 5 + textBounds.height);
   br.x = std::max(br.x, textBounds.left + textBounds.width);
   _zone = sf::FloatRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
 }
