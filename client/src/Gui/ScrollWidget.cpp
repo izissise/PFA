@@ -281,7 +281,7 @@ void	ScrollWidget::setAutoHide(bool state)
   _autoHide = state;
 }
 
-void	ScrollWidget::draw(sf::RenderTexture &window) const
+void	ScrollWidget::draw(sf::RenderTarget &window) const
 {
   sf::FloatRect	barZone = getSpriteAttr(0).sprite.getGlobalBounds();
   sf::FloatRect	picZone = getSpriteAttr(1).sprite.getGlobalBounds();

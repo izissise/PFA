@@ -18,7 +18,7 @@ ServerMenu::~ServerMenu()
 void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels)
 {
-  Widget	*wTitle = new Widget("title", {_zone.left, _zone.top, _zone.width, 140},
+  Widget	*wTitle = new Widget("title", {_zone.left, _zone.top, _zone.width, 80},
 				     sf::Text("Server List", _font["default"], 40));
   Widget	*wFooter = new Widget("Footer", {_zone.left, _zone.height - 70, _zone.width, 70},
 				      sf::Text());
@@ -68,8 +68,8 @@ Panel *ServerMenu::createContPanel(Settings &set UNUSED,
 				   const sf::Texture &texture UNUSED,
 				   const std::vector<APanelScreen *> &panels)
 {
-  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
-	_zone.width, _zone.height - 210});
+  Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 80,
+	_zone.width, _zone.height - 150});
   std::function<void (const t_event &event)>	triggerFunc;
 
   triggerFunc = [content](const t_event &event)
@@ -90,18 +90,17 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
 {
   sf::FloatRect	zone = panels[0]->getZone();
   Panel		*content = new Panel(zone);
-  Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
-				zone.width, zone.height}, sf::Text());
+  Widget	*bgWidget = new Widget("bg", zone, sf::Text(), wFlag::None);
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
-					    {zone.left + zone.width - 15, zone.top, 16, zone.height},
+					    sf::FloatRect(zone.left + zone.width * 3.f / 4.f + 8,
+							  zone.top, 16, zone.height),
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
 
   content->setDisplayFlag(APanelScreen::Display::Overlap);
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
-
-  addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
+  addSpriteForWidget(bgWidget, sf::Color(39, 43, 42, 255), {zone.width, zone.height});
   content->addWidget({bgWidget, wScroll});
   content->construct(texture, set, {});
   return content;
@@ -114,10 +113,10 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 {
   sf::FloatRect	zone = panels[0]->getZone();
   Panel		*content = new Panel(zone);
-  Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
-				zone.width, zone.height}, sf::Text());
+  Widget	*bgWidget = new Widget("bg", zone, sf::Text(), wFlag::None);
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
-					    {zone.left + zone.width - 13, zone.top, 13, zone.height},
+					    sf::FloatRect(zone.left + zone.width * 3.f / 4.f + 8,
+							  zone.top, 16, zone.height),
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
 
@@ -126,7 +125,7 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
 
-  addSpriteForWidget(bgWidget, sf::Color(200, 200, 200, 255), {zone.width, zone.height});
+  addSpriteForWidget(bgWidget, sf::Color(39, 43, 42, 255), {zone.width, zone.height});
   content->addWidget({bgWidget, wScroll});
   content->construct(texture, set, {});
   content->setHide(true);
@@ -330,7 +329,7 @@ void	ServerMenu::addServerToList(Settings &set,
 {
   APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
-  sf::FloatRect	widgetZone(zone.left + zone.width / 6, 0, zone.width * 4.f / 6.f, 60);
+  sf::FloatRect	widgetZone(zone.left + zone.width / 4, 0, zone.width * 1.f / 2.f, 60);
   unsigned int	nbElem = list->getSubPanels().size();
 
   widgetZone.top = zone.top + nbElem * widgetZone.height + 3;
@@ -668,8 +667,8 @@ void	ServerMenu::createTitle(Widget *title)
 {
   sf::FloatRect zone = title->getZone();
 
-  addSpriteForWidget(title, sf::Color(50, 30, 60, 255), {zone.width, zone.height});
-  title->alignText({zone.left, zone.top}, {zone.width, 100}, 50, 50);
+  addSpriteForWidget(title, sf::Color(27, 32, 26, 255), {zone.width, zone.height});
+  title->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
 }
 
 void	ServerMenu::createPopupHeader(Widget *widget)
@@ -882,4 +881,5 @@ void	ServerMenu::createScrollBar(ScrollWidget *widget, const sf::Texture &textur
   // widget->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
   // widget->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
   widget->toSize(0, 16, zone.height);
+  widget->setAutoHide(true);
 }

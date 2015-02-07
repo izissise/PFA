@@ -27,7 +27,7 @@ public:
 	       wFlag flg = wFlag::Movable | wFlag::Resizable);
 
   int   update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
-  void	draw(sf::RenderTexture &window) const;
+  void	draw(sf::RenderTarget &window) const;
   bool	isOver(const sf::RenderWindow &ref) const;
   void	addSprite(t_sprite &elem);
   void	addSprite(const sf::Texture &texture, const sf::IntRect &rect,
