@@ -146,8 +146,7 @@ void	MainMenu::createButtonStyle(Widget *widget)
   addSpriteForWidget(widget, sf::Color(0x70, 0x6F, 0x6F, 150), {zone.width, zone.height});
   addSpriteForWidget(widget, sf::Color(0x83, 0x7e, 0xa7, 150), {zone.width, zone.height});
   widget->alignText({zone.left,zone.top}, {zone.width, zone.height}, 50, 50);
-  widget->setEdge(std::unique_ptr<sf::RectangleShape>
-		 (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+  widget->setEdge(sf::Vector2f(zone.width, zone.height),
 		 3.f);
   widget->getEdge()->setOutlineColor(sf::Color(0x18, 0x18, 0x1A, 255));
 }

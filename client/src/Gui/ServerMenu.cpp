@@ -93,7 +93,7 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
   Widget	*bgWidget = new Widget("bg", {zone.left, zone.top,
 				zone.width, zone.height}, sf::Text());
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
-					    {zone.left + zone.width - 13, zone.top, 13, zone.height},
+					    {zone.left + zone.width - 15, zone.top, 16, zone.height},
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
 
@@ -231,11 +231,10 @@ void	ServerMenu::createPopupControler(Widget *widget,
     };
 
   widget->setUpdate(updateDisplay);
-  if (nbElem % 2)
-    addSpriteForWidget(widget, sf::Color(100, 100, 100, 255), {zone.width, zone.height});
-  else
-    addSpriteForWidget(widget, sf::Color(130, 130, 130, 255), {zone.width, zone.height});
-  addSpriteForWidget(widget, sf::Color(0x40, 0x6F, 0x39, 255), {zone.width, zone.height});
+  widget->setEdge(sf::Vector2f(zone.width, zone.height), 3.f,
+		  sf::Color(46, 50, 49, 255));
+  addSpriteForWidget(widget, sf::Color(58, 62, 61, 255), {zone.width, zone.height});
+  addSpriteForWidget(widget, sf::Color(91, 111, 58, 255), {zone.width, zone.height});
   widget->setSpriteAttr(1, false);
 }
 
@@ -331,11 +330,10 @@ void	ServerMenu::addServerToList(Settings &set,
 {
   APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
-  sf::FloatRect	widgetZone(zone.left, 0, zone.width - 13, 30);
-  // -13 for the scrollbar so it doesnt overlap
+  sf::FloatRect	widgetZone(zone.left + zone.width / 6, 0, zone.width * 4.f / 6.f, 60);
   unsigned int	nbElem = list->getSubPanels().size();
 
-  widgetZone.top = zone.top + nbElem * widgetZone.height;
+  widgetZone.top = zone.top + nbElem * widgetZone.height + 3;
   Panel *pan = createServerPanel(set, texture, {list},
 				 widgetZone,
 				 ip);
@@ -379,8 +377,7 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
   popup->setState(APanelScreen::State::Leader);
   popup->setHide(true);
   addSpriteForWidget(bgWidget, sf::Color(0x11, 0x1E, 0x5E, 240), {zone.width - 2, zone.height});
-  bgWidget->setEdge(std::unique_ptr<sf::RectangleShape>
-		    (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+  bgWidget->setEdge(sf::Vector2f(zone.width, zone.height),
 		    2.f);
   createServerPopupText(serverName);
   createServerPopupText(serverIp);
@@ -606,8 +603,7 @@ Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
   popup->setState(APanelScreen::State::Leader);
   popup->setHide(true);
   addSpriteForWidget(bgWidget, sf::Color(0x11, 0x1E, 0x5E, 240), {zone.width - 4, zone.height});
-  bgWidget->setEdge(std::unique_ptr<sf::RectangleShape>
-		    (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+  bgWidget->setEdge(sf::Vector2f(zone.width, zone.height),
 		    2.f);
   createPopupHeader(header);
   createCancelButton(caButton, texture);
@@ -682,9 +678,8 @@ void	ServerMenu::createPopupHeader(Widget *widget)
 
   addSpriteForWidget(widget, sf::Color(0x91, 0x4D, 0x03, 255), {zone.width, zone.height});
   widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
-  widget->setEdge(std::unique_ptr<sf::RectangleShape>
-	  (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
-	  2.f);
+  widget->setEdge(sf::Vector2f(zone.width, zone.height),
+		  2.f);
 }
 
 void	ServerMenu::createFooter(Widget *footer)
@@ -714,8 +709,7 @@ void	ServerMenu::createButtonStyle(Widget *widget, const sf::Texture &texture)
   widget->addSprite(texture, sf::IntRect(265, 1085, 250, 50), false);
   widget->setSpriteSize(0, zone.width, zone.height);
   widget->setSpriteSize(1, zone.width, zone.height);
-  widget->setEdge(std::unique_ptr<sf::RectangleShape>
-		  (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+  widget->setEdge(sf::Vector2f(zone.width, zone.height),
 		  2.f);
 }
 
@@ -820,8 +814,7 @@ void	ServerMenu::createTextWidget(TextWidget *wTextWidget, const sf::Texture &te
   wTextWidget->setColor(sf::Color(0,0,0));
   wTextWidget->setDefaultColor(sf::Color(60,60,60));
   wTextWidget->getCursor().setColor(sf::Color(0,0,0));
-  wTextWidget->setEdge(std::unique_ptr<sf::RectangleShape>
-		       (new sf::RectangleShape(sf::Vector2f(zone.width, zone.height))),
+  wTextWidget->setEdge(sf::Vector2f(zone.width, zone.height),
 		       2.f);
 }
 
@@ -883,8 +876,10 @@ void	ServerMenu::createScrollBar(ScrollWidget *widget, const sf::Texture &textur
 {
   sf::FloatRect zone = widget->getZone();
 
-  widget->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
-  widget->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
-  widget->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
-  widget->toSize(0, 13, zone.height);
+  addSpriteForWidget(widget, sf::Color(200, 200, 200, 0), {16, zone.height});
+  addSpriteForWidget(widget, sf::Color(100, 100, 100, 255), {16, zone.height});
+  // widget->addSprite(texture, sf::IntRect(1012, 1085, 13, 13));
+  // widget->addSprite(texture, sf::IntRect(1025, 1085, 13, 13));
+  // widget->addSprite(texture, sf::IntRect(1038, 1085, 13, 13));
+  widget->toSize(0, 16, zone.height);
 }

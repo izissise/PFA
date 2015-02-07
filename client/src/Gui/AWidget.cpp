@@ -114,12 +114,17 @@ void		AWidget::setTrigger(const std::function
   _event = func;
 }
 
-void		AWidget::setEdge(std::unique_ptr<sf::RectangleShape> edgeShape,
+void		AWidget::setEdge(const sf::Vector2f &size,
 				 float thickness,
 				 const sf::Color &outColor)
 {
-  _edge = std::move(edgeShape);
-  _edge->setPosition(_zone.left, _zone.top);
+  sf::FloatRect	zone = sf::FloatRect(_zone.left + thickness, _zone.top + thickness,
+				     size.x, size.y);
+
+  _edge = std::unique_ptr<sf::RectangleShape>(new sf::RectangleShape
+					      (sf::Vector2f(zone.width - 2.f * thickness,
+							    zone.height - 2.f * thickness)));
+  _edge->setPosition(_zone.left + thickness, _zone.top + thickness);
   _edge->setFillColor(sf::Color(127,127,127,0));
   _edge->setOutlineColor(outColor);
   _edge->setOutlineThickness(thickness);
@@ -190,8 +195,10 @@ void	AWidget::scale(const sf::Vector2f &size)
   _text.setPosition(textPos);
   if (_edge)
     {
-      _edge->setSize({_zone.width, _zone.height});
-      _edge->setPosition({_zone.left, _zone.top});
+      const sf::FloatRect &edgeRect = _edge->getGlobalBounds();
+
+      _edge->setSize({edgeRect.width * ratioX, edgeRect.height * ratioY});
+      _edge->setPosition({edgeRect.left * ratioX, edgeRect.top * ratioY});
       thickness = _edge->getOutlineThickness()
       	* (pointDistf(ratioX, ratioY) / pointDistf(1, 1));
       thickness = std::round(thickness);
@@ -247,6 +254,8 @@ void	AWidget::move(float pX, float pY)
       spritePos.y += pY;
       elem.sprite.setPosition(spritePos);
     }
+  if (_edge)
+    _edge->move(pX, pY);
   textPos.x += pX;
   textPos.y += pY;
   _text.setPosition(textPos);

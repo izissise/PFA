@@ -10,16 +10,17 @@ ServerInfoPanel::ServerInfoPanel(const sf::FloatRect &zone,
 void	ServerInfoPanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSED,
 				   const std::vector<APanelScreen *> &panels UNUSED)
 {
-  Widget	*wName = new Widget("Name", {_zone.left, _zone.top, 25.f * _zone.width / 100.f, 30},
+  Widget	*wName = new Widget("Name", {_zone.left, _zone.top,
+						25.f * _zone.width / 100.f, _zone.height},
 				    sf::Text("Server's Name", _font["default"], 20));
   Widget	*wCountry = new Widget("Country", {_zone.left + 25.f * _zone.width / 100.f, _zone.top,
-						5.f * _zone.width / 100.f, 30},
+						5.f * _zone.width / 100.f, _zone.height},
 						sf::Text("NA", _font["default"], 20));
   Widget	*wPlayers = new Widget("Players", {_zone.left + 30.f * _zone.width / 100.f, _zone.top,
-					10.f * _zone.width / 100.f, 30},
+					10.f * _zone.width / 100.f, _zone.height},
 					sf::Text("nb/max", _font["default"], 20));
   Widget	*wPing = new Widget("Ping", {_zone.left + 40.f * _zone.width / 100.f, _zone.top,
-					10.f * _zone.width / 100.f, 30},
+					10.f * _zone.width / 100.f, _zone.height},
 					sf::Text("nb ms", _font["default"], 20));
 
   createNameWidget(wName);

@@ -238,7 +238,7 @@ public:
    * This method will resize all the widget's attributes
    */
 
-  void		setEdge(std::unique_ptr<sf::RectangleShape> edgeShape,
+  void		setEdge(const sf::Vector2f &size,
 			float thickness, const sf::Color &outColor = {0,0,0,255});
   sf::Shape	*getEdge();
 
