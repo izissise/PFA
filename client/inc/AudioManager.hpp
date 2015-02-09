@@ -3,11 +3,13 @@
 
 #include <SFML/Audio.hpp>
 #include "RessourceManager.hpp"
+#include "Singleton.hpp"
 
 template <typename T = sf::SoundBuffer>
-class AutioManager : public RessourceManager<T>
+class AudioManager : public RessourceManager<T>, public Singleton< AudioManager<T> >
 {
 public:
+  virtual ~AudioManager() = default;
   std::shared_ptr<T>	load(const std::string &path,
 			     const std::string &name)
   {
@@ -16,7 +18,7 @@ public:
 
     if (!soundBuf->loadFromFile(fullPath))
       throw (std::runtime_error("Can't load Audio file " + fullPath));
-    addObject(name, soundBuf);
+    this->addObject(name, soundBuf);
     return soundBuf;
   }
 
