@@ -3,11 +3,13 @@
 
 #include <SFML/Graphics.hpp>
 #include "RessourceManager.hpp"
+#include "Singleton.hpp"
 
 template <typename T = sf::Texture>
-class TextureManager : public RessourceManager<T>
+class TextureManager : public RessourceManager<T>, public Singleton< TextureManager<T> >
 {
 public:
+  virtual ~TextureManager() = default;
   std::shared_ptr<T>	load(const std::string &path,
 			     const std::string &name)
   {
@@ -16,7 +18,7 @@ public:
 
     if (!texture->loadFromFile(fullPath))
       throw (std::runtime_error("Can't load texture " + fullPath));
-    addObject(name, texture);
+    this->addObject(name, texture);
     return texture;
   }
 

@@ -9,11 +9,11 @@ template <typename T>
 class RessourceManager
 {
 public:
-  typedef std::map <std::string, std::shared_ptr<T>>	ResourceMap;
+  typedef std::map <std::string, std::shared_ptr<T> >	ResourceMap;
 
 public:
   RessourceManager() = default;
-  virtual ~RessourceManager();
+  virtual ~RessourceManager() = default;
 
   virtual std::shared_ptr<T>	load(const std::string &path, const std::string &name) = 0;
   virtual void			free(const std::string &) = 0;
