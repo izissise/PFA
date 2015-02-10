@@ -156,22 +156,15 @@ void			ClientProtocol::queryChunks(const std::vector<Vector2i> &chunkIds) const
 
 void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
 {
-  if (!packet.has_fullchunk())
+  if (!packet.has_chunkdata())
     return ;
 
-  const FullChunk	&fullChunk = packet.fullchunk();
-  unsigned int		nbChunk = fullChunk.chunkdata_size();
+  const ChunkData	&chunk = packet.chunkdata();
+  const VectorInt	&chunkId = chunk.id();
+  const RepeatedField<uint32> &bgTiles = chunk.bgtiles();
+  const RepeatedField<uint32> &fgTiles = chunk.fgtiles();
 
-  //  _world->removeOldChunks();
-  for (unsigned int i = 0; i < nbChunk; ++i)
-    {
-      const ChunkData	&chunk = fullChunk.chunkdata(i);
-      const VectorInt	&chunkId = chunk.id();
-      const RepeatedField<uint32> &bgTiles = chunk.bgtiles();
-      const RepeatedField<uint32> &fgTiles = chunk.fgtiles();
-
-      _world->fillChunkData(chunkId, bgTiles, fgTiles);
-    }
+  _world->fillChunkData(chunkId, bgTiles, fgTiles);
 }
 
 void			ClientProtocol::getNewChunks()

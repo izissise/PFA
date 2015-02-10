@@ -110,7 +110,8 @@ void	ServerProtocol::queryChunks(const ClientMessage &message,
       newChunks.emplace(newChunks.begin() + idx, pos);
       ++idx;
     }
-  client->sendPacket(2, _world.serialize(newChunks)); // send on 2 because it's a huge transfer
+  for (auto &chunkId : newChunks)
+    client->sendPacket(2, _world.serialize(chunkId)); // send on 2 because it's a huge transfer
 }
 
 void		ServerProtocol::generateNewId(std::string &guid)
