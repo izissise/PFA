@@ -1,6 +1,6 @@
 import "SettingMessage.proto";
 import "InitClient.proto";
-import "FullChunk.proto";
+import "ChunkData.proto";
 import "ChunkZone.proto";
 import "Displacement.proto";
 
@@ -17,7 +17,7 @@ message ProtocolMessage {
   required PacketContent content = 1;
   optional SettingMessage settings = 2;
   optional InitClient clInit = 3;
-  optional FullChunk fullChunk = 4;
+  optional ChunkData chunkData = 4;
   optional WorldZone worldZone = 5;
   optional Displacement displacement = 6;
 }
