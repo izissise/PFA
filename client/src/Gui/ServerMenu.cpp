@@ -5,7 +5,7 @@
 #include "File.hpp"
 
 ServerMenu::ServerMenu(const sf::FloatRect &zone) :
-  APanelScreen(zone), _frameCount(0)
+  APanelScreen(zone), _update(true)
 {
   addFont("default", "../client/assets/default.TTF");
   _hide = true;
@@ -82,13 +82,12 @@ void	ServerMenu::updateContent()
 
 int	ServerMenu::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
 {
-  if (_frameCount == 20)
+  if (_update)
     {
       updateContent();
-      _frameCount = 0;
+      _update = false;
       return updateView(event, ref, set);
     }
-  ++_frameCount;
   return updateView(event, ref, set);
 }
 
@@ -301,7 +300,6 @@ void	ServerMenu::createPopupControler(Widget *widget,
       return 0;
     };
 
-  widget->setUpdate(updateDisplay);
   widget->setEdge(sf::Vector2f(zone.width, zone.height), 3.f,
 		  sf::Color(46, 50, 49, 255));
   addSpriteForWidget(widget, sf::Color(59, 63, 62, 255), {zone.width, zone.height});
@@ -405,10 +403,12 @@ void	ServerMenu::addServerToList(Settings &set,
   unsigned int	nbElem = list->getSubPanels().size();
 
   widgetZone.top = zone.top + nbElem * widgetZone.height + 3;
-  Panel *pan = createServerPanel(set, texture, {list},
-				 widgetZone,
-				 ip);
-  pan->addObserver({_panels.at(_panels.size() - 1), panels.at(1)}); // serverPopup , contPanel
+  ServerItem *pan = new ServerItem(widgetZone);
+  pan->construct(texture, set, {});
+  // Panel *pan = createServerPanel(set, texture, {list},
+  // 				 widgetZone,
+  // 				 ip);
+  // pan->addObserver({_panels.at(_panels.size() - 1), panels.at(1)}); // serverPopup , contPanel
   list->addPanel(pan);
 }
 
