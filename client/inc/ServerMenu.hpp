@@ -6,6 +6,7 @@
 #include "TextWidget.hpp"
 #include "TabWidget.hpp"
 #include "ScrollWidget.hpp"
+#include "ServerItem.hpp"
 
 #define FavFile "../favlist.txt"
 
@@ -74,7 +75,7 @@ private:
   void		setServerPopupTrigger(Panel *panel);
 
 private:
-  unsigned int	_frameCount;
+  bool	_update;
 };
 
 #endif /* _SERVERMENU_H_ */
