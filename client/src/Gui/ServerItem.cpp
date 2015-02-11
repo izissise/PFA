@@ -1,10 +1,9 @@
 #include "ServerItem.hpp"
 
-ServerItem::ServerItem(const sf::FloatRect &zone) :
-  APanelScreen(zone)
+ServerItem::ServerItem(const sf::FloatRect &zone, const std::string &ip) :
+  APanelScreen(zone), _ip(ip)
 {
   addFont("default", "../client/assets/default.TTF");
-  //  _hide = true;
 }
 
 void	ServerItem::construct(const sf::Texture &texture, Settings &set,
@@ -25,8 +24,7 @@ void	ServerItem::construct(const sf::Texture &texture, Settings &set,
 				    sf::Text("", _font["default"], 20));
 
   createBackgroundController(wBg);
-  for (auto panel : panels)
-    wBg->addObserver(panel);
+  wBg->addObserver(panels[0]);
   addWidget({wBg, wName, wCountry, wPlayers, wPing});
   updateItem({"Long server name", "FR", "20/60", "35"}); // as an example
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
@@ -43,7 +41,7 @@ void	ServerItem::createBackgroundController(Widget *widget)
 
   std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
     updateDisplay =
-    [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    [this](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
     {
       bool	isOver;
 
@@ -54,12 +52,24 @@ void	ServerItem::createBackgroundController(Widget *widget)
 	{
 	  if (lwidget.isClicked(event, sf::Mouse::Right))
 	    {
-	      lwidget.notify(t_event(wEvent::Update | wEvent::Hide | wEvent::Toggle));
+	      t_event	evt(wEvent::Update | wEvent::Hide | wEvent::Toggle);
+
+	      evt.str = getWidget("Name")->getContent() + "\n" +
+	      	getIp() + "\n" +
+		getWidget("Ping")->getContent() + "\n" +
+	      	getWidget("Players")->getContent();
+	      lwidget.notify(evt);
 	      return 1;
 	    }
 	  else if (lwidget.isClicked(event, sf::Mouse::Left))
 	    {
-	      lwidget.notify(t_event(wEvent::Update));
+	      t_event	evt(wEvent::Update | wEvent::Show);
+
+	      evt.str = getWidget("Name")->getContent() + "\n" +
+	      	getIp() + "\n" +
+		getWidget("Ping")->getContent() + "\n" +
+	      	getWidget("Players")->getContent();
+	      lwidget.notify(evt);
 	      return 1;
 	    }
 	}
@@ -85,7 +95,7 @@ void	ServerItem::updateItem(const std::vector<std::string> &info)
     }
 }
 
-std::string	ServerItem::getIp()
+const std::string	&ServerItem::getIp() const
 {
-  return getWidget("Name")->getContent();
+  return _ip;
 }

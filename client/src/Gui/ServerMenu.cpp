@@ -3,6 +3,7 @@
 #include "ServerInfoPanel.hpp"
 #include "printv.hpp"
 #include "File.hpp"
+#include "StringUtils.hpp"
 
 ServerMenu::ServerMenu(const sf::FloatRect &zone) :
   APanelScreen(zone), _update(true)
@@ -31,7 +32,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
   Panel *popup = createCoPopup(set, texture, panels);
   createHeader(set, texture, {panels[0], popup});
   createListHeader(set, texture, {cont});
-  createServerPopup(set, texture, {cont, fav});
+  _panelCo = createServerPopup(set, texture, {panels.at(1), this});
 
   for (unsigned int i = 0; i < 50; ++i)
     addServerToList(set, texture, "127.0.0.1:6060", {serv, cont});
@@ -405,8 +406,8 @@ void	ServerMenu::addServerToList(Settings &set,
   unsigned int	nbElem = list->getSubPanels().size();
 
   widgetZone.top = zone.top + nbElem * widgetZone.height + 3;
-  ServerItem *pan = new ServerItem(widgetZone);
-  pan->construct(texture, set, {});
+  ServerItem *pan = new ServerItem(widgetZone, ip);
+  pan->construct(texture, set, {_panelCo});
   // Panel *pan = createServerPanel(set, texture, {list},
   // 				 widgetZone,
   // 				 ip);
@@ -423,25 +424,25 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
 	_zone.top + 100, 400, 220});
   sf::FloatRect	zone = popup->getZone();
   Widget	*bgWidget = new Widget("bg", zone);
-  Widget	*serverName = new Widget("Name", sf::FloatRect(zone.left, zone.top,
+  Widget	*serverName = new Widget("name", sf::FloatRect(zone.left, zone.top,
 							       zone.width, 60),
 				sf::Text("Server Name", _font["default"], 30));
   Widget	*serverIp = new Widget("", sf::FloatRect(zone.left, zone.top + 60,
 							 zone.width / 2, 25),
 				       sf::Text("IP Adress:", _font["default"], 20));
-  Widget	*ip = new Widget("", sf::FloatRect(zone.left + zone.width / 2, zone.top + 60,
+  Widget	*ip = new Widget("ip", sf::FloatRect(zone.left + zone.width / 2, zone.top + 60,
 							 zone.width / 2, 25),
 				       sf::Text("ip", _font["default"], 20));
   Widget	*serverPing = new Widget("", sf::FloatRect(zone.left, zone.top + 90,
 							zone.width / 2, 25),
 				      sf::Text("Ping:", _font["default"], 20));
-  Widget	*ping = new Widget("", sf::FloatRect(zone.left + zone.width / 2, zone.top + 90,
+  Widget	*ping = new Widget("ping", sf::FloatRect(zone.left + zone.width / 2, zone.top + 90,
 							zone.width / 2, 25),
 				      sf::Text("0", _font["default"], 20));
   Widget	*serverPl = new Widget("", sf::FloatRect(zone.left, zone.top + 120,
 							zone.width / 2, 25),
 				      sf::Text("Player Count:", _font["default"], 20));
-  Widget	*pl = new Widget("", sf::FloatRect(zone.left + zone.width / 2, zone.top + 120,
+  Widget	*pl = new Widget("pl", sf::FloatRect(zone.left + zone.width / 2, zone.top + 120,
 							zone.width / 2, 25),
 				      sf::Text("x/y", _font["default"], 20));
 
@@ -449,16 +450,20 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
 						     60,
 						     zone.width - 20, 50),
 				   sf::Text("Join Server", _font["default"], 20));
+
+  popup->setHide(true);
   addSpriteForWidget(bgWidget, sf::Color(83, 83, 83, 255), {zone.width, zone.height});
-  serverName->alignTextLeft({zone.left, zone.top}, {zone.width, 60}, 4.5, 50);
+  serverName->alignTextLeft({zone.left, zone.top}, {zone.width, 60}, 4.25, 50);
   createPopupText(serverIp, true);
   createPopupText(ip, false);
   createPopupText(serverPing, true);
   createPopupText(ping, false);
   createPopupText(serverPl, true);
   createPopupText(pl, false);
-  createPopupJoin(join);
+  createPopupJoin(join, ip);
+  join->addObserver({panels.at(0), panels.at(1)});
   popup->addWidget({bgWidget, serverName, serverIp, ip, serverPing, ping, serverPl, pl, join});
+  setServerPopupTrigger(popup);
   popup->construct(texture, set, {});
   addPanel({popup});
   return popup;
@@ -468,18 +473,49 @@ void	ServerMenu::createPopupText(Widget *widget, bool left)
 {
   const sf::FloatRect &zone = widget->getZone();
 
+
   if (left)
     widget->alignTextLeft({zone.left, zone.top}, {zone.width, zone.height}, 9, 50);
   else
     widget->alignTextRight({zone.left, zone.top}, {zone.width, zone.height}, 90, 50);
+  widget->setColor(sf::Color(203,200,203,255));
 }
 
-void	ServerMenu::createPopupJoin(Widget *widget)
+void	ServerMenu::createPopupJoin(Widget *widget, Widget *ip)
 {
   const sf::FloatRect &zone = widget->getZone();
 
   widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
   addSpriteForWidget(widget, sf::Color(113, 139, 68, 255), {zone.width, zone.height});
+  widget->setColor(sf::Color(225,225,225,255));
+
+  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [&, ip](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    -> int
+    {
+      bool	isOver;
+
+      isOver = lwidget.isOver(ref);
+      if (isOver)
+	lwidget.setColor(sf::Color(255,255,255,255));
+      else
+	lwidget.setColor(sf::Color(225,225,225,255));
+      if (isOver)
+	{
+	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	    {
+	      t_event evt(wEvent::Hide | wEvent::Toggle | wEvent::Update);
+
+	      evt.str = ip->getContent();
+	      lwidget.notify(evt);
+	      return 1;
+	    }
+	}
+      return 0;
+    };
+  widget->setUpdate(updateFunc);
 }
 
 void	ServerMenu::setServerPopupTrigger(Panel *panel)
@@ -488,43 +524,32 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
 
   func = [panel](const t_event &event) // cannot call APanelScreen::trigger
     {
-      if (event.e & wEvent::Hide)
+      if (event.e & wEvent::Update)
 	{
-	  if (event.e & wEvent::Toggle)
-	    panel->setHide(!panel->isHidden());
-	  else
-	    panel->setHide(true);
-	}
-      if (event.e & wEvent::UpdateText)
-	{
-	  std::string	ip;
-	  std::string	servName;
-	  std::size_t	pos;
+	  StringUtils	su;
+	  std::vector<std::string>	info;
+	  AWidget *wName = panel->getWidget("name");
+	  AWidget *wIp = panel->getWidget("ip");
+	  AWidget *wPing = panel->getWidget("ping");
+	  AWidget *wPl = panel->getWidget("pl");
+	  std::function<void (AWidget *widget)> align = [](AWidget *widget)
+	  {
+	    const sf::FloatRect &zone = widget->getZone();
+	    widget->alignTextRight({zone.left, zone.top}, {zone.width, zone.height}, 90, 50);
+	  };
+	  const sf::FloatRect &nameZone = wName->getZone();
 
-	  pos = event.str.find("\n");
-	  if (pos == std::string::npos)
-	    throw std::runtime_error("Missing arguments");
-	  panel->getWidget("serverName")->setTextContent(event.str.substr(0, pos));
-	  panel->getWidget("serverIp")->setTextContent(event.str.substr(pos + 1));
-	  //treatment here
+	  su.split(event.str, '\n', info);
+	  wName->setTextContent(info.at(0));
+	  wIp->setTextContent(info.at(1));
+	  wPing->setTextContent(info.at(2));
+	  wPl->setTextContent(info.at(3));
+	  wName->alignTextLeft({nameZone.left, nameZone.top}, {nameZone.width, 60}, 4.25, 50);
+	  align(wIp);
+	  align(wPing);
+	  align(wPl);
 	}
-      if (event.e & wEvent::Update && event.e & wEvent::Hide) // means the connect button is clicked
-	{
-	  t_event evt;
-
-	  evt.e = wEvent::Update;
-	  evt.str = panel->getWidget("serverIp")->getTextContent();
-	  panel->notify(evt);
-	}
-      if (event.e & wEvent::Reset || event.e & wEvent::Hide)
-	{
-	  t_event	evt = event;
-	  const std::vector<AWidget *>	&widgets = panel->getWidgets();
-
-	  evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Reset;
-	  for (AWidget *widget : widgets)
-	    widget->trigger(evt);
-	}
+      panel->APanelScreen::trigger(event);
     };
   panel->setTrigger(func);
 }

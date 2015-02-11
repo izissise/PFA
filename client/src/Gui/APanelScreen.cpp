@@ -267,6 +267,13 @@ void		APanelScreen::trigger(const t_event &event)
       else
 	_hide = true;
     }
+  else if (event.e & wEvent::Show)
+    {
+      if (event.e & wEvent::Toggle)
+	_hide = !_hide;
+      else
+	_hide = false;
+    }
   if (event.e & wEvent::Reset)
     {
       t_event	evt = event;
