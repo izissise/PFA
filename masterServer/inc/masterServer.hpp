@@ -3,16 +3,21 @@
 
 # include <iostream>
 # include <enet/enet.h>
+# include <SQLiteCpp/SQLiteCpp.h>
 
 class MasterServer {
 public:
-  MasterServer();
-  ~MasterServer();
-
-  void run();
-  
+    MasterServer();
+    ~MasterServer();
+    
+    void run();
+    void createServer();
+    void deleteServer();
+    void getServer();
+    
 private:
-  ENetHost  *_server;
+    ENetHost            *_server;
+    SQLite::Database    _db;
 };
 
 #endif

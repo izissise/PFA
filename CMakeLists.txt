@@ -33,6 +33,7 @@ find_package(SFML 2.1 COMPONENTS system window graphics audio)
 find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
 find_package(ENet)
 find_package(Protobuf)
+find_package(Sqlite3)
 
 INCLUDE(CMakeDependentOption)
 INCLUDE(CheckIncludeFile)
@@ -238,6 +239,11 @@ endif()
 if (PROTOBUF_FOUND)
    include_directories(${PROTOBUF_INCLUDE_DIRS})
    target_link_libraries(${NAME_LIB} ${PROTOBUF_LIBRARIES})
+endif()
+
+if (SQLITE3_FOUND)
+  include_directories(${SQLITE3_INCLUDE_DIR})
+  target_link_libraries (${NAME_MASTERSERVER} ${SQLITE3_LIBRARIES})
 endif()
 
 # --- enable unit tests if desired ---
