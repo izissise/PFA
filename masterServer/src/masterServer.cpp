@@ -28,7 +28,7 @@ MasterServer::MasterServer()
     
     try
     {
-        _db.exec("CREATE TABLE IF NOT EXISTS server (ip TEXT, port TEXT)");
+        _db.exec("CREATE TABLE IF NOT EXISTS server (ip TEXT, port TEXT, PRIMARY KEY (ip, port))");
     }
     catch (std::exception& e)
     {
@@ -45,13 +45,17 @@ MasterServer::~MasterServer()
 
 void MasterServer::createServer(ENetPeer *peer, const std::string &port)
 {
+    char name[256] = { 0 };
+
+    enet_address_get_host_ip(&peer->address, name, 256);
     try
     {
         SQLite::Transaction transaction(_db);
         
-        int nb = _db.exec("INSERT INTO server VALUES (\"10.10.253.252\", \"8000\")");
+        std::string tmp(std::string("INSERT INTO server VALUES (\"") + name + "\", \"" + port + "\")");
+        int nb = _db.exec(tmp.c_str());
         
-        std::cout << "INSERT INTO server VALUES (\"10.10.253.252\", \"8000\"), returned " << nb << std::endl;
+        std::cout << tmp << ", returned " << nb << std::endl;
         
         // Commit transaction
         transaction.commit();
@@ -64,8 +68,26 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port)
 
 void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
 {
+    char name[256] = { 0 };
+
+    enet_address_get_host_ip(&peer->address, name, 256);
+    try
+    {
+        SQLite::Transaction transaction(_db);
+        
+        std::string tmp(std::string("DELETE FROM server WHERE ip LIKE \"") + name + "\" AND port LIKE \"" + port + "\"");
+        int nb = _db.exec(tmp.c_str());
+        
+        std::cout << tmp << ", returned " << nb << std::endl;
+        
+        // Commit transaction
+        transaction.commit();
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "exception: " << e.what() << std::endl;
+    }
     std::cout << "Delete" << std::endl;
-    
 }
 
 void MasterServer::getServer(ENetPeer *peer)
