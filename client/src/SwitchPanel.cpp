@@ -50,7 +50,7 @@ void		SwitchPanel::draw(sf::RenderWindow &window, bool toWin)
     }
 }
 
-int	SwitchPanel::update(const sf::Event &event, sf::RenderWindow &ref,
+int	SwitchPanel::event(const sf::Event &ev, sf::RenderWindow &ref,
 			    Settings &set)
 {
   const std::vector<AWidget *> &contentWidgets = _content->getWidgets();
@@ -58,8 +58,8 @@ int	SwitchPanel::update(const sf::Event &event, sf::RenderWindow &ref,
   int	dir;
 
   if (!contentWidgets.empty())
-    retVal = contentWidgets[_idx]->update(event, ref, set);
-  if (!retVal && isOver(ref) && isClicked(event, sf::Mouse::Left))
+    retVal = contentWidgets[_idx]->update(ev, ref, set);
+  if (!retVal && isOver(ref) && isClicked(ev, sf::Mouse::Left))
     {
       retVal = 1;
       if ((dir = isOverContent(ref)) != 0)
@@ -94,12 +94,12 @@ void		SwitchPanel::switchContent(int dir)
   _idx = ((dir == 1) ? ((_idx + 1) % contentSize) : ((contentSize + _idx - 1) % contentSize));
 }
 
-void	SwitchPanel::trigger(const t_event &event)
+void	SwitchPanel::trigger(const t_event &ev)
 {
-  if (event.e & wEvent::Update)
-    switchContent(event.idx);
+  if (ev.e & wEvent::Update)
+    switchContent(ev.idx);
   else
-    APanelScreen::trigger(event);
+    APanelScreen::trigger(ev);
 }
 
 unsigned int	SwitchPanel::getContentSize() const
@@ -138,11 +138,11 @@ int	SwitchPanel::isOverContent(const sf::RenderWindow &ref) const
   return 0;
 }
 
-bool	SwitchPanel::isClicked(const sf::Event &event, sf::Mouse::Button button) const
+bool	SwitchPanel::isClicked(const sf::Event &ev, sf::Mouse::Button button) const
 {
-  if (event.type == sf::Event::MouseButtonPressed)
+  if (ev.type == sf::Event::MouseButtonPressed)
     {
-      if (event.mouseButton.button == button)
+      if (ev.mouseButton.button == button)
 	return true;
     }
   return false;

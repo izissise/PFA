@@ -12,15 +12,15 @@ OptionTabPanel::~OptionTabPanel()
 {
 }
 
-void	OptionTabPanel::trigger(const t_event &event)
+void	OptionTabPanel::trigger(const t_event &ev)
 {
-  if (event.e & wEvent::Hide)
+  if (ev.e & wEvent::Hide)
     {
-      if (event.e & wEvent::Toggle)
+      if (ev.e & wEvent::Toggle)
 	_hide = !_hide;
       else
 	{
-	  _hide = event.value;
+	  _hide = ev.value;
 	}
     }
 }
@@ -47,10 +47,10 @@ void	OptionTabPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 
 void	OptionTabPanel::createBarGame(const sf::Texture &texture UNUSED, TabWidget *wBarGame)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -58,7 +58,7 @@ void	OptionTabPanel::createBarGame(const sf::Texture &texture UNUSED, TabWidget 
       isOver = widget.isOver(ref);
       if (isOver)
 	{
- 	 if (widget.isClicked(event, sf::Mouse::Left))
+ 	 if (widget.isClicked(ev, sf::Mouse::Left))
 	   {
 	     widget.setSpriteAttr(0, 0);
 	     widget.setSpriteAttr(1, 1);
@@ -78,10 +78,10 @@ void	OptionTabPanel::createBarGame(const sf::Texture &texture UNUSED, TabWidget 
 
 void	OptionTabPanel::createBarKeyboard(const sf::Texture &texture UNUSED, TabWidget *wBarKeyboard)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -89,7 +89,7 @@ void	OptionTabPanel::createBarKeyboard(const sf::Texture &texture UNUSED, TabWid
       isOver = widget.isOver(ref);
       if (isOver)
 	{
- 	 if (widget.isClicked(event, sf::Mouse::Left))
+ 	 if (widget.isClicked(ev, sf::Mouse::Left))
 	   {
 	     widget.notify(t_event(wEvent::SetSprite, 0, 1));
 	     widget.notify(t_event(wEvent::SetSprite, 1, 0));

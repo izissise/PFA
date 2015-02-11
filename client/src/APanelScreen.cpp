@@ -5,10 +5,6 @@ APanelScreen::APanelScreen(const sf::FloatRect &zone) :
 {
 }
 
-APanelScreen::~APanelScreen()
-{
-}
-
 void		APanelScreen::draw(sf::RenderWindow &window, bool toWin)
 {
   sf::Sprite	tmp;
@@ -120,20 +116,20 @@ bool	APanelScreen::checkPanelBounds(AWidget * const widget) const
 	  && wZone.top < _zone.top + _zone.height);
 }
 
-int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
+int	APanelScreen::event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
 
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
       if ((*rit)->isHidden() == false)
-	if ((retVal = (*rit)->update(event, ref, set)) != 0)
+	if ((retVal = (*rit)->event(ev, ref, set)) != 0)
 	  return retVal;
     }
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
     {
       if (checkPanelBounds(*rit))
-	if ((retVal = (*rit)->update(event, ref, set)) != 0)
+	if ((retVal = (*rit)->update(ev, ref, set)) != 0)
 	  return retVal;
     }
   return retVal;
@@ -150,11 +146,11 @@ void	APanelScreen::addPanels(const std::initializer_list<APanelScreen * const>  
     _panels.push_back(panel);
 }
 
-void	APanelScreen::trigger(const t_event &event)
+void	APanelScreen::trigger(const t_event &ev)
 {
-  if (event.e & wEvent::Hide)
+  if (ev.e & wEvent::Hide)
     {
-      if (event.e & wEvent::Toggle)
+      if (ev.e & wEvent::Toggle)
 	_hide = !_hide;
       else
 	_hide = true;

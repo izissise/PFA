@@ -15,9 +15,9 @@ void	OptionPanel::construct(const sf::Texture &texture UNUSED, Settings &set UNU
 {
 }
 
-void	OptionPanel::trigger(const t_event &event)
+void	OptionPanel::trigger(const t_event &ev)
 {
-  if (event.e & (wEvent::Hide | wEvent::Toggle))
+  if (ev.e & (wEvent::Hide | wEvent::Toggle))
     {
       _hide = !_hide;
       notify(t_event(wEvent::Hide, 0, 1));
