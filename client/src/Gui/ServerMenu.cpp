@@ -252,99 +252,6 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
   panel->construct(texture, set, {});
 }
 
-Panel	*ServerMenu::createServerPanel(Settings &set, const sf::Texture &texture,
-				       const std::vector<APanelScreen *> &panels,
-				       const sf::FloatRect &zone,
-				       const std::string &ip)
-{
-  Panel			*controler = new Panel(zone);
-  ServerInfoPanel	*serverInfoPanel = new ServerInfoPanel(zone, ip);
-  Panel			*style = new Panel(zone);
-  Widget		*wBg = new Widget("bg", zone);
-
-  createPopupControler(wBg, panels);
-  wBg->addObserver(controler);		// to signal the events
-  setControlerTrigger(controler);
-  style->addWidget(wBg);
-  style->construct(texture, set, {});
-  serverInfoPanel->construct(texture, set, {});
-  controler->addPanel({style, serverInfoPanel});
-  controler->construct(texture, set, {});
-  return controler;
-}
-
-void	ServerMenu::createPopupControler(Widget *widget,
-					 const std::vector<APanelScreen *> &panels)
-{
-  unsigned int		nbElem = panels[0]->getSubPanels().size();
-  sf::FloatRect		zone = widget->getZone();
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-    updateDisplay =
-    [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
-    {
-      bool	isOver;
-
-      isOver = lwidget.isOver(ref);
-      lwidget.setSpriteAttr(0, !isOver);
-      lwidget.setSpriteAttr(1, isOver);
-      if (isOver)
-	{
-	  if (lwidget.isClicked(event, sf::Mouse::Right))
-	    {
-	      lwidget.notify(t_event(wEvent::Update | wEvent::Hide | wEvent::Toggle));
-	      return 1;
-	    }
-	  else if (lwidget.isClicked(event, sf::Mouse::Left))
-	    {
-	      lwidget.notify(t_event(wEvent::Update));
-	      return 1;
-	    }
-	}
-      return 0;
-    };
-
-  widget->setEdge(sf::Vector2f(zone.width, zone.height), 3.f,
-		  sf::Color(46, 50, 49, 255));
-  addSpriteForWidget(widget, sf::Color(59, 63, 62, 255), {zone.width, zone.height});
-  addSpriteForWidget(widget, sf::Color(91, 111, 58, 255), {zone.width, zone.height});
-  widget->setSpriteAttr(1, false);
-}
-
-void	ServerMenu::setControlerTrigger(Panel *panel)
-{
-  std::function<void (const t_event &event)>  func;
-
-  func = [panel](const t_event &event) // cannot call APanelScreen::trigger
-    {
-      if (event.e & wEvent::Update)
-	{
-	  const ServerInfoPanel *info = dynamic_cast<ServerInfoPanel *>
-	  (panel->getSubPanels().at(1));
-	  if (event.e & wEvent::Hide) // right click
-	    {
-	      t_event	evt;
-	      std::ostringstream	newLine;
-
-	      printv(newLine, "%\n%", info->getWidget("Name")->getContent(), info->getIp());
-	      evt.str = newLine.str();
-	      evt.e = wEvent::UpdateText;
-	      panel->notify(evt);
-	      panel->notify(t_event(wEvent::Hide | wEvent::Toggle));
-	    }
-	  else // left click, connect to the game
-	    {
-	      t_event	connectEvent;
-
-	      connectEvent = event;
-	      connectEvent.e = wEvent::Update;
-	      connectEvent.str = info->getIp();
-	      panel->notify(connectEvent); // send him the ip to connect to;
-	    }
-	}
-    };
-  panel->setTrigger(func);
-}
-
 void	ServerMenu::trigger(const t_event &event)
 {
   if (event.e & wEvent::Hide)
@@ -408,10 +315,6 @@ void	ServerMenu::addServerToList(Settings &set,
   widgetZone.top = zone.top + nbElem * widgetZone.height + 3;
   ServerItem *pan = new ServerItem(widgetZone, ip);
   pan->construct(texture, set, {_panelCo});
-  // Panel *pan = createServerPanel(set, texture, {list},
-  // 				 widgetZone,
-  // 				 ip);
-  // pan->addObserver({_panels.at(_panels.size() - 1), panels.at(1)}); // serverPopup , contPanel
   list->addPanel(pan);
 }
 
