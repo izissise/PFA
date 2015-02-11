@@ -121,7 +121,7 @@ void	ServerMenu::createListHeader(Settings &set, const sf::Texture &texture,
 				     const std::vector<APanelScreen *> &panels)
 {
   const sf::FloatRect	&listZone = panels[0]->getZone();
-  Panel		*cont = new Panel(sf::FloatRect(listZone.left + listZone.width / 4.f,
+  Panel		*cont = new Panel(sf::FloatRect(listZone.left + listZone.width / 6.f,
 						listZone.top - 43,
 						listZone.width / 2.f, 40));
   const sf::FloatRect	&zone = cont->getZone();
@@ -166,7 +166,8 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
   sf::FloatRect	zone = panels[0]->getZone(); // cont's zone
   Panel		*content = new Panel(zone);
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
-					    sf::FloatRect(zone.left + zone.width * 3.f / 4.f + 8,
+					    sf::FloatRect(zone.left + zone.width / 2.f +
+							  zone.width / 6.f + 8,
 							  zone.top, 16, zone.height),
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
@@ -187,7 +188,8 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
   sf::FloatRect	zone = panels[0]->getZone();
   Panel		*content = new Panel(zone);
   ScrollWidget	*wScroll = new ScrollWidget("scroll",
-					    sf::FloatRect(zone.left + zone.width * 3.f / 4.f + 8,
+					    sf::FloatRect(zone.left + zone.width / 2.f +
+							  zone.width / 6.f + 8,
 							  zone.top, 16, zone.height),
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
@@ -399,7 +401,7 @@ void	ServerMenu::addServerToList(Settings &set,
 {
   APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
-  sf::FloatRect	widgetZone(zone.left + zone.width / 4, 0, zone.width * 1.f / 2.f, 60);
+  sf::FloatRect	widgetZone(zone.left + zone.width / 6.f, 0, zone.width * 1.f / 2.f, 60);
   unsigned int	nbElem = list->getSubPanels().size();
 
   widgetZone.top = zone.top + nbElem * widgetZone.height + 3;
@@ -417,55 +419,67 @@ void	ServerMenu::addServerToList(Settings &set,
 Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
 				       const std::vector<APanelScreen *> &panels)
 {
-  Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 2 - 200,
-	_zone.top + _zone.height / 2 - 110, 400, 220});
+  Panel	*popup = new Panel(sf::FloatRect{_zone.left + _zone.width / 1.42f,
+	_zone.top + 100, 400, 220});
   sf::FloatRect	zone = popup->getZone();
-  Widget	*bgWidget = new Widget("bg", {zone.left + 2, zone.top,
-				zone.width - 4, zone.height}, sf::Text());
-  Widget	*header = new Widget("header", {zone.left, zone.top,
-					zone.width, 40},
-					sf::Text("Server's Options", _font["default"], 20));
+  Widget	*bgWidget = new Widget("bg", zone);
+  Widget	*serverName = new Widget("Name", sf::FloatRect(zone.left, zone.top,
+							       zone.width, 60),
+				sf::Text("Server Name", _font["default"], 30));
+  Widget	*serverIp = new Widget("", sf::FloatRect(zone.left, zone.top + 60,
+							 zone.width / 2, 25),
+				       sf::Text("IP Adress:", _font["default"], 20));
+  Widget	*ip = new Widget("", sf::FloatRect(zone.left + zone.width / 2, zone.top + 60,
+							 zone.width / 2, 25),
+				       sf::Text("ip", _font["default"], 20));
+  Widget	*serverPing = new Widget("", sf::FloatRect(zone.left, zone.top + 90,
+							zone.width / 2, 25),
+				      sf::Text("Ping:", _font["default"], 20));
+  Widget	*ping = new Widget("", sf::FloatRect(zone.left + zone.width / 2, zone.top + 90,
+							zone.width / 2, 25),
+				      sf::Text("0", _font["default"], 20));
+  Widget	*serverPl = new Widget("", sf::FloatRect(zone.left, zone.top + 120,
+							zone.width / 2, 25),
+				      sf::Text("Player Count:", _font["default"], 20));
+  Widget	*pl = new Widget("", sf::FloatRect(zone.left + zone.width / 2, zone.top + 120,
+							zone.width / 2, 25),
+				      sf::Text("x/y", _font["default"], 20));
 
-  Widget	*serverName = new Widget("serverName", {zone.left + 10, zone.top + 50,
-				zone.width / 2, 25},
-				sf::Text("Server Name", _font["default"], 20));
-  Widget	*serverIp = new Widget("serverIp", {zone.left + 10, zone.top + 75,
-					zone.width / 2, 25},
-					sf::Text("Cancel", _font["default"], 20));
-  Widget	*caButton = new Widget("ca", {zone.left + 10, zone.top + 110,
-					zone.width / 2 - 17, 45},
-					sf::Text("Cancel", _font["default"], 20));
-  Widget	*coButton = new Widget("co", {zone.left + zone.width / 2 + 7,
-					zone.top + 110, zone.width / 2 - 17, 45},
-					sf::Text("Connect", _font["default"], 20));
-  Widget	*addFav = new Widget("co", {zone.left + 10,
-					zone.top + 166, zone.width / 2 - 17, 45},
-					sf::Text("Fav", _font["default"], 20));
-  Widget	*remFav = new Widget("co", {zone.left + zone.width / 2 + 7,
-					zone.top + 166, zone.width / 2 - 17, 45},
-					sf::Text("unFav", _font["default"], 20));
-
-  popup->setState(APanelScreen::State::Leader);
-  popup->setHide(true);
-  addSpriteForWidget(bgWidget, sf::Color(0x11, 0x1E, 0x5E, 240), {zone.width - 2, zone.height});
-  bgWidget->setEdge(sf::Vector2f(zone.width, zone.height),
-		    2.f);
-  createServerPopupText(serverName);
-  createServerPopupText(serverIp);
-  createPopupHeader(header);
-  createCancelButton(caButton, texture);
-  createConnectButton(coButton, texture);
-  createAddFavButton(serverIp->getTextContent(), addFav, texture);
-  createRemFavButton(serverIp->getTextContent(), remFav, texture);
-  remFav->addObserver(panels.at(1)); // fav Panel
-  popup->addObserver({panels.at(0)}); // container
-  setServerPopupTrigger(popup);
-  caButton->addObserver(popup);
-  coButton->addObserver({popup});
-  popup->addWidget({bgWidget, serverName, serverIp, header, caButton, coButton, addFav, remFav});
+  Widget	*join = new Widget("", sf::FloatRect(zone.left + 10, zone.top + zone.height -
+						     60,
+						     zone.width - 20, 50),
+				   sf::Text("Join Server", _font["default"], 20));
+  addSpriteForWidget(bgWidget, sf::Color(83, 83, 83, 255), {zone.width, zone.height});
+  serverName->alignTextLeft({zone.left, zone.top}, {zone.width, 60}, 4.5, 50);
+  createPopupText(serverIp, true);
+  createPopupText(ip, false);
+  createPopupText(serverPing, true);
+  createPopupText(ping, false);
+  createPopupText(serverPl, true);
+  createPopupText(pl, false);
+  createPopupJoin(join);
+  popup->addWidget({bgWidget, serverName, serverIp, ip, serverPing, ping, serverPl, pl, join});
   popup->construct(texture, set, {});
   addPanel({popup});
   return popup;
+}
+
+void	ServerMenu::createPopupText(Widget *widget, bool left)
+{
+  const sf::FloatRect &zone = widget->getZone();
+
+  if (left)
+    widget->alignTextLeft({zone.left, zone.top}, {zone.width, zone.height}, 9, 50);
+  else
+    widget->alignTextRight({zone.left, zone.top}, {zone.width, zone.height}, 90, 50);
+}
+
+void	ServerMenu::createPopupJoin(Widget *widget)
+{
+  const sf::FloatRect &zone = widget->getZone();
+
+  widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
+  addSpriteForWidget(widget, sf::Color(113, 139, 68, 255), {zone.width, zone.height});
 }
 
 void	ServerMenu::setServerPopupTrigger(Panel *panel)
@@ -726,13 +740,6 @@ void	ServerMenu::setPopupTrigger(Panel *panel)
 	}
     };
   panel->setTrigger(func);
-}
-
-void	ServerMenu::createServerPopupText(Widget *widget)
-{
-  sf::FloatRect zone = widget->getZone();
-
-  widget->alignTextLeft({zone.left, zone.top}, {zone.width, zone.height}, 0, 50);
 }
 
 void	ServerMenu::createTitle(Widget *widget, const sf::FloatRect &zone)

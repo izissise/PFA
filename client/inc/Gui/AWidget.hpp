@@ -133,7 +133,8 @@ public:
    */
   void		alignText(const sf::Vector2f &pos, const sf::Vector2f &size,
 			  float xPercent, float yPercent);
-
+  void		alignTextRight(const sf::Vector2f &pos, const sf::Vector2f &size,
+			       float xPercent, float yPercent);
   void		setPosition(const sf::Vector2f &pos, const sf::Vector2f &size,
 			    float xPercent, float yPercent);
   /**
