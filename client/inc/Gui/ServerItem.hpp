@@ -14,6 +14,7 @@ public:
 		  const std::vector<APanelScreen *> &panels);
   void	updateItem(const std::vector<std::string> &info);
 
+  std::string	getIp();
 private:
   void	createBackgroundController(Widget *widget);
 };

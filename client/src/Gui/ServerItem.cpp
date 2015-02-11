@@ -25,6 +25,8 @@ void	ServerItem::construct(const sf::Texture &texture, Settings &set,
 				    sf::Text("", _font["default"], 20));
 
   createBackgroundController(wBg);
+  for (auto panel : panels)
+    wBg->addObserver(panel);
   addWidget({wBg, wName, wCountry, wPlayers, wPing});
   updateItem({"Long server name", "FR", "20/60", "35"}); // as an example
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
@@ -81,4 +83,9 @@ void	ServerItem::updateItem(const std::vector<std::string> &info)
       else
 	widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
     }
+}
+
+std::string	ServerItem::getIp()
+{
+  return getWidget("Name")->getContent();
 }

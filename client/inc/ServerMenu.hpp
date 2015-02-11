@@ -48,7 +48,8 @@ private:
 				   const std::string &ip);
   Panel		*createServerPopup(Settings &set, const sf::Texture &texture,
 				   const std::vector<APanelScreen *> &panels);
-  void		createServerPopupText(Widget *widget);
+  void		createPopupText(Widget *widget, bool left);
+  void		createPopupJoin(Widget *widget);
   void		createPopupControler(Widget *widget, const std::vector<APanelScreen *> &panels);
   void		setControlerTrigger(Panel *controler);
   void		setFavTrigger(Settings &set, const sf::Texture &texture,
