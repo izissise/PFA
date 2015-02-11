@@ -43,14 +43,14 @@ Menu::~Menu()
 {
 }
 
-bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
+bool	Menu::run(const sf::Event& ev, sf::RenderWindow &window, Settings &set)
 {
   bool	handled = false;
 
   _consoleActive = set.getControls().getActionState(Action::ToggleConsole);
   if (_consoleActive)
     {
-      _console.run(event, set.getControls());
+      _console.run(ev, set.getControls());
       handled = true;
     }
   else
@@ -58,7 +58,7 @@ bool	Menu::run(const sf::Event& event, sf::RenderWindow &window, Settings &set)
       for (auto &panel : _panels)
 	{
 	  if (!panel->isHidden())
-	    if ((handled = (panel->update(event, window, set) != 0)))
+	    if ((handled = (panel->event(ev, window, set) != 0)))
 	      return handled;
 	}
     }

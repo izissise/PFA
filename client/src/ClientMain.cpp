@@ -5,52 +5,28 @@ ClientMain::ClientMain()
     _window(sf::VideoMode(std::stoi(_settings.getCvarList().getCvar("r_width")),
                           std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
     _menu(_settings, _parser),
-  _showMenu(false)//,
-    //_updateThread(std::bind(&ClientMain::update, this))
+  _showMenu(false),
+  _updateThread(std::bind(&ClientMain::update, this))
 {
   _window.setVerticalSyncEnabled(true);
 }
 
 ClientMain::~ClientMain()
 {
-  //  _updateThread.join();
+    _updateThread.join();
 }
 
 void ClientMain::update()
 {
-  // int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
-  // TimeHandling time((std::chrono::milliseconds(gfps)));
+  int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
+   TimeHandling time((std::chrono::milliseconds(gfps)));
 
-  // ENetEvent	event;
-  // Network      	socket;
-
-  // try
-  //   {
-  //     socket.connect("127.0.0.1", "6060", 2);
-  //     // the updating loop
-  //     time.start();
-  //     while (_window.isOpen())
-  // 	{
-  // 	      printf ("A packet of length %lu containing %s was received from %s on channel %u.\n",
-  // 		      event.packet->dataLength,
-  // 		      event.packet->data,
-  // 		      event.peer->data,
-  // 		      event.channelID);
-  // 	      enet_packet_destroy (event.packet);
-  // 	      break;
-  // 	    default:
-  // 	      break;
-  // 	    }
-  // 	  socket.sendPacket("Salut", 0);
-  // 	  //update object here
-  // 	  // time.endFrame();
-  // 	}
-  //     socket.disconnect();
-  //   }
-  // catch (NetworkException &e)
-  //   {
-  //     std::cerr << e.what() << std::endl;
-  //   }
+	time.start();
+	while (_window.isOpen())
+   	{
+   	 // _menu.run(_window, _settings);
+   	  time.endFrame();
+   	}
 }
 
 void ClientMain::run()

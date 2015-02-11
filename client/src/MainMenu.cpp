@@ -61,10 +61,10 @@ void	MainMenu::createBgPanel(const sf::Texture &texture, Widget *wBackground,
 void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
 {
   sf::FloatRect zone = wPlay->getZone();
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -74,7 +74,7 @@ void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
       widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (widget.isClicked(event, sf::Mouse::Left))
+	  if (widget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      widget.notify(t_event(wEvent::Hide | wEvent::Toggle));
 	      return 0;
@@ -91,10 +91,10 @@ void	MainMenu::createPlayButton(const sf::Texture &texture, Widget *wPlay)
 void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
 {
   sf::FloatRect zone = wOpt->getZone();
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -104,7 +104,7 @@ void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
       widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (widget.isClicked(event, sf::Mouse::Left))
+	  if (widget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      widget.notify(t_event(wEvent::Hide | wEvent::Toggle, 0, 0));
 	      return 1;
@@ -121,10 +121,10 @@ void	MainMenu::createOptButton(const sf::Texture &texture, Widget *wOpt)
 void	MainMenu::createQuitButton(const sf::Texture &texture, Widget *wQuit)
 {
   sf::FloatRect zone = wQuit->getZone();
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -134,7 +134,7 @@ void	MainMenu::createQuitButton(const sf::Texture &texture, Widget *wQuit)
       widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
- 	 if (widget.isClicked(event, sf::Mouse::Left))
+ 	 if (widget.isClicked(ev, sf::Mouse::Left))
 	   {
 	     ref.close();
 	     return 1;

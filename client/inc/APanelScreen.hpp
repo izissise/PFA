@@ -11,7 +11,7 @@ public:
   virtual ~APanelScreen() = 0;
 
   /**
-   * \fn int run(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+   * \fn int event(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
    * \brief Update the state of the panel
    * \param[in] event The event
    * \param[in] ref The reffered window
@@ -20,7 +20,7 @@ public:
    *
    * This function will call every widget's update method
    */
-  virtual int	update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  virtual int	event(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
 
   /**
    * \fn void draw(sf::RenderWindow &window)

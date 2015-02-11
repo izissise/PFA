@@ -93,6 +93,7 @@ bool		World::movePlayer(const VectorInt &chunkId,
 
 void	World::update()
 {
+	std::cout << "Update called !!" << std::endl;
 }
 
 auto World::_getScreenOrigin(void) const -> screenPos
@@ -228,8 +229,8 @@ void			World::removeOldChunks()
     {
       const Vector2i &pos = itr->second->getPosition();
       if (itr->second->isGenerated() &&
-	  (std::abs(chunkPos.x - pos.x) > radius ||
-	   std::abs(chunkPos.y - pos.y) > radius))
+	  (static_cast<decltype(radius)>(std::abs(chunkPos.x - pos.x)) > radius ||
+	   static_cast<decltype(radius)>(std::abs(chunkPos.y - pos.y)) > radius))
 	{
 	  std::cout << "Removing chunk at pos " << pos.x << " " << pos.y << std::endl;
 	  _chunks.erase(itr++);
