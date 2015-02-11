@@ -93,7 +93,8 @@ bool		World::movePlayer(const VectorInt &chunkId,
 
 void	World::update(const std::chrono::milliseconds& timeStep)
 {
-	std::cout << "Update called !! with " << timeStep.count() << "ms" << std::endl;
+	//The suggested iteration count for Box2D is 8 for velocity and 3 for position.
+	_b2World->Step(timeStep.count() / 1000.0f, 8, 3);
 }
 
 auto World::_getScreenOrigin(void) const -> screenPos
