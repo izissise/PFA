@@ -42,16 +42,10 @@ private:
 			     const std::vector<APanelScreen *> &panels);
   Panel		*createCoPopup(Settings &set, const sf::Texture &texture,
 			      const std::vector<APanelScreen *> &panels);
-  Panel		*createServerPanel(Settings &set, const sf::Texture &texture,
-				   const std::vector<APanelScreen *> &panels,
-				   const sf::FloatRect &zone,
-				   const std::string &ip);
   Panel		*createServerPopup(Settings &set, const sf::Texture &texture,
 				   const std::vector<APanelScreen *> &panels);
   void		createPopupText(Widget *widget, bool left);
   void		createPopupJoin(Widget *widget, Widget *ip);
-  void		createPopupControler(Widget *widget, const std::vector<APanelScreen *> &panels);
-  void		setControlerTrigger(Panel *controler);
   void		setFavTrigger(Settings &set, const sf::Texture &texture,
 			      Panel *panel, APanelScreen *container);
   void		loadFavServers(Settings &set, const sf::Texture &texture,
