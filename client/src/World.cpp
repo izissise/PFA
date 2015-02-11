@@ -9,6 +9,7 @@ World::World(Settings& settings) :
   _settings(settings),
   _camera(),
   _player(_camera),
+  _b2World(new b2World(b2Vec2(0.0f, -9.81f)) ),
   _loaded(false)
 {
   CvarList	&cvarList = _settings.getCvarList();

@@ -204,6 +204,11 @@ if (Boost_FOUND)
    target_link_libraries (${NAME_LIB} ${Boost_LIBRARIES})
 endif()
 
+if (BOX2D_FOUND)
+   include(${BOX2D_INCLUDE_DIR})
+   target_link_libraries (${NAME_LIB} ${BOX2D_LIBRARIES})
+endif()
+
 if (ENET_FOUND)
    include_directories(${ENet_INCLUDE_DIRS})
    target_link_libraries(${NAME_LIB} ${ENet_LIBRARIES})

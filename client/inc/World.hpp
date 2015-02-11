@@ -7,6 +7,8 @@
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
+# include <Box2D/Box2D.h>
+
 # include "Settings.hpp"
 # include "Camera.hpp"
 # include "Player.hpp"
@@ -75,6 +77,7 @@ private:
   TileCodex	_codex;
   Camera	_camera;
   Player	_player;
+  std::unique_ptr<b2World>	_b2World;
   bool		_loaded;
 };
 
