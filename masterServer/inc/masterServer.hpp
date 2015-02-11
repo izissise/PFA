@@ -11,9 +11,9 @@ public:
     ~MasterServer();
     
     void run();
-    void createServer();
-    void deleteServer();
-    void getServer();
+    void createServer(ENetPeer *peer, const std::string &port);
+    void deleteServer(ENetPeer *peer, const std::string &port);
+    void getServer(ENetPeer *peer);
     
 private:
     ENetHost            *_server;

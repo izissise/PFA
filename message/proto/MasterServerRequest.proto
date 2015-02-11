@@ -1,0 +1,10 @@
+message MasterServerRequest {
+  enum PacketContent
+  {
+    GETIP = 0;
+    CREATESERVER = 1;
+    DELETESERVER = 2;
+  }
+  required PacketContent content = 1;
+  optional string port = 2;
+}

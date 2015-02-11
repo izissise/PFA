@@ -1,3 +1,4 @@
+#include <MasterServerRequest.pb.h>
 #include "masterServer.hpp"
 
 MasterServer::MasterServer()
@@ -42,7 +43,7 @@ MasterServer::~MasterServer()
     enet_deinitialize();
 }
 
-void MasterServer::createServer()
+void MasterServer::createServer(ENetPeer *peer, const std::string &port)
 {
     try
     {
@@ -61,13 +62,13 @@ void MasterServer::createServer()
     }
 }
 
-void MasterServer::deleteServer()
+void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
 {
     std::cout << "Delete" << std::endl;
     
 }
 
-void MasterServer::getServer()
+void MasterServer::getServer(ENetPeer *peer)
 {
     try
     {
@@ -92,6 +93,7 @@ void MasterServer::getServer()
 void MasterServer::run()
 {
     ENetEvent event;
+    MasterServerRequest request;
     
     while ((enet_host_service (_server, &event, 50)) >= 0)
     {
@@ -111,18 +113,26 @@ void MasterServer::run()
                         event.packet -> data,
                         event.peer -> data,
                         event.channelID);
-                std::string data = std::string((char *)event.packet->data);
-                if (data == "getip")
+                if (request.ParseFromArray(event.packet->data, event.packet->dataLength))
                 {
-                    getServer();
-                }
-                else if (data == "createServer")
-                {
-                    createServer();
-                }
-                else if (data == "deleteServer")
-                {
-                    createServer();
+                    std::cout << "Parse Good" << std::endl;
+                    switch (request.content()) {
+                        case MasterServerRequest::GETIP:
+                            getServer(event.peer);
+                            break;
+
+                        case MasterServerRequest::CREATESERVER:
+                            createServer(event.peer, request.port());
+                            break;
+
+                        case MasterServerRequest::DELETESERVER:
+                            deleteServer(event.peer, request.port());
+                            break;
+
+                        default:
+                            break;
+                    }
+                    
                 }
                 /* Clean up the packet now that we're done using it. */
                 enet_packet_destroy (event.packet);
