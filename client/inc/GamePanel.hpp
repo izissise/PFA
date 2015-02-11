@@ -21,8 +21,9 @@ public:
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
 
-  void		draw(sf::RenderWindow &window, bool toWin);
-  int		event(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  void		update(std::chrono::milliseconds timeStep, Settings &set) override;
+  void		draw(sf::RenderWindow &window, bool toWin) override;
+  int		event(const sf::Event &event, sf::RenderWindow &ref, Settings &set) override;
   void		trigger(const t_event &event);
 
 private:

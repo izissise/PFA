@@ -67,7 +67,7 @@ void  ServerProtocol::handleConnection(ClientMessage &message,
 
 void	ServerProtocol::handleActions(ClientMessage &message,
 				      Client *client,
-				      const std::vector<Client *> &clients)
+				     UNUSED const std::vector<Client *> &clients)
 {
   const ClientActions	&clientActions = message.actions();
   unsigned int		nbActions = clientActions.actions_size();
@@ -111,7 +111,7 @@ void		ServerProtocol::generateNewId(std::string &guid)
 }
 
 int			ServerProtocol::isChunkSpawnable(Chunk *chunk,
-							 const std::vector<Client *> &clients)
+							UNUSED const std::vector<Client *> &clients)
 {
   for (unsigned int idx = 0; idx < Chunk::lod; ++idx)
     {

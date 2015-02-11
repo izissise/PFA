@@ -91,9 +91,9 @@ bool		World::movePlayer(const VectorInt &chunkId,
 		    - _camera.center());
 }
 
-void	World::update()
+void	World::update(const std::chrono::milliseconds& timeStep)
 {
-	std::cout << "Update called !!" << std::endl;
+	std::cout << "Update called !! with " << timeStep.count() << "ms" << std::endl;
 }
 
 auto World::_getScreenOrigin(void) const -> screenPos

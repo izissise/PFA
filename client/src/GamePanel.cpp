@@ -234,18 +234,22 @@ void			GamePanel::sendConnectionInfo() const
   _socket.sendPacket(1, serialized);
 }
 
+void	GamePanel::update(std::chrono::milliseconds timeStep, Settings &set)
+{
+  updateNetwork(set);
+  _world->update(timeStep);
+}
+
 int		GamePanel::event(const sf::Event &ev,
 				  sf::RenderWindow &ref,
 				  Settings &set)
 {
   int		retVal;
 
-  updateNetwork(set);
   if (_actAnalyzer.getInputChanges(set))
     {
       _socket.sendPacket(1, _actAnalyzer.serialize());
     }
   retVal = updateHud(ev, ref, set);
-  _world->update();
   return retVal;
 }

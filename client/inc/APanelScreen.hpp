@@ -2,13 +2,23 @@
 #define _APANELSCREEN_H_
 
 #include <vector>
+#include <chrono>
+
 #include "AWidget.hpp"
 
 class APanelScreen : public IObserver, public Observable
 {
 public:
   APanelScreen(const sf::FloatRect &zone);
-  virtual ~APanelScreen() = 0;
+  virtual ~APanelScreen() = default;
+
+  /**
+    * \fn void update(std::chrono::milliseconds timeStep, Settings &set)
+    * \brief update panel at timeStep interval
+    * \param[in] The elapsed time since the last call
+    * \param[in] set The game's settings
+    */
+   virtual void update(UNUSED std::chrono::milliseconds timeStep, UNUSED Settings &set) {};
 
   /**
    * \fn int event(const sf::Event &event, sf::RenderWindow &ref, Settings &set);

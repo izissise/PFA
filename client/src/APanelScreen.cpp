@@ -5,10 +5,6 @@ APanelScreen::APanelScreen(const sf::FloatRect &zone) :
 {
 }
 
-APanelScreen::~APanelScreen()
-{
-}
-
 void		APanelScreen::draw(sf::RenderWindow &window, bool toWin)
 {
   sf::Sprite	tmp;

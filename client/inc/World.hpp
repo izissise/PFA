@@ -3,6 +3,7 @@
 
 # include <map>
 # include <memory>
+# include <chrono>
 
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
@@ -33,7 +34,7 @@ public:
   World(const World& other) = delete;
   World&		operator=(const World& other) = delete;
 
-  void			update(void);
+  void			update(const std::chrono::milliseconds& timeStep);
   void			draw(sf::RenderWindow& window) const;
   void			load();
   void			loadRange();

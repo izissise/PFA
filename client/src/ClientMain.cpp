@@ -24,7 +24,7 @@ void ClientMain::update()
 	time.start();
 	while (_window.isOpen())
    	{
-   	 // _menu.run(_window, _settings);
+   	 _menu.update(time.GetTargetFrameDuration(), _settings);
    	  time.endFrame();
    	}
 }
