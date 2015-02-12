@@ -6,6 +6,7 @@
 #include "TextWidget.hpp"
 #include "TabWidget.hpp"
 #include "ScrollWidget.hpp"
+#include "ServerItem.hpp"
 
 #define FavFile "../favlist.txt"
 
@@ -41,15 +42,10 @@ private:
 			     const std::vector<APanelScreen *> &panels);
   Panel		*createCoPopup(Settings &set, const sf::Texture &texture,
 			      const std::vector<APanelScreen *> &panels);
-  Panel		*createServerPanel(Settings &set, const sf::Texture &texture,
-				   const std::vector<APanelScreen *> &panels,
-				   const sf::FloatRect &zone,
-				   const std::string &ip);
   Panel		*createServerPopup(Settings &set, const sf::Texture &texture,
 				   const std::vector<APanelScreen *> &panels);
-  void		createServerPopupText(Widget *widget);
-  void		createPopupControler(Widget *widget, const std::vector<APanelScreen *> &panels);
-  void		setControlerTrigger(Panel *controler);
+  void		createPopupText(Widget *widget, bool left);
+  void		createPopupJoin(Widget *widget, Widget *ip);
   void		setFavTrigger(Settings &set, const sf::Texture &texture,
 			      Panel *panel, APanelScreen *container);
   void		loadFavServers(Settings &set, const sf::Texture &texture,
@@ -74,7 +70,8 @@ private:
   void		setServerPopupTrigger(Panel *panel);
 
 private:
-  unsigned int	_frameCount;
+  bool		_update;
+  Panel		*_panelCo;
 };
 
 #endif /* _SERVERMENU_H_ */
