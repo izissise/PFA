@@ -283,7 +283,7 @@ void	ServerMenu::trigger(const t_event &event)
 void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
 				 const std::vector<APanelScreen *> &panels)
 {
-  Panel	*content = new Panel(sf::FloatRect{_zone.left + 100, _zone.top + 140,
+  Panel	*content = new Panel(sf::FloatRect{_zone.left + 90, _zone.top + 140,
 	150, 2 * 40});
   sf::FloatRect	zone = content->getZone();
   TabWidget	*tabServer = new TabWidget("bg", {zone.left, zone.top,
