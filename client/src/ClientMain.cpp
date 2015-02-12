@@ -34,10 +34,13 @@ void ClientMain::run()
   Controls	&ctrl = _settings.getControls();
   sf::Event	event;
   t_entry	entry;
+  int		gameFps = std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
 
-  int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
+  int gfps = 1000 / gameFps;
   TimeHandling time((std::chrono::milliseconds(gfps)));
 
+  _window.setFramerateLimit(gameFps);
+  _window.setVerticalSyncEnabled(true);
   time.start();
   //_window.setKeyRepeatEnabled(false);
   while (_window.isOpen())
@@ -67,7 +70,6 @@ void ClientMain::run()
                 ctrl.releaseKey(entry);
             }
         }
-      //update object here
       time.endFrame();
       // draw stuff here
       _menu.draw(_window);
