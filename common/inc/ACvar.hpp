@@ -22,13 +22,16 @@ enum class Restriction
 typedef struct	s_cvar
 {
   std::vector<std::string>	restrictValue;
+  std::string			defaultValue;
   std::string			value;
   cvarType			type;
   Restriction			restrictType;
   s_cvar(const std::vector<std::string> &vec,
+	 const std::string &dValue,
 	 const std::string &val, cvarType dtype,
 	 Restriction restric = Restriction::Range) :
-    restrictValue(vec), value(val), type(dtype), restrictType(restric)
+    restrictValue(vec),  defaultValue(dValue),
+    value(val), type(dtype), restrictType(restric)
   {
   }
 }		t_cvar;

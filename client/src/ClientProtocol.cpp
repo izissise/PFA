@@ -56,9 +56,11 @@ void  ClientProtocol::handleSetting(const ProtocolMessage &packet)
   for (int i = 0; i < set.settingentry_size(); ++i)
     {
       SettingMessage::SettingEntry::Cvar cvar = set.settingentry(i).cvar();
-      t_cvar *entry = new t_cvar({{std::string(cvar.default_()),
-	      std::string(cvar.min()),
-	      std::string(cvar.max())}},
+
+      t_cvar *entry = new t_cvar({
+	  std::string(cvar.min()),
+	    std::string(cvar.max())},
+	std::string(cvar.default_()),
 	cvar.value(), static_cast<cvarType>(cvar.type()));
 
       if (!_set->getCvarList().addCvar(set.settingentry(i).key(), entry))

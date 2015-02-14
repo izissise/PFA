@@ -72,11 +72,11 @@ void	ACvar::setCvar(const std::string &name, const std::string &value)
 	    {
 	      throw (Exception(name + " cvar's value must be a number"));
 	    }
-	  if (numValue < std::stod(*(cvar->restrictValue.begin() + 1)))
+	  if (numValue < std::stod(*(cvar->restrictValue.begin())))
             throw (Exception("Value for " + name + ": " + value + ", minimum: " +
                              * (cvar->restrictValue.begin() + 1)));
           if (cvar->restrictValue.size() > 2 &&
-              numValue > std::stod(*(cvar->restrictValue.begin() + 2)))
+              numValue > std::stod(*(cvar->restrictValue.begin() + 1)))
             throw (Exception("Value for " + name + ": " + value + ", maximum: " +
                              * (cvar->restrictValue.begin() + 2)));
 

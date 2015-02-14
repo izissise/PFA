@@ -3,8 +3,8 @@
 ServerSettings::ServerSettings()
 : ACvar()
 {
-  ACvar::addCvar("com_gameFps", new t_cvar({"60", "20", "300"}, "125", Number));
-  ACvar::addCvar("s_seed", new t_cvar({"0", "0", "4294967295"}, "25341", Number));
+  ACvar::addCvar("com_gameFps", new t_cvar({"20", "300"}, "60", "125", Number));
+  ACvar::addCvar("s_seed", new t_cvar({"0", "4294967295"}, "0", "25341", Number));
 }
 
 ServerSettings::~ServerSettings()
