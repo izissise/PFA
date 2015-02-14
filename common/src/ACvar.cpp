@@ -17,7 +17,7 @@ bool	ACvar::isCvar(const std::string &name) const
   return it != _cvars.end();
 }
 
-const std::array<std::string, 3>	&ACvar::getCvarInfo(const std::string &name) const
+const std::vector<std::string>	&ACvar::getCvarInfo(const std::string &name) const
 {
   auto it = _cvars.find(name);
 
@@ -44,41 +44,54 @@ bool	ACvar::addCvar(const std::string &name, t_cvar *cvar)
 
 void	ACvar::setCvar(const std::string &name, const std::string &value)
 {
-  auto it = _cvars.find(name);
+  auto		it = _cvars.find(name);
   t_cvar	*cvar;
   double	numValue;
 
   if (it == _cvars.end())
-    throw(Exception("Cvar [" + name + "] doesn't exist"));
+    throw (Exception("Cvar [" + name + "] doesn't exist"));
   cvar = it->second;
-  if ((cvar->type == String && cvar->restrictValue.size() > 1) ||
-      (cvar->type == Number && cvar->restrictValue.size() > 3))
+  if (cvar->restrictType != Restriction::None)
     {
-      if (std::find(cvar->restrictValue.begin(), cvar->restrictValue.end(), value) ==
-          cvar->restrictValue.end())
-        throw(Exception("Value for " + name + " isn't correct, default: " +
-                        * (cvar->restrictValue.begin())));
-    }
-  else if (cvar->type == Number)
-    {
-      try
-        {
-          numValue = std::stod(value);
-        }
-      catch (const std::invalid_argument &ia)
-        {
-          throw (Exception(name + " cvar's value must be a number"));
-        }
-      if (cvar->restrictValue.size() > 1) // Means the cvar has value limits
-        {
-          if (numValue < std::stod(*(cvar->restrictValue.begin() + 1)))
+      if (cvar->restrictType == Restriction::Value)
+	{
+	  if (std::find(cvar->restrictValue.begin(), cvar->restrictValue.end(), value) ==
+	      cvar->restrictValue.end())
+	    throw (Exception("Value for " + name + " isn't correct, default: " +
+			     *(cvar->restrictValue.begin())));
+	}
+      else if (cvar->restrictType == Restriction::Range)
+	{
+	  if (cvar->type == String)
+	    throw (Exception("String value cvars can't have a Range restriction"));
+	  try
+	    {
+	      numValue = std::stod(value);
+	    }
+	  catch (const std::invalid_argument &ia)
+	    {
+	      throw (Exception(name + " cvar's value must be a number"));
+	    }
+	  if (numValue < std::stod(*(cvar->restrictValue.begin() + 1)))
             throw (Exception("Value for " + name + ": " + value + ", minimum: " +
                              * (cvar->restrictValue.begin() + 1)));
           if (cvar->restrictValue.size() > 2 &&
               numValue > std::stod(*(cvar->restrictValue.begin() + 2)))
             throw (Exception("Value for " + name + ": " + value + ", maximum: " +
                              * (cvar->restrictValue.begin() + 2)));
-        }
+
+	}
+    }
+  if (cvar->type == Number) // In case there are no restrictions
+    {
+      try
+	{
+	  numValue = std::stod(value);
+	}
+      catch (const std::invalid_argument &ia)
+	{
+	  throw (Exception(name + " cvar's value must be a number"));
+	}
     }
   cvar->value = value;
 }
