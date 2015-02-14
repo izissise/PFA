@@ -50,18 +50,18 @@ void	SelectList::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void	SelectList::trigger(const t_event &event)
+void	SelectList::trigger(const t_event &ev)
 {
-  if (event.e & wEvent::Hide)
+  if (ev.e & wEvent::Hide)
     {
-      if (event.e & wEvent::Toggle)
+      if (ev.e & wEvent::Toggle)
 	_hide = !_hide;
       else
 	{
-	  _hide = event.value;
+	  _hide = ev.value;
 	}
     }
-  else if (event.e & wEvent::UpdateText)
+  else if (ev.e & wEvent::UpdateText)
     {
       _widgets[0]->setTextContent(event.str); // widget[0] is the Header
       notify(t_event(wEvent::Hide));
@@ -70,17 +70,17 @@ void	SelectList::trigger(const t_event &event)
 
 void	SelectList::createHeader(const sf::Texture &texture UNUSED, Widget *w)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
   sf::FloatRect	wZone = w->getZone();
 
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
 
       isOver = widget.isOver(ref);
-      if (isOver && widget.isClicked(event, sf::Mouse::Left))
+      if (isOver && widget.isClicked(ev, sf::Mouse::Left))
 	{
 	  widget.notify(t_event(wEvent::Toggle | wEvent::Hide));
 	  return 1;
@@ -102,11 +102,11 @@ void	SelectList::createScroll(const sf::Texture &texture, ScrollWidget *wScroll)
 
 void	SelectList::createButton(const sf::Texture &texture, Widget *w)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
   sf::FloatRect	wZone = w->getZone();
 
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -116,7 +116,7 @@ void	SelectList::createButton(const sf::Texture &texture, Widget *w)
       widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (widget.isClicked(event, sf::Mouse::Left))
+	  if (widget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      widget.notify(t_event(wEvent::UpdateText, 0, 0,
 				    widget.getTextContent().toAnsiString()));

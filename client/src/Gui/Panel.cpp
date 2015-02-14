@@ -16,10 +16,10 @@ void		Panel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSED,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void		Panel::trigger(const t_event &event)
+void		Panel::trigger(const t_event &ev)
 {
   if (_trigger)
-    _trigger(event);
+    _trigger(ev);
   else
-    APanelScreen::trigger(event);
+    APanelScreen::trigger(ev);
 }

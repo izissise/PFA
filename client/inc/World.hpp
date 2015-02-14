@@ -3,9 +3,12 @@
 
 # include <map>
 # include <memory>
+# include <chrono>
 
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
+
+# include <Box2D/Box2D.h>
 
 # include "Settings.hpp"
 # include "Camera.hpp"
@@ -31,8 +34,9 @@ public:
   World(const World& other) = delete;
   World&		operator=(const World& other) = delete;
 
-  void			update(void);
-  void			draw(sf::RenderTarget& window) const;
+  void			update(const std::chrono::milliseconds& timeStep);
+  void			draw(sf::RenderWindow& window) const;
+
   void			load();
   void			loadRange();
 
@@ -75,6 +79,7 @@ private:
   TileCodex	_codex;
   Camera	_camera;
   Player	_player;
+  std::unique_ptr<b2World>	_b2World;
   bool		_loaded;
 };
 

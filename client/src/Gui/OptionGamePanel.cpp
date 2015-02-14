@@ -67,10 +67,10 @@ void	OptionGamePanel::createCheckBox(const sf::Texture &texture,
 void	OptionGamePanel::createTextWidget(const sf::Texture &texture UNUSED, TextWidget *wTextWidget)
 {
   sf::FloatRect	wZone = wTextWidget->getZone();
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &widget, const sf::Event &event UNUSED, sf::RenderWindow &ref UNUSED)
+  updateFunc = [](AWidget &widget, const sf::Event &ev UNUSED, sf::RenderWindow &ref UNUSED)
     -> int
     {
       sf::FloatRect zone = widget.getZone();

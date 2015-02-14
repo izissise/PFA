@@ -28,6 +28,7 @@ find_package(CppUnit)
 find_package(Threads)
 find_package(SFML 2.1 COMPONENTS system window graphics audio)
 find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
+find_package(Box2D REQUIRED)
 find_package(ENet)
 find_package(Protobuf)
 
@@ -204,6 +205,11 @@ if (Boost_FOUND)
    target_link_libraries (${NAME_LIB} ${Boost_LIBRARIES})
 endif()
 
+if (BOX2D_FOUND)
+   include(${BOX2D_INCLUDE_DIR})
+   target_link_libraries (${NAME_LIB} ${BOX2D_LIBRARIES})
+endif()
+
 if (ENET_FOUND)
    include_directories(${ENet_INCLUDE_DIRS})
    target_link_libraries(${NAME_LIB} ${ENet_LIBRARIES})
@@ -224,7 +230,7 @@ if(BUILD_TESTS)
       test_files_lib
       test/common/*
     )
-    
+
     file(
       GLOB_RECURSE
       test_files_client
@@ -236,15 +242,15 @@ if(BUILD_TESTS)
       test_files_server
       test/server/*
     )
-    
+
    # list(REMOVE_ITEM ALL_SRCS ${ui} ${f}.cpp ${f}Driver.cpp)
-    
+
     add_executable(
       ${TEST_EXEC_LIB}
       ${test_files_lib}
     )
     set_property(TARGET ${TEST_EXEC_LIB} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
-    
+
     set(client_source_files_test ${client_source_files})
     list(REMOVE_ITEM client_source_files_test "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/main.cpp")
     add_executable(
@@ -255,7 +261,7 @@ if(BUILD_TESTS)
 
     set_property(TARGET ${TEST_EXEC_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
     set_property(TARGET ${TEST_EXEC_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc")
-    
+
     set(server_source_files_test ${server_source_files})
     list(REMOVE_ITEM server_source_files_test "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/main.cpp")
     add_executable(
@@ -296,7 +302,7 @@ if(BUILD_TESTS)
     target_link_libraries(${TEST_EXEC_SERVER} ${CPPUNIT_LIBRARY} ${NAME_LIB})
     target_link_libraries(${TEST_EXEC_CLIENT} ${CPPUNIT_LIBRARY} ${NAME_LIB})
     target_link_libraries(${TEST_EXEC_LIB} ${CPPUNIT_LIBRARY} ${NAME_LIB})
-    
+
     target_link_libraries(${TEST_EXEC_CLIENT} ${NAME_LIB})
     target_link_libraries(${TEST_EXEC_SERVER} ${NAME_LIB})
 

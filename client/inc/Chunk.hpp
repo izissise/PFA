@@ -25,9 +25,9 @@ public:
   static const unsigned	pWidth = width * TileCodex::tileSize;
   static const unsigned pHeight = height * TileCodex::tileSize;
 
-  Chunk(void);
+  Chunk();
   Chunk(const Vector2i &chunkPos);
-  virtual ~Chunk(void);
+  virtual ~Chunk() = default;
 
   Chunk(const Chunk& other) = delete;
   Chunk&	operator=(const Chunk& other) = delete;

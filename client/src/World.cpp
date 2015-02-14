@@ -10,6 +10,7 @@ World::World(Settings& settings) :
   _settings(settings),
   _camera(),
   _player(_camera),
+  _b2World(new b2World(b2Vec2(0.0f, -9.81f)) ),
   _loaded(false)
 {
   CvarList	&cvarList = _settings.getCvarList();
@@ -70,8 +71,10 @@ bool		World::movePlayer(const VectorInt &chunkId,
 		    - _camera.center());
 }
 
-void	World::update()
+void	World::update(const std::chrono::milliseconds& timeStep)
 {
+	//The suggested iteration count for Box2D is 8 for velocity and 3 for position.
+	_b2World->Step(timeStep.count() / 1000.0f, 8, 3);
 }
 
 auto World::_getScreenOrigin(void) const -> screenPos
@@ -188,6 +191,27 @@ bool	World::isChunkLoaded(const Vector2i &chunkPos) const
   if (it == _chunks.end())
     return false;
   return (it->second->isGenerated() || it->second->isLoaded());
+}
+
+void			World::removeOldChunks()
+{
+  const Vector2i	&chunkPos = _player.getChunkId();
+  auto			itr = _chunks.begin();
+  unsigned int		radius = 1 + World::cacheSize;
+
+  while (itr != _chunks.end())
+    {
+      const Vector2i &pos = itr->second->getPosition();
+      if (itr->second->isGenerated() &&
+	  (std::abs(chunkPos.x - pos.x) > radius ||
+	   std::abs(chunkPos.y - pos.y) > radius))
+	{
+	  std::cout << "Removing chunk at pos " << pos.x << " " << pos.y << std::endl;
+	  _chunks.erase(itr++);
+	}
+      else
+	++itr;
+    }
 }
 
 bool			World::getNewChunks(std::vector<Vector2i> &chunks)

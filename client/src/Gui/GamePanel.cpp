@@ -72,14 +72,14 @@ void	GamePanel::createVoiceButton(const sf::Texture &texture, Widget *w,
 				     Controls &controls, int idx)
 {
   sf::FloatRect	zone = w->getZone();
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [&controls, idx](AWidget &widget UNUSED, const sf::Event &event,
+  updateFunc = [&controls, idx](AWidget &widget UNUSED, const sf::Event &ev,
 				sf::RenderWindow &ref UNUSED)
     -> int
     {
-      if (event.type == sf::Event::KeyPressed && event.key.code == idx)
+      if (ev.type == sf::Event::KeyPressed && ev.key.code == idx)
 	{
 	  t_entry		entry = controls.getKeyFromAction(Action::ToggleQuickMenu);
 	  sf::SoundBuffer	buffer;
@@ -112,7 +112,7 @@ void	GamePanel::draw(sf::RenderTarget &window, bool toWin)
   drawHud(window, toWin);
 }
 
-void	GamePanel::trigger(const t_event &event)
+void	GamePanel::trigger(const t_event &ev)
 {
   if (event.e & ~wEvent::Update) // importent to switch the hide state before connecting
     APanelScreen::trigger(event);
@@ -136,9 +136,11 @@ void	GamePanel::trigger(const t_event &event)
 	  notify(t_event(wEvent::Hide | wEvent::Toggle));
 	}
     }
+  else
+    APanelScreen::trigger(ev);
 }
 
-int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
+int	GamePanel::updateHud(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
 
@@ -146,12 +148,12 @@ int	GamePanel::updateHud(const sf::Event &event, sf::RenderWindow &ref, Settings
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
       if ((*rit)->isHidden() == false)
-	if ((retVal = (*rit)->update(event, ref, set)) != 0)
+	if ((retVal = (*rit)->event(ev, ref, set)) != 0)
 	  return retVal;
     }
   for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
     {
-      if ((retVal = (*rit)->update(event, ref, set)) != 0)
+      if ((retVal = (*rit)->update(ev, ref, set)) != 0)
 	return retVal;
     }
   return 0;
@@ -169,22 +171,22 @@ void		GamePanel::adjustNetworkSettings(Settings &set)
 
 int		GamePanel::updateNetwork(Settings &set)
 {
-  ENetEvent	event;
+  ENetEvent	ev;
 
   try
     {
-      if (_socket.pollEvent(&event, 1) < 0)
+      if (_socket.pollEvent(&ev, 1) < 0)
 	throw NetworkException("Connection problem");
-      switch (event.type)
+      switch (ev.type)
 	{
 	case ENET_EVENT_TYPE_CONNECT:
-	  connectClient(event.peer, set);
+	  connectClient(ev.peer, set);
 	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
-	  this->handlePackets(event);
+	  this->handlePackets(ev);
 	  break;
 	case ENET_EVENT_TYPE_DISCONNECT:
-	  disconnectClient(event.peer);
+	  disconnectClient(ev.peer);
 	  break;
 	default:
 	  break;
@@ -197,10 +199,10 @@ int		GamePanel::updateNetwork(Settings &set)
   return 0;
 }
 
-void	GamePanel::handlePackets(ENetEvent &event)
+void	GamePanel::handlePackets(ENetEvent &ev)
 {
-  _proto.parseCmd(event.packet->data, event.packet->dataLength);
-  enet_packet_destroy(event.packet);
+  _proto.parseCmd(ev.packet->data, ev.packet->dataLength);
+  enet_packet_destroy(ev.packet);
 }
 
 void	GamePanel::connectClient(ENetPeer * const peer, Settings &set UNUSED)
@@ -209,7 +211,7 @@ void	GamePanel::connectClient(ENetPeer * const peer, Settings &set UNUSED)
   sendConnectionInfo();
 }
 
-void	GamePanel::disconnectClient(ENetPeer * const peer)
+void	GamePanel::disconnectClient(UNUSED ENetPeer * const peer)
 {
   std::cout << "Disconnect Peer" << std::endl;
   setHide(true);
@@ -244,20 +246,24 @@ void			GamePanel::sendConnectionInfo() const
   _socket.sendPacket(1, serialized);
 }
 
-int		GamePanel::update(const sf::Event &event,
+void	GamePanel::update(std::chrono::milliseconds timeStep, Settings &set)
+{
+  if (_adjustedNet == false)
+    adjustNetworkSettings(set);
+  updateNetwork(set);
+  _world->update(timeStep);
+}
+
+int		GamePanel::event(const sf::Event &ev,
 				  sf::RenderWindow &ref,
 				  Settings &set)
 {
   int		retVal;
 
-  if (_adjustedNet == false)
-    adjustNetworkSettings(set);
-  updateNetwork(set);
   if (_actAnalyzer.getInputChanges(set))
     {
       _socket.sendPacket(1, _actAnalyzer.serialize());
     }
-  retVal = updateHud(event, ref, set);
-  _world->update();
+  retVal = updateHud(ev, ref, set);
   return retVal;
 }
