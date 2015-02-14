@@ -71,8 +71,8 @@ void	Parser::execKeyword(const std::vector<std::string> &tokens)
 void	Parser::giveCvarInfo(const std::vector<std::string> &tokens)
 {
   CvarList	&cvars = _set->getCvarList();
-  const std::array<std::string, 3> cvarInfo = cvars.getCvarInfo(tokens[0]);
-  const std::string cvarValue = cvars.getCvar(tokens[0]);
+  auto		&cvarInfo = cvars.getCvarInfo(tokens[0]);
+  const std::string &cvarValue = cvars.getCvar(tokens[0]);
 
   _retVal.push_back(tokens[0] + " [" + cvarValue + "] [Def: "
 		    + cvarInfo[0] + " | Min: "
