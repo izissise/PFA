@@ -38,10 +38,10 @@ void	ServerInfoPanel::construct(const sf::Texture &texture UNUSED, Settings &set
 
 void	ServerInfoPanel::createNameWidget(Widget *widget)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       return 0;
@@ -51,10 +51,10 @@ void	ServerInfoPanel::createNameWidget(Widget *widget)
 
 void	ServerInfoPanel::createCountryWidget(Widget *widget)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       return 0;
@@ -64,10 +64,10 @@ void	ServerInfoPanel::createCountryWidget(Widget *widget)
 
 void	ServerInfoPanel::createPlayerWidget(Widget *widget)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       return 0;
@@ -77,10 +77,10 @@ void	ServerInfoPanel::createPlayerWidget(Widget *widget)
 
 void	ServerInfoPanel::createPingWidget(Widget *widget)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       return 0;

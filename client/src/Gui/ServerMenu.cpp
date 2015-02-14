@@ -81,15 +81,15 @@ void	ServerMenu::updateContent()
   // getEnetEvent
 }
 
-int	ServerMenu::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
+int	ServerMenu::update(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
 {
   if (_update)
     {
       updateContent();
       _update = false;
-      return updateView(event, ref, set);
+      return updateView(ev, ref, set);
     }
-  return updateView(event, ref, set);
+  return updateView(ev, ref, set);
 }
 
 void	ServerMenu::createHeader(Settings &set UNUSED,
@@ -150,14 +150,14 @@ Panel *ServerMenu::createContPanel(Settings &set UNUSED,
 {
   Panel	*content = new Panel(sf::FloatRect{_zone.left, _zone.top + 140,
 	_zone.width, _zone.height - 190});
-  std::function<void (const t_event &event)>	triggerFunc;
+  std::function<void (const t_event &ev)>	triggerFunc;
 
-  triggerFunc = [content](const t_event &event)
+  triggerFunc = [content](const t_event &ev)
     {
-      if (event.e & wEvent::Update) // Means a connect to ip
+      if (ev.e & wEvent::Update) // Means a connect to ip
 	{
 	  content->notify(t_event(wEvent::Hide | wEvent::Toggle)); // swap the panels
-	  content->notify(event); // connect to ip
+	  content->notify(ev); // connect to ip
 	}
     };
   content->addObserver({this, panels.at(0)}); // this & gamepanel
@@ -213,20 +213,20 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 void	ServerMenu::setFavTrigger(Settings &set, const sf::Texture &texture,
 				  Panel *panel, APanelScreen *container)
 {
-  std::function<void (const t_event &event)>  func;
+  std::function<void (const t_event &ev)>  func;
 
-  func = [&, panel, container](const t_event &event)
+  func = [&, panel, container](const t_event &ev)
     {
-      if (event.e & wEvent::Hide)
+      if (ev.e & wEvent::Hide)
   	{
-  	  if (event.e & wEvent::Toggle)
+  	  if (ev.e & wEvent::Toggle)
   	    panel->setHide(!(panel->isHidden()));
   	  else
 	    panel->setHide(true);
 	  if (!panel->isHidden()) // load the panel content
 	    loadFavServers(set, texture, panel, container);
 	}
-      if (event.e & wEvent::Reset)
+      if (ev.e & wEvent::Reset)
 	{
 	  if (!panel->isHidden()) // refresh the panel content
 	    loadFavServers(set, texture, panel, container);
@@ -256,11 +256,11 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
   panel->construct(texture, set, {});
 }
 
-void	ServerMenu::trigger(const t_event &event)
+void	ServerMenu::trigger(const t_event &ev)
 {
-  if (event.e & wEvent::Hide)
+  if (ev.e & wEvent::Hide)
     {
-      if (event.e & wEvent::Toggle)
+      if (ev.e & wEvent::Toggle)
 	_hide = !_hide;
       else
 	_hide = true;
@@ -270,9 +270,9 @@ void	ServerMenu::trigger(const t_event &event)
 	    pan->setState(APanelScreen::State::Inactive);
 	}
     }
-  if (event.e & wEvent::Reset)
+  if (ev.e & wEvent::Reset)
     {
-      t_event	evt = event;
+      t_event	evt = ev;
 
       evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Reset;
       for (AWidget *widget : _widgets)
@@ -397,10 +397,10 @@ void	ServerMenu::createPopupJoin(Widget *widget, Widget *ip)
   addSpriteForWidget(widget, sf::Color(113, 139, 68, 255), {zone.width, zone.height});
   widget->setColor(sf::Color(225,225,225,255));
 
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [&, ip](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [&, ip](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -412,7 +412,7 @@ void	ServerMenu::createPopupJoin(Widget *widget, Widget *ip)
 	lwidget.setColor(sf::Color(225,225,225,255));
       if (isOver)
 	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	  if (lwidget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      t_event evt(wEvent::Hide | wEvent::Toggle | wEvent::Update);
 
@@ -428,11 +428,11 @@ void	ServerMenu::createPopupJoin(Widget *widget, Widget *ip)
 
 void	ServerMenu::setServerPopupTrigger(Panel *panel)
 {
-  std::function<void (const t_event &event)>  func;
+  std::function<void (const t_event &ev)>  func;
 
-  func = [panel](const t_event &event) // cannot call APanelScreen::trigger
+  func = [panel](const t_event &ev) // cannot call APanelScreen::trigger
     {
-      if (event.e & wEvent::Update)
+      if (ev.e & wEvent::Update)
 	{
 	  StringUtils	su;
 	  std::vector<std::string>	info;
@@ -447,7 +447,7 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
 	  };
 	  const sf::FloatRect &nameZone = wName->getZone();
 
-	  su.split(event.str, '\n', info);
+	  su.split(ev.str, '\n', info);
 	  wName->setTextContent(info.at(0));
 	  wIp->setTextContent(info.at(1));
 	  wPing->setTextContent(info.at(2));
@@ -457,7 +457,7 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
 	  align(wPing);
 	  align(wPl);
 	}
-      panel->APanelScreen::trigger(event);
+      panel->APanelScreen::trigger(ev);
     };
   panel->setTrigger(func);
 }
@@ -465,10 +465,10 @@ void	ServerMenu::setServerPopupTrigger(Panel *panel)
 void	ServerMenu::createAddFavButton(const sf::String &ip, Widget *widget,
 				       const sf::Texture &texture)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [&](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [&](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -478,7 +478,7 @@ void	ServerMenu::createAddFavButton(const sf::String &ip, Widget *widget,
       lwidget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	  if (lwidget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      if (this->addServerToFav(ip))
 		{
@@ -494,11 +494,11 @@ void	ServerMenu::createAddFavButton(const sf::String &ip, Widget *widget,
       return 0;
     };
 
-  std::function<void (const t_event &event)>  tfunc;
+  std::function<void (const t_event &ev)>  tfunc;
 
-  tfunc = [widget](const t_event &event) // cannot call APanelScreen::trigger
+  tfunc = [widget](const t_event &ev) // cannot call APanelScreen::trigger
     {
-      if (event.e & wEvent::Reset)
+      if (ev.e & wEvent::Reset)
 	{
 	  sf::FloatRect zone = widget->getZone();
 
@@ -514,10 +514,10 @@ void	ServerMenu::createAddFavButton(const sf::String &ip, Widget *widget,
 void	ServerMenu::createRemFavButton(const sf::String &ip, Widget *widget,
 				       const sf::Texture &texture)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [&](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [&](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -527,7 +527,7 @@ void	ServerMenu::createRemFavButton(const sf::String &ip, Widget *widget,
       lwidget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	  if (lwidget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      if (this->removeServerFromFav(ip))
 		{
@@ -544,11 +544,11 @@ void	ServerMenu::createRemFavButton(const sf::String &ip, Widget *widget,
       return 0;
     };
 
-  std::function<void (const t_event &event)>  tfunc;
+  std::function<void (const t_event &ev)>  tfunc;
 
-  tfunc = [widget](const t_event &event) // cannot call APanelScreen::trigger
+  tfunc = [widget](const t_event &ev) // cannot call APanelScreen::trigger
     {
-      if (event.e & wEvent::Reset)
+      if (ev.e & wEvent::Reset)
 	{
 	  sf::FloatRect zone = widget->getZone();
 
@@ -638,21 +638,21 @@ Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
 
 void	ServerMenu::setPopupTrigger(Panel *panel)
 {
-  std::function<void (const t_event &event)>  func;
+  std::function<void (const t_event &ev)>  func;
 
-  func = [panel](const t_event &event) // cannot call APanelScreen::trigger
+  func = [panel](const t_event &ev) // cannot call APanelScreen::trigger
     {
-      if (event.e & wEvent::Hide)
+      if (ev.e & wEvent::Hide)
 	{
-	  if (event.e & wEvent::Toggle)
+	  if (ev.e & wEvent::Toggle)
 	    panel->setHide(!panel->isHidden());
 	  else
 	    panel->setHide(true);
 	}
-      if (event.e & wEvent::Update)
+      if (ev.e & wEvent::Update)
 	{
 	  const std::vector<AWidget *> &widgets = panel->getWidgets();
-	  t_event	evt = event;
+	  t_event	evt = ev;
 	  std::string	ip;
 
 	  for (AWidget *widget : widgets)
@@ -661,9 +661,9 @@ void	ServerMenu::setPopupTrigger(Panel *panel)
 	  evt.str = ip;
 	  panel->notify(evt);
 	}
-      if (event.e & wEvent::Reset)
+      if (ev.e & wEvent::Reset)
 	{
-	  t_event	evt = event;
+	  t_event	evt = ev;
 	  const std::vector<AWidget *>	&widgets = panel->getWidgets();
 
 	  evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Reset;
@@ -682,10 +682,10 @@ void	ServerMenu::createTitle(Widget *widget, const sf::FloatRect &zone)
 
 void	ServerMenu::createHome(Widget *widget, const sf::FloatRect &zone)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -693,7 +693,7 @@ void	ServerMenu::createHome(Widget *widget, const sf::FloatRect &zone)
       isOver = lwidget.isOver(ref);
       if (isOver)
 	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	  if (lwidget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      // so we don't se the flickering when getting back to the menu
 	      lwidget.setColor(sf::Color(83, 85, 82, 255));
@@ -715,10 +715,10 @@ void	ServerMenu::createHome(Widget *widget, const sf::FloatRect &zone)
 
 void	ServerMenu::createIp(Widget *widget, const sf::FloatRect &zone)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -726,7 +726,7 @@ void	ServerMenu::createIp(Widget *widget, const sf::FloatRect &zone)
       isOver = lwidget.isOver(ref);
       if (isOver)
 	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	  if (lwidget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      lwidget.setColor(sf::Color(83, 85, 82, 255));
 	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle));
@@ -779,10 +779,10 @@ void	ServerMenu::createButtonStyle(Widget *widget, const sf::Texture &texture)
 void	ServerMenu::createTextWidget(TextWidget *wTextWidget, const sf::Texture &texture UNUSED)
 {
   sf::FloatRect	zone = wTextWidget->getZone();
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &widget, const sf::Event &event UNUSED, sf::RenderWindow &ref UNUSED)
+  updateFunc = [](AWidget &widget, const sf::Event &ev UNUSED, sf::RenderWindow &ref UNUSED)
     -> int
     {
       sf::FloatRect wZone = widget.getZone();
@@ -801,10 +801,10 @@ void	ServerMenu::createTextWidget(TextWidget *wTextWidget, const sf::Texture &te
 
 void	ServerMenu::createCancelButton(Widget *widget, const sf::Texture &texture)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -814,7 +814,7 @@ void	ServerMenu::createCancelButton(Widget *widget, const sf::Texture &texture)
       lwidget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	  if (lwidget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle | wEvent::Reset));
 	      return 0;
@@ -828,10 +828,10 @@ void	ServerMenu::createCancelButton(Widget *widget, const sf::Texture &texture)
 
 void	ServerMenu::createConnectButton(Widget *widget, const sf::Texture &texture)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+  updateFunc = [](AWidget &lwidget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -841,7 +841,7 @@ void	ServerMenu::createConnectButton(Widget *widget, const sf::Texture &texture)
       lwidget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (lwidget.isClicked(event, sf::Mouse::Left))
+	  if (lwidget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      lwidget.notify(t_event(wEvent::Hide | wEvent::Toggle | wEvent::Update));
 	      return 0;
