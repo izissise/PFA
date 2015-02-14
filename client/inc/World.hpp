@@ -35,7 +35,7 @@ public:
   World&		operator=(const World& other) = delete;
 
   void			update(const std::chrono::milliseconds& timeStep);
-  void			draw(sf::RenderWindow& window) const;
+  void			draw(sf::RenderTarget& window) const;
 
   void			load();
   void			loadRange();

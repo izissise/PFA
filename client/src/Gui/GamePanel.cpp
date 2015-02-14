@@ -114,14 +114,14 @@ void	GamePanel::draw(sf::RenderTarget &window, bool toWin)
 
 void	GamePanel::trigger(const t_event &ev)
 {
-  if (event.e & ~wEvent::Update) // importent to switch the hide state before connecting
-    APanelScreen::trigger(event);
-  if (event.e & wEvent::Update)
+  if (ev.e & ~wEvent::Update) // importent to switch the hide state before connecting
+    APanelScreen::trigger(ev);
+  if (ev.e & wEvent::Update)
     {
       _hide = false;
       try
 	{
-	  std::string	ip(event.str);
+	  std::string	ip(ev.str);
 	  std::size_t	pos = ip.find(':');
 
 	  std::cout << "GamePanel trigger " <<  ip.substr(0, pos) << ":"

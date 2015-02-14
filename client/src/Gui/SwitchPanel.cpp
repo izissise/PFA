@@ -6,7 +6,7 @@ SwitchPanel::SwitchPanel(const sf::FloatRect &panelZone,
 {
 }
 
-int	SwitchPanel::update(const sf::Event &event, sf::RenderWindow &ref,
+int	SwitchPanel::update(const sf::Event &ev, sf::RenderWindow &ref,
 			    Settings &set)
 {
   const std::vector<APanelScreen *> &contentPanels = _content->getSubPanels();
@@ -14,8 +14,8 @@ int	SwitchPanel::update(const sf::Event &event, sf::RenderWindow &ref,
   int	dir;
 
   if (!contentPanels.empty())
-    retVal = contentPanels[_idx]->update(event, ref, set);
-  if (!retVal && isOver(ref) && isClicked(event, sf::Mouse::Left))
+    retVal = contentPanels[_idx]->event(ev, ref, set);
+  if (!retVal && isOver(ref) && isClicked(ev, sf::Mouse::Left))
     {
       retVal = 1;
       if ((dir = isOverContent(ref)) != 0)
