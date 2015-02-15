@@ -50,22 +50,23 @@ void  ClientProtocol::handleSetting(const ProtocolMessage &packet)
 {
   if (!packet.has_settings())
     return ;
-  std::cout << "Handle Setting" << std::endl;
+  const SettingMessage &set = packet.settings();
 
-  SettingMessage set = packet.settings();
-  for (int i = 0; i < set.settingentry_size(); ++i)
+  for (int i = 0; i < set.cvars_size(); ++i)
     {
-      SettingMessage::SettingEntry::Cvar cvar = set.settingentry(i).cvar();
+      const cvarData	&cvar = set.cvars(i);
+      std::vector<std::string>	restrict(cvar.restrictedvalues().begin(),
+					 cvar.restrictedvalues().end());
 
-      t_cvar *entry = new t_cvar({
-	  std::string(cvar.min()),
-	    std::string(cvar.max())},
-	std::string(cvar.default_()),
-	cvar.value(), static_cast<cvarType>(cvar.type()));
+      t_cvar *entry = new t_cvar(restrict,
+				 std::string(cvar.default_()),
+				 cvar.value(),
+				 static_cast<cvarType>(cvar.type()),
+				 static_cast<Restriction>(cvar.restrictiontype()));
 
-      if (!_set->getCvarList().addCvar(set.settingentry(i).key(), entry))
+      if (!_set->getCvarList().addCvar(cvar.key(), entry))
 	{
-	  _set->getCvarList().setCvar(set.settingentry(i).key(), cvar.value());
+	  _set->getCvarList().setCvar(cvar.key(), cvar.value());
 	  delete entry;
 	}
     }
