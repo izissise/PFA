@@ -36,9 +36,9 @@ std::string	ServerSettings::serialize()
     SettingMessage::SettingEntry::Cvar *cvar = new SettingMessage::SettingEntry::Cvar();
 
     entry->set_allocated_key(new std::string(it.first));
-    cvar->set_allocated_default_(new std::string(it.second->restrictValue[0]));
-    cvar->set_allocated_min(new std::string(it.second->restrictValue[1]));
-    cvar->set_allocated_max(new std::string(it.second->restrictValue[2]));
+    cvar->set_allocated_default_(new std::string(it.second->defaultValue));
+    cvar->set_allocated_min(new std::string(it.second->restrictValue[0]));
+    cvar->set_allocated_max(new std::string(it.second->restrictValue[1]));
     cvar->set_allocated_value(new std::string(it.second->value));
     cvar->set_type(it.second->type);
 

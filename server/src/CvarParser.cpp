@@ -1,8 +1,10 @@
 #include <fstream>
 #include <sstream>
 #include <iterator>
+
 #include "CvarParser.hpp"
 #include "Exception.hpp"
+#include "StringUtils.hpp"
 
 CvarParser::CvarParser(ACvar &cvars) :
   _cvars(cvars)
@@ -31,10 +33,10 @@ void	CvarParser::execKeyword(const std::vector<std::string> &tokens)
 
 void	CvarParser::parseCommandLine(const std::string &cmd)
 {
-  std::istringstream			buf(cmd);
-  std::istream_iterator<std::string>	beg(buf), end;
-  std::vector<std::string>		tokens(beg, end);
+  std::vector<std::string>	tokens;
+  StringUtils	su;
 
+  su.tokenString(cmd, tokens);
   if (tokens.empty())
     return ;
   else

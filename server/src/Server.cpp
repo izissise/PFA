@@ -25,6 +25,7 @@ Server::Server(t_arg &arg)
   CvarParser	parser(_set);
 
   parser.loadConfigFile("../ServerConfig.cfg");
+  std::cout << "server's name: " << _set.getCvar("sv_hostname") << std::endl;
 }
 
 Server::~Server()
