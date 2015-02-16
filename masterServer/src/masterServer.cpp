@@ -1,4 +1,5 @@
 #include <MasterServerRequest.pb.h>
+#include <MasterServerResponse.pb.h>
 #include "masterServer.hpp"
 
 MasterServer::MasterServer()
@@ -95,10 +96,29 @@ void MasterServer::getServer(ENetPeer *peer)
         // Loop to execute the query step by step, to get rows of result
         while (query.executeStep())
         {
+            MasterServerResponse response;
+            ServerInfo *server = new ServerInfo();
             // Demonstrate how to get some typed column value
             const char* ip     = query.getColumn(0);
             const char* port   = query.getColumn(1);
+
+            server->set_ip(ip);
+            server->set_port(port);
+            server->set_country("France");
+            server->set_currentplayer(3);
+            server->set_maxplayer(20);
             
+            response.set_content(MasterServerResponse::IP);
+            response.set_allocated_server(server);
+            
+            std::string message;
+            response.SerializeToString(&message);
+            
+            ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
+                                                    ENET_PACKET_FLAG_RELIABLE);
+            if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0) {
+                std::cerr << "row: " << ip << ", " << port << " Cannot be send"<< std::endl;
+            }
             std::cout << "row: " << ip << ", " << port << std::endl;
         }
     }
