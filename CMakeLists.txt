@@ -206,7 +206,7 @@ if (Boost_FOUND)
 endif()
 
 if (BOX2D_FOUND)
-   include(${BOX2D_INCLUDE_DIR})
+	 include_directories(${BOX2D_INCLUDE_DIR})
    target_link_libraries (${NAME_LIB} ${BOX2D_LIBRARIES})
 endif()
 
