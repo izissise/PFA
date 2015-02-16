@@ -1,0 +1,18 @@
+message ServerInfo {
+  required string ip = 1;
+  required string port = 2;
+  required uint32 currentPlayer = 3;
+  required uint32 maxPlayer = 4;
+  required string country = 5;
+}
+
+message MasterServerResponse {
+  enum PacketContent
+  {
+    SUCCESS = 0;
+    FAILURE = 1;
+    IP = 2;
+  }
+  required PacketContent content = 1;
+  optional ServerInfo server = 2;
+}
