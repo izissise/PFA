@@ -71,15 +71,13 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
     enet_address_get_host_ip(&peer->address, name, 256);
     try
     {
-        SQLite::Transaction transaction(_db);
+        SQLite::Statement st(_db, "DELETE FROM server WHERE ip LIKE ? AND port LIKE ?");
         
-        std::string tmp(std::string("DELETE FROM server WHERE ip LIKE \"") + name + "\" AND port LIKE \"" + port + "\"");
-        int nb = _db.exec(tmp.c_str());
+        st.bind(1, name);
+        st.bind(2, port);
+        int nb = st.exec();
         
-        std::cout << tmp << ", returned " << nb << std::endl;
-        
-        // Commit transaction
-        transaction.commit();
+        std::cout << st.getQuery() << ", returned " << nb << std::endl;
     }
     catch (std::exception& e)
     {
