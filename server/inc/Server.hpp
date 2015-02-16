@@ -6,13 +6,14 @@
 # include <iostream>
 # include <functional>
 
-# include "NetworkException.hpp"
+# include "Network.hpp"
 # include "Observer.hpp"
 # include "ServerSettings.hpp"
 # include "ServerProtocol.hpp"
 # include "ThreadPool.hpp"
+# include "MasterServerRequest.pb.h"
 
-#define DEFAULT_PORT 6060
+# define DEFAULT_PORT 6060
 
 typedef struct  s_arg
 {
@@ -42,9 +43,11 @@ private:
   void	updateClients();
   void	saveClientId(Client *cl);
   void	actDisplacement(Client *client, Action act);
+  void	registerToMaster();
 
 private:
   t_arg			_arg;
+  Network		_masterSocket;
   ServerSettings	_set;
   ThreadPool		_threadPool;
   ENetAddress		_address;
