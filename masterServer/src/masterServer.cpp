@@ -46,19 +46,17 @@ MasterServer::~MasterServer()
 void MasterServer::createServer(ENetPeer *peer, const std::string &port)
 {
     char name[256] = { 0 };
-
+    
     enet_address_get_host_ip(&peer->address, name, 256);
     try
     {
-        SQLite::Transaction transaction(_db);
+        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?)");
         
-        std::string tmp(std::string("INSERT INTO server VALUES (\"") + name + "\", \"" + port + "\")");
-        int nb = _db.exec(tmp.c_str());
+        st.bind(1, name);
+        st.bind(2, port);
+        int nb = st.exec();
         
-        std::cout << tmp << ", returned " << nb << std::endl;
-        
-        // Commit transaction
-        transaction.commit();
+        std::cout << st.getQuery() << ", returned " << nb << std::endl;
     }
     catch (std::exception& e)
     {
@@ -69,7 +67,7 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port)
 void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
 {
     char name[256] = { 0 };
-
+    
     enet_address_get_host_ip(&peer->address, name, 256);
     try
     {
@@ -142,15 +140,15 @@ void MasterServer::run()
                         case MasterServerRequest::GETIP:
                             getServer(event.peer);
                             break;
-
+                            
                         case MasterServerRequest::CREATESERVER:
                             createServer(event.peer, request.port());
                             break;
-
+                            
                         case MasterServerRequest::DELETESERVER:
                             deleteServer(event.peer, request.port());
                             break;
-
+                            
                         default:
                             break;
                     }
