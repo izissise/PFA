@@ -1,9 +1,10 @@
 message ServerInfo {
   required string ip = 1;
   required string port = 2;
-  required uint32 currentPlayer = 3;
-  required uint32 maxPlayer = 4;
-  required string country = 5;
+  required string name = 3;
+  required uint32 currentPlayer = 4;
+  required uint32 maxPlayer = 5;
+  required string country = 6;
 }
 
 message MasterServerResponse {
