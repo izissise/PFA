@@ -49,8 +49,8 @@ Menu::~Menu()
 
 void	Menu::update(const std::chrono::milliseconds timeStep, Settings &set)
 {
-	for (auto &panel : _panels)
-		panel->update(timeStep, set);
+  for (auto &panel : _panels)
+    panel->update(timeStep, set);
 }
 
 bool	Menu::run(const sf::Event& ev, sf::RenderWindow &window, Settings &set)

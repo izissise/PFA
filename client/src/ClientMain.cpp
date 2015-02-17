@@ -20,14 +20,14 @@ ClientMain::~ClientMain()
 void ClientMain::update()
 {
   int gfps = 1000 / std::stoi(_settings.getCvarList().getCvar("com_gameFps"));
-   TimeHandling time((std::chrono::milliseconds(gfps)));
+  TimeHandling time((std::chrono::milliseconds(gfps)));
 
-	time.start();
-	while (_window.isOpen())
-   	{
-   	 _menu.update(time.GetTargetFrameDuration(), _settings);
-   	  time.endFrame();
-   	}
+  time.start();
+  while (_window.isOpen())
+    {
+      _menu.update(time.GetTargetFrameDuration(), _settings);
+      time.endFrame();
+    }
 }
 
 void ClientMain::run()
