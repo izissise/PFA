@@ -1,5 +1,3 @@
-#include <MasterServerRequest.pb.h>
-#include <MasterServerResponse.pb.h>
 #include "masterServer.hpp"
 
 MasterServer::MasterServer()
@@ -10,9 +8,9 @@ MasterServer::MasterServer()
         fprintf (stderr, "An error occurred while initializing ENet.\n");
         exit (EXIT_FAILURE);
     }
-    
+
     ENetAddress address;
-    
+
     address.host = ENET_HOST_ANY;
     address.port = 25255;
     _server = enet_host_create (& address /* the address to bind the server host to */,
@@ -26,7 +24,7 @@ MasterServer::MasterServer()
         exit (EXIT_FAILURE);
     }
     std::cout << "Server start on " << address.port << std::endl;
-    
+
     try
     {
         _db.exec("CREATE TABLE IF NOT EXISTS server (ip TEXT, port TEXT, PRIMARY KEY (ip, port))");
@@ -44,19 +42,21 @@ MasterServer::~MasterServer()
     enet_deinitialize();
 }
 
-void MasterServer::createServer(ENetPeer *peer, const std::string &port)
+void MasterServer::createServer(ENetPeer *peer, const std::string &port,
+				const ServerData &info)
 {
-    char name[256] = { 0 };
-    
-    enet_address_get_host_ip(&peer->address, name, 256);
+    char ip[256] = { 0 };
+
+    enet_address_get_host_ip(&peer->address, ip, 256);
     try
     {
         SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?)");
-        
-        st.bind(1, name);
+
+        st.bind(1, ip);
         st.bind(2, port);
+	std::cout << "new add name: " << info.name() << " slot: " << info.slots() << std::endl;
         int nb = st.exec();
-        
+
         std::cout << st.getQuery() << ", returned " << nb << std::endl;
     }
     catch (std::exception& e)
@@ -68,16 +68,16 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port)
 void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
 {
     char name[256] = { 0 };
-    
+
     enet_address_get_host_ip(&peer->address, name, 256);
     try
     {
         SQLite::Statement st(_db, "DELETE FROM server WHERE ip LIKE ? AND port LIKE ?");
-        
+
         st.bind(1, name);
         st.bind(2, port);
         int nb = st.exec();
-        
+
         std::cout << st.getQuery() << ", returned " << nb << std::endl;
     }
     catch (std::exception& e)
@@ -92,7 +92,7 @@ void MasterServer::getServer(ENetPeer *peer)
     try
     {
         SQLite::Statement   query(_db, "SELECT * FROM server");
-        
+
         // Loop to execute the query step by step, to get rows of result
         while (query.executeStep())
         {
@@ -107,13 +107,13 @@ void MasterServer::getServer(ENetPeer *peer)
             server->set_country("France");
             server->set_currentplayer(3);
             server->set_maxplayer(20);
-            
+
             response.set_content(MasterServerResponse::IP);
             response.set_allocated_server(server);
-            
+
             std::string message;
             response.SerializeToString(&message);
-            
+
             ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
                                                     ENET_PACKET_FLAG_RELIABLE);
             if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0) {
@@ -132,7 +132,7 @@ void MasterServer::run()
 {
     ENetEvent event;
     MasterServerRequest request;
-    
+
     while ((enet_host_service (_server, &event, 50)) >= 0)
     {
         switch (event.type)
@@ -158,23 +158,20 @@ void MasterServer::run()
                         case MasterServerRequest::GETIP:
                             getServer(event.peer);
                             break;
-                            
                         case MasterServerRequest::CREATESERVER:
-                            createServer(event.peer, request.port());
-                            break;
-                            
+			  createServer(event.peer, request.port(), request.info());
+			  break;
                         case MasterServerRequest::DELETESERVER:
                             deleteServer(event.peer, request.port());
                             break;
-                            
                         default:
                             break;
                     }
-                    
+
                 }
                 /* Clean up the packet now that we're done using it. */
                 enet_packet_destroy (event.packet);
-                
+
                 break;
             }
             case ENET_EVENT_TYPE_DISCONNECT:

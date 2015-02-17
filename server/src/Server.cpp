@@ -76,11 +76,18 @@ void	Server::registerToMaster()
       switch (event.type)
         {
 	case ENET_EVENT_TYPE_CONNECT:
-	  msg.set_content(MasterServerRequest::CREATESERVER);
-	  msg.set_port(_set.getCvar("sv_port"));
-	  msg.SerializeToString(&packet);
-	  _masterSocket.sendPacket(0, packet);
-	  passed = true;
+	  {
+	    ServerData	*data = new ServerData;
+
+	    msg.set_content(MasterServerRequest::CREATESERVER);
+	    msg.set_port(_set.getCvar("sv_port"));
+	    data->set_name(_set.getCvar("sv_hostname"));
+	    data->set_slots(std::stoul(_set.getCvar("sv_slot")));
+	    msg.set_allocated_info(data);
+	    msg.SerializeToString(&packet);
+	    _masterSocket.sendPacket(0, packet);
+	    passed = true;
+	  }
 	  break;
 	default:
 	  std::cout << "pass" << std::endl;
