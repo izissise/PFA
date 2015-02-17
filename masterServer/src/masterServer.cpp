@@ -1,5 +1,3 @@
-#include <MasterServerRequest.pb.h>
-#include <MasterServerResponse.pb.h>
 #include <thread>
 #include "masterServer.hpp"
 
@@ -30,7 +28,9 @@ MasterServer::MasterServer()
     
     try
     {
-        _db.exec("CREATE TABLE IF NOT EXISTS server (ip TEXT, port TEXT, PRIMARY KEY (ip, port))");
+        _db.exec("CREATE TABLE IF NOT EXISTS server"
+                 "(ip TEXT, port TEXT, name TEXT, slots INTEGER,"
+                 "PRIMARY KEY (ip, port))");
     }
     catch (std::exception& e)
     {
@@ -45,17 +45,20 @@ MasterServer::~MasterServer()
     enet_deinitialize();
 }
 
-void MasterServer::createServer(ENetPeer *peer, const std::string &port)
+void MasterServer::createServer(ENetPeer *peer, const std::string &port,
+                                const ServerData &info)
 {
-    char name[256] = { 0 };
+    char ip[256] = { 0 };
     
-    enet_address_get_host_ip(&peer->address, name, 256);
+    enet_address_get_host_ip(&peer->address, ip, 256);
     try
     {
-        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?)");
+        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, ?)");
         
-        st.bind(1, name);
+        st.bind(1, ip);
         st.bind(2, port);
+        st.bind(3, info.name());
+        st.bind(4, static_cast<int>(info.slots()));
         int nb = st.exec();
         
         std::cout << st.getQuery() << ", returned " << nb << std::endl;
@@ -102,7 +105,7 @@ void MasterServer::getServer(ENetPeer *peer)
             // Demonstrate how to get some typed column value
             const char* ip     = query.getColumn(0);
             const char* port   = query.getColumn(1);
-
+            
             server->set_ip(ip);
             server->set_port(port);
             server->set_country("France");
@@ -132,7 +135,7 @@ void MasterServer::getServer(ENetPeer *peer)
 void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
 {
     MasterServerRequest request;
-
+    
     if (request.ParseFromArray(packet->data, packet->dataLength))
     {
         std::cout << "Parse Good" << std::endl;
@@ -142,7 +145,7 @@ void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
                 break;
                 
             case MasterServerRequest::CREATESERVER:
-                createServer(peer, request.port());
+                createServer(peer, request.port(), request.info());
                 break;
                 
             case MasterServerRequest::DELETESERVER:
@@ -162,7 +165,6 @@ void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
 void MasterServer::run()
 {
     ENetEvent event;
-    
     while ((enet_host_service (_server, &event, 50)) >= 0)
     {
         switch (event.type)
@@ -188,7 +190,6 @@ void MasterServer::run()
                         event.packet -> data,
                         event.peer -> data,
                         event.channelID);
-                
                 break;
             }
             case ENET_EVENT_TYPE_DISCONNECT:
