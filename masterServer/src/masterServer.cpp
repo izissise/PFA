@@ -27,7 +27,9 @@ MasterServer::MasterServer()
 
     try
     {
-        _db.exec("CREATE TABLE IF NOT EXISTS server (ip TEXT, port TEXT, PRIMARY KEY (ip, port))");
+      _db.exec("CREATE TABLE IF NOT EXISTS server"
+	       "(ip TEXT, port TEXT, name TEXT, slots INTEGER,"
+	       "PRIMARY KEY (ip, port))");
     }
     catch (std::exception& e)
     {
@@ -50,11 +52,12 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
     enet_address_get_host_ip(&peer->address, ip, 256);
     try
     {
-        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?)");
+        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, ?)");
 
         st.bind(1, ip);
         st.bind(2, port);
-	std::cout << "new add name: " << info.name() << " slot: " << info.slots() << std::endl;
+	st.bind(3, info.name());
+	st.bind(4, static_cast<int>(info.slots()));
         int nb = st.exec();
 
         std::cout << st.getQuery() << ", returned " << nb << std::endl;
