@@ -32,7 +32,7 @@ MasterServer::MasterServer()
         _db.exec("CREATE TABLE IF NOT EXISTS server"
                  "(ip TEXT, port TEXT, name TEXT, slots INTEGER, country TEXT, "
                  "PRIMARY KEY (ip, port))");
-    } 
+    }
     catch (std::exception& e)
     {
         std::cout << "exception: " << e.what() << std::endl;
@@ -54,15 +54,22 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
     enet_address_get_host_ip(&peer->address, ip, 256);
     try
     {
-        IpToCountrySlow iptc;
-        IpAddressMapping country = iptc.GetCountry(ip);
+        std::string c;
+        try {
+            IpToCountrySlow iptc;
+            IpAddressMapping country = iptc.GetCountry(ip);
+            c = country.country;
+        } catch (std::exception &e) {
+            std::cerr << "exception: " << e.what() << std::endl;
+            c = "N/A";
+        }
         SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, ?, ?)");
         
         st.bind(1, ip);
         st.bind(2, port);
         st.bind(3, info.name());
         st.bind(4, static_cast<int>(info.slots()));
-        st.bind(5, country.country);
+        st.bind(5, c );
         int nb = st.exec();
         
         std::cout << st.getQuery() << ", returned " << nb << std::endl;
