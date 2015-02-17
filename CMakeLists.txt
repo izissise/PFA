@@ -5,6 +5,7 @@ project(PFA)
 set(NAME_LIB "common")
 set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
+set(NAME_MASTERSERVER "masterServer")
 set(TEST_EXEC_LIB "UnitTesterLib")
 set(TEST_EXEC_CLIENT "UnitTesterClient")
 set(TEST_EXEC_SERVER "UnitTesterServer")
@@ -12,10 +13,12 @@ set(PROTO_DIR "message")
 
 set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/"
 					  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/"
-					  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/")
+					  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/"
+						"${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/inc/")
 set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/"
 				  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/"
-				  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/")
+				  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/"
+					"${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/src/")
 set(DOC_PATH "${PROJECT_SOURCE_DIR}/doc")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
@@ -29,6 +32,7 @@ find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
 find_package(Box2D REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(ENet)
+find_package(Sqlite3)
 
 INCLUDE(CMakeDependentOption)
 INCLUDE(CheckIncludeFile)
@@ -53,7 +57,6 @@ if (UNIX)
 			   "-Wundef" "-Wno-endif-labels"
 			   "-Wno-shadow" "-Wno-builtin-macro-redefined"
 			   "-Wmissing-declarations"
-			   "-Wdocumentation"
 			   "-Wno-switch-enum"
 		FLAGS_RELEASE  "-march=native" "-O2"
 		FLAGS_DEBUG    "-DNDEBUG" "-g3"
@@ -113,6 +116,18 @@ file(
   ${NAME_SERVER}/inc/*
 )
 
+file(
+	GLOB_RECURSE
+	masterserver_source_files
+	${NAME_MASTERSERVER}/src/*
+)
+
+file(
+	GLOB_RECURSE
+	masterserver_include_files
+	${NAME_MASTERSERVER}/inc/*
+)
+
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
@@ -168,7 +183,20 @@ add_executable(
 set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc")
 set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
 
+add_executable(
+	${NAME_MASTERSERVER}
+# source files
+	${masterserver_source_files}
+	${masterserver_include_files}
+)
+
+set_property(TARGET ${NAME_MASTERSERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/inc")
+set_property(TARGET ${NAME_MASTERSERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+
 target_link_libraries(${NAME_LIB} messages)
+target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
+target_link_libraries(${NAME_SERVER} ${NAME_LIB})
+target_link_libraries(${NAME_MASTERSERVER} ${NAME_LIB})
 
 if (THREADS_FOUND)
   target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
@@ -196,6 +224,11 @@ endif()
 
 target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
 target_link_libraries(${NAME_SERVER} ${NAME_LIB})
+
+if (SQLITE3_FOUND)
+  include_directories(${SQLITE3_INCLUDE_DIR})
+  target_link_libraries (${NAME_MASTERSERVER} ${SQLITE3_LIBRARIES})
+endif()
 
 # --- enable unit tests if desired ---
 if(BUILD_TESTS)

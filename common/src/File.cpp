@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <string>
 #include "File.hpp"
 
 File::File(char separator) :
@@ -16,7 +17,7 @@ void	File::readFile(const std::string &fileName,
   file.open(fileName, mode);
   if (!file)
     throw std::invalid_argument(fileName + " : File not found");
-  while (getline(file, line))
+  while (std::getline(file, line))
     content.push_back(line);
   file.close();
 }

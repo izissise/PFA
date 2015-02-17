@@ -1,0 +1,16 @@
+message ServerData {
+  required string name = 1;
+  required uint32 slots = 2;
+}
+
+message MasterServerRequest {
+  enum PacketContent
+  {
+    GETIP = 0;
+    CREATESERVER = 1;
+    DELETESERVER = 2;
+  }
+  required PacketContent content = 1;
+  required string port = 2;
+  optional ServerData info = 3;
+}

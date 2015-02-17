@@ -1,8 +1,10 @@
 #include <fstream>
 #include <sstream>
 #include <iterator>
+
 #include "Parser.hpp"
 #include "Exception.hpp"
+#include "StringUtils.hpp"
 
 Parser::Parser(Settings *set) :
   _set(set)
@@ -71,8 +73,8 @@ void	Parser::execKeyword(const std::vector<std::string> &tokens)
 void	Parser::giveCvarInfo(const std::vector<std::string> &tokens)
 {
   CvarList	&cvars = _set->getCvarList();
-  const std::array<std::string, 3> cvarInfo = cvars.getCvarInfo(tokens[0]);
-  const std::string cvarValue = cvars.getCvar(tokens[0]);
+  auto		&cvarInfo = cvars.getCvarInfo(tokens[0]);
+  const std::string &cvarValue = cvars.getCvar(tokens[0]);
 
   _retVal.push_back(tokens[0] + " [" + cvarValue + "] [Def: "
 		    + cvarInfo[0] + " | Min: "
@@ -82,10 +84,10 @@ void	Parser::giveCvarInfo(const std::vector<std::string> &tokens)
 
 void	Parser::parseCommandLine(const std::string &cmd, bool isFile)
 {
-  std::istringstream			buf(cmd);
-  std::istream_iterator<std::string>	beg(buf), end;
-  std::vector<std::string>		tokens(beg, end);
+  std::vector<std::string>	tokens;
+  StringUtils	su;
 
+  su.tokenString(cmd, tokens);
   if (tokens.empty())
     return ;
   else if (tokens[0].at(0) == '/' || isFile == true)

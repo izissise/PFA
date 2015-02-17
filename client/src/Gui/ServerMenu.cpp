@@ -42,54 +42,18 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-int	ServerMenu::updateView(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
-{
-  int	retVal = 0;
-  bool	overlap = _flag & APanelScreen::Display::Overlap;
-
-  if (_state & APanelScreen::State::Inactive)
-    {
-      if (_countdown.update() == false)
-	return 0;
-      else
-	removeState(APanelScreen::State::Inactive);
-    }
-  for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
-    {
-      if (!(*rit)->isHidden())
-	{
-	  if (!(overlap) || (overlap && checkPanelBounds(*rit)))
-	    {
-	      if ((retVal = (*rit)->event(ev, ref, set)) != 0)
-		return retVal;
-	      else if ((*rit)->getState() == APanelScreen::State::Leader)
-		return 1;
-	    }
-	}
-    }
-  for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
-    {
-      if (checkPanelBounds(*rit)) // update widget even if hidden
-	if ((retVal = (*rit)->update(ev, ref, set)) != 0)
-	  return retVal;
-    }
-  return retVal;
-}
-
 void	ServerMenu::updateContent()
 {
-  // getEnetEvent
+
 }
 
-int	ServerMenu::update(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
+void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
 {
   if (_update)
     {
       updateContent();
       _update = false;
-      return updateView(ev, ref, set);
     }
-  return updateView(ev, ref, set);
 }
 
 void	ServerMenu::createHeader(Settings &set UNUSED,

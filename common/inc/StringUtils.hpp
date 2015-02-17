@@ -12,7 +12,8 @@ public:
   virtual ~StringUtils();
 
   void		split(const std::string &s, char delim,
-		      std::vector<std::string> &elems);
+		      std::vector<std::string> &elems) const;
+  void		tokenString(const std::string &cmd, std::vector<std::string> &tokens) const;
 };
 
 #endif /* _STRINGUTILS_H_ */

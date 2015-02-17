@@ -19,6 +19,8 @@ public:
   int	pollEvent(ENetEvent *event, int timeout);
   void	adjustNetworkSettings(enet_uint32 incomingBandwidth,
 			      enet_uint32 outgoingBandwidth);
+  ENetHost	*getHost();
+
 private:
   ENetHost	*_host;
   ENetPeer	*_peer;

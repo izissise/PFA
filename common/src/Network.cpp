@@ -3,7 +3,7 @@
 Network::Network()
   : _host(nullptr), _peer(nullptr)
 {
-  if (enet_initialize () != 0)
+  if (enet_initialize() < 0)
     throw NetworkException("An error occurred while initializing ENet.");
 }
 
@@ -20,13 +20,12 @@ void	Network::connect(const std::string &address, const std::string &port, int n
 
   if (_host || _peer)
     disconnect();
-
   if ((_host = enet_host_create(NULL, 1, nbChannel, 0, 0)) == NULL)
     throw NetworkException("An error occurred while trying to create an ENet client host.");
   enet_address_set_host(&addr, address.c_str());
   ss >> addr.port;
   _peer = enet_host_connect(_host, &addr, nbChannel, 0);
-  if (_peer == NULL)
+  if (_peer == nullptr)
     throw NetworkException("No available peers for initiating an ENet connection.");
 }
 
@@ -36,6 +35,8 @@ void	Network::disconnect()
     enet_peer_reset(_peer);
   if (_host)
     enet_host_destroy(_host);
+  _peer = nullptr;
+  _host = nullptr;
 }
 
 void	Network::sendPacket(enet_uint8 chan, const std::string &message) const
@@ -44,8 +45,10 @@ void	Network::sendPacket(enet_uint8 chan, const std::string &message) const
     {
       ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
 					      ENET_PACKET_FLAG_RELIABLE);
-      if (packet == nullptr || enet_peer_send(_peer, chan, packet) != 0)
-	throw (NetworkException("Cannot send the message"));
+      if (packet == nullptr || enet_peer_send(_peer, chan, packet) < 0)
+	{
+	  throw (NetworkException("Cannot send the message"));
+	}
     }
 }
 
@@ -59,5 +62,13 @@ int	Network::pollEvent(ENetEvent *event, int timeout)
 void	Network::adjustNetworkSettings(enet_uint32 incomingBandwidth,
 				       enet_uint32 outgoingBandwidth)
 {
-  enet_host_bandwidth_limit(_host, incomingBandwidth, outgoingBandwidth);
+  if (_host)
+    enet_host_bandwidth_limit(_host, incomingBandwidth, outgoingBandwidth);
+  else
+    throw (NetworkException("Must call connect methode before adjusting network settings"));
+}
+
+ENetHost	*Network::getHost()
+{
+  return _host;
 }

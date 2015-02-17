@@ -16,13 +16,12 @@ public:
   ServerMenu(const sf::FloatRect &zone);
   virtual ~ServerMenu();
 
-  int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
+  void		update(std::chrono::milliseconds timeStep, Settings &set);
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
   void		trigger(const t_event &event);
 
 private:
-  int		updateView(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		updateContent();
   void		createHeader(Settings &set, const sf::Texture &texture,
 			     const std::vector<APanelScreen *> &panels);
