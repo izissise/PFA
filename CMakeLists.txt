@@ -9,8 +9,6 @@ set(TEST_EXEC_LIB "UnitTesterLib")
 set(TEST_EXEC_CLIENT "UnitTesterClient")
 set(TEST_EXEC_SERVER "UnitTesterServer")
 set(PROTO_DIR "message")
-set(PROTO_SRCS "")
-set(PROTO_HDRS "")
 
 set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/"
 					  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/"
@@ -29,8 +27,8 @@ find_package(Threads)
 find_package(SFML 2.1 COMPONENTS system window graphics audio)
 find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
 find_package(Box2D REQUIRED)
+find_package(Protobuf REQUIRED)
 find_package(ENet)
-find_package(Protobuf)
 
 INCLUDE(CMakeDependentOption)
 INCLUDE(CheckIncludeFile)
@@ -53,7 +51,7 @@ if (UNIX)
 			   "-Wchar-subscripts" "-Winit-self" "-Wswitch-enum"
 			   "-Wstrict-aliasing=3"
 			   "-Wundef" "-Wno-endif-labels"
-			   "-Wshadow" "-Wno-builtin-macro-redefined"
+			   "-Wno-shadow" "-Wno-builtin-macro-redefined"
 			   "-Wmissing-declarations"
 			   "-Wdocumentation"
 			   "-Wno-switch-enum"
@@ -62,7 +60,7 @@ if (UNIX)
 			   )
 elseif (MSVC)
   COMPILER_FLAGS(FLAGS "/wd4251" # needs to have dll-interface to be used by clients
-			   "/wd4275" # exported class derived from non-exported class
+			           "/wd4275" # exported class derived from non-exported class
 			   )
 endif()
 
@@ -115,12 +113,6 @@ file(
   ${NAME_SERVER}/inc/*
 )
 
-file(
-  GLOB_RECURSE
-  proto_files
-  ${PROTO_DIR}/proto/*.proto
-)
-
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
@@ -128,31 +120,21 @@ configure_file (
   "${NAME_LIB}/inc/Config.h"
 )
 
-if(PROTOBUF_FOUND)
-
-  execute_process( COMMAND protoc --proto_path "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/proto" --cpp_out "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp" ${proto_files} )
-
-  file(
-  GLOB_RECURSE
-  PROTO_SRCS
-  ${PROTO_DIR}/cpp/*.cc
-  )
-
-  foreach(source_file ${PROTO_SRCS})
-    set_source_files_properties(${source_file} PROPERTIES COMPILE_FLAGS -Wno-shadow)
-  endforeach(source_file)
-
-  file(
-  GLOB_RECURSE
-  PROTO_HDRS
-  ${PROTO_DIR}/cpp/*.h
-  )
-
-  include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp/")
-
-endif()
-
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
+
+add_subdirectory(${PROTO_DIR})
+
+add_library(
+  messages STATIC 
+  ${PROTO_SRC} 
+  ${PROTO_HEADER}
+)
+
+set_target_properties(messages PROPERTIES LINKER_LANGUAGE CXX)
+set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER} PROPERTIES GENERATED TRUE)
+include_directories("${CMAKE_BINARY_DIR}/${PROTO_DIR}")
+add_dependencies(messages protobuf_compilation)
+target_link_libraries(messages ${Boost_LIBRARIES} ${PROTOBUF_LIBRARY})
 
 add_library(
 # executable name
@@ -160,8 +142,6 @@ add_library(
 # source files
   ${lib_source_files}
   ${lib_include_files}
-  ${PROTO_SRCS}
-  ${PROTO_HDRS}
 )
 
 set_property(TARGET ${NAME_LIB} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
@@ -188,8 +168,7 @@ add_executable(
 set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc")
 set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
 
-target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
-target_link_libraries(${NAME_SERVER} ${NAME_LIB})
+target_link_libraries(${NAME_LIB} messages)
 
 if (THREADS_FOUND)
   target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
@@ -215,10 +194,8 @@ if (ENET_FOUND)
    target_link_libraries(${NAME_LIB} ${ENet_LIBRARIES})
 endif()
 
-if (PROTOBUF_FOUND)
-   include_directories(${PROTOBUF_INCLUDE_DIRS})
-   target_link_libraries(${NAME_LIB} ${PROTOBUF_LIBRARIES})
-endif()
+target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
+target_link_libraries(${NAME_SERVER} ${NAME_LIB})
 
 # --- enable unit tests if desired ---
 if(BUILD_TESTS)
