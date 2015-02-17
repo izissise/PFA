@@ -62,7 +62,10 @@ int	Network::pollEvent(ENetEvent *event, int timeout)
 void	Network::adjustNetworkSettings(enet_uint32 incomingBandwidth,
 				       enet_uint32 outgoingBandwidth)
 {
-  enet_host_bandwidth_limit(_host, incomingBandwidth, outgoingBandwidth);
+  if (_host)
+    enet_host_bandwidth_limit(_host, incomingBandwidth, outgoingBandwidth);
+  else
+    throw (NetworkException("Must call connect methode before adjusting network settings"));
 }
 
 ENetHost	*Network::getHost()
