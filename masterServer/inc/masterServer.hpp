@@ -15,6 +15,8 @@ public:
     void deleteServer(ENetPeer *peer, const std::string &port);
     void getServer(ENetPeer *peer);
     
+    void parsePacket(ENetPacket *packet, ENetPeer *peer);
+    
 private:
     ENetHost            *_server;
     SQLite::Database    _db;

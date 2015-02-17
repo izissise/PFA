@@ -1,5 +1,6 @@
 #include <MasterServerRequest.pb.h>
 #include <MasterServerResponse.pb.h>
+#include <thread>
 #include "masterServer.hpp"
 
 MasterServer::MasterServer()
@@ -128,52 +129,65 @@ void MasterServer::getServer(ENetPeer *peer)
     }
 }
 
+void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
+{
+    MasterServerRequest request;
+
+    if (request.ParseFromArray(packet->data, packet->dataLength))
+    {
+        std::cout << "Parse Good" << std::endl;
+        switch (request.content()) {
+            case MasterServerRequest::GETIP:
+                getServer(peer);
+                break;
+                
+            case MasterServerRequest::CREATESERVER:
+                createServer(peer, request.port());
+                break;
+                
+            case MasterServerRequest::DELETESERVER:
+                deleteServer(peer, request.port());
+                break;
+                
+            default:
+                break;
+        }
+        
+    }
+    
+    /* Clean up the packet now that we're done using it. */
+    enet_packet_destroy(packet);
+}
+
 void MasterServer::run()
 {
     ENetEvent event;
-    MasterServerRequest request;
     
     while ((enet_host_service (_server, &event, 50)) >= 0)
     {
         switch (event.type)
         {
             case ENET_EVENT_TYPE_CONNECT:
-                printf ("A new client connected from %x:%u.\n",
-                        event.peer -> address.host,
+            {
+                char name[256] = { 0 };
+                enet_address_get_host_ip(&event.peer->address, name, 256);
+                printf ("A new client connected from %s:%u.\n",
+                        name,
                         event.peer -> address.port);
                 /* Store any relevant client information here. */
-                event.peer -> data = (char *)"Client information";
+                event.peer -> data = strdup(name);
                 break;
+            }
             case ENET_EVENT_TYPE_RECEIVE:
             {
+                std::thread t(&MasterServer::parsePacket, this, event.packet, event.peer);
+                t.detach();
+                
                 printf ("A packet of length %zu containing %s was received from %s on channel %u.\n",
                         event.packet -> dataLength,
                         event.packet -> data,
                         event.peer -> data,
                         event.channelID);
-                if (request.ParseFromArray(event.packet->data, event.packet->dataLength))
-                {
-                    std::cout << "Parse Good" << std::endl;
-                    switch (request.content()) {
-                        case MasterServerRequest::GETIP:
-                            getServer(event.peer);
-                            break;
-                            
-                        case MasterServerRequest::CREATESERVER:
-                            createServer(event.peer, request.port());
-                            break;
-                            
-                        case MasterServerRequest::DELETESERVER:
-                            deleteServer(event.peer, request.port());
-                            break;
-                            
-                        default:
-                            break;
-                    }
-                    
-                }
-                /* Clean up the packet now that we're done using it. */
-                enet_packet_destroy (event.packet);
                 
                 break;
             }
