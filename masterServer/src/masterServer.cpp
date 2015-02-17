@@ -47,24 +47,24 @@ MasterServer::~MasterServer()
 void MasterServer::createServer(ENetPeer *peer, const std::string &port,
 				const ServerData &info)
 {
-    char ip[256] = { 0 };
+  char ip[256] = { 0 };
 
-    enet_address_get_host_ip(&peer->address, ip, 256);
-    try
+  enet_address_get_host_ip(&peer->address, ip, 256);
+  try
     {
-        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, ?)");
+      SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, ?)");
 
-        st.bind(1, ip);
-        st.bind(2, port);
-	st.bind(3, info.name());
-	st.bind(4, static_cast<int>(info.slots()));
-        int nb = st.exec();
+      st.bind(1, ip);
+      st.bind(2, port);
+      st.bind(3, info.name());
+      st.bind(4, static_cast<int>(info.slots()));
+      int nb = st.exec();
 
-        std::cout << st.getQuery() << ", returned " << nb << std::endl;
+      std::cout << st.getQuery() << ", returned " << nb << std::endl;
     }
-    catch (std::exception& e)
+  catch (std::exception& e)
     {
-        std::cout << "exception: " << e.what() << std::endl;
+      std::cout << "exception: " << e.what() << std::endl;
     }
 }
 
@@ -92,42 +92,46 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
 
 void MasterServer::getServer(ENetPeer *peer)
 {
-    try
+  try
     {
-        SQLite::Statement   query(_db, "SELECT * FROM server");
+      SQLite::Statement   query(_db, "SELECT * FROM server");
 
-        // Loop to execute the query step by step, to get rows of result
-        while (query.executeStep())
-        {
-            MasterServerResponse response;
-            ServerInfo *server = new ServerInfo();
-            // Demonstrate how to get some typed column value
-            const char* ip     = query.getColumn(0);
-            const char* port   = query.getColumn(1);
+      // Loop to execute the query step by step, to get rows of result
+      while (query.executeStep())
+	{
+	  MasterServerResponse response;
+	  ServerInfo *server = new ServerInfo();
+	  // Demonstrate how to get some typed column value
+	  const char* ip = query.getColumn(0).getText("N/A");
+	  const char* port = query.getColumn(1).getText("N/A");
+	  const char* name = query.getColumn(2).getText("N/A");
+	  unsigned int slots = query.getColumn(3).getInt();
 
-            server->set_ip(ip);
-            server->set_port(port);
-            server->set_country("France");
-            server->set_currentplayer(3);
-            server->set_maxplayer(20);
+	  server->set_ip(ip);
+	  server->set_port(port);
+	  server->set_name(name);
+	  server->set_currentplayer(0);
+	  server->set_maxplayer(slots);
+	  server->set_country("FR");
 
-            response.set_content(MasterServerResponse::IP);
-            response.set_allocated_server(server);
+	  response.set_content(MasterServerResponse::IP);
+	  response.set_allocated_server(server);
 
-            std::string message;
-            response.SerializeToString(&message);
+	  std::string message;
+	  response.SerializeToString(&message);
 
-            ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
+	  ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
                                                     ENET_PACKET_FLAG_RELIABLE);
-            if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0) {
-                std::cerr << "row: " << ip << ", " << port << " Cannot be send"<< std::endl;
-            }
-            std::cout << "row: " << ip << ", " << port << std::endl;
+	  if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
+	    {
+	      std::cerr << "row: " << ip << ", " << port << " Cannot be send"<< std::endl;
+	    }
+	  std::cout << "row: " << ip << ", " << port << std::endl;
         }
     }
-    catch (std::exception& e)
+  catch (std::exception& e)
     {
-        std::cout << "exception: " << e.what() << std::endl;
+      std::cout << "exception: " << e.what() << std::endl;
     }
 }
 
