@@ -6,7 +6,6 @@
 # include "World.hpp"
 # include "Settings.hpp"
 # include "Network.hpp"
-# include "NetworkException.hpp"
 # include "ProtocolMessage.pb.h"
 # include "ClientMessage.pb.h"
 # include "ThreadPool.hpp"

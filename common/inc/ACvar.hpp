@@ -2,7 +2,7 @@
 #define _ACVAR_H_
 
 # include <map>
-# include <array>
+# include <vector>
 # include <iostream>
 
 enum cvarType {Number, String};
@@ -12,14 +12,26 @@ enum cvarType {Number, String};
 ** default - {min, max} or {val1, val2, valX}
 */
 
+enum class Restriction
+{
+  None = 0,
+  Range,
+  Value
+};
+
 typedef struct	s_cvar
 {
-  std::array<std::string, 3>	restrictValue;
+  std::vector<std::string>	restrictValue;
+  std::string			defaultValue;
   std::string			value;
   cvarType			type;
-  s_cvar(const std::array<std::string, 3> &vec,
-	 const std::string &val,  cvarType dtype) :
-    restrictValue(vec), value(val), type(dtype)
+  Restriction			restrictType;
+  s_cvar(const std::vector<std::string> &vec,
+	 const std::string &dValue,
+	 const std::string &val, cvarType dtype,
+	 Restriction restric = Restriction::Range) :
+    restrictValue(vec),  defaultValue(dValue),
+    value(val), type(dtype), restrictType(restric)
   {
   }
 }		t_cvar;
@@ -33,7 +45,7 @@ public:
   virtual void	       	setCvar(const std::string &name, const std::string &value);
 
   bool	isCvar(const std::string &name) const;
-  const std::array<std::string, 3>	&getCvarInfo(const std::string &name) const;
+  const std::vector<std::string>	&getCvarInfo(const std::string &name) const;
   const std::string	&getCvar(const std::string &name) const;
   bool			addCvar(const std::string &name, t_cvar *cvar);
 

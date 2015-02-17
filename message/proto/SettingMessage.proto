@@ -1,15 +1,12 @@
+message cvarData {
+    required string key = 1;
+    repeated string restrictedValues = 2;
+    required string default = 3;
+    required string value = 4;
+    required int32 type = 5;
+    optional int32 restrictionType = 6;
+}
+
 message SettingMessage {
-  repeated group SettingEntry = 1
-  {
-
-    required string key = 2;
-
-    required group Cvar = 3 {
-      required string min = 4;
-      required string max = 5;
-      required string default = 6;
-      required string value = 7;
-      required int32  type = 8;
-    }
-  }
+    repeated cvarData cvars = 1;
 }
