@@ -39,9 +39,9 @@ void	ServerItem::createBackgroundController(Widget *widget)
   widget->setEdge(sf::Vector2f(_zone.width, _zone.height), 3.f,
 	       sf::Color(46, 50, 49, 255));
 
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &evt, sf::RenderWindow &ref)>
     updateDisplay =
-    [this](AWidget &lwidget, const sf::Event &event, sf::RenderWindow &ref)
+    [this](AWidget &lwidget, const sf::Event &evt, sf::RenderWindow &ref)
     {
       bool	isOver;
 
@@ -50,26 +50,26 @@ void	ServerItem::createBackgroundController(Widget *widget)
       lwidget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (lwidget.isClicked(event, sf::Mouse::Right))
+	  if (lwidget.isClicked(evt, sf::Mouse::Right))
 	    {
-	      t_event	evt(wEvent::Update | wEvent::Hide | wEvent::Toggle);
+	      t_event	ev(wEvent::Update | wEvent::Hide | wEvent::Toggle);
 
-	      evt.str = getWidget("Name")->getContent() + "\n" +
+	      ev.str = getWidget("Name")->getContent() + "\n" +
 	      	getIp() + "\n" +
 		getWidget("Ping")->getContent() + "\n" +
 	      	getWidget("Players")->getContent();
-	      lwidget.notify(evt);
+	      lwidget.notify(ev);
 	      return 1;
 	    }
-	  else if (lwidget.isClicked(event, sf::Mouse::Left))
+	  else if (lwidget.isClicked(evt, sf::Mouse::Left))
 	    {
-	      t_event	evt(wEvent::Update | wEvent::Show);
+	      t_event	ev(wEvent::Update | wEvent::Show);
 
-	      evt.str = getWidget("Name")->getContent() + "\n" +
+	      ev.str = getWidget("Name")->getContent() + "\n" +
 	      	getIp() + "\n" +
 		getWidget("Ping")->getContent() + "\n" +
 	      	getWidget("Players")->getContent();
-	      lwidget.notify(evt);
+	      lwidget.notify(ev);
 	      return 1;
 	    }
 	}

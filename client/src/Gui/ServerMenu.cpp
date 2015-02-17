@@ -6,7 +6,7 @@
 #include "StringUtils.hpp"
 
 ServerMenu::ServerMenu(const sf::FloatRect &zone) :
-  APanelScreen(zone), _update(true)
+  APanelScreen(zone), _update(true), _masterSocket()
 {
   addFont("default", "../client/assets/default.TTF");
   _hide = true;
@@ -19,39 +19,116 @@ ServerMenu::~ServerMenu()
 void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels)
 {
-  Panel *cont = createContPanel(set, texture, {panels.at(1)}); // pass the gamepanel
-  Panel *serv = createServListPanel(set, texture, {cont});
-  Panel *fav = createFavPanel(set, texture, {cont});
+  _texture = &texture;
+  _cont = createContPanel(set, texture, {panels.at(1)}); // pass the gamepanel
+  Panel *serv = createServListPanel(set, texture, {_cont});
+  Panel *fav = createFavPanel(set, texture, {_cont});
   Widget	*bgWidget = new Widget("bg", _zone, sf::Text(), wFlag::None);
-  cont->addPanel({serv, fav});
-  cont->construct(texture, set, {});
-  addPanel(cont);
+  _cont->addPanel({serv, fav});
+  _cont->construct(texture, set, {});
+  addPanel(_cont);
 
   addSpriteForWidget(bgWidget, sf::Color(39, 43, 42, 255), {_zone.width, _zone.height});
   createTabBar(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
   createHeader(set, texture, {panels[0], popup});
-  createListHeader(set, texture, {cont});
+  createListHeader(set, texture, {_cont});
   _panelCo = createServerPopup(set, texture, {panels.at(1), this});
 
-  for (unsigned int i = 0; i < 50; ++i)
-    addServerToList(set, texture, "127.0.0.1:6060", {serv, cont});
+  // for (unsigned int i = 0; i < 50; ++i)
+  //   addServerToList(set, texture, "127.0.0.1:6060", {serv, _cont});
 
   _widgets.push_back(bgWidget);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void	ServerMenu::updateContent()
+void	ServerMenu::parseServerPacket(Settings &set, const void *data, int size)
 {
+  MasterServerResponse	packet;
 
+  if (packet.ParseFromString(std::string((char *)data, size)))
+    {
+      if (!packet.has_content())
+	return ;
+      if (packet.content() == MasterServerResponse::IP)
+	{
+	  const std::vector<APanelScreen *>	&containers = _cont->getSubPanels();
+	  const ServerInfo	&server = packet.server();
+
+	  std::cout << "add Server: " << server.ip() << ":" << server.port() << std::endl;
+	  addServerToList(set, *_texture, server.ip() + server.port(), {containers.at(0), _cont});
+	}
+    }
+  else
+    std::cerr << "Cannot DeSerialize Data" << std::endl;
+}
+
+void	ServerMenu::updateContent(Settings &set)
+{
+  const CvarList	&cvars = set.getCvarList();
+  ENetEvent		evt;
+  MasterServerRequest	msg;
+  std::string		packet;
+
+  _masterSocket.connect(cvars.getCvar("sv_masterIP"),
+			cvars.getCvar("sv_masterPort"),
+			2);
+  while ((enet_host_service(_masterSocket.getHost(), &evt, 100)) > 0) // if no evt == 0
+    {
+      switch (evt.type)
+        {
+	case ENET_EVENT_TYPE_CONNECT:
+	  msg.set_content(MasterServerRequest::GETIP);
+	  msg.set_port("");
+	  msg.SerializeToString(&packet);
+	  _masterSocket.sendPacket(0, packet);
+	  break;
+	case ENET_EVENT_TYPE_RECEIVE:
+	  parseServerPacket(set, evt.packet->data, evt.packet->dataLength);
+	  break;
+	default:
+	  std::cout << "pass" << std::endl;
+	  break;
+        }
+    }
+}
+
+void         ServerMenu::draw(sf::RenderTarget &window, bool first)
+{
+  sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);
+  // here i get the target to draw into
+
+  if (&target != &window)                       // then we get a new RenderTarget
+    target.clear(sf::Color(127,127,127,0));     // clear it before any usage
+  if (dynamic_cast<sf::RenderTexture *>(&target) != nullptr) // draw content into the renderTexture
+    {
+      for (auto &widget : _widgets)
+        if (!widget->isHidden())
+          widget->draw(target);
+    }
+  for (auto &panel : _panels)
+    if (!panel->isHidden())
+      {
+	if (panel == _cont)
+	  {
+	    std::lock_guard<std::mutex> lock(_mutex);
+	    panel->draw(target, false);
+	  }
+	else
+	  panel->draw(target, false);
+      }
+  if (first)
+    print(window, false);
 }
 
 void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
 {
+  if (_hide)
+    return ;
   if (_update)
     {
-      updateContent();
+      updateContent(set);
       _update = false;
     }
 }
@@ -275,6 +352,7 @@ void	ServerMenu::addServerToList(Settings &set,
 				    const std::string &ip,
 				    const std::vector<APanelScreen *> &panels)
 {
+  std::lock_guard<std::mutex>	lock(_mutex);
   APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
   sf::FloatRect	widgetZone(zone.left + zone.width / 6.f, 0, zone.width / 2.f, 60);

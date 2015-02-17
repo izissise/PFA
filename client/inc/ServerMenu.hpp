@@ -1,12 +1,17 @@
 #ifndef _SERVERMENU_H_
 #define _SERVERMENU_H_
 
+#include <mutex>
+
 #include "Panel.hpp"
 #include "Widget.hpp"
 #include "TextWidget.hpp"
 #include "TabWidget.hpp"
 #include "ScrollWidget.hpp"
 #include "ServerItem.hpp"
+#include "Network.hpp"
+#include "MasterServerRequest.pb.h"
+#include "MasterServerResponse.pb.h"
 
 #define FavFile "../favlist.txt"
 
@@ -16,13 +21,15 @@ public:
   ServerMenu(const sf::FloatRect &zone);
   virtual ~ServerMenu();
 
+  void		draw(sf::RenderTarget &window, bool first);
   void		update(std::chrono::milliseconds timeStep, Settings &set);
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
   void		trigger(const t_event &event);
 
 private:
-  void		updateContent();
+  void		parseServerPacket(Settings &set, const void *data, int size);
+  void		updateContent(Settings &set);
   void		createHeader(Settings &set, const sf::Texture &texture,
 			     const std::vector<APanelScreen *> &panels);
   void		createTitle(Widget *title, const sf::FloatRect &zone);
@@ -70,7 +77,11 @@ private:
 
 private:
   bool		_update;
+  Network	_masterSocket;
   Panel		*_panelCo;
+  Panel		*_cont;
+  std::mutex	_mutex;
+  const sf::Texture	*_texture;
 };
 
 #endif /* _SERVERMENU_H_ */
