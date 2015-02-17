@@ -11,6 +11,6 @@ message MasterServerRequest {
     DELETESERVER = 2;
   }
   required PacketContent content = 1;
-  required string port = 2;
+  optional string port = 2;
   optional ServerData info = 3;
 }

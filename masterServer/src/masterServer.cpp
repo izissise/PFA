@@ -1,5 +1,6 @@
 #include <thread>
 #include "masterServer.hpp"
+#include "IpToCountrySlow.hpp"
 
 MasterServer::MasterServer()
 : _db("server.db", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)
@@ -29,9 +30,9 @@ MasterServer::MasterServer()
     try
     {
         _db.exec("CREATE TABLE IF NOT EXISTS server"
-                 "(ip TEXT, port TEXT, name TEXT, slots INTEGER,"
+                 "(ip TEXT, port TEXT, name TEXT, slots INTEGER, country TEXT, "
                  "PRIMARY KEY (ip, port))");
-    }
+    } 
     catch (std::exception& e)
     {
         std::cout << "exception: " << e.what() << std::endl;
@@ -48,24 +49,27 @@ MasterServer::~MasterServer()
 void MasterServer::createServer(ENetPeer *peer, const std::string &port,
                                 const ServerData &info)
 {
-  char ip[256] = { 0 };
-
-  enet_address_get_host_ip(&peer->address, ip, 256);
-  try
+    char ip[256] = { 0 };
+    
+    enet_address_get_host_ip(&peer->address, ip, 256);
+    try
     {
-      SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, ?)");
-
-      st.bind(1, ip);
-      st.bind(2, port);
-      st.bind(3, info.name());
-      st.bind(4, static_cast<int>(info.slots()));
-      int nb = st.exec();
-
-      std::cout << st.getQuery() << ", returned " << nb << std::endl;
+        IpToCountrySlow iptc;
+        IpAddressMapping country = iptc.GetCountry(ip);
+        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, ?, ?)");
+        
+        st.bind(1, ip);
+        st.bind(2, port);
+        st.bind(3, info.name());
+        st.bind(4, static_cast<int>(info.slots()));
+        st.bind(5, country.country);
+        int nb = st.exec();
+        
+        std::cout << st.getQuery() << ", returned " << nb << std::endl;
     }
-  catch (std::exception& e)
+    catch (std::exception& e)
     {
-      std::cout << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << std::endl;
     }
 }
 
@@ -93,53 +97,53 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
 
 void MasterServer::getServer(ENetPeer *peer)
 {
-  try
+    try
     {
-      SQLite::Statement   query(_db, "SELECT * FROM server");
-
-      // Loop to execute the query step by step, to get rows of result
-      while (query.executeStep())
-	{
-	  MasterServerResponse response;
-	  ServerInfo *server = new ServerInfo();
-	  // Demonstrate how to get some typed column value
-	  const char* ip = query.getColumn(0).getText("N/A");
-	  const char* port = query.getColumn(1).getText("N/A");
-	  const char* name = query.getColumn(2).getText("N/A");
-	  unsigned int slots = query.getColumn(3).getInt();
-
-	  server->set_ip(ip);
-	  server->set_port(port);
-	  server->set_name(name);
-	  server->set_currentplayer(0);
-	  server->set_maxplayer(slots);
-	  server->set_country("FR");
-
-	  response.set_content(MasterServerResponse::IP);
-	  response.set_allocated_server(server);
-
-	  std::string message;
-	  response.SerializeToString(&message);
-
-	  ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
+        SQLite::Statement   query(_db, "SELECT * FROM server");
+        
+        // Loop to execute the query step by step, to get rows of result
+        while (query.executeStep())
+        {
+            MasterServerResponse response;
+            ServerInfo *server = new ServerInfo();
+            // Demonstrate how to get some typed column value
+            const char* ip = query.getColumn(0).getText("N/A");
+            const char* port = query.getColumn(1).getText("N/A");
+            const char* name = query.getColumn(2).getText("N/A");
+            unsigned int slots = query.getColumn(3).getInt();
+            const char *country = query.getColumn(4).getText("N/A");
+            
+            server->set_ip(ip);
+            server->set_port(port);
+            server->set_name(name);
+            server->set_currentplayer(0);
+            server->set_maxplayer(slots);
+            server->set_country(country);
+            
+            response.set_content(MasterServerResponse::IP);
+            response.set_allocated_server(server);
+            
+            std::string message;
+            response.SerializeToString(&message);
+            
+            ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
                                                     ENET_PACKET_FLAG_RELIABLE);
-	  if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
-	    {
-	      std::cerr << "row: " << ip << ", " << port << " Cannot be send"<< std::endl;
-	    }
-	  std::cout << "row: " << ip << ", " << port << std::endl;
+            std::cout << "row: " << ip << ", " << port << std::endl;
+            if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
+            {
+                std::cerr << "Cannot be send"<< std::endl;
+            }
         }
     }
-  catch (std::exception& e)
+    catch (std::exception& e)
     {
-      std::cout << "exception: " << e.what() << std::endl;
+        std::cout << "exception: " << e.what() << std::endl;
     }
 }
 
 void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
 {
     MasterServerRequest request;
-    
     if (request.ParseFromArray(packet->data, packet->dataLength))
     {
         std::cout << "Parse Good" << std::endl;
