@@ -67,9 +67,9 @@ private:
   void		createPopupText(Widget *widget, bool left);
   void		createPopupJoin(Widget *widget, Widget *ip);
   void		setFavTrigger(Settings &set, const sf::Texture &texture,
-			      Panel *panel, APanelScreen *container);
+			      Panel *panel);
   void		loadFavServers(Settings &set, const sf::Texture &texture,
-			       Panel *panel, APanelScreen *container);
+			       Panel *panel);
   bool		addServerToFav(const std::string &ip) const;
   bool		removeServerFromFav(const std::string &ip) const;
   ServerItem	*addServerToList(Settings &set,

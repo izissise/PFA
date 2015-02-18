@@ -55,10 +55,10 @@ void	ServerMenu::parseServerPacket(Settings &set, const void *data, int size)
 	{
 	  std::lock_guard<std::mutex>	lock(_mutex);
 	  const std::vector<APanelScreen *>	&containers = _cont->getSubPanels();
-	  const ServerInfo	&server = packet.server();
+	  const ServerInfo			&server = packet.server();
 
 	  std::cout << "add Server: " << server.ip() << ":" << server.port() << std::endl;
-	  _servers.push(t_server(_cont, containers.at(0), server));
+	  _servers.push(t_server(_cont, containers.at(packet.place()), server));
 	}
     }
   else
@@ -291,7 +291,7 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
 
-  setFavTrigger(set, texture, content, panels[0]); // container
+  setFavTrigger(set, texture, content); // container
   content->setDisplayFlag(APanelScreen::Display::Overlap);
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
@@ -303,11 +303,11 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 }
 
 void	ServerMenu::setFavTrigger(Settings &set, const sf::Texture &texture,
-				  Panel *panel, APanelScreen *container)
+				  Panel *panel)
 {
   std::function<void (const t_event &ev)>  func;
 
-  func = [&, panel, container](const t_event &ev)
+  func = [&, panel](const t_event &ev)
     {
       if (ev.e & wEvent::Hide)
   	{
@@ -316,19 +316,19 @@ void	ServerMenu::setFavTrigger(Settings &set, const sf::Texture &texture,
   	  else
 	    panel->setHide(true);
 	  if (!panel->isHidden()) // load the panel content
-	    loadFavServers(set, texture, panel, container);
+	    loadFavServers(set, texture, panel);
 	}
       if (ev.e & wEvent::Reset)
 	{
 	  if (!panel->isHidden()) // refresh the panel content
-	    loadFavServers(set, texture, panel, container);
+	    loadFavServers(set, texture, panel);
 	}
     };
   panel->setTrigger(func);
 }
 
 void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
-				   Panel *panel, APanelScreen *container)
+				   Panel *panel)
 {
   std::vector<std::string>	content;
   File		file;

@@ -114,6 +114,7 @@ void MasterServer::sendServers(ENetPeer *peer)
 	  server->set_country("FR");
 
 	  response.set_content(MasterServerResponse::IP);
+	  response.set_place(0);
 	  response.set_allocated_server(server);
 	  response.SerializeToString(&message);
 
@@ -158,6 +159,7 @@ void	MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
 	  server->set_country("FR");
 
 	  response.set_content(MasterServerResponse::IP);
+	  response.set_place(1);
 	  response.set_allocated_server(server);
 	  response.SerializeToString(&message);
 
