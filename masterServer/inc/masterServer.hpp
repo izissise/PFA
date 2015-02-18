@@ -18,6 +18,8 @@ public:
                       const ServerData &info);
     void deleteServer(ENetPeer *peer, const std::string &port);
     void getServer(ENetPeer *peer);
+    void addPlayer(ENetPeer *peer, const std::string &port);
+    void subPlayer(ENetPeer *peer, const std::string &port);
     
     void parsePacket(ENetPacket *packet, ENetPeer *peer);
     

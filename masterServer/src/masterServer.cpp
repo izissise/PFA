@@ -30,7 +30,7 @@ MasterServer::MasterServer()
     try
     {
         _db.exec("CREATE TABLE IF NOT EXISTS server"
-                 "(ip TEXT, port TEXT, name TEXT, slots INTEGER, country TEXT, "
+                 "(ip TEXT, port TEXT, name TEXT, currentPlayer INTEGER, slots INTEGER, country TEXT, "
                  "PRIMARY KEY (ip, port))");
     }
     catch (std::exception& e)
@@ -63,13 +63,13 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
             std::cerr << "exception: " << e.what() << std::endl;
             c = "N/A";
         }
-        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, ?, ?)");
+        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, 0, ?, ?)");
         
         st.bind(1, ip);
         st.bind(2, port);
         st.bind(3, info.name());
         st.bind(4, static_cast<int>(info.slots()));
-        st.bind(5, c );
+        st.bind(5, c);
         int nb = st.exec();
         
         std::cout << st.getQuery() << ", returned " << nb << std::endl;
@@ -94,12 +94,12 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
         int nb = st.exec();
         
         std::cout << st.getQuery() << ", returned " << nb << std::endl;
+        std::cout << "Delete" << std::endl;
     }
     catch (std::exception& e)
     {
         std::cout << "exception: " << e.what() << std::endl;
     }
-    std::cout << "Delete" << std::endl;
 }
 
 void MasterServer::getServer(ENetPeer *peer)
@@ -117,13 +117,14 @@ void MasterServer::getServer(ENetPeer *peer)
             const char* ip = query.getColumn(0).getText("N/A");
             const char* port = query.getColumn(1).getText("N/A");
             const char* name = query.getColumn(2).getText("N/A");
-            unsigned int slots = query.getColumn(3).getInt();
-            const char *country = query.getColumn(4).getText("N/A");
+            unsigned int currentPlayer = query.getColumn(3).getInt();
+            unsigned int slots = query.getColumn(4).getInt();
+            const char *country = query.getColumn(5).getText("N/A");
             
             server->set_ip(ip);
             server->set_port(port);
             server->set_name(name);
-            server->set_currentplayer(0);
+            server->set_currentplayer(currentPlayer);
             server->set_maxplayer(slots);
             server->set_country(country);
             
@@ -141,6 +142,50 @@ void MasterServer::getServer(ENetPeer *peer)
                 std::cerr << "Cannot be send"<< std::endl;
             }
         }
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "exception: " << e.what() << std::endl;
+    }
+}
+
+void MasterServer::addPlayer(ENetPeer *peer, const std::string &port)
+{
+    char name[256] = { 0 };
+    
+    enet_address_get_host_ip(&peer->address, name, 256);
+    try
+    {
+        SQLite::Statement st(_db, "UPDATE server SET currentPlayer = currentPlayer + 1 WHERE ip = ? AND port = ?");
+        
+        st.bind(1, name);
+        st.bind(2, port);
+        int nb = st.exec();
+        
+        std::cout << st.getQuery() << ", returned " << nb << std::endl;
+        std::cout << "Add Player to " << name << ":" << port << std::endl;
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "exception: " << e.what() << std::endl;
+    }
+}
+
+void MasterServer::subPlayer(ENetPeer *peer, const std::string &port)
+{
+    char name[256] = { 0 };
+    
+    enet_address_get_host_ip(&peer->address, name, 256);
+    try
+    {
+        SQLite::Statement st(_db, "UPDATE server SET currentPlayer = currentPlayer - 1 WHERE ip = ? AND port = ?");
+        
+        st.bind(1, name);
+        st.bind(2, port);
+        int nb = st.exec();
+        
+        std::cout << st.getQuery() << ", returned " << nb << std::endl;
+        std::cout << "Sub Player to " << name << ":" << port << std::endl;
     }
     catch (std::exception& e)
     {
@@ -166,7 +211,15 @@ void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
             case MasterServerRequest::DELETESERVER:
                 deleteServer(peer, request.port());
                 break;
-                
+
+            case MasterServerRequest::NEWCONNECTION:
+                addPlayer(peer, request.port());
+                break;
+
+            case MasterServerRequest::DECONNECTION:
+                subPlayer(peer, request.port());
+                break;
+
             default:
                 break;
         }

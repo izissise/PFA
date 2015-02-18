@@ -9,6 +9,8 @@ message MasterServerRequest {
     GETIP = 0;
     CREATESERVER = 1;
     DELETESERVER = 2;
+    NEWCONNECTION = 3;
+    DECONNECTION = 4;
   }
   required PacketContent content = 1;
   optional string port = 2;
