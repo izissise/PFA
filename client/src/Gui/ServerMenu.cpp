@@ -171,7 +171,7 @@ int	ServerMenu::event(const sf::Event &evt, sf::RenderWindow &ref, Settings &set
       const t_server &s = _servers.front();
       const ServerInfo &packet = s.packet;
 
-      ServerItem *item = addServerToList(set, *_texture, packet.ip() + packet.port(),
+      ServerItem *item = addServerToList(set, *_texture, packet.ip() + ":" + packet.port(),
 					 {s.list, s.container});
 
       item->updateItem("Name", packet.name());
@@ -334,6 +334,7 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
   File		file;
   StringUtils	su;
   std::vector<std::string> serverInfo;
+  std::vector<APanelScreen *> &itemList = panel->getSubPanels();
 
   try
     {
@@ -342,15 +343,34 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
   catch (const std::invalid_argument &e)
     { // Do nothing, file just doesnt exist
     }
-  panel->getSubPanels().clear();
-  for (const std::string &s : content)
+  auto it = std::remove_if(itemList.begin(), itemList.end(),
+			   [&content](APanelScreen *panel) -> bool
+			   {
+			     ServerItem *item = dynamic_cast<ServerItem *>(panel);
+			     return (std::find_if(content.begin(), content.end(),
+						  [&item](const std::string &ip)
+						  {
+						    return (item->getIp() == ip);
+						  }) == content.end());
+			   });
+  itemList.erase(it, itemList.end());
+  for (const std::string &ip : content)
     {
       std::lock_guard<std::mutex>	lock(_mutex);
+
+      if (std::find_if(itemList.begin(), itemList.end(),
+		       [&ip](APanelScreen *panel) -> bool
+		       {
+			 ServerItem *item = dynamic_cast<ServerItem *>(panel);
+
+			 return (ip == item->getIp());
+		       }) != itemList.end())
+	continue ; // means the server is already in the list
       MasterServerRequest	msg;
       std::string		packet;
       ServerId			*id = new ServerId;
 
-      su.split(s, ':', serverInfo); // ip:port
+      su.split(ip, ':', serverInfo); // ip:port
       id->set_ip(serverInfo.at(0));
       id->set_port(serverInfo.at(1));
       msg.set_content(MasterServerRequest::GETIP);
