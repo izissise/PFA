@@ -248,6 +248,8 @@ void			GamePanel::sendConnectionInfo() const
 
 void	GamePanel::update(std::chrono::milliseconds timeStep, Settings &set)
 {
+  if (_hide)
+    return ;
   updateNetwork(set);
   _world->update(timeStep);
 }

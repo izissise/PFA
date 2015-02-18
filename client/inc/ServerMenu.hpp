@@ -2,6 +2,7 @@
 #define _SERVERMENU_H_
 
 #include <mutex>
+#include <queue>
 
 #include "Panel.hpp"
 #include "Widget.hpp"
@@ -15,19 +16,32 @@
 
 #define FavFile "../favlist.txt"
 
+typedef struct	s_server
+{
+  APanelScreen	*container;
+  APanelScreen	*list;
+  ServerInfo	packet;
+  s_server(APanelScreen *cont, APanelScreen *l,
+	   const ServerInfo &p) :
+    container(cont), list(l), packet(p)
+  {
+  }
+}		t_server;
+
 class ServerMenu : public APanelScreen
 {
 public:
   ServerMenu(const sf::FloatRect &zone);
   virtual ~ServerMenu();
 
-  void		draw(sf::RenderTarget &window, bool first);
   void		update(std::chrono::milliseconds timeStep, Settings &set);
+  int		event(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
   void		trigger(const t_event &event);
 
 private:
+  int		updateHud(const sf::Event &ev, sf::RenderWindow &ref, Settings &set);
   void		parseServerPacket(Settings &set, const void *data, int size);
   void		updateContent(Settings &set);
   void		createHeader(Settings &set, const sf::Texture &texture,
@@ -82,6 +96,7 @@ private:
   Panel		*_cont;
   std::mutex	_mutex;
   const sf::Texture	*_texture;
+  std::queue<t_server>	_servers;
 };
 
 #endif /* _SERVERMENU_H_ */

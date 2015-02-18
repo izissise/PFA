@@ -53,11 +53,12 @@ void	ServerMenu::parseServerPacket(Settings &set, const void *data, int size)
 	return ;
       if (packet.content() == MasterServerResponse::IP)
 	{
+	  std::lock_guard<std::mutex>	lock(_mutex);
 	  const std::vector<APanelScreen *>	&containers = _cont->getSubPanels();
 	  const ServerInfo	&server = packet.server();
 
 	  std::cout << "add Server: " << server.ip() << ":" << server.port() << std::endl;
-	  addServerToList(set, *_texture, server.ip() + server.port(), {containers.at(0), _cont});
+	  _servers.push(t_server(_cont, containers.at(0), server));
 	}
     }
   else
@@ -94,34 +95,6 @@ void	ServerMenu::updateContent(Settings &set)
     }
 }
 
-void         ServerMenu::draw(sf::RenderTarget &window, bool first)
-{
-  sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);
-  // here i get the target to draw into
-
-  if (&target != &window)                       // then we get a new RenderTarget
-    target.clear(sf::Color(127,127,127,0));     // clear it before any usage
-  if (dynamic_cast<sf::RenderTexture *>(&target) != nullptr) // draw content into the renderTexture
-    {
-      for (auto &widget : _widgets)
-        if (!widget->isHidden())
-          widget->draw(target);
-    }
-  for (auto &panel : _panels)
-    if (!panel->isHidden())
-      {
-	if (panel == _cont)
-	  {
-	    std::lock_guard<std::mutex> lock(_mutex);
-	    panel->draw(target, false);
-	  }
-	else
-	  panel->draw(target, false);
-      }
-  if (first)
-    print(window, false);
-}
-
 void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
 {
   if (_hide)
@@ -131,6 +104,53 @@ void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
       updateContent(set);
       _update = false;
     }
+}
+
+int	ServerMenu::updateHud(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
+{
+  int	retVal = 0;
+  bool  overlap = _flag & APanelScreen::Display::Overlap;
+
+  if (_state & APanelScreen::State::Inactive)
+    {
+      if (_countdown.update() == false)
+        return 0;
+      else
+        removeState(APanelScreen::State::Inactive);
+    }
+
+  for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
+    {
+     if (!(*rit)->isHidden())
+        {
+          if (!(overlap) || (overlap && checkPanelBounds(*rit)))
+            {
+              if ((retVal = (*rit)->event(ev, ref, set)) != 0)
+                return retVal;
+              else if ((*rit)->getState() == APanelScreen::State::Leader)
+                return 1;
+            }
+        }
+    }
+  for (auto rrrit = _widgets.rbegin(); rrrit != _widgets.rend(); ++rrrit)
+    {
+     if (checkPanelBounds(*rrrit)) // update widget even if hidden
+        if ((retVal = (*rrrit)->update(ev, ref, set)) != 0)
+          return retVal;
+    }
+  return retVal;
+}
+
+int	ServerMenu::event(const sf::Event &evt, sf::RenderWindow &ref, Settings &set)
+{
+  while (!_servers.empty())
+    {
+      const t_server &s = _servers.front();
+
+      addServerToList(set, *_texture, s.packet.ip() + s.packet.port(), {s.list, s.container});
+      _servers.pop();
+    }
+  return updateHud(evt, ref, set);
 }
 
 void	ServerMenu::createHeader(Settings &set UNUSED,
@@ -352,7 +372,6 @@ void	ServerMenu::addServerToList(Settings &set,
 				    const std::string &ip,
 				    const std::vector<APanelScreen *> &panels)
 {
-  std::lock_guard<std::mutex>	lock(_mutex);
   APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
   sf::FloatRect	widgetZone(zone.left + zone.width / 6.f, 0, zone.width / 2.f, 60);
