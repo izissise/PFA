@@ -18,7 +18,7 @@ void	Network::connect(const std::string &address, const std::string &port, int n
   ENetAddress addr;
   std::stringstream ss(port);
 
-  if (_host || _peer)
+  if (isConnected())
     disconnect();
   if ((_host = enet_host_create(NULL, 1, nbChannel, 0, 0)) == NULL)
     throw NetworkException("An error occurred while trying to create an ENet client host.");
@@ -71,4 +71,9 @@ void	Network::adjustNetworkSettings(enet_uint32 incomingBandwidth,
 ENetHost	*Network::getHost()
 {
   return _host;
+}
+
+bool	Network::isConnected() const
+{
+  return (_host && _peer);
 }

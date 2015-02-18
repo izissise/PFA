@@ -69,27 +69,41 @@ void	ServerMenu::updateContent(Settings &set)
 {
   const CvarList	&cvars = set.getCvarList();
   ENetEvent		evt;
-  MasterServerRequest	msg;
-  std::string		packet;
+  bool			connected;
 
-  _masterSocket.connect(cvars.getCvar("sv_masterIP"),
-			cvars.getCvar("sv_masterPort"),
-			2);
+  connected = _masterSocket.isConnected();
+  if (!connected)
+    _masterSocket.connect(cvars.getCvar("sv_masterIP"),
+			  cvars.getCvar("sv_masterPort"),
+			  2);
+  if (connected)
+    {
+      std::lock_guard<std::mutex>	lock(_mutex);
+      while (!_messages.empty())
+	{
+	  _masterSocket.sendPacket(0, _messages.front());
+	  _messages.pop();
+	}
+    }
   while ((enet_host_service(_masterSocket.getHost(), &evt, 100)) > 0) // if no evt == 0
     {
       switch (evt.type)
         {
 	case ENET_EVENT_TYPE_CONNECT:
-	  msg.set_content(MasterServerRequest::GETSERVERS);
-	  msg.set_port("");
-	  msg.SerializeToString(&packet);
-	  _masterSocket.sendPacket(0, packet);
+	  {
+	    std::lock_guard<std::mutex>	lock(_mutex);
+	    connected = true;
+	    while (!_messages.empty())
+	      {
+		_masterSocket.sendPacket(0, _messages.front());
+		_messages.pop();
+	      }
+	  }
 	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
 	  parseServerPacket(set, evt.packet->data, evt.packet->dataLength);
 	  break;
 	default:
-	  std::cout << "pass" << std::endl;
 	  break;
         }
     }
@@ -101,9 +115,18 @@ void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
     return ;
   if (_update)
     {
-      updateContent(set);
+      std::lock_guard<std::mutex>	lock(_mutex);
+      MasterServerRequest	msg;
+      std::string		packet;
+
+      msg.set_content(MasterServerRequest::GETSERVERS);
+      msg.set_port("");
+      msg.SerializeToString(&packet);
+      _messages.push(packet);
       _update = false;
     }
+  updateContent(set);
+  _update = false;
 }
 
 int	ServerMenu::updateHud(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
@@ -308,7 +331,9 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
 				   Panel *panel, APanelScreen *container)
 {
   std::vector<std::string>	content;
-  File	file;
+  File		file;
+  StringUtils	su;
+  std::vector<std::string> serverInfo;
 
   try
     {
@@ -320,7 +345,19 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
   panel->getSubPanels().clear();
   for (const std::string &s : content)
     {
-      addServerToList(set, texture, s, {panel, container});
+      std::lock_guard<std::mutex>	lock(_mutex);
+      MasterServerRequest	msg;
+      std::string		packet;
+      ServerId			*id = new ServerId;
+
+      su.split(s, ':', serverInfo); // ip:port
+      id->set_ip(serverInfo.at(0));
+      id->set_port(serverInfo.at(1));
+      msg.set_content(MasterServerRequest::GETIP);
+      msg.set_port("");
+      msg.set_allocated_id(id);
+      msg.SerializeToString(&packet);
+      _messages.push(packet);
     }
   panel->construct(texture, set, {});
 }

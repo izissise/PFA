@@ -5,7 +5,7 @@ ServerSettings::ServerSettings()
 {
   ACvar::addCvar("com_gameFps", new t_cvar({"20", "300"}, "60", "125", Number));
   ACvar::addCvar("s_seed", new t_cvar({"0", "4294967295"}, "0", "25341", Number));
-  ACvar::addCvar("sv_port", new t_cvar({"0", "65535"}, "27960", "27960", Number));
+  ACvar::addCvar("sv_port", new t_cvar({"0", "65535"}, "6000", "6000", Number));
   ACvar::addCvar("sv_hostname", new t_cvar({}, "ServerName", "ServerName", String, Restriction::None));
   ACvar::addCvar("sv_slot", new t_cvar({"1", "4294967295"}, "30", "30", Number));
   ACvar::addCvar("sv_masterIP", new t_cvar({"127.0.0.1"}, "127.0.0.1",

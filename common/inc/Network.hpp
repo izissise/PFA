@@ -20,6 +20,7 @@ public:
   void	adjustNetworkSettings(enet_uint32 incomingBandwidth,
 			      enet_uint32 outgoingBandwidth);
   ENetHost	*getHost();
+  bool		isConnected() const;
 
 private:
   ENetHost	*_host;

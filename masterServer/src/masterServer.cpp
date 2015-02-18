@@ -136,7 +136,7 @@ void	MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
 {
   try
     {
-      SQLite::Statement   query(_db, "SELECT * WHERE ip LIKE ? AND port LIKE ?");
+      SQLite::Statement   query(_db, "SELECT * from server WHERE ip LIKE ? AND port LIKE ?");
 
       query.bind(1, id.ip());
       query.bind(2, id.port());

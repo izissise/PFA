@@ -95,8 +95,9 @@ private:
   Panel		*_panelCo;
   Panel		*_cont;
   std::mutex	_mutex;
-  const sf::Texture	*_texture;
-  std::queue<t_server>	_servers;
+  const sf::Texture		*_texture;
+  std::queue<t_server>		_servers;
+  std::queue<std::string>	_messages;
 };
 
 #endif /* _SERVERMENU_H_ */
