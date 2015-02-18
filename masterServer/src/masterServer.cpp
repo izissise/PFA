@@ -96,12 +96,11 @@ void MasterServer::sendServers(ENetPeer *peer)
     {
       SQLite::Statement   query(_db, "SELECT * FROM server");
 
-      // Loop to execute the query step by step, to get rows of result
       while (query.executeStep())
 	{
 	  MasterServerResponse response;
+	  std::string message;
 	  ServerInfo *server = new ServerInfo();
-	  // Demonstrate how to get some typed column value
 	  const char* ip = query.getColumn(0).getText("N/A");
 	  const char* port = query.getColumn(1).getText("N/A");
 	  const char* name = query.getColumn(2).getText("N/A");
@@ -116,8 +115,6 @@ void MasterServer::sendServers(ENetPeer *peer)
 
 	  response.set_content(MasterServerResponse::IP);
 	  response.set_allocated_server(server);
-
-	  std::string message;
 	  response.SerializeToString(&message);
 
 	  ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
@@ -135,9 +132,48 @@ void MasterServer::sendServers(ENetPeer *peer)
     }
 }
 
-void MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
+void	MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
 {
+  try
+    {
+      SQLite::Statement   query(_db, "SELECT * WHERE ip LIKE ? AND port LIKE ?");
 
+      query.bind(1, id.ip());
+      query.bind(2, id.port());
+      while (query.executeStep())
+	{
+	  MasterServerResponse response;
+	  std::string message;
+	  ServerInfo *server = new ServerInfo();
+	  const char* ip = query.getColumn(0).getText("N/A");
+	  const char* port = query.getColumn(1).getText("N/A");
+	  const char* name = query.getColumn(2).getText("N/A");
+	  unsigned int slots = query.getColumn(3).getInt();
+
+	  server->set_ip(ip);
+	  server->set_port(port);
+	  server->set_name(name);
+	  server->set_currentplayer(0);
+	  server->set_maxplayer(slots);
+	  server->set_country("FR");
+
+	  response.set_content(MasterServerResponse::IP);
+	  response.set_allocated_server(server);
+	  response.SerializeToString(&message);
+
+	  ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
+						  ENET_PACKET_FLAG_RELIABLE);
+	  if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
+	    {
+	      std::cerr << "row: " << ip << ", " << port << " Cannot be send"<< std::endl;
+	    }
+	  std::cout << "row: " << ip << ", " << port << std::endl;
+        }
+    }
+  catch (std::exception& e)
+    {
+      std::cout << "exception: " << e.what() << std::endl;
+    }
 }
 
 void MasterServer::run()
