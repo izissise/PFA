@@ -3,6 +3,8 @@
 
 #include "Panel.hpp"
 #include "Widget.hpp"
+#include "Network.hpp"
+#include "ClientMessage.pb.h"
 
 class ServerItem : public APanelScreen
 {
@@ -12,6 +14,7 @@ public:
 
   void	construct(const sf::Texture &texture, Settings &set,
 		  const std::vector<APanelScreen *> &panels);
+  void	update(UNUSED std::chrono::milliseconds timeStep, UNUSED Settings &set);
   void	updateItem(const std::string &info,
 		   const std::string &value);
 
@@ -21,6 +24,7 @@ private:
 
 private:
   std::string	_ip;
+  Network	_socket;
 };
 
 #endif /* _SERVERITEM_H_ */

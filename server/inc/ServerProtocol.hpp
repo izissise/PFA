@@ -39,6 +39,9 @@ private:
   void	queryChunks(const ClientMessage &message,
 		    Client *client,
 		    const std::vector<Client *> &clients);
+  void	ping(const ClientMessage &message,
+	     Client *client,
+	     const std::vector<Client *> &clients);
   void	spawnClient(const std::vector<Client *> &clients,
 		    Client *client);
   void	loadClientProfile(const std::vector<Client *> &clients,

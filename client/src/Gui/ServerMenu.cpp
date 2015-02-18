@@ -113,6 +113,8 @@ void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
 {
   if (_hide)
     return ;
+  std::vector<APanelScreen *>	&containers = _cont->getSubPanels();
+
   if (_update)
     {
       std::lock_guard<std::mutex>	lock(_mutex);
@@ -124,6 +126,16 @@ void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
       msg.SerializeToString(&packet);
       _messages.push(packet);
       _update = false;
+    }
+  for (auto &panel : containers)
+    {
+      if (!panel->isHidden())
+  	{
+  	  std::vector<APanelScreen *>	&servers = panel->getSubPanels();
+
+  	  for (auto &server : servers)
+  	    server->update(timeStep, set);
+  	}
     }
   updateContent(set);
   _update = false;

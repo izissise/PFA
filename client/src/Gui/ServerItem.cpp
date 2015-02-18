@@ -1,7 +1,8 @@
 #include "ServerItem.hpp"
+#include "StringUtils.hpp"
 
 ServerItem::ServerItem(const sf::FloatRect &zone, const std::string &ip) :
-  APanelScreen(zone), _ip(ip)
+  APanelScreen(zone), _ip(ip), _socket()
 {
   addFont("default", "../client/assets/default.TTF");
 }
@@ -28,6 +29,53 @@ void	ServerItem::construct(const sf::Texture &texture, Settings &set,
   addWidget({wBg, wName, wCountry, wPlayers, wPing});
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
+}
+
+void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
+{
+  ENetEvent		evt;
+  bool			connected;
+  std::function<void ()> pingFunc =
+    [this]()
+    {
+      ClientMessage	msg;
+      PingTime		*ping = new PingTime;
+      std::string	packet;
+
+      ping->set_time(0);
+      msg.set_allocated_ping(ping);
+      msg.set_content(ClientMessage::PING);
+      msg.SerializeToString(&packet);
+      _socket.sendPacket(0, packet);
+    };
+
+  connected = _socket.isConnected();
+  if (!connected)
+    {
+      StringUtils		su;
+      std::vector<std::string>	serverInfo;
+
+      su.split(_ip, ':', serverInfo); // ip:port
+      _socket.connect(serverInfo.at(0),
+		      serverInfo.at(1),
+		      2);
+    }
+  if (connected)
+    pingFunc();
+  while ((enet_host_service(_socket.getHost(), &evt, 100)) > 0) // if no evt == 0
+    {
+      switch (evt.type)
+        {
+	case ENET_EVENT_TYPE_CONNECT:
+	  pingFunc();
+	  break;
+	case ENET_EVENT_TYPE_RECEIVE:
+	  std::cout << "got response" << std::endl;
+	  break;
+	default:
+	  break;
+        }
+    }
 }
 
 void	ServerItem::createBackgroundController(Widget *widget)

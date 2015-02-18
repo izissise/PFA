@@ -10,6 +10,7 @@ ServerProtocol::ServerProtocol(World &world, ThreadPool &threadPool) :
   _func[ClientMessage::CONNECTION] = &ServerProtocol::handleConnection;
   _func[ClientMessage::ACTION] = &ServerProtocol::handleActions;
   _func[ClientMessage::QUERYCHUNK] = &ServerProtocol::queryChunks;
+  _func[ClientMessage::PING] = &ServerProtocol::ping;
 }
 
 ServerProtocol::~ServerProtocol()
@@ -112,6 +113,16 @@ void	ServerProtocol::queryChunks(const ClientMessage &message,
     }
   for (auto &chunkId : newChunks)
     client->sendPacket(2, _world.serialize(chunkId)); // send on 2 because it's a huge transfer
+}
+
+void	ServerProtocol::ping(const ClientMessage &message,
+			     Client *client,
+			     const std::vector<Client *> &clients)
+{
+  std::string	packet;
+
+  message.SerializeToString(&packet);
+  client->sendPacket(0, packet);
 }
 
 void		ServerProtocol::generateNewId(std::string &guid)

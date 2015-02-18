@@ -13,7 +13,7 @@
 # include "ThreadPool.hpp"
 # include "MasterServerRequest.pb.h"
 
-# define DEFAULT_PORT 6060
+# define DEFAULT_PORT 6000
 
 typedef struct  s_arg
 {
