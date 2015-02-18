@@ -72,10 +72,10 @@ private:
 			       Panel *panel, APanelScreen *container);
   bool		addServerToFav(const std::string &ip) const;
   bool		removeServerFromFav(const std::string &ip) const;
-  void		addServerToList(Settings &set,
-				const sf::Texture &texture,
-				const std::string &ip,
-				const std::vector<APanelScreen *> &panels);
+  ServerItem	*addServerToList(Settings &set,
+				 const sf::Texture &texture,
+				 const std::string &ip,
+				 const std::vector<APanelScreen *> &panels);
   void		createTabButton(TabWidget *widget);
   void		createButtonStyle(Widget *widget, const sf::Texture &texture);
   void		createTextWidget(TextWidget *widget, const sf::Texture &texture);

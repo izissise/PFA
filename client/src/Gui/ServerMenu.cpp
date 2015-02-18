@@ -146,8 +146,16 @@ int	ServerMenu::event(const sf::Event &evt, sf::RenderWindow &ref, Settings &set
   while (!_servers.empty())
     {
       const t_server &s = _servers.front();
+      const ServerInfo &packet = s.packet;
 
-      addServerToList(set, *_texture, s.packet.ip() + s.packet.port(), {s.list, s.container});
+      ServerItem *item = addServerToList(set, *_texture, packet.ip() + packet.port(),
+					 {s.list, s.container});
+
+      item->updateItem("Name", packet.name());
+      item->updateItem("Country", packet.country());
+      item->updateItem("Players", std::to_string(packet.currentplayer()) +
+		       "/" + std::to_string(packet.maxplayer()));
+      item->updateItem("Ping", "0");
       _servers.pop();
     }
   return updateHud(evt, ref, set);
@@ -367,10 +375,10 @@ void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
   addPanel({content});
 }
 
-void	ServerMenu::addServerToList(Settings &set,
-				    const sf::Texture &texture,
-				    const std::string &ip,
-				    const std::vector<APanelScreen *> &panels)
+ServerItem	*ServerMenu::addServerToList(Settings &set,
+					     const sf::Texture &texture,
+					     const std::string &ip,
+					     const std::vector<APanelScreen *> &panels)
 {
   APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
@@ -381,6 +389,7 @@ void	ServerMenu::addServerToList(Settings &set,
   ServerItem *pan = new ServerItem(widgetZone, ip);
   pan->construct(texture, set, {_panelCo});
   list->addPanel(pan);
+  return pan;
 }
 
 // Server Popup

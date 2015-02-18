@@ -26,7 +26,6 @@ void	ServerItem::construct(const sf::Texture &texture, Settings &set,
   createBackgroundController(wBg);
   wBg->addObserver(panels[0]);
   addWidget({wBg, wName, wCountry, wPlayers, wPing});
-  updateItem({"Long server name", "FR", "20/60", "35"}); // as an example
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
@@ -78,21 +77,17 @@ void	ServerItem::createBackgroundController(Widget *widget)
   widget->setUpdate(updateDisplay);
 }
 
-void	ServerItem::updateItem(const std::vector<std::string> &info)
+void	ServerItem::updateItem(const std::string &info,
+			       const std::string &value)
 {
-  std::vector<AWidget *>	widgets {getWidget("Name"), getWidget("Country"),
-      getWidget("Players"), getWidget("Ping")};
-  for (unsigned int i = 0; i < widgets.size(); ++i)
-    {
-      const sf::FloatRect &zone = widgets[i]->getZone();
-      AWidget	*widget = widgets.at(i);
+  AWidget	*widget = getWidget(info);
+  const sf::FloatRect &zone = widget->getZone();
 
-      widget->setTextContent(info.at(i));
-      if (i == 0)
-	widget->alignTextLeft({zone.left, zone.top}, {zone.width, zone.height}, 3, 50);
-      else
-	widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
-    }
+  widget->setTextContent(value);
+  if (info == "Name")
+    widget->alignTextLeft({zone.left, zone.top}, {zone.width, zone.height}, 3, 50);
+  else
+    widget->alignText({zone.left, zone.top}, {zone.width, zone.height}, 50, 50);
 }
 
 const std::string	&ServerItem::getIp() const

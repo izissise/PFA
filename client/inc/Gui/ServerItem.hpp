@@ -12,7 +12,8 @@ public:
 
   void	construct(const sf::Texture &texture, Settings &set,
 		  const std::vector<APanelScreen *> &panels);
-  void	updateItem(const std::vector<std::string> &info);
+  void	updateItem(const std::string &info,
+		   const std::string &value);
 
   const std::string	&getIp() const;
 private:
