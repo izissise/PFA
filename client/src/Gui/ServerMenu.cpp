@@ -80,7 +80,7 @@ void	ServerMenu::updateContent(Settings &set)
       switch (evt.type)
         {
 	case ENET_EVENT_TYPE_CONNECT:
-	  msg.set_content(MasterServerRequest::GETIP);
+	  msg.set_content(MasterServerRequest::GETSERVERS);
 	  msg.set_port("");
 	  msg.SerializeToString(&packet);
 	  _masterSocket.sendPacket(0, packet);

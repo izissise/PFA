@@ -3,14 +3,21 @@ message ServerData {
   required uint32 slots = 2;
 }
 
+message ServerId {
+  required string ip = 1;
+  required string port = 2;
+}
+
 message MasterServerRequest {
   enum PacketContent
   {
-    GETIP = 0;
-    CREATESERVER = 1;
-    DELETESERVER = 2;
+    GETSERVERS = 0;
+    GETIP = 1;
+    CREATESERVER = 2;
+    DELETESERVER = 3;
   }
   required PacketContent content = 1;
   required string port = 2;
   optional ServerData info = 3;
+  optional ServerId id = 4;
 }

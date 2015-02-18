@@ -90,7 +90,7 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
     std::cout << "Delete" << std::endl;
 }
 
-void MasterServer::getServer(ENetPeer *peer)
+void MasterServer::sendServers(ENetPeer *peer)
 {
   try
     {
@@ -135,58 +135,65 @@ void MasterServer::getServer(ENetPeer *peer)
     }
 }
 
+void MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
+{
+
+}
+
 void MasterServer::run()
 {
-    ENetEvent event;
-    MasterServerRequest request;
+  ENetEvent event;
+  MasterServerRequest request;
 
-    while ((enet_host_service (_server, &event, 50)) >= 0)
+  while ((enet_host_service (_server, &event, 50)) >= 0)
     {
-        switch (event.type)
+      switch (event.type)
         {
-            case ENET_EVENT_TYPE_CONNECT:
-                printf ("A new client connected from %x:%u.\n",
-                        event.peer -> address.host,
-                        event.peer -> address.port);
-                /* Store any relevant client information here. */
-                event.peer -> data = (char *)"Client information";
-                break;
-            case ENET_EVENT_TYPE_RECEIVE:
-            {
-                printf ("A packet of length %zu containing %s was received from %s on channel %u.\n",
-                        event.packet -> dataLength,
-                        event.packet -> data,
-                        event.peer -> data,
-                        event.channelID);
-                if (request.ParseFromArray(event.packet->data, event.packet->dataLength))
-                {
-                    std::cout << "Parse Good" << std::endl;
-                    switch (request.content()) {
-                        case MasterServerRequest::GETIP:
-                            getServer(event.peer);
-                            break;
-                        case MasterServerRequest::CREATESERVER:
-			  createServer(event.peer, request.port(), request.info());
-			  break;
-                        case MasterServerRequest::DELETESERVER:
-                            deleteServer(event.peer, request.port());
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
-                /* Clean up the packet now that we're done using it. */
-                enet_packet_destroy (event.packet);
-
-                break;
-            }
-            case ENET_EVENT_TYPE_DISCONNECT:
-                printf ("%s disconnected.\n", event.peer -> data);
-                /* Reset the peer's client information. */
-                event.peer -> data = NULL;
-            default:
-                break;
+	case ENET_EVENT_TYPE_CONNECT:
+	  printf ("A new client connected from %x:%u.\n",
+		  event.peer -> address.host,
+		  event.peer -> address.port);
+	  /* Store any relevant client information here. */
+	  event.peer -> data = (char *)"Client information";
+	  break;
+	case ENET_EVENT_TYPE_RECEIVE:
+	  {
+	    printf ("A packet of length %zu containing %s was received from %s on channel %u.\n",
+		    event.packet -> dataLength,
+		    event.packet -> data,
+		    event.peer -> data,
+		    event.channelID);
+	    if (request.ParseFromArray(event.packet->data, event.packet->dataLength))
+	      {
+		std::cout << "Parse Good" << std::endl;
+		switch (request.content())
+		  {
+		  case MasterServerRequest::GETSERVERS:
+		    sendServers(event.peer);
+		    break;
+		  case MasterServerRequest::GETIP:
+		    sendServer(event.peer, request.id());
+		    break;
+		  case MasterServerRequest::CREATESERVER:
+		    createServer(event.peer, request.port(), request.info());
+		    break;
+		  case MasterServerRequest::DELETESERVER:
+		    deleteServer(event.peer, request.port());
+		    break;
+		  default:
+		    break;
+		  }
+	      }
+	    /* Clean up the packet now that we're done using it. */
+	    enet_packet_destroy (event.packet);
+	    break;
+	  }
+	case ENET_EVENT_TYPE_DISCONNECT:
+	  printf ("%s disconnected.\n", event.peer -> data);
+	  /* Reset the peer's client information. */
+	  event.peer -> data = NULL;
+	default:
+	  break;
         }
     }
 }

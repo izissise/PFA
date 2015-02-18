@@ -13,11 +13,14 @@ public:
   MasterServer();
   ~MasterServer();
 
-  void run();
-  void createServer(ENetPeer *peer, const std::string &port,
+  void	run();
+
+private:
+  void	createServer(ENetPeer *peer, const std::string &port,
 		    const ServerData &info);
-  void deleteServer(ENetPeer *peer, const std::string &port);
-  void getServer(ENetPeer *peer);
+  void	deleteServer(ENetPeer *peer, const std::string &port);
+  void	sendServers(ENetPeer *peer);
+  void	sendServer(ENetPeer *peer, const ServerId &id);
 
 private:
   ENetHost            *_server;
