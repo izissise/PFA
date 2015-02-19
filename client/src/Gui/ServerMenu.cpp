@@ -43,7 +43,7 @@ void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void	ServerMenu::parseServerPacket(Settings &set, const void *data, int size)
+void	ServerMenu::parseServerPacket(UNUSED Settings &set, const void *data, int size)
 {
   MasterServerResponse	packet;
 
@@ -990,7 +990,7 @@ void	ServerMenu::createConnectButton(Widget *widget, const sf::Texture &texture)
   widget->setUpdate(updateFunc);
 }
 
-void	ServerMenu::createScrollBar(ScrollWidget *widget, const sf::Texture &texture)
+void	ServerMenu::createScrollBar(ScrollWidget *widget, UNUSED const sf::Texture &texture)
 {
   sf::FloatRect zone = widget->getZone();
 

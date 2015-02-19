@@ -1,9 +1,10 @@
 #ifndef _SERVERITEM_H_
 #define _SERVERITEM_H_
 
-#include <SFML/System/Clock.hpp>
 #include <queue>
 #include <mutex>
+
+#include <SFML/System/Clock.hpp>
 
 #include "Panel.hpp"
 #include "Widget.hpp"
@@ -20,7 +21,7 @@ public:
   void	construct(const sf::Texture &texture, Settings &set,
 		  const std::vector<APanelScreen *> &panels);
   int	event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set);
-  void	update(UNUSED std::chrono::milliseconds timeStep, UNUSED Settings &set);
+  void	update(std::chrono::milliseconds timeStep, Settings &set);
   void	updateItem(const std::string &info,
 		   const std::string &value);
 

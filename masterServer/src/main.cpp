@@ -1,7 +1,9 @@
 #include <iostream>
+
+#include "Unused.hpp"
 #include "masterServer.hpp"
 
-int main(int ac, char **av)
+int main(UNUSED int ac, UNUSED char **av)
 {
   MasterServer main;
 

@@ -1,5 +1,7 @@
 #include "Spawner.hpp"
 
+#include "Unused.hpp"
+
 Spawner::Spawner(World &world) : _world(world)
 {
 }
@@ -9,7 +11,7 @@ Spawner::~Spawner()
 }
 
 int			Spawner::isChunkSpawnable(Chunk *chunk,
-							 const std::vector<Client *> &clients)
+							 UNUSED const std::vector<Client *> &clients)
 {
   const Vector2i	&pos = chunk->getPosition();
 

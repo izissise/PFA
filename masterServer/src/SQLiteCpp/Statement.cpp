@@ -345,6 +345,7 @@ Statement::Ptr::~Ptr() noexcept // nothrow
         // If count reaches zero, finalize the sqlite3_stmt,
         // as no Statement not Column objet use it anymore
         int ret = sqlite3_finalize(mpStmt);
+        (void)ret;
         // Never throw an exception in a destructor
         SQLITECPP_ASSERT((SQLITE_OK == ret || mLastStatus == ret),
           sqlite3_errmsg(mpSQLite));  // See SQLITECPP_ENABLE_ASSERT_HANDLER

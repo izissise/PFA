@@ -117,7 +117,7 @@ void	ServerProtocol::queryChunks(const ClientMessage &message,
 
 void	ServerProtocol::ping(const ClientMessage &message,
 			     Client *client,
-			     const std::vector<Client *> &clients)
+			     UNUSED const std::vector<Client *> &clients)
 {
   std::string	packet;
 

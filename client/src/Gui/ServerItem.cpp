@@ -10,7 +10,7 @@ ServerItem::ServerItem(const sf::FloatRect &zone, const std::string &ip) :
   addFont("default", "../client/assets/default.TTF");
 }
 
-void	ServerItem::construct(const sf::Texture &texture, Settings &set,
+void	ServerItem::construct(UNUSED const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels)
 {
   Widget	*wBg = new Widget("", _zone);
@@ -48,7 +48,7 @@ int	ServerItem::event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
   return APanelScreen::event(ev, ref, set);
 }
 
-void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
+void	ServerItem::update(UNUSED std::chrono::milliseconds timeStep, Settings &set)
 {
   std::function<void ()> pingFunc =
     [this, &set]()
