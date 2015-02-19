@@ -33,31 +33,36 @@ Server::~Server()
   MasterServerRequest	msg;
   std::string		packet;
   ENetEvent		event;
+  int			hasEvent;
+  bool			pull = true;
   bool			passed = false;
 
   enet_host_destroy(_server);
   _masterSocket.connect(_set.getCvar("sv_masterIP"),
 			_set.getCvar("sv_masterPort"),
 			2);
-  std::cout << "Shutting down server ~ 5 secondes" << std::endl;
-  while ((enet_host_service(_masterSocket.getHost(), &event, 3000)) > 0) // if no event == 0
+  std::cout << "Shutting down server" << std::endl;
+  while (!passed)
     {
-      switch (event.type)
-        {
-	case ENET_EVENT_TYPE_CONNECT:
-	  msg.set_content(MasterServerRequest::DELETESERVER);
-	  msg.set_port(_set.getCvar("sv_port"));
-	  msg.SerializeToString(&packet);
-	  _masterSocket.sendPacket(0, packet);
-	  passed = true;
-	  break;
-	default:
-	  std::cout << "pass" << std::endl;
-	  break;
-        }
+      if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
+	{
+	  switch (event.type)
+	    {
+	    case ENET_EVENT_TYPE_CONNECT:
+	      msg.set_content(MasterServerRequest::DELETESERVER);
+	      msg.set_port(_set.getCvar("sv_port"));
+	      msg.SerializeToString(&packet);
+	      _masterSocket.sendPacket(0, packet);
+	      enet_host_flush(_masterSocket.getHost());
+	      passed = true;
+	      break;
+	    default:
+	      break;
+	    }
+	}
+      else if (hasEvent < 0)
+	break ;
     }
-  if (!passed)
-    throw (NetworkException("Authentification to master server failed"));
   _masterSocket.disconnect();
 }
 
@@ -66,36 +71,41 @@ void	Server::registerToMaster()
   MasterServerRequest	msg;
   std::string		packet;
   ENetEvent		event;
+  int			hasEvent;
+  bool			pull = true;
   bool			passed = false;
 
   _masterSocket.connect(_set.getCvar("sv_masterIP"),
 			_set.getCvar("sv_masterPort"),
 			2);
-  while ((enet_host_service(_masterSocket.getHost(), &event, 3000)) > 0) // if no event == 0
+  while (!passed)
     {
-      switch (event.type)
-        {
-	case ENET_EVENT_TYPE_CONNECT:
-	  {
-	    ServerData	*data = new ServerData;
+      if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
+	{
+	  switch (event.type)
+	    {
+	    case ENET_EVENT_TYPE_CONNECT:
+	      {
+		ServerData	*data = new ServerData;
 
-	    msg.set_content(MasterServerRequest::CREATESERVER);
-	    msg.set_port(_set.getCvar("sv_port"));
-	    data->set_name(_set.getCvar("sv_hostname"));
-	    data->set_slots(std::stoul(_set.getCvar("sv_slot")));
-	    msg.set_allocated_info(data);
-	    msg.SerializeToString(&packet);
-	    _masterSocket.sendPacket(0, packet);
-	    passed = true;
-	  }
-	  break;
-	default:
-	  std::cout << "pass" << std::endl;
-	  break;
-        }
+		msg.set_content(MasterServerRequest::CREATESERVER);
+		msg.set_port(_set.getCvar("sv_port"));
+		data->set_name(_set.getCvar("sv_hostname"));
+		data->set_slots(std::stoul(_set.getCvar("sv_slot")));
+		msg.set_allocated_info(data);
+		msg.SerializeToString(&packet);
+		_masterSocket.sendPacket(0, packet);
+		enet_host_flush(_masterSocket.getHost());
+		passed = true;
+	      }
+	      break;
+	    default:
+	      break;
+	    }
+	}
+      else if (hasEvent < 0)
+	throw (NetworkException("Authentification to master server failed"));
     }
-  if (!passed)
-    throw (NetworkException("Authentification to master server failed"));
   _masterSocket.disconnect();
 }
 
@@ -109,6 +119,8 @@ void		Server::run()
 
   while ((enet_host_service(_server, &event, 50)) >= 0)
     {
+      if (getchar() == 10)
+	return ;
       switch (event.type)
         {
 	case ENET_EVENT_TYPE_CONNECT:
