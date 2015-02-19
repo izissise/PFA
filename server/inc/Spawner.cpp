@@ -1,6 +1,8 @@
 #include "Spawner.hpp"
 #include "Unused.hpp"
 
+#include "Unused.hpp"
+
 Spawner::Spawner(World &world) : _world(world)
 {
 }

@@ -1,4 +1,5 @@
 #include "masterServer.hpp"
+#include "printv.hpp"
 
 MasterServer::MasterServer()
 : _db("server.db", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)
@@ -188,19 +189,17 @@ void MasterServer::run()
       switch (event.type)
         {
 	case ENET_EVENT_TYPE_CONNECT:
-	  printf ("A new client connected from %x:%u.\n",
-		  event.peer -> address.host,
-		  event.peer -> address.port);
+	  printv(std::cout, "A new client connected from %:%.\n", event.peer->address.host, event.peer->address.port);
 	  /* Store any relevant client information here. */
-	  event.peer -> data = (char *)"Client information";
+	  event.peer->data = const_cast<void*>(static_cast<const void*>("Client information"));
 	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
 	  {
-	    printf ("A packet of length %zu containing %s was received from %s on channel %u.\n",
-		    event.packet -> dataLength,
-		    event.packet -> data,
-		    event.peer -> data,
-		    event.channelID);
+	  	printv(std::cout, "A packet of length % containing % was received from % on channel %.\n",
+		    static_cast<size_t>(event.packet->dataLength),
+		    static_cast<unsigned char*>(event.packet->data),
+		    static_cast<char*>(event.peer->data),
+		    static_cast<unsigned>(event.channelID));
 	    if (request.ParseFromArray(event.packet->data, event.packet->dataLength))
 	      {
 		std::cout << "Parse Good" << std::endl;
@@ -227,7 +226,7 @@ void MasterServer::run()
 	    break;
 	  }
 	case ENET_EVENT_TYPE_DISCONNECT:
-	  printf ("%s disconnected.\n", event.peer -> data);
+	  printv(std::cout, "% disconnected.\n", static_cast<const char*>(event.peer->data));
 	  /* Reset the peer's client information. */
 	  event.peer -> data = NULL;
 	default:
