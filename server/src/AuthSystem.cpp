@@ -73,14 +73,10 @@ void	AuthSystem::ping(const ClientMessage &message,
 			 ENetPeer *peer)
 {
   std::string	packet;
-  ENetPacket	*msg;
+  Client	cl(peer);
 
   message.SerializeToString(&packet);
-  msg = enet_packet_create(packet.c_str(),
-			   packet.size(),
-			   ENET_PACKET_FLAG_RELIABLE);
-  if (msg == NULL || enet_peer_send(peer, 0, msg) != 0)
-    throw (NetworkException("Cannot send the message"));
+  cl.sendPacket(0, packet);
 }
 
 void	AuthSystem::loadClientProfile(Client *client, const std::string &userId)
