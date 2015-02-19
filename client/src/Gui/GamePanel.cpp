@@ -172,25 +172,30 @@ void		GamePanel::adjustNetworkSettings(Settings &set)
 int		GamePanel::updateNetwork(Settings &set)
 {
   ENetEvent	ev;
+  bool		pull = true;
+  int		haveEvent;
 
   try
     {
-      if (_socket.pollEvent(&ev, 1) < 0)
-	throw NetworkException("Connection problem");
-      switch (ev.type)
+      while ((haveEvent = _socket.pullEvent(ev, 0, pull)) > 0)
 	{
-	case ENET_EVENT_TYPE_CONNECT:
-	  connectClient(ev.peer, set);
-	  break;
-	case ENET_EVENT_TYPE_RECEIVE:
-	  this->handlePackets(ev);
-	  break;
-	case ENET_EVENT_TYPE_DISCONNECT:
-	  disconnectClient(ev.peer);
-	  break;
-	default:
-	  break;
+	  switch (ev.type)
+	    {
+	    case ENET_EVENT_TYPE_CONNECT:
+	      connectClient(ev.peer, set);
+	      break;
+	    case ENET_EVENT_TYPE_RECEIVE:
+	      this->handlePackets(ev);
+	      break;
+	    case ENET_EVENT_TYPE_DISCONNECT:
+	      disconnectClient(ev.peer);
+	      break;
+	    default:
+	      break;
+	    }
 	}
+      if (haveEvent < 0)
+	throw NetworkException("Connection problem");
     }
   catch (NetworkException &e)
     {

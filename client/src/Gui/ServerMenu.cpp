@@ -69,36 +69,26 @@ void	ServerMenu::updateContent(Settings &set)
 {
   const CvarList	&cvars = set.getCvarList();
   ENetEvent		evt;
-  bool			online;
+  bool			pull = true;
   std::function<void ()> dequeueMessages =
     [this]()
     {
       std::lock_guard<std::mutex>	lock(_messageMutex);
       while (!_messages.empty())
 	{
-	  _masterSocket.sendPacket(0, _messages.front());
-	  _messages.pop();
+	  if (_masterSocket.sendPacket(0, _messages.front()))
+	    _messages.pop();
+	  else
+	    break ;
 	}
     };
-
-  online = _masterSocket.isOnline();
-  if (online)
+  if (_masterSocket.isOnline())
     {
-      for (bool serviced = false;;)
+      dequeueMessages();
+      while (_masterSocket.pullEvent(evt, 0, pull))
 	{
-	  if (!serviced)
-	    {
-	      if (enet_host_service(_masterSocket.getHost(), &evt, 0) <= 0)
-		break;
-	      serviced = true;
-	    }
-	  else if (enet_host_check_events(_masterSocket.getHost(), &evt) <= 0)
-	    break;
 	  switch (evt.type)
 	    {
-	    case ENET_EVENT_TYPE_CONNECT:
-	      _masterSocket.setConnected();
-	      break;
 	    case ENET_EVENT_TYPE_RECEIVE:
 	      parseServerPacket(set, evt.packet->data, evt.packet->dataLength);
 	      break;
@@ -111,8 +101,6 @@ void	ServerMenu::updateContent(Settings &set)
     _masterSocket.connect(cvars.getCvar("sv_masterIP"),
 			  cvars.getCvar("sv_masterPort"),
 			  2);
-  if (_masterSocket.isConnected())
-    dequeueMessages();
 }
 
 void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)

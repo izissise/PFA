@@ -89,23 +89,15 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
 
 void	ServerItem::updateNetwork()
 {
-  ENetEvent		evt;
+  ENetEvent	evt;
+  bool		pull = true;
 
-  for (bool serviced = false;;)
+  while (1)
     {
-      if (!serviced)
-	{
-	  if (enet_host_service(_socket.getHost(), &evt, 0) <= 0)
-	    break;
-	  serviced = true;
-	}
-      else if (enet_host_check_events(_socket.getHost(), &evt) <= 0)
-	break;
+      if (_socket.pullEvent(evt, 0, pull) <= 0)
+	break ;
       switch (evt.type)
 	{
-	case ENET_EVENT_TYPE_CONNECT:
-	  _socket.setConnected();
-	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
 	  {
 	    ClientMessage	packet;

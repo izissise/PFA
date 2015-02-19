@@ -40,24 +40,49 @@ void	Network::disconnect()
   _connected = false;
 }
 
-void	Network::sendPacket(enet_uint8 chan, const std::string &message) const
+bool	Network::sendPacket(enet_uint8 chan, const std::string &message) const
 {
-  if (_host)
+  if (isConnected())
     {
       ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
 					      ENET_PACKET_FLAG_RELIABLE);
       if (packet == nullptr || enet_peer_send(_peer, chan, packet) < 0)
-	{
-	  throw (NetworkException("Cannot send the message"));
-	}
+	throw (NetworkException("Cannot send the message"));
+      return true;
     }
+  return false;
 }
 
-int	Network::pollEvent(ENetEvent *event, int timeout)
+int	Network::pullEvent(ENetEvent &event, int timeout, bool &first,
+			   bool multiPull)
 {
-  if (_host && _peer)
-    return (enet_host_service(_host, event, timeout));
-  return (-1);
+  int	retVal;
+
+  if (!isOnline())
+    throw (NetworkException("Not connected"));
+  if (first)
+    {
+      if ((retVal = enet_host_service(_host, &event, timeout)) <= 0)
+	return retVal;
+      first = false;
+    }
+  else if ((retVal = enet_host_check_events(_host, &event)) <= 0)
+    {
+      first = multiPull;
+      return retVal;
+    }
+  switch (event.type)
+    {
+    case ENET_EVENT_TYPE_CONNECT:
+      _connected = true;
+      break;
+    case ENET_EVENT_TYPE_DISCONNECT:
+      _connected = false;
+      break;
+    default:
+      break;
+    }
+  return 1;
 }
 
 void	Network::adjustNetworkSettings(enet_uint32 incomingBandwidth,
