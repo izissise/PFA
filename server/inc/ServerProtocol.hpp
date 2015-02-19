@@ -11,8 +11,6 @@
 #include "ActionEnum.hpp"
 #include "ThreadPool.hpp"
 
-#define LOGFILE "../log/ClientInfo.txt"
-
 using namespace google::protobuf;
 
 class ServerProtocol
@@ -30,24 +28,12 @@ private:
 					    Client *client,
 					    const std::vector<Client *> &clients);
 
-  void  handleConnection(const ClientMessage &message,
-			 Client *client,
-			 const std::vector<Client *> &clients);
   void	handleActions(const ClientMessage &message,
 		      Client *client,
 		      const std::vector<Client *> &clients);
   void	queryChunks(const ClientMessage &message,
 		    Client *client,
 		    const std::vector<Client *> &clients);
-  void	ping(const ClientMessage &message,
-	     Client *client,
-	     const std::vector<Client *> &clients);
-  void	spawnClient(const std::vector<Client *> &clients,
-		    Client *client);
-  void	loadClientProfile(const std::vector<Client *> &clients,
-			  Client *client, const std::string &userId);
-  void	sendClientProfile(Client *client, const std::string &newId);
-  void	generateNewId(std::string &guid);
 
   std::map<ClientMessage::PacketContent, parseFunc> _func;
   World		&_world;

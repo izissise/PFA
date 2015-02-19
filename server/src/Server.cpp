@@ -7,12 +7,13 @@
 
 Server::Server(t_arg &arg)
   : _arg(arg),
+    _clients(),
     _masterSocket(),
     _set(),
     _threadPool(200),
     _world(_set),
     _proto(_world, _threadPool),
-    _clients()
+    _auth(_world, _clients)
 {
   // enet_initialize is called in the _masterSocket()
   _address.host = ENET_HOST_ANY;
@@ -22,6 +23,7 @@ Server::Server(t_arg &arg)
   if (_server == NULL)
     throw (NetworkException("An error occurred while trying to create an ENet server host."));
   _set.addObserver(this);
+  _auth.addObserver(this);
 
   CvarParser	parser(_set);
   parser.loadConfigFile("../ServerConfig.cfg");
@@ -153,25 +155,27 @@ void	Server::handlePackets(ENetEvent &event)
   // 	    << (int)event.channelID << std::endl;
   // if ((int)event.channelID == 2)
   //   std::cout << std::endl << std::endl;
-  _proto.parseCmd(packet->data, packet->dataLength, client, _clients);
+
+  if (client == nullptr)
+    _auth.parseCmd(packet->data, packet->dataLength, peer);
+  else
+    _proto.parseCmd(packet->data, packet->dataLength, client, _clients);
   enet_packet_destroy(packet);
 }
 
 void		Server::connectClient(ENetPeer * const peer)
 {
-  Client	*newClient = new Client(peer);
-
   std::cout << "A new client connected from "
-	    << peer->address.host << " : "
-	    << peer->address.port << std::endl;
-  peer->data = newClient;
-  _clients.push_back(newClient);
-  newClient->sendPacket(0, _set.serialize());
+  	    << peer->address.host << " : "
+  	    << peer->address.port << std::endl;
+  peer->data = nullptr;
 }
 
 void	Server::disconnectClient(ENetPeer * const peer)
 {
   std::cout << "Client disconnected" << std::endl;
+  if (peer->data == nullptr) // not authenticated player
+    return ;
   saveClientId(static_cast<Client *>(peer->data));
   peer->data = NULL;
   _clients.erase(std::find_if(_clients.begin(), _clients.end(),
@@ -308,7 +312,11 @@ void		Server::actDisplacement(Client *client, Action act)
   client->sendPacket(0, serialized);
 }
 
-void	Server::trigger(const t_event &event)
+void		Server::trigger(const t_event &event)
 {
-  std::cout << event.change << " Change" << std::endl;
+  Client	*client = event.client;
+
+  _clients.push_back(client);
+  client->sendPacket(0, _set.serialize());
+  std::cout << "Client authenticated" << std::endl;
 }

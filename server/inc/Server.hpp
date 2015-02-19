@@ -11,6 +11,7 @@
 # include "ServerSettings.hpp"
 # include "ServerProtocol.hpp"
 # include "ThreadPool.hpp"
+# include "AuthSystem.hpp"
 # include "MasterServerRequest.pb.h"
 
 # define DEFAULT_PORT 6000
@@ -47,6 +48,7 @@ private:
 
 private:
   t_arg			_arg;
+  std::vector<Client *>	_clients;
   Network		_masterSocket;
   ServerSettings	_set;
   ThreadPool		_threadPool;
@@ -54,7 +56,7 @@ private:
   ENetHost*		_server;
   World			_world;
   ServerProtocol	_proto;
-  std::vector<Client *>	_clients;
+  AuthSystem		_auth;
 };
 
 #endif

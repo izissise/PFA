@@ -20,11 +20,7 @@ ServerSettings::~ServerSettings()
 
 void	ServerSettings::setCvar(const std::string &name, const std::string &value)
 {
-  t_event event;
-
   ACvar::setCvar(name, value);
-  event.change = name;
-  notify(event);
 }
 
 std::string	ServerSettings::serialize()
