@@ -5,6 +5,7 @@
 #include <vector>
 #include "ProtocolMessage.pb.h"
 #include "ClientMessage.pb.h"
+#include "ServerResponse.pb.h"
 #include "World.hpp"
 #include "Client.hpp"
 #include "Unused.hpp"
@@ -39,6 +40,9 @@ private:
   void	queryChunks(const ClientMessage &message,
 		    Client *client,
 		    const std::vector<Client *> &clients);
+  void  getPlayer(const ClientMessage &message,
+                  Client *client,
+                  const std::vector<Client *> &clients);
   void	spawnClient(const std::vector<Client *> &clients,
 		    Client *client);
   void	loadClientProfile(const std::vector<Client *> &clients,

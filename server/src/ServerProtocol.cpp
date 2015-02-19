@@ -10,6 +10,7 @@ ServerProtocol::ServerProtocol(World &world, ThreadPool &threadPool) :
   _func[ClientMessage::CONNECTION] = &ServerProtocol::handleConnection;
   _func[ClientMessage::ACTION] = &ServerProtocol::handleActions;
   _func[ClientMessage::QUERYCHUNK] = &ServerProtocol::queryChunks;
+  _func[ClientMessage::GETPLAYER] = &ServerProtocol::getPlayer;
 }
 
 ServerProtocol::~ServerProtocol()
@@ -167,6 +168,27 @@ void	ServerProtocol::loadClientProfile(const std::vector<Client *> &clients,
     }
   file.close();
   spawnClient(clients, client);
+}
+
+void    ServerProtocol::getPlayer(const ClientMessage &message,
+                                  Client *client,
+                                  const std::vector<Client *> &clients)
+{
+    ServerResponse response;
+    std::string str;
+    
+    
+    response.set_content(ServerResponse::PLAYER);
+    response.set_player(clients.size() - 1);
+    response.SerializeToString(&str);
+
+    std::cout << "Nb Player = " << response.player() << std::endl;
+    for (unsigned int i = 0; i < str.length();++i)
+    {
+        std::cout << (int)str.data()[i] << " ";
+    }
+    std::cout << std::endl;
+    client->sendPacket(0, str);
 }
 
 void	ServerProtocol::sendClientProfile(Client *client,

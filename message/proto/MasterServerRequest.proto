@@ -6,9 +6,9 @@ message ServerData {
 message MasterServerRequest {
   enum PacketContent
   {
-    GETIP = 0;
-    CREATESERVER = 1;
-    DELETESERVER = 2;
+    CREATESERVER = 0;
+    DELETESERVER = 1;
+    GETIP = 2;
     NEWCONNECTION = 3;
     DECONNECTION = 4;
   }

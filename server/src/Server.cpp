@@ -16,7 +16,7 @@ Server::Server(t_arg &arg)
 {
   // enet_initialize is called in the _masterSocket()
   _address.host = ENET_HOST_ANY;
-  _address.port = _arg.port;
+    _address.port = std::stoi(_set.getCvar("sv_port"));
   _server = enet_host_create(&_address, 128, 3, 0, 0);
 
   if (_server == NULL)

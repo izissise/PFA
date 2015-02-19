@@ -9,6 +9,7 @@ message ClientMessage {
     IDENTIFICATION = 1;
     QUERYCHUNK = 2;
     ACTION = 3;
+    GETPLAYER = 4;
   }
   required PacketContent content = 1;
   optional ConnectionMessage co = 2;

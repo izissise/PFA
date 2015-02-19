@@ -7,6 +7,8 @@
 
 # include "MasterServerRequest.pb.h"
 # include "MasterServerResponse.pb.h"
+# include "ClientMessage.pb.h"
+# include "ServerResponse.pb.h"
 
 class MasterServer {
 public:
@@ -18,10 +20,11 @@ public:
                       const ServerData &info);
     void deleteServer(ENetPeer *peer, const std::string &port);
     void getServer(ENetPeer *peer);
-    void addPlayer(ENetPeer *peer, const std::string &port);
-    void subPlayer(ENetPeer *peer, const std::string &port);
+    
+    int getServerPlayer(const char *ip, int port) const;
     
     void parsePacket(ENetPacket *packet, ENetPeer *peer);
+    void getServerInfo(SQLite::Statement &query, ServerInfo *server) const;
     
 private:
     ENetHost            *_server;

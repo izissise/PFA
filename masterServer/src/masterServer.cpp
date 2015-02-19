@@ -80,6 +80,114 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
     }
 }
 
+void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server) const
+{
+    // Demonstrate how to get some typed column value
+    const char* ip = query.getColumn(0).getText("N/A");
+    const char* port = query.getColumn(1).getText("N/A");
+    const char* name = query.getColumn(2).getText("N/A");
+    unsigned int currentPlayer = query.getColumn(3).getInt();
+    unsigned int slots = query.getColumn(4).getInt();
+    const char *country = query.getColumn(5).getText("N/A");
+    
+    std::cout << "row: " << ip << ", " << port << std::endl;
+    currentPlayer = getServerPlayer(ip, std::stoi(port));
+    
+    if (currentPlayer == (unsigned int)-1)
+    {
+        std::cerr << "The Server Cannot be reach" << std::endl;
+    }
+    
+    server->set_ip(ip);
+    server->set_port(port);
+    server->set_name(name);
+    server->set_currentplayer(currentPlayer);
+    server->set_maxplayer(slots);
+    server->set_country(country);
+
+}
+
+int MasterServer::getServerPlayer(const char *ip, int port) const
+{
+    ENetPeer *peer;
+    ENetAddress address;
+    ENetHost * client;
+    int currentPlayer;
+    
+    client = enet_host_create (NULL /* create a client host */,
+                               1 /* only allow 1 outgoing connection */,
+                               2 /* allow up 2 channels to be used, 0 and 1 */,
+                               57600 / 8 /* 56K modem with 56 Kbps downstream bandwidth */,
+                               14400 / 8 /* 56K modem with 14 Kbps upstream bandwidth */);
+    
+    enet_address_set_host (&address, ip);
+    address.port = port;
+    peer = enet_host_connect (client, & address, 2, 0);
+    if (peer == NULL)
+    {
+        fprintf (stderr,
+                 "No available peers for initiating an ENet connection.\n");
+        exit (EXIT_FAILURE);
+    }
+    
+    ENetEvent event;
+    int i = 0;
+    while (enet_host_service (client, & event, 1000) >= 0 && i < 3)
+    {
+        switch (event.type)
+        {
+            case ENET_EVENT_TYPE_CONNECT:
+            {
+                ClientMessage request;
+                std::string message;
+                
+                request.set_content(ClientMessage::GETPLAYER);
+                request.SerializeToString(&message);
+                ENetPacket * packet = enet_packet_create (message.data(),
+                                                          message.size(),
+                                                          ENET_PACKET_FLAG_RELIABLE);
+                enet_peer_send(peer, 0, packet);
+                break;
+            }
+            case ENET_EVENT_TYPE_RECEIVE:
+            {
+                ServerResponse response;
+                
+                for (unsigned int i = 0; i < event.packet->dataLength; ++i)
+                {
+                    std::cout << (int)event.packet->data[i] << " ";
+                }
+                std::cout << std::endl;
+                
+                if (response.ParseFromArray(event.packet->data, event.packet->dataLength)
+                    && response.content() == ServerResponse::PLAYER)
+                {
+                    std::cout << "Packet Player = " << response.player() << std::endl;
+                    currentPlayer = response.player();
+                    enet_peer_disconnect (peer, 0);
+                    enet_host_destroy(client);
+                    return currentPlayer;
+                }
+                else
+                {
+                    currentPlayer = -1;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+        ++i;
+    }
+    if (i == 3)
+    {
+        std::cout << "No Response Received" << std::endl;
+        currentPlayer = -1;
+    }
+    enet_host_destroy(client);
+    return currentPlayer;
+}
+
 void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
 {
     char name[256] = { 0 };
@@ -113,20 +221,8 @@ void MasterServer::getServer(ENetPeer *peer)
         {
             MasterServerResponse response;
             ServerInfo *server = new ServerInfo();
-            // Demonstrate how to get some typed column value
-            const char* ip = query.getColumn(0).getText("N/A");
-            const char* port = query.getColumn(1).getText("N/A");
-            const char* name = query.getColumn(2).getText("N/A");
-            unsigned int currentPlayer = query.getColumn(3).getInt();
-            unsigned int slots = query.getColumn(4).getInt();
-            const char *country = query.getColumn(5).getText("N/A");
-            
-            server->set_ip(ip);
-            server->set_port(port);
-            server->set_name(name);
-            server->set_currentplayer(currentPlayer);
-            server->set_maxplayer(slots);
-            server->set_country(country);
+
+            getServerInfo(query, server);
             
             response.set_content(MasterServerResponse::IP);
             response.set_allocated_server(server);
@@ -136,7 +232,6 @@ void MasterServer::getServer(ENetPeer *peer)
             
             ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
                                                     ENET_PACKET_FLAG_RELIABLE);
-            std::cout << "row: " << ip << ", " << port << std::endl;
             if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
             {
                 std::cerr << "Cannot be send"<< std::endl;
@@ -149,49 +244,6 @@ void MasterServer::getServer(ENetPeer *peer)
     }
 }
 
-void MasterServer::addPlayer(ENetPeer *peer, const std::string &port)
-{
-    char name[256] = { 0 };
-    
-    enet_address_get_host_ip(&peer->address, name, 256);
-    try
-    {
-        SQLite::Statement st(_db, "UPDATE server SET currentPlayer = currentPlayer + 1 WHERE ip = ? AND port = ?");
-        
-        st.bind(1, name);
-        st.bind(2, port);
-        int nb = st.exec();
-        
-        std::cout << st.getQuery() << ", returned " << nb << std::endl;
-        std::cout << "Add Player to " << name << ":" << port << std::endl;
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "exception: " << e.what() << std::endl;
-    }
-}
-
-void MasterServer::subPlayer(ENetPeer *peer, const std::string &port)
-{
-    char name[256] = { 0 };
-    
-    enet_address_get_host_ip(&peer->address, name, 256);
-    try
-    {
-        SQLite::Statement st(_db, "UPDATE server SET currentPlayer = currentPlayer - 1 WHERE ip = ? AND port = ?");
-        
-        st.bind(1, name);
-        st.bind(2, port);
-        int nb = st.exec();
-        
-        std::cout << st.getQuery() << ", returned " << nb << std::endl;
-        std::cout << "Sub Player to " << name << ":" << port << std::endl;
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "exception: " << e.what() << std::endl;
-    }
-}
 
 void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
 {
@@ -210,14 +262,6 @@ void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
                 
             case MasterServerRequest::DELETESERVER:
                 deleteServer(peer, request.port());
-                break;
-
-            case MasterServerRequest::NEWCONNECTION:
-                addPlayer(peer, request.port());
-                break;
-
-            case MasterServerRequest::DECONNECTION:
-                subPlayer(peer, request.port());
                 break;
 
             default:
