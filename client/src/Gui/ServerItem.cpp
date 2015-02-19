@@ -64,6 +64,7 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
       msg.set_content(ClientMessage::PING);
       msg.SerializeToString(&packet);
       _socket.sendPacket(0, packet);
+      enet_host_flush(_socket.getHost());
     };
 
   online = _socket.isOnline();
@@ -79,7 +80,7 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
 		      serverInfo.at(1),
 		      2);
     }
-  if (_time.getElapsedTime().asMilliseconds() < 2500)
+  if (_time.getElapsedTime().asMilliseconds() < 1000)
     return ;
   if (_socket.isConnected())
     pingFunc();
@@ -110,7 +111,7 @@ void	ServerItem::updateNetwork()
 		    std::lock_guard<std::mutex> lock(_mutex);
 		    uint64_t	time = std::chrono::duration_cast<std::chrono::milliseconds>
 		      (std::chrono::system_clock::now().time_since_epoch()).count();
-		    // std::cout << "update Ping" << std::endl;
+		    //std::cout << "update Ping" << std::endl;
 		    _pingTime.push(time - packet.ping().time());
 		  }
 	      }

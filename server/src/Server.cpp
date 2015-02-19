@@ -119,8 +119,6 @@ void		Server::run()
 
   while ((enet_host_service(_server, &event, 50)) >= 0)
     {
-      if (getchar() == 10)
-	return ;
       switch (event.type)
         {
 	case ENET_EVENT_TYPE_CONNECT:
