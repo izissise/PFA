@@ -24,7 +24,7 @@ public:
     int getServerPlayer(const char *ip, int port) const;
     
     void parsePacket(ENetPacket *packet, ENetPeer *peer);
-    void getServerInfo(SQLite::Statement &query, ServerInfo *server) const;
+    void getServerInfo(SQLite::Statement &query, ServerInfo *server);
     
 private:
     ENetHost            *_server;

@@ -30,7 +30,7 @@ MasterServer::MasterServer()
     try
     {
         _db.exec("CREATE TABLE IF NOT EXISTS server"
-                 "(ip TEXT, port TEXT, name TEXT, currentPlayer INTEGER, slots INTEGER, country TEXT, "
+                 "(ip TEXT, port TEXT, name TEXT, currentPlayer INTEGER, slots INTEGER, country TEXT, lastUpdate INTEGER, "
                  "PRIMARY KEY (ip, port))");
     }
     catch (std::exception& e)
@@ -63,13 +63,14 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
             std::cerr << "exception: " << e.what() << std::endl;
             c = "N/A";
         }
-        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, 0, ?, ?)");
+        SQLite::Statement st(_db, "INSERT INTO server VALUES (?, ?, ?, 0, ?, ?, ?)");
         
         st.bind(1, ip);
         st.bind(2, port);
         st.bind(3, info.name());
         st.bind(4, static_cast<int>(info.slots()));
         st.bind(5, c);
+        st.bind(6, 0);
         int nb = st.exec();
         
         std::cout << st.getQuery() << ", returned " << nb << std::endl;
@@ -80,8 +81,10 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
     }
 }
 
-void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server) const
+void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server)
 {
+    int laps = 2 * 60; // 5 minutes
+    
     // Demonstrate how to get some typed column value
     const char* ip = query.getColumn(0).getText("N/A");
     const char* port = query.getColumn(1).getText("N/A");
@@ -91,11 +94,23 @@ void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server) c
     const char *country = query.getColumn(5).getText("N/A");
     
     std::cout << "row: " << ip << ", " << port << std::endl;
-    currentPlayer = getServerPlayer(ip, std::stoi(port));
-    
-    if (currentPlayer == (unsigned int)-1)
+    if (query.getColumn(6).getInt() + laps < std::time(NULL))
     {
-        std::cerr << "The Server Cannot be reach" << std::endl;
+        currentPlayer = getServerPlayer(ip, std::stoi(port));
+        if (currentPlayer == (unsigned int)-1)
+        {
+            std::cerr << "The Server Cannot be reach" << std::endl;
+        }
+
+        SQLite::Statement st(_db, "UPDATE server SET currentPlayer = ?, lastUpdate = ? WHERE ip = ? AND port = ?");
+
+        st.bind(1, (int)currentPlayer);
+        st.bind(2, (int)std::time(NULL));
+        st.bind(3, ip);
+        st.bind(4, port);
+        st.exec();
+        
+        std::cout << "UPDATE the database for the player" << std::endl;
     }
     
     server->set_ip(ip);
