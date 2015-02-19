@@ -70,43 +70,46 @@ void	ServerMenu::updateContent(Settings &set)
   const CvarList	&cvars = set.getCvarList();
   ENetEvent		evt;
   bool			connected;
-
-  connected = _masterSocket.isConnected();
-  if (!connected)
-    _masterSocket.connect(cvars.getCvar("sv_masterIP"),
-			  cvars.getCvar("sv_masterPort"),
-			  2);
-  if (connected)
+  std::function<void ()> dequeueMessages =
+    [this]()
     {
-      std::lock_guard<std::mutex>	lock(_mutex);
+      std::lock_guard<std::mutex>	lock(_messageMutex);
       while (!_messages.empty())
 	{
 	  _masterSocket.sendPacket(0, _messages.front());
 	  _messages.pop();
 	}
-    }
-  while ((enet_host_service(_masterSocket.getHost(), &evt, 100)) > 0) // if no evt == 0
+    };
+
+  connected = _masterSocket.isConnected();
+  if (connected)
     {
-      switch (evt.type)
-        {
-	case ENET_EVENT_TYPE_CONNECT:
-	  {
-	    std::lock_guard<std::mutex>	lock(_mutex);
-	    connected = true;
-	    while (!_messages.empty())
-	      {
-		_masterSocket.sendPacket(0, _messages.front());
-		_messages.pop();
-	      }
-	  }
-	  break;
-	case ENET_EVENT_TYPE_RECEIVE:
-	  parseServerPacket(set, evt.packet->data, evt.packet->dataLength);
-	  break;
-	default:
-	  break;
-        }
+      for (bool serviced = false;;)
+	{
+	  if (!serviced)
+	    {
+	      if (enet_host_service(_masterSocket.getHost(), &evt, 1) <= 0)
+		break;
+	      serviced = true;
+	    }
+	  else if (enet_host_check_events(_masterSocket.getHost(), &evt) <= 0)
+	    break;
+	  switch (evt.type)
+	    {
+	    case ENET_EVENT_TYPE_RECEIVE:
+	      parseServerPacket(set, evt.packet->data, evt.packet->dataLength);
+	      break;
+	    default:
+	      break;
+	    }
+	}
     }
+  else
+    _masterSocket.connect(cvars.getCvar("sv_masterIP"),
+			  cvars.getCvar("sv_masterPort"),
+			  2);
+  if (connected)
+    dequeueMessages();
 }
 
 void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
@@ -117,7 +120,7 @@ void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
 
   if (_update)
     {
-      std::lock_guard<std::mutex>	lock(_mutex);
+      std::lock_guard<std::mutex>	lock(_messageMutex);
       MasterServerRequest	msg;
       std::string		packet;
 
@@ -127,16 +130,19 @@ void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
       _messages.push(packet);
       _update = false;
     }
-  for (auto &panel : containers)
-    {
-      if (!panel->isHidden())
-  	{
-  	  std::vector<APanelScreen *>	&servers = panel->getSubPanels();
+  {
+    std::lock_guard<std::mutex>	lock(_mutex);
+    for (auto &panel : containers)
+      {
+	if (!panel->isHidden())
+	  {
+	    std::vector<APanelScreen *>	&servers = panel->getSubPanels();
 
-  	  for (auto &server : servers)
-  	    server->update(timeStep, set);
-  	}
-    }
+	    for (auto &server : servers)
+	      server->update(timeStep, set);
+	  }
+      }
+  }
   updateContent(set);
   _update = false;
 }
@@ -368,7 +374,7 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
   itemList.erase(it, itemList.end());
   for (const std::string &ip : content)
     {
-      std::lock_guard<std::mutex>	lock(_mutex);
+      std::lock_guard<std::mutex>	lock(_messageMutex);
 
       if (std::find_if(itemList.begin(), itemList.end(),
 		       [&ip](APanelScreen *panel) -> bool
@@ -449,6 +455,7 @@ ServerItem	*ServerMenu::addServerToList(Settings &set,
 					     const std::string &ip,
 					     const std::vector<APanelScreen *> &panels)
 {
+  std::lock_guard<std::mutex>	lock(_mutex);
   APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
   sf::FloatRect	widgetZone(zone.left + zone.width / 6.f, 0, zone.width / 2.f, 60);

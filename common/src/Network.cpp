@@ -75,5 +75,5 @@ ENetHost	*Network::getHost()
 
 bool	Network::isConnected() const
 {
-  return (_host && _peer);
+  return _host && _peer;
 }

@@ -9,6 +9,7 @@
 #include "Widget.hpp"
 #include "Network.hpp"
 #include "ClientMessage.pb.h"
+#include "ThreadPool.hpp"
 
 class ServerItem : public APanelScreen
 {
@@ -31,6 +32,7 @@ private:
   std::string	_ip;
   Network	_socket;
   sf::Clock	_time;
+  ThreadPool	_threadPool;
   std::queue<uint64_t>	_pingTime;
   std::mutex	_mutex;
 };
