@@ -114,20 +114,22 @@ void	GamePanel::draw(sf::RenderTarget &window, bool toWin)
 
 void	GamePanel::trigger(const t_event &ev)
 {
-  if (ev.e & ~wEvent::Update) // importent to switch the hide state before connecting
+  if (ev.e & ~wEvent::Update) // important to switch the hide state before connecting
     APanelScreen::trigger(ev);
   if (ev.e & wEvent::Update)
     {
       _hide = false;
       try
 	{
+	  const std::string defaultPort("6060");
 	  std::string	ip(ev.str);
-	  std::size_t	pos = ip.find(':');
+	  size_t nbColon = std::count(ip.begin(), ip.end(), ':');
+      std::string realIp = (nbColon % 2 == 0 ? ip : ip.substr(0, ip.find_last_of(':')));
+      std::string realPort = (nbColon % 2 == 1 ? ip.substr(ip.find_last_of(':') + 1) : defaultPort);
 
-	  std::cout << "GamePanel trigger " <<  ip.substr(0, pos) << ":"
-		    << ip.substr(pos + 1) << std::endl;
+	  std::cout << "GamePanel trigger " << realIp << ":" << realPort << std::endl;
 	  _adjustedNet = false;
-	  _socket.connect(ip.substr(0, pos), ip.substr(pos + 1), 3);
+	  _socket.connect(realIp, realPort, 3);
 	}
       catch (NetworkException &e)
 	{
