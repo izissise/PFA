@@ -1,8 +1,10 @@
+#include <chrono>
+
 #include "ServerItem.hpp"
 #include "StringUtils.hpp"
 
 ServerItem::ServerItem(const sf::FloatRect &zone, const std::string &ip) :
-  APanelScreen(zone), _ip(ip), _socket()
+  APanelScreen(zone), _ip(ip), _socket(), _time()
 {
   addFont("default", "../client/assets/default.TTF");
 }
@@ -31,6 +33,20 @@ void	ServerItem::construct(const sf::Texture &texture, Settings &set,
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
+int	ServerItem::event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
+{
+  {
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    while (!_pingTime.empty())
+      {
+	updateItem("Ping", std::to_string(_pingTime.front()));
+	_pingTime.pop();
+      }
+  }
+  return APanelScreen::event(ev, ref, set);
+}
+
 void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
 {
   ENetEvent		evt;
@@ -42,13 +58,16 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
       PingTime		*ping = new PingTime;
       std::string	packet;
 
-      ping->set_time(0);
+      ping->set_time(std::chrono::duration_cast<std::chrono::milliseconds>
+		     (std::chrono::system_clock::now().time_since_epoch()).count());
       msg.set_allocated_ping(ping);
       msg.set_content(ClientMessage::PING);
       msg.SerializeToString(&packet);
       _socket.sendPacket(0, packet);
     };
 
+  if (_time.getElapsedTime().asMilliseconds() < 1000)
+    return ;
   connected = _socket.isConnected();
   if (!connected)
     {
@@ -60,6 +79,7 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
 		      serverInfo.at(1),
 		      2);
     }
+  _time.restart();
   if (connected)
     pingFunc();
   while ((enet_host_service(_socket.getHost(), &evt, 100)) > 0) // if no evt == 0
@@ -70,7 +90,20 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
 	  pingFunc();
 	  break;
 	case ENET_EVENT_TYPE_RECEIVE:
-	  std::cout << "got response" << std::endl;
+	  {
+	    ClientMessage	packet;
+
+	    if (packet.ParseFromString(std::string((char *)evt.packet->data, evt.packet->dataLength)))
+	      {
+		if (packet.has_ping())
+		  {
+		    std::lock_guard<std::mutex> lock(_mutex);
+		    uint64_t	time = std::chrono::duration_cast<std::chrono::milliseconds>
+		      (std::chrono::system_clock::now().time_since_epoch()).count();
+		    _pingTime.push(time - packet.ping().time());
+		  }
+	      }
+	  }
 	  break;
 	default:
 	  break;
