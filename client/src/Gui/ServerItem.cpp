@@ -50,16 +50,16 @@ int	ServerItem::event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
 
 void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
 {
-  bool			online;
   std::function<void ()> pingFunc =
-    [this]()
+    [this, &set]()
     {
       ClientMessage	msg;
       PingTime		*ping = new PingTime;
       std::string	packet;
 
       ping->set_time(std::chrono::duration_cast<std::chrono::milliseconds>
-		     (std::chrono::system_clock::now().time_since_epoch()).count());
+		     (std::chrono::system_clock::now().time_since_epoch()).count() +
+		     1000 / std::stoi(set.getCvarList().getCvar("com_gameFps")));
       msg.set_allocated_ping(ping);
       msg.set_content(ClientMessage::PING);
       msg.SerializeToString(&packet);
@@ -67,8 +67,7 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
       enet_host_flush(_socket.getHost());
     };
 
-  online = _socket.isOnline();
-  if (online)
+  if (_socket.isOnline())
     updateNetwork();
   else
     {
@@ -80,12 +79,11 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
 		      serverInfo.at(1),
 		      2);
     }
-  if (_time.getElapsedTime().asMilliseconds() < 1000)
+  if (_time.getElapsedTime().asMilliseconds() < 100)
     return ;
   if (_socket.isConnected())
     pingFunc();
   _time.restart();
-
 }
 
 void	ServerItem::updateNetwork()
