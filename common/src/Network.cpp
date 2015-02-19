@@ -1,7 +1,7 @@
 #include "Network.hpp"
 
 Network::Network()
-  : _host(nullptr), _peer(nullptr)
+  : _host(nullptr), _peer(nullptr), _connected(false)
 {
   if (enet_initialize() < 0)
     throw NetworkException("An error occurred while initializing ENet.");
@@ -18,7 +18,7 @@ void	Network::connect(const std::string &address, const std::string &port, int n
   ENetAddress addr;
   std::stringstream ss(port);
 
-  if (isConnected())
+  if (isOnline())
     disconnect();
   if ((_host = enet_host_create(NULL, 1, nbChannel, 0, 0)) == NULL)
     throw NetworkException("An error occurred while trying to create an ENet client host.");
@@ -37,6 +37,7 @@ void	Network::disconnect()
     enet_host_destroy(_host);
   _peer = nullptr;
   _host = nullptr;
+  _connected = false;
 }
 
 void	Network::sendPacket(enet_uint8 chan, const std::string &message) const
@@ -73,7 +74,17 @@ ENetHost	*Network::getHost()
   return _host;
 }
 
+void	Network::setConnected()
+{
+  _connected = true;
+}
+
 bool	Network::isConnected() const
+{
+  return _connected;
+}
+
+bool	Network::isOnline() const
 {
   return _host && _peer;
 }

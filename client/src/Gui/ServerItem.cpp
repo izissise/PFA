@@ -50,8 +50,7 @@ int	ServerItem::event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
 
 void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
 {
-  ENetEvent		evt;
-  bool			connected;
+  bool			online;
   std::function<void ()> pingFunc =
     [this]()
     {
@@ -67,44 +66,9 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
       _socket.sendPacket(0, packet);
     };
 
-  connected = _socket.isConnected();
-  if (connected)
-    {
-      for (bool serviced = false;;)
-	{
-	  if (!serviced)
-	    {
-	      if (enet_host_service(_socket.getHost(), &evt, 1) <= 0)
-		break;
-	      serviced = true;
-	    }
-	  else if (enet_host_check_events(_socket.getHost(), &evt) <= 0)
-	    break;
-	  switch (evt.type)
-	    {
-	    case ENET_EVENT_TYPE_RECEIVE:
-	      {
-		ClientMessage	packet;
-
-		if (packet.ParseFromString(std::string((char *)evt.packet->data,
-						       evt.packet->dataLength)))
-		  {
-		    if (packet.has_ping())
-		      {
-			std::lock_guard<std::mutex> lock(_mutex);
-			uint64_t	time = std::chrono::duration_cast<std::chrono::milliseconds>
-			  (std::chrono::system_clock::now().time_since_epoch()).count();
-			// std::cout << "update Ping" << std::endl;
-			_pingTime.push(time - packet.ping().time());
-		      }
-		  }
-	      }
-	      break;
-	    default:
-	      break;
-	    }
-	}
-    }
+  online = _socket.isOnline();
+  if (online)
+    updateNetwork();
   else
     {
       StringUtils		su;
@@ -117,10 +81,53 @@ void	ServerItem::update(std::chrono::milliseconds timeStep, Settings &set)
     }
   if (_time.getElapsedTime().asMilliseconds() < 2500)
     return ;
-  if (connected)
+  if (_socket.isConnected())
     pingFunc();
   _time.restart();
 
+}
+
+void	ServerItem::updateNetwork()
+{
+  ENetEvent		evt;
+
+  for (bool serviced = false;;)
+    {
+      if (!serviced)
+	{
+	  if (enet_host_service(_socket.getHost(), &evt, 0) <= 0)
+	    break;
+	  serviced = true;
+	}
+      else if (enet_host_check_events(_socket.getHost(), &evt) <= 0)
+	break;
+      switch (evt.type)
+	{
+	case ENET_EVENT_TYPE_CONNECT:
+	  _socket.setConnected();
+	  break;
+	case ENET_EVENT_TYPE_RECEIVE:
+	  {
+	    ClientMessage	packet;
+
+	    if (packet.ParseFromString(std::string((char *)evt.packet->data,
+						   evt.packet->dataLength)))
+	      {
+		if (packet.has_ping())
+		  {
+		    std::lock_guard<std::mutex> lock(_mutex);
+		    uint64_t	time = std::chrono::duration_cast<std::chrono::milliseconds>
+		      (std::chrono::system_clock::now().time_since_epoch()).count();
+		    // std::cout << "update Ping" << std::endl;
+		    _pingTime.push(time - packet.ping().time());
+		  }
+	      }
+	  }
+	  break;
+	default:
+	  break;
+	}
+    }
 }
 
 void	ServerItem::createBackgroundController(Widget *widget)

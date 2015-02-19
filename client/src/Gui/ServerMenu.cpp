@@ -69,7 +69,7 @@ void	ServerMenu::updateContent(Settings &set)
 {
   const CvarList	&cvars = set.getCvarList();
   ENetEvent		evt;
-  bool			connected;
+  bool			online;
   std::function<void ()> dequeueMessages =
     [this]()
     {
@@ -81,14 +81,14 @@ void	ServerMenu::updateContent(Settings &set)
 	}
     };
 
-  connected = _masterSocket.isConnected();
-  if (connected)
+  online = _masterSocket.isOnline();
+  if (online)
     {
       for (bool serviced = false;;)
 	{
 	  if (!serviced)
 	    {
-	      if (enet_host_service(_masterSocket.getHost(), &evt, 1) <= 0)
+	      if (enet_host_service(_masterSocket.getHost(), &evt, 0) <= 0)
 		break;
 	      serviced = true;
 	    }
@@ -96,6 +96,9 @@ void	ServerMenu::updateContent(Settings &set)
 	    break;
 	  switch (evt.type)
 	    {
+	    case ENET_EVENT_TYPE_CONNECT:
+	      _masterSocket.setConnected();
+	      break;
 	    case ENET_EVENT_TYPE_RECEIVE:
 	      parseServerPacket(set, evt.packet->data, evt.packet->dataLength);
 	      break;
@@ -108,7 +111,7 @@ void	ServerMenu::updateContent(Settings &set)
     _masterSocket.connect(cvars.getCvar("sv_masterIP"),
 			  cvars.getCvar("sv_masterPort"),
 			  2);
-  if (connected)
+  if (_masterSocket.isConnected())
     dequeueMessages();
 }
 

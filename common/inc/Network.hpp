@@ -20,11 +20,14 @@ public:
   void	adjustNetworkSettings(enet_uint32 incomingBandwidth,
 			      enet_uint32 outgoingBandwidth);
   ENetHost	*getHost();
+  void		setConnected();
   bool		isConnected() const;
+  bool		isOnline() const;
 
 private:
   ENetHost	*_host;
   ENetPeer	*_peer;
+  bool		_connected;
 };
 
 #endif

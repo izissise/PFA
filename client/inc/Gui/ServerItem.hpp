@@ -26,6 +26,7 @@ public:
 
   const std::string	&getIp() const;
 private:
+  void	updateNetwork();
   void	createBackgroundController(Widget *widget);
 
 private:
