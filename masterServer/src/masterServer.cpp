@@ -72,7 +72,7 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
     }
   catch (std::exception& e)
     {
-      std::cout << "exception: " << e.what() << std::endl;
+      std::cerr << "exception: " << e.what() << std::endl;
     }
 }
 
@@ -155,9 +155,7 @@ int MasterServer::getServerPlayer(const char *ip, const char *port) const
                     return currentPlayer;
                   }
                 else
-                  {
-                    currentPlayer = -1;
-                  }
+                  currentPlayer = -1;
                 break;
               }
             default:
@@ -195,7 +193,6 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
       int nb = st.exec();
 
       std::cout << st.getQuery() << ", returned " << nb << std::endl;
-      std::cout << "Delete" << std::endl;
     }
   catch (std::exception& e)
     {
@@ -221,15 +218,7 @@ void MasterServer::sendServers(ENetPeer *peer)
           response.set_allocated_server(server);
           response.set_place(0);
 
-          std::string message;
-          response.SerializeToString(&message);
-
-          ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
-                                                  ENET_PACKET_FLAG_RELIABLE);
-          if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
-            {
-              std::cerr << "Cannot be send"<< std::endl;
-            }
+          sendPacket(peer, response);
         }
     }
   catch (std::exception& e)
@@ -258,15 +247,7 @@ void    MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
           response.set_allocated_server(server);
           response.set_place(1);
 
-          std::string message;
-          response.SerializeToString(&message);
-
-          ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
-                                                  ENET_PACKET_FLAG_RELIABLE);
-          if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
-            {
-              std::cerr << "Cannot be send"<< std::endl;
-            }
+          sendPacket(peer, response);
         }
     }
   catch (std::exception& e)
@@ -306,6 +287,17 @@ void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
 
   /* Clean up the packet now that we're done using it. */
   enet_packet_destroy(packet);
+}
+
+void MasterServer::sendPacket(ENetPeer *peer, const ::google::protobuf::Message &message) const
+{
+  std::string msg;
+  message.SerializeToString(&msg);
+
+  ENetPacket *packet = enet_packet_create(msg.c_str(), msg.size(),
+                                          ENET_PACKET_FLAG_RELIABLE);
+  if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
+    std::cerr << "Cannot be send"<< std::endl;
 }
 
 void MasterServer::run()

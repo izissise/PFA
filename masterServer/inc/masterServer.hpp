@@ -16,6 +16,9 @@ public:
   ~MasterServer();
 
   void run();
+
+private:
+
   void createServer(ENetPeer *peer, const std::string &port,
                     const ServerData &info);
   void deleteServer(ENetPeer *peer, const std::string &port);
@@ -29,7 +32,8 @@ public:
   void parsePacket(ENetPacket *packet, ENetPeer *peer);
   void getServerInfo(SQLite::Statement &query, ServerInfo *server);
 
-private:
+  void sendPacket(ENetPeer *peer, const ::google::protobuf::Message &message) const;
+
   ENetHost            *_server;
   SQLite::Database    _db;
 };
