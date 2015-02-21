@@ -23,6 +23,11 @@ public:
   */
   std::chrono::milliseconds GetTargetFrameDuration() const {return std::chrono::duration_cast<std::chrono::milliseconds>(_targetFrameDuration);};
 
+  /**
+  * \return The current lag the game is up to
+  */
+  std::chrono::milliseconds GetLag() const {return std::chrono::duration_cast<std::chrono::milliseconds>(_lag);};
+
   /** Get number of frame since the beginning
   * \return Value of _nbFrame
   */

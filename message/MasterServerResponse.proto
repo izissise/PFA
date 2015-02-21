@@ -10,10 +10,9 @@ message ServerInfo {
 message MasterServerResponse {
   enum PacketContent
   {
-    SUCCESS = 0;
-    FAILURE = 1;
-    IP = 2;
+    IP = 1;
   }
   required PacketContent content = 1;
   optional ServerInfo server = 2;
+  required uint32 place = 3;
 }

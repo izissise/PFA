@@ -39,12 +39,12 @@ void		ASwitchElem::switchContent(int dir)
   _idx = ((dir == 1) ? ((_idx + 1) % contentSize) : ((contentSize + _idx - 1) % contentSize));
 }
 
-void	ASwitchElem::trigger(const t_event &event)
+void	ASwitchElem::trigger(const t_event &ev)
 {
-  if (event.e & wEvent::Update)
-    switchContent(event.idx);
+  if (ev.e & wEvent::Update)
+    switchContent(ev.idx);
   else
-    APanelScreen::trigger(event);
+    APanelScreen::trigger(ev);
 }
 
 const sf::FloatRect	&ASwitchElem::getLeftZone() const
@@ -78,11 +78,11 @@ int	ASwitchElem::isOverContent(const sf::RenderWindow &ref) const
   return 0;
 }
 
-bool	ASwitchElem::isClicked(const sf::Event &event, sf::Mouse::Button button) const
+bool	ASwitchElem::isClicked(const sf::Event &ev, sf::Mouse::Button button) const
 {
-  if (event.type == sf::Event::MouseButtonPressed)
+  if (ev.type == sf::Event::MouseButtonPressed)
     {
-      if (event.mouseButton.button == button)
+      if (ev.mouseButton.button == button)
 	return true;
     }
   return false;

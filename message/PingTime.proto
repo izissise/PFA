@@ -1,0 +1,3 @@
+message PingTime {
+  required uint64 time = 1;
+}

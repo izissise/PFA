@@ -12,15 +12,15 @@ OptionTabPanel::~OptionTabPanel()
 {
 }
 
-void	OptionTabPanel::trigger(const t_event &event)
+void	OptionTabPanel::trigger(const t_event &ev)
 {
-  if (event.e & wEvent::Hide)
+  if (ev.e & wEvent::Hide)
     {
-      if (event.e & wEvent::Toggle)
+      if (ev.e & wEvent::Toggle)
 	_hide = !_hide;
       else
 	{
-	  _hide = event.value;
+	  _hide = ev.value;
 	}
     }
 }

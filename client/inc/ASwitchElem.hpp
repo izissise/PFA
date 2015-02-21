@@ -14,6 +14,7 @@ public:
 
   void	construct(const sf::Texture &texture, Settings &set,
 		  const std::vector<APanelScreen *> &panels);
+
   void	trigger(const t_event &event);
   void	addSides(const std::array<AWidget * const, 2> &sides);
   const sf::FloatRect	&getLeftZone() const;

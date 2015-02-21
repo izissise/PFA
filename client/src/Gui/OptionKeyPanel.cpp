@@ -97,12 +97,12 @@ void	OptionKeyPanel::createKeyPanel(Panel *keyPanel, const sf::FloatRect &zone,
   KeyWidget	*wConsole = new KeyWidget("Left", {zone.left, zone.top + 5 * 4 + 40 * 4,
 					zone.width, 40},
 					Action::ToggleConsole, ctrl, txt);
-  std::function<void (const t_event &event)> eventFunc;
+  std::function<void (const t_event &ev)> eventFunc;
 
-  eventFunc = [keyPanel](const t_event &event)
+  eventFunc = [keyPanel](const t_event &ev)
     {
-      if (event.e & wEvent::Update)
-	keyPanel->notify(event);
+      if (ev.e & wEvent::Update)
+	keyPanel->notify(ev);
     };
   keyPanel->addObserver({wForward, wBack, wRight, wLeft, wConsole});
   createKeyWidget(texture, wForward, keyPanel);
@@ -165,10 +165,10 @@ void	OptionKeyPanel::createKeyWidget(const sf::Texture &texture UNUSED,
 					KeyWidget *wKey, Panel *panel)
 {
   sf::FloatRect wzone = wKey->getZone();
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [](AWidget &widget, const sf::Event &event UNUSED, sf::RenderWindow &ref UNUSED)
+  updateFunc = [](AWidget &widget, const sf::Event &ev UNUSED, sf::RenderWindow &ref UNUSED)
     -> int
     {
       sf::FloatRect zone = widget.getZone();

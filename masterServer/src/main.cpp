@@ -1,7 +1,7 @@
 #include <iostream>
 #include "masterServer.hpp"
 
-int main(int ac, char **av)
+int main(int, char **)
 {
   MasterServer main;
 

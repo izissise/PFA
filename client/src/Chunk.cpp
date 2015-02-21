@@ -14,9 +14,9 @@
 using namespace std;
 using namespace noise;
 
-Chunk::Chunk(void) :
-  _tiles(width * height, TileType::Empty),
-  _bgTiles(width * height, TileType::Empty),
+Chunk::Chunk() :
+  _tiles(width *height, TileType::Empty),
+  _bgTiles(width *height, TileType::Empty),
   _generated(false),
   _loaded(false)
 {
@@ -28,10 +28,6 @@ Chunk::Chunk(const Vector2i &chunkPos) :
   _pos(chunkPos),
   _generated(false),
   _loaded(false)
-{
-}
-
-Chunk::~Chunk(void)
 {
 }
 

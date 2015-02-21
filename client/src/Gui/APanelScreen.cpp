@@ -9,22 +9,18 @@ APanelScreen::APanelScreen(const sf::FloatRect &zone) :
 {
 }
 
-APanelScreen::~APanelScreen()
-{
-}
-
 void         APanelScreen::draw(sf::RenderTarget &window, bool first)
 {
   sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);
   // here i get the target to draw into
 
-  if (&target != &window)			// then we get a new RenderTarget
-    target.clear(sf::Color(127,127,127,0));	// clear it before any usage
+  if (&target != &window)                       // then we get a new RenderTarget
+    target.clear(sf::Color(127,127,127,0));     // clear it before any usage
   if (dynamic_cast<sf::RenderTexture *>(&target) != nullptr) // draw content into the renderTexture
     {
       for (auto &widget : _widgets)
-	if (!widget->isHidden())
-	  widget->draw(target);
+        if (!widget->isHidden())
+          widget->draw(target);
     }
   for (auto &panel : _panels)
     if (!panel->isHidden())
@@ -33,19 +29,19 @@ void         APanelScreen::draw(sf::RenderTarget &window, bool first)
     print(window, false);
 }
 
-void	APanelScreen::print(sf::RenderTarget &window, bool isTextured)
+void    APanelScreen::print(sf::RenderTarget &window, bool isTextured)
 {
   isTextured = (isTextured || _flag & APanelScreen::Display::Overlap);
   if (!isTextured)
     {
       for (auto widget : _widgets)
-	if (!widget->isHidden())
-	  widget->draw(window);
+        if (!widget->isHidden())
+          widget->draw(window);
     }
   else if (_flag & APanelScreen::Display::Overlap) // means it is the main RenderTexture
     {
-      _rt.display();		// Must refresh before drawing
-      sf::Sprite		sprite(_rt.getTexture(), static_cast<sf::IntRect>(_zone));
+      _rt.display();            // Must refresh before drawing
+      sf::Sprite                sprite(_rt.getTexture(), static_cast<sf::IntRect>(_zone));
 
       sprite.setPosition(_zone.left, _zone.top);
       window.draw(sprite);
@@ -111,12 +107,12 @@ bool	APanelScreen::isHidden() const
   return _hide;
 }
 
-void	APanelScreen::setDisplayFlag(APanelScreen::Display flag)
+void    APanelScreen::setDisplayFlag(APanelScreen::Display flag)
 {
   _flag = flag;
 }
 
-auto	APanelScreen::getDisplayFlag() const -> APanelScreen::Display
+auto    APanelScreen::getDisplayFlag() const -> APanelScreen::Display
 {
   return _flag;
 }
@@ -124,59 +120,6 @@ auto	APanelScreen::getDisplayFlag() const -> APanelScreen::Display
 void	APanelScreen::setHide(bool hide)
 {
   _hide = hide;
-}
-
-void	APanelScreen::setState(APanelScreen::State state)
-{
-  if (state & APanelScreen::State::Inactive)
-    _countdown.start(sf::milliseconds(InactiveTime));
-  _state = static_cast<APanelScreen::State>(_state | state);
-}
-
-void	APanelScreen::removeState(APanelScreen::State state)
-{
-  _state = static_cast<APanelScreen::State>(_state & static_cast<APanelScreen::State>(~(state)));
-}
-
-void	APanelScreen::moveWidgets(APanelScreen * const pan,
-				  const sf::Vector2f &displacement)
-{
-  auto	vec = pan->getWidgets();
-
-  for (auto &it : vec)
-    it->move(displacement.x, displacement.y);
-}
-
-void	APanelScreen::moveZone(const sf::Vector2f &displacement)
-{
-  _zone.top += displacement.y;
-  _zone.left += displacement.x;
-}
-
-void	APanelScreen::move(const sf::Vector2f &displacement)
-{
-  for (auto &pit : _panels)
-    {
-      if (!pit->getSubPanels().empty())
-	pit->move(displacement);
-      else
-	pit->moveWidgets(pit, displacement);
-    }
-  moveWidgets(this, displacement);
-  moveZone(displacement);
-}
-
-void	APanelScreen::setPosition(const sf::Vector2f &position)
-{
-  sf::Vector2f	displacement(position.x - _zone.left,
-			     position.y - _zone.top);
-
-  move(displacement);
-}
-
-APanelScreen::State	APanelScreen::getState() const
-{
-  return _state;
 }
 
 bool	APanelScreen::checkPanelBounds(AWidget * const widget) const
@@ -189,46 +132,100 @@ bool	APanelScreen::checkPanelBounds(AWidget * const widget) const
 	  && wZone.top < _zone.top + _zone.height);
 }
 
-bool	APanelScreen::checkPanelBounds(APanelScreen * const panel) const
+bool    APanelScreen::checkPanelBounds(APanelScreen * const panel) const
 {
-  sf::FloatRect	wZone = panel->getZone();
+  sf::FloatRect wZone = panel->getZone();
 
   return (wZone.left + wZone.width > _zone.left
-	  && wZone.top + wZone.height > _zone.top
-	  && wZone.left < _zone.left + _zone.width
-	  && wZone.top < _zone.top + _zone.height);
+          && wZone.top + wZone.height > _zone.top
+          && wZone.left < _zone.left + _zone.width
+          && wZone.top < _zone.top + _zone.height);
 }
 
-int	APanelScreen::update(const sf::Event &event, sf::RenderWindow &ref, Settings &set)
+void    APanelScreen::setState(APanelScreen::State state)
+{
+  if (state & APanelScreen::State::Inactive)
+    _countdown.start(sf::milliseconds(InactiveTime));
+  _state = static_cast<APanelScreen::State>(_state | state);
+}
+
+void    APanelScreen::removeState(APanelScreen::State state)
+{
+  _state = static_cast<APanelScreen::State>(_state & static_cast<APanelScreen::State>(~(state)));
+}
+
+void    APanelScreen::moveWidgets(APanelScreen * const pan,
+                                  const sf::Vector2f &displacement)
+{
+  auto  vec = pan->getWidgets();
+
+  for (auto &it : vec)
+    it->move(displacement.x, displacement.y);
+}
+
+void    APanelScreen::moveZone(const sf::Vector2f &displacement)
+{
+  _zone.top += displacement.y;
+  _zone.left += displacement.x;
+}
+
+void    APanelScreen::move(const sf::Vector2f &displacement)
+{
+  for (auto &pit : _panels)
+    {
+      if (!pit->getSubPanels().empty())
+        pit->move(displacement);
+      else
+        pit->moveWidgets(pit, displacement);
+    }
+  moveWidgets(this, displacement);
+  moveZone(displacement);
+}
+
+void    APanelScreen::setPosition(const sf::Vector2f &position)
+{
+  sf::Vector2f  displacement(position.x - _zone.left,
+                             position.y - _zone.top);
+
+  move(displacement);
+}
+
+APanelScreen::State     APanelScreen::getState() const
+{
+  return _state;
+}
+
+int	APanelScreen::event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
-  bool	overlap = _flag & APanelScreen::Display::Overlap;
+  bool  overlap = _flag & APanelScreen::Display::Overlap;
 
   if (_state & APanelScreen::State::Inactive)
     {
       if (_countdown.update() == false)
-	return 0;
+        return 0;
       else
-	removeState(APanelScreen::State::Inactive);
+        removeState(APanelScreen::State::Inactive);
     }
+
   for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
     {
-      if (!(*rit)->isHidden())
-	{
-	  if (!(overlap) || (overlap && checkPanelBounds(*rit)))
-	    {
-	      if ((retVal = (*rit)->update(event, ref, set)) != 0)
-		return retVal;
-	      else if ((*rit)->getState() == APanelScreen::State::Leader)
-		return 1;
-	    }
-	}
+     if (!(*rit)->isHidden())
+        {
+          if (!(overlap) || (overlap && checkPanelBounds(*rit)))
+            {
+              if ((retVal = (*rit)->event(ev, ref, set)) != 0)
+                return retVal;
+              else if ((*rit)->getState() == APanelScreen::State::Leader)
+                return 1;
+            }
+        }
     }
-  for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
+  for (auto rrrit = _widgets.rbegin(); rrrit != _widgets.rend(); ++rrrit)
     {
-      if (checkPanelBounds(*rit)) // update widget even if hidden
-	if ((retVal = (*rit)->update(event, ref, set)) != 0)
-	  return retVal;
+     if (checkPanelBounds(*rrrit)) // update widget even if hidden
+        if ((retVal = (*rrrit)->update(ev, ref, set)) != 0)
+          return retVal;
     }
   return retVal;
 }
@@ -238,16 +235,16 @@ void	APanelScreen::setTrigger(const std::function<void (const t_event &event)> &
   _trigger = func;
 }
 
-Panel	*APanelScreen::encapsulate(AWidget *widget) const
+Panel   *APanelScreen::encapsulate(AWidget *widget) const
 {
   sf::FloatRect zone = widget->getZone();
-  Panel		*panel = new Panel(zone);
+  Panel         *panel = new Panel(zone);
 
   panel->addWidget(widget);
   return panel;
 }
 
-void	APanelScreen::addPanel(APanelScreen * const panel)
+void    APanelScreen::addPanel(APanelScreen * const panel)
 {
   _panels.push_back(panel);
 }
@@ -258,29 +255,29 @@ void	APanelScreen::addPanel(const std::initializer_list<APanelScreen * const>  &
     _panels.push_back(panel);
 }
 
-void		APanelScreen::trigger(const t_event &event)
+void	APanelScreen::trigger(const t_event &ev)
 {
-  if (event.e & wEvent::Hide)
+  if (ev.e & wEvent::Hide)
     {
-      if (event.e & wEvent::Toggle)
-	_hide = !_hide;
+      if (ev.e & wEvent::Toggle)
+        _hide = !_hide;
       else
-	_hide = true;
+        _hide = true;
     }
-  else if (event.e & wEvent::Show)
+  else if (ev.e & wEvent::Show)
     {
-      if (event.e & wEvent::Toggle)
-	_hide = !_hide;
+      if (ev.e & wEvent::Toggle)
+        _hide = !_hide;
       else
-	_hide = false;
+        _hide = false;
     }
-  if (event.e & wEvent::Reset)
+  if (ev.e & wEvent::Reset)
     {
-      t_event	evt = event;
+      t_event   evt = ev;
 
       evt.e = static_cast<wEvent>(evt.e & wEvent::None) | wEvent::Reset;
       for (AWidget *widget : _widgets)
-	widget->trigger(evt);
+        widget->trigger(evt);
     }
 }
 
@@ -305,23 +302,23 @@ void		APanelScreen::addFont(const std::string &fontName,
   _font.insert(std::pair<std::string, sf::Font>(fontName, font));
 }
 
-const AWidget	*APanelScreen::getWidget(const std::string &id) const
+const AWidget   *APanelScreen::getWidget(const std::string &id) const
 {
   auto it = std::find_if(_widgets.begin(), _widgets.end(), [&id](AWidget *widget)
-			 {
-			   return (widget->getId() == id);
-			 });
+                         {
+                           return (widget->getId() == id);
+                         });
   if (it == _widgets.end())
     throw (std::runtime_error(id + " not found"));
   return (*it);
 }
 
-AWidget		*APanelScreen::getWidget(const std::string &id)
+AWidget         *APanelScreen::getWidget(const std::string &id)
 {
   auto it = std::find_if(_widgets.begin(), _widgets.end(), [&id](AWidget *widget)
-			 {
-			   return (widget->getId() == id);
-			 });
+                         {
+                           return (widget->getId() == id);
+                         });
   if (it == _widgets.end())
     throw (std::runtime_error(id + " not found"));
   return (*it);

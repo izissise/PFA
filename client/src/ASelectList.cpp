@@ -9,6 +9,6 @@ ASelectList::~ASelectList()
 {
 }
 
-void	ASelectList::trigger(const t_event &event UNUSED)
+void	ASelectList::trigger(UNUSED const t_event &ev)
 {
 }

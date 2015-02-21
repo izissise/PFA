@@ -12,23 +12,26 @@
 
 class MasterServer {
 public:
-    MasterServer();
-    ~MasterServer();
-    
-    void run();
-    void createServer(ENetPeer *peer, const std::string &port,
-                      const ServerData &info);
-    void deleteServer(ENetPeer *peer, const std::string &port);
-    void getServer(ENetPeer *peer);
-    
-    int getServerPlayer(const char *ip, int port) const;
-    
-    void parsePacket(ENetPacket *packet, ENetPeer *peer);
-    void getServerInfo(SQLite::Statement &query, ServerInfo *server);
-    
+  MasterServer();
+  ~MasterServer();
+
+  void run();
+  void createServer(ENetPeer *peer, const std::string &port,
+                    const ServerData &info);
+  void deleteServer(ENetPeer *peer, const std::string &port);
+  void getServer(const char *ip, int port);
+
+  void sendServers(ENetPeer *peer);
+  void sendServer(ENetPeer *peer, const ServerId &id);
+
+  int getServerPlayer(const char *ip, const char *port) const;
+
+  void parsePacket(ENetPacket *packet, ENetPeer *peer);
+  void getServerInfo(SQLite::Statement &query, ServerInfo *server);
+
 private:
-    ENetHost            *_server;
-    SQLite::Database    _db;
+  ENetHost            *_server;
+  SQLite::Database    _db;
 };
 
 #endif

@@ -60,10 +60,7 @@ void	MainMenu::createBgPanel(const sf::Texture &texture, Widget *wBackground,
 
 void	MainMenu::createPlayButton(Widget *wPlay)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-    updateFunc;
-
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  auto updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -73,7 +70,7 @@ void	MainMenu::createPlayButton(Widget *wPlay)
       widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (widget.isClicked(event, sf::Mouse::Left))
+	  if (widget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      widget.notify(t_event(wEvent::Hide | wEvent::Toggle));
 	      return 0;
@@ -87,10 +84,7 @@ void	MainMenu::createPlayButton(Widget *wPlay)
 
 void	MainMenu::createOptButton(Widget *wOpt)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-    updateFunc;
-
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+  auto updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -100,7 +94,7 @@ void	MainMenu::createOptButton(Widget *wOpt)
       widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
-	  if (widget.isClicked(event, sf::Mouse::Left))
+	  if (widget.isClicked(ev, sf::Mouse::Left))
 	    {
 	      widget.notify(t_event(wEvent::Hide | wEvent::Toggle, 0, 0));
 	      return 1;
@@ -114,10 +108,7 @@ void	MainMenu::createOptButton(Widget *wOpt)
 
 void	MainMenu::createQuitButton(Widget *wQuit)
 {
-  std::function	<int (AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)>
-    updateFunc;
-
-  updateFunc = [](AWidget &widget, const sf::Event &event, sf::RenderWindow &ref)
+ auto updateFunc = [](AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)
     -> int
     {
       bool	isOver;
@@ -127,7 +118,7 @@ void	MainMenu::createQuitButton(Widget *wQuit)
       widget.setSpriteAttr(1, isOver);
       if (isOver)
 	{
- 	 if (widget.isClicked(event, sf::Mouse::Left))
+ 	 if (widget.isClicked(ev, sf::Mouse::Left))
 	   {
 	     ref.close();
 	     return 1;

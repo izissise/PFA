@@ -11,6 +11,7 @@ ServerProtocol::ServerProtocol(World &world, ThreadPool &threadPool) :
   _func[ClientMessage::ACTION] = &ServerProtocol::handleActions;
   _func[ClientMessage::QUERYCHUNK] = &ServerProtocol::queryChunks;
   _func[ClientMessage::GETPLAYER] = &ServerProtocol::getPlayer;
+  _func[ClientMessage::PING] = &ServerProtocol::ping;
 }
 
 ServerProtocol::~ServerProtocol()
@@ -78,7 +79,7 @@ void  ServerProtocol::handleConnection(const ClientMessage &message,
 
 void	ServerProtocol::handleActions(const ClientMessage &message,
 				      Client *client,
-				      const std::vector<Client *> &clients UNUSED)
+				     UNUSED const std::vector<Client *> &clients)
 {
   const ClientActions	&clientActions = message.actions();
   unsigned int		nbActions = clientActions.actions_size();
@@ -113,6 +114,16 @@ void	ServerProtocol::queryChunks(const ClientMessage &message,
     }
   for (auto &chunkId : newChunks)
     client->sendPacket(2, _world.serialize(chunkId)); // send on 2 because it's a huge transfer
+}
+
+void	ServerProtocol::ping(const ClientMessage &message,
+			     Client *client,
+			     const std::vector<Client *> &clients)
+{
+  std::string	packet;
+
+  message.SerializeToString(&packet);
+  client->sendPacket(0, packet);
 }
 
 void		ServerProtocol::generateNewId(std::string &guid)
@@ -176,8 +187,8 @@ void    ServerProtocol::getPlayer(const ClientMessage &message,
 {
     ServerResponse response;
     std::string str;
-    
-    
+
+
     response.set_content(ServerResponse::PLAYER);
     response.set_player(clients.size() - 1);
     response.SerializeToString(&str);
