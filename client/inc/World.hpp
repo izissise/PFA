@@ -3,6 +3,7 @@
 
 # include <map>
 # include <memory>
+# include <deque>
 # include <chrono>
 
 # include <SFML/Graphics.hpp>
@@ -30,7 +31,7 @@ private:
 
 public:
   World(Settings& settings);
-  ~World(void) = default;
+  ~World() = default;
   World(const World& other) = delete;
   World&		operator=(const World& other) = delete;
 
@@ -72,13 +73,14 @@ private:
   void		_unloadChunks();
 
 private:
+  std::shared_ptr<b2World>	_b2World;
   std::map<chunkId, std::unique_ptr<Chunk>>	_chunks;
   Settings&	_settings;
   screenPos	_screenSize;
   TileCodex	_codex;
   Camera	_camera;
+  std::deque<AMovable> _entities;
   Player	_player;
-  std::unique_ptr<b2World>	_b2World;
   bool		_loaded;
 };
 

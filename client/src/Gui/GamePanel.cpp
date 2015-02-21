@@ -1,8 +1,11 @@
 #include <fstream>
 #include <iostream>
 #include <SFML/Audio.hpp>
+
+
 #include "GamePanel.hpp"
 #include "SimplexNoise.h"
+#include "World.hpp"
 
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
@@ -212,7 +215,7 @@ void	GamePanel::handlePackets(ENetEvent &ev)
   enet_packet_destroy(ev.packet);
 }
 
-void	GamePanel::connectClient(ENetPeer * const peer, Settings &set UNUSED)
+void	GamePanel::connectClient(ENetPeer * const peer, UNUSED Settings &set)
 {
   peer->data = (char *)("Server");
   sendConnectionInfo();
@@ -253,7 +256,7 @@ void			GamePanel::sendConnectionInfo() const
   _socket.sendPacket(1, serialized);
 }
 
-void	GamePanel::update(std::chrono::milliseconds timeStep, Settings &set)
+void	GamePanel::update(std::chrono::milliseconds const & timeStep, Settings &set)
 {
   if (_hide)
     return ;

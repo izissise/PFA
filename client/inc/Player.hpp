@@ -3,17 +3,19 @@
 
 #include <cmath>
 
-#include "AMovable.hpp"
+#include "AEntity.hpp"
 #include "Range2.hpp"
 #include "Camera.hpp"
 
-class Player : public AMovable
+class Player : public AEntity
 {
 public:
-  Player(Camera &camera);
-  virtual ~Player();
+  Player(std::shared_ptr<b2World> const& world, Camera &camera);
+  virtual ~Player() {};
 
-  bool		move(const Vector2f &dir);
+  void update(std::chrono::milliseconds const & timeStep) override;
+ // void draw(sf::RenderTarget& window, std::chrono::milliseconds const & timeStep) const override;
+  bool		move(const Vector2f &dir) override;
 
   Range2i	&getLoadedRange();
   Range2i	&getVisibleRange();

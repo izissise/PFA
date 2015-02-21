@@ -4,7 +4,7 @@ AMovable::AMovable()
 {
 }
 
-AMovable::~AMovable()
+void AMovable::update(std::chrono::milliseconds const & timeStep)
 {
 }
 

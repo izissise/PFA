@@ -1,13 +1,17 @@
 #ifndef _CLIENTENTITY_H_
 #define _CLIENTENTITY_H_
 
+#include "Unused.hpp"
+
 #include "AMovable.hpp"
 
 class ClientEntity : public AMovable
 {
 public:
-  ClientEntity();
-  virtual ~ClientEntity();
+  ClientEntity() = default;
+  virtual ~ClientEntity() {};
+
+  void update(std::chrono::milliseconds const & timeStep) override;
 
 };
 

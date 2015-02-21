@@ -9,7 +9,7 @@ Server::Server(ServerSettings &set)
   : _clients(),
     _masterSocket(),
     _set(set),
-    _threadPool(200),
+    _threadPool(200), je
     _world(_set),
     _proto(_world, _threadPool),
     _auth(_world, _clients)
@@ -24,7 +24,11 @@ Server::Server(ServerSettings &set)
   _set.addObserver(this);
   _auth.addObserver(this);
 
+  try {
   registerToMaster();
+  } catch (NetworkException& e) {
+  	std::cerr << e.what() << std::endl;
+  }
 }
 
 Server::~Server()

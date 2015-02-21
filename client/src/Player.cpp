@@ -1,15 +1,25 @@
 #include <functional>
+#include <iostream>
+
 #include "Player.hpp"
 
-Player::Player(Camera &camera) :
-  _camera(camera)
+Player::Player(std::shared_ptr<b2World> const& world, Camera &camera) :
+  AEntity(world), _camera(camera)
 {
 }
 
-Player::~Player()
+void Player::update(std::chrono::milliseconds const & timeStep)
 {
+  AMovable::update(timeStep);
 }
-#include <iostream>
+
+/*
+void Player::draw(sf::RenderTarget& window, std::chrono::milliseconds const & timeStep) const
+{
+  AMovable::draw(window, timeStep);
+}
+*/
+
 bool	Player::move(const Vector2f &dir)
 {
   bool	retVal;
