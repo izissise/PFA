@@ -7,10 +7,7 @@ MasterServer::MasterServer()
   : _db("server.db", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)
 {
   if (enet_initialize () != 0)
-    {
-      fprintf (stderr, "An error occurred while initializing ENet.\n");
-      exit (EXIT_FAILURE);
-    }
+    throw NetworkException("An error occurred while initializing ENet.");
 
   ENetAddress address;
 
@@ -22,10 +19,7 @@ MasterServer::MasterServer()
                               0      /* assume any amount of incoming bandwidth */,
                               0      /* assume any amount of outgoing bandwidth */);
   if (_server == NULL)
-    {
-      std::cerr << "An error occurred while trying to create an ENet server host." << std::endl;
-      exit (EXIT_FAILURE);
-    }
+    throw NetworkException("An error occurred while trying to create an ENet server host.");
   std::cout << "Server start on " << address.port << std::endl;
 
   try
@@ -36,7 +30,7 @@ MasterServer::MasterServer()
     }
   catch (std::exception& e)
     {
-      std::cout << "exception: " << e.what() << std::endl;
+      std::cerr << "exception: " << e.what() << std::endl;
     }
 }
 
@@ -111,7 +105,6 @@ void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server)
       st.bind(4, port);
       st.exec();
 
-      std::cout << "UPDATE the database for the player" << std::endl;
     }
 
   server->set_ip(ip);
@@ -157,7 +150,6 @@ int MasterServer::getServerPlayer(const char *ip, const char *port) const
                 if (response.ParseFromArray(event.packet->data, event.packet->dataLength)
                     && response.content() == ServerResponse::PLAYER)
                   {
-                    std::cout << "Packet Player = " << response.player() << std::endl;
                     currentPlayer = response.player();
                     client.disconnect();
                     return currentPlayer;
@@ -242,7 +234,7 @@ void MasterServer::sendServers(ENetPeer *peer)
     }
   catch (std::exception& e)
     {
-      std::cout << "exception: " << e.what() << std::endl;
+      std::cerr << "exception: " << e.what() << std::endl;
     }
 }
 
@@ -279,7 +271,7 @@ void    MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
     }
   catch (std::exception& e)
     {
-      std::cout << "exception: " << e.what() << std::endl;
+      std::cerr << "exception: " << e.what() << std::endl;
     }
 }
 
@@ -289,7 +281,6 @@ void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
   MasterServerRequest request;
   if (request.ParseFromArray(packet->data, packet->dataLength))
     {
-      std::cout << "Parse Good" << std::endl;
       switch (request.content()) {
       case MasterServerRequest::GETSERVERS:
         sendServers(peer);
@@ -328,29 +319,15 @@ void MasterServer::run()
           {
             char name[256] = { 0 };
             enet_address_get_host_ip(&event.peer->address, name, 256);
-            printf ("A new client connected from %s:%u.\n",
-                    name,
-                    event.peer -> address.port);
-            /* Store any relevant client information here. */
-            event.peer -> data = strdup(name);
+            std::cout << "A new client connected from " << name << ":" << event.peer->address.port << std::endl;
             break;
           }
         case ENET_EVENT_TYPE_RECEIVE:
           {
             std::thread t(&MasterServer::parsePacket, this, event.packet, event.peer);
             t.detach();
-
-            printf ("A packet of length %zu containing %s was received from %s on channel %u.\n",
-                    event.packet -> dataLength,
-                    event.packet -> data,
-                    event.peer -> data,
-                    event.channelID);
             break;
           }
-        case ENET_EVENT_TYPE_DISCONNECT:
-          printf ("%s disconnected.\n", event.peer -> data);
-          /* Reset the peer's client information. */
-          event.peer -> data = NULL;
         default:
           break;
         }
