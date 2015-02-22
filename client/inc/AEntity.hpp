@@ -19,7 +19,7 @@ public:
   virtual void draw(sf::RenderTarget& window, std::chrono::milliseconds const & timeStep) const;
 
 protected:
-	std::unique_ptr<b2Body, void(*)(b2Body*)> _body;
+	std::unique_ptr<b2Body, std::function<void(b2Body*)>> _body;
 };
 
 #endif // AENTITY_HPP

@@ -2,6 +2,7 @@
 #define BOX2DHELPERS_H
 
 #include <memory>
+#include <functional>
 
 #include <Box2D/Box2D.h>
 
@@ -25,12 +26,10 @@ public:
       return body;
     };
 
-    auto deconstructor = [](b2Body * bud) {
-    //  std::cout << bud << std::endl;
-      /*if (auto world = weakWorld.lock())
-        world->DestroyBody(bud);*/
+    auto deconstructor = [weakWorld](b2Body * bud) {
+      if (auto world = weakWorld.lock())
+        world->DestroyBody(bud);
     };
-
     return make_resource(constructor, deconstructor, world, bodyDef, shape, density);
   };
 
