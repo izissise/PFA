@@ -1,8 +1,9 @@
 #include <iostream>
 #include <Network.hpp>
+#include <Unused.hpp>
 #include "masterServer.hpp"
 
-int main(int, char **)
+int main(UNUSED int ac, UNUSED char **av)
 {
   try {
     MasterServer main;

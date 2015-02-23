@@ -78,7 +78,7 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
 
 void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server)
 {
-  int laps = 2 * 60; // 5 minutes
+  int laps = 2 * 60; // 2 minutes
 
   // Demonstrate how to get some typed column value
   const char* ip = query.getColumn(0).getText("N/A");
@@ -91,16 +91,17 @@ void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server)
   std::cout << "row: " << ip << ", " << port << std::endl;
   if (query.getColumn(6).getInt() + laps < std::time(NULL))
     {
-      currentPlayer = getServerPlayer(ip, port);
-      if (currentPlayer == (unsigned int)-1)
-        {
-          std::cerr << "The Server Cannot be reach" << std::endl;
-        }
+      try {
+        currentPlayer = getServerPlayer(ip, port);
+      } catch (NetworkException &e) {
+        std::cerr << e.what() << std::endl;
+        currentPlayer = 0;
+      }
 
       SQLite::Statement st(_db, "UPDATE server SET currentPlayer = ?, lastUpdate = ? WHERE ip = ? AND port = ?");
 
-      st.bind(1, (int)currentPlayer);
-      st.bind(2, (int)std::time(NULL));
+      st.bind(1, static_cast<int>(currentPlayer));
+      st.bind(2, static_cast<int>(std::time(NULL)));
       st.bind(3, ip);
       st.bind(4, port);
       st.exec();
@@ -120,63 +121,48 @@ int MasterServer::getServerPlayer(const char *ip, const char *port) const
 {
   Network client;
   int currentPlayer;
+  ENetEvent event;
+  bool first = true;
+  int i = 0;
 
-  try
+  client.connect(ip, port, 1);
+  while (client.pullEvent(event, 1000, first) && i < 3)
     {
-      client.connect(ip, port, 1);
-
-      ENetEvent event;
-      bool first = true;
-
-      int i = 0;
-      while (client.pullEvent(event, 1000, first) && i < 3)
+      switch (event.type)
         {
-          switch (event.type)
-            {
-            case ENET_EVENT_TYPE_CONNECT:
+        case ENET_EVENT_TYPE_CONNECT:
+          {
+            ClientMessage request;
+            std::string message;
+
+            request.set_content(ClientMessage::GETPLAYER);
+            request.SerializeToString(&message);
+            client.sendPacket(0, message);
+            break;
+          }
+        case ENET_EVENT_TYPE_RECEIVE:
+          {
+            ServerResponse response;
+
+            if (response.ParseFromArray(event.packet->data, event.packet->dataLength)
+                && response.content() == ServerResponse::PLAYER)
               {
-                ClientMessage request;
-                std::string message;
-
-                request.set_content(ClientMessage::GETPLAYER);
-                request.SerializeToString(&message);
-                client.sendPacket(0, message);
-                break;
+                currentPlayer = response.player();
+                client.disconnect();
+                return currentPlayer;
               }
-            case ENET_EVENT_TYPE_RECEIVE:
-              {
-                ServerResponse response;
-
-                if (response.ParseFromArray(event.packet->data, event.packet->dataLength)
-                    && response.content() == ServerResponse::PLAYER)
-                  {
-                    currentPlayer = response.player();
-                    client.disconnect();
-                    return currentPlayer;
-                  }
-                else
-                  currentPlayer = -1;
-                break;
-              }
-            default:
-              break;
-            }
-          ++i;
+            else
+              currentPlayer = -1;
+            break;
+          }
+        default:
+          break;
         }
-      if (i == 3)
-        {
-          std::cerr << "No Response Received from " << ip << ":" << port << std::endl;
-          currentPlayer = -1;
-        }
-      return currentPlayer;
-
+      ++i;
     }
-  catch (NetworkException &e)
-    {
-      std::cerr << e.what() << std::endl;
-      return (-1);
-    }
-
+  if (i == 3)
+    throw NetworkException(std::string("No Response Received from ") + ip + ":" + port);
+  return currentPlayer;
 }
 
 void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
@@ -196,7 +182,7 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
     }
   catch (std::exception& e)
     {
-      std::cout << "exception: " << e.what() << std::endl;
+      std::cerr << "exception: " << e.what() << std::endl;
     }
 }
 
@@ -262,26 +248,27 @@ void MasterServer::parsePacket(ENetPacket *packet, ENetPeer *peer)
   MasterServerRequest request;
   if (request.ParseFromArray(packet->data, packet->dataLength))
     {
-      switch (request.content()) {
-      case MasterServerRequest::GETSERVERS:
-        sendServers(peer);
-        break;
+      switch (request.content())
+        {
+        case MasterServerRequest::GETSERVERS:
+          sendServers(peer);
+          break;
 
-      case MasterServerRequest::GETIP:
-        sendServer(peer, request.id());
-        break;
+        case MasterServerRequest::GETIP:
+          sendServer(peer, request.id());
+          break;
 
-      case MasterServerRequest::CREATESERVER:
-        createServer(peer, request.port(), request.info());
-        break;
+        case MasterServerRequest::CREATESERVER:
+          createServer(peer, request.port(), request.info());
+          break;
 
-      case MasterServerRequest::DELETESERVER:
-        deleteServer(peer, request.port());
-        break;
+        case MasterServerRequest::DELETESERVER:
+          deleteServer(peer, request.port());
+          break;
 
-      default:
-        break;
-      }
+        default:
+          break;
+        }
 
     }
 
