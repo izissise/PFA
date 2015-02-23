@@ -5,11 +5,10 @@
 #include "printv.hpp"
 #include "demangle.hpp"
 
-Server::Server(t_arg &arg)
-  : _arg(arg),
-    _clients(),
+Server::Server(ServerSettings &set)
+  : _clients(),
     _masterSocket(),
-    _set(),
+    _set(set),
     _threadPool(200),
     _world(_set),
     _proto(_world, _threadPool),
@@ -17,7 +16,7 @@ Server::Server(t_arg &arg)
 {
   // enet_initialize is called in the _masterSocket()
   _address.host = ENET_HOST_ANY;
-  _address.port = _arg.port;
+  _address.port = std::stoi(_set.getCvar("sv_port"));
   _server = enet_host_create(&_address, 128, 3, 0, 0);
 
   if (_server == NULL)
@@ -25,134 +24,132 @@ Server::Server(t_arg &arg)
   _set.addObserver(this);
   _auth.addObserver(this);
 
-  CvarParser	parser(_set);
-  parser.loadConfigFile("../ServerConfig.cfg");
   registerToMaster();
 }
 
 Server::~Server()
 {
-  MasterServerRequest	msg;
-  std::string		packet;
-  ENetEvent		event;
-  int			hasEvent;
-  bool			pull = true;
-  bool			passed = false;
+  MasterServerRequest   msg;
+  std::string           packet;
+  ENetEvent             event;
+  int                   hasEvent;
+  bool                  pull = true;
+  bool                  passed = false;
 
   enet_host_destroy(_server);
   _masterSocket.connect(_set.getCvar("sv_masterIP"),
-			_set.getCvar("sv_masterPort"),
-			2);
+                        _set.getCvar("sv_masterPort"),
+                        2);
   std::cout << "Shutting down server" << std::endl;
   while (!passed)
     {
       if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
-	{
-	  switch (event.type)
-	    {
-	    case ENET_EVENT_TYPE_CONNECT:
-	      msg.set_content(MasterServerRequest::DELETESERVER);
-	      msg.set_port(_set.getCvar("sv_port"));
-	      msg.SerializeToString(&packet);
-	      _masterSocket.sendPacket(0, packet);
-	      enet_host_flush(_masterSocket.getHost());
-	      passed = true;
-	      break;
-	    default:
-	      break;
-	    }
-	}
+        {
+          switch (event.type)
+            {
+            case ENET_EVENT_TYPE_CONNECT:
+              msg.set_content(MasterServerRequest::DELETESERVER);
+              msg.set_port(_set.getCvar("sv_port"));
+              msg.SerializeToString(&packet);
+              _masterSocket.sendPacket(0, packet);
+              enet_host_flush(_masterSocket.getHost());
+              passed = true;
+              break;
+            default:
+              break;
+            }
+        }
       else if (hasEvent < 0)
-	break ;
+        break ;
     }
   _masterSocket.disconnect();
 }
 
-void	Server::registerToMaster()
+void    Server::registerToMaster()
 {
-  MasterServerRequest	msg;
-  std::string		packet;
-  ENetEvent		event;
-  int			hasEvent;
-  bool			pull = true;
-  bool			passed = false;
+  MasterServerRequest   msg;
+  std::string           packet;
+  ENetEvent             event;
+  int                   hasEvent;
+  bool                  pull = true;
+  bool                  passed = false;
 
   _masterSocket.connect(_set.getCvar("sv_masterIP"),
-			_set.getCvar("sv_masterPort"),
-			2);
+                        _set.getCvar("sv_masterPort"),
+                        2);
   while (!passed)
     {
       if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
-	{
-	  switch (event.type)
-	    {
-	    case ENET_EVENT_TYPE_CONNECT:
-	      {
-		ServerData	*data = new ServerData;
+        {
+          switch (event.type)
+            {
+            case ENET_EVENT_TYPE_CONNECT:
+              {
+                ServerData      *data = new ServerData;
 
-		msg.set_content(MasterServerRequest::CREATESERVER);
-		msg.set_port(_set.getCvar("sv_port"));
-		data->set_name(_set.getCvar("sv_hostname"));
-		data->set_slots(std::stoul(_set.getCvar("sv_slot")));
-		msg.set_allocated_info(data);
-		msg.SerializeToString(&packet);
-		_masterSocket.sendPacket(0, packet);
-		enet_host_flush(_masterSocket.getHost());
-		passed = true;
-	      }
-	      break;
-	    default:
-	      break;
-	    }
-	}
+                msg.set_content(MasterServerRequest::CREATESERVER);
+                msg.set_port(_set.getCvar("sv_port"));
+                data->set_name(_set.getCvar("sv_hostname"));
+                data->set_slots(std::stoul(_set.getCvar("sv_slot")));
+                msg.set_allocated_info(data);
+                msg.SerializeToString(&packet);
+                _masterSocket.sendPacket(0, packet);
+                enet_host_flush(_masterSocket.getHost());
+                passed = true;
+              }
+              break;
+            default:
+              break;
+            }
+        }
       else if (hasEvent < 0)
-	throw (NetworkException("Authentification to master server failed"));
+        throw (NetworkException("Authentification to master server failed"));
     }
   _masterSocket.disconnect();
 }
 
-void		Server::run()
+void            Server::run()
 {
-  ENetEvent	event;
+  ENetEvent     event;
 
-  std::cout << "Actual port => " << _arg.port << std::endl;
-  std::cout << "Quiet => " << _arg.quiet << std::endl;
-  std::cout << "Debug => " << _arg.debug << std::endl;
+  std::cout << "Actual port => " << _set.getCvar("sv_port") << std::endl;
+  std::cout << "Quiet => " << _set.getCvar("sv_quiet") << std::endl;
+  std::cout << "Debug => " << _set.getCvar("sv_debug") << std::endl;
 
   while ((enet_host_service(_server, &event, 50)) >= 0)
     {
       switch (event.type)
         {
-	case ENET_EVENT_TYPE_CONNECT:
-	  connectClient(event.peer);
-	  break;
-	case ENET_EVENT_TYPE_RECEIVE:
-	  handlePackets(event);
-	  break;
-	case ENET_EVENT_TYPE_DISCONNECT:
-	  disconnectClient(event.peer);
-	default:
-	  break;
+        case ENET_EVENT_TYPE_CONNECT:
+          connectClient(event.peer);
+          break;
+        case ENET_EVENT_TYPE_RECEIVE:
+          handlePackets(event);
+          break;
+        case ENET_EVENT_TYPE_DISCONNECT:
+          disconnectClient(event.peer);
+        default:
+          break;
         }
       updateClients();
     }
 }
 
-void	Server::handlePackets(ENetEvent &event)
+void    Server::handlePackets(ENetEvent &event)
 {
-  ENetPeer	*peer = event.peer;
-  Client	*client = static_cast<Client *>(peer->data);
-  ENetPacket	*packet = event.packet;
+  ENetPeer      *peer = event.peer;
+  Client        *client = static_cast<Client *>(peer->data);
+  ENetPacket    *packet = event.packet;
 
   // std::cout << "A packet of length "
-  // 	    << packet->dataLength << " containing ["
-  // 	    << packet->data
-  // 	    << "] was received from "
-  // 	    << peer->data
-  // 	    << " user id -> "
-  // 	    << peer->connectID
-  // 	    << " on channel "
-  // 	    << (int)event.channelID << std::endl;
+  //        << packet->dataLength << " containing ["
+  //        << packet->data
+  //        << "] was received from "
+  //        << peer->data
+  //        << " user id -> "
+  //        << peer->connectID
+  //        << " on channel "
+  //        << (int)event.channelID << std::endl;
   // if ((int)event.channelID == 2)
   //   std::cout << std::endl << std::endl;
 
@@ -163,15 +160,15 @@ void	Server::handlePackets(ENetEvent &event)
   enet_packet_destroy(packet);
 }
 
-void		Server::connectClient(ENetPeer * const peer)
+void            Server::connectClient(ENetPeer * const peer)
 {
   std::cout << "A new client connected from "
-  	    << peer->address.host << " : "
-  	    << peer->address.port << std::endl;
+            << peer->address.host << " : "
+            << peer->address.port << std::endl;
   peer->data = nullptr;
 }
 
-void	Server::disconnectClient(ENetPeer * const peer)
+void    Server::disconnectClient(ENetPeer * const peer)
 {
   std::cout << "Client disconnected" << std::endl;
   if (peer->data == nullptr) // not authenticated player
@@ -179,64 +176,64 @@ void	Server::disconnectClient(ENetPeer * const peer)
   saveClientId(static_cast<Client *>(peer->data));
   peer->data = NULL;
   _clients.erase(std::find_if(_clients.begin(), _clients.end(),
-			      [peer] (Client * const elem)
-			      { return elem->getPeer() == peer;}));
+                              [peer] (Client * const elem)
+                              { return elem->getPeer() == peer;}));
 }
 
-void	Server::updateClients()
+void    Server::updateClients()
 {
   for (auto client : _clients)
     {
-      const std::vector<bool>	&actions = client->getActions();
-      unsigned int		vecSize = actions.size();
+      const std::vector<bool>   &actions = client->getActions();
+      unsigned int              vecSize = actions.size();
 
       for (unsigned int actId = 0; actId < vecSize; ++actId)
-	{
-	  Action	act = static_cast<Action>(actId);
+        {
+          Action        act = static_cast<Action>(actId);
 
-	  if (actions[actId] == true)
-	    {
-	      switch (act)
-		{
-		case Action::Forward:
-		case Action::Back:
-		case Action::Right:
-		case Action::Left:
-		  actDisplacement(client, act);
-		  break;
-		default:
-		  std::cout << "Action n: " << actId << " not implemented" << std::endl;
-		  break;
-		}
-	    }
-	}
+          if (actions[actId] == true)
+            {
+              switch (act)
+                {
+                case Action::Forward:
+                case Action::Back:
+                case Action::Right:
+                case Action::Left:
+                  actDisplacement(client, act);
+                  break;
+                default:
+                  std::cout << "Action n: " << actId << " not implemented" << std::endl;
+                  break;
+                }
+            }
+        }
     }
 }
 
-void	Server::saveClientId(Client *client)
+void    Server::saveClientId(Client *client)
 {
-  const ClientInfo	&clInfo = client->getInfo();
-  const ClientEntity	&clEnt = client->getEntity();
-  const std::string	&clId = clInfo.getId();
-  const Vector2f	&position = clEnt.getPosition();
-  const Vector2i	&chunkId = clEnt.getChunkId();
+  const ClientInfo      &clInfo = client->getInfo();
+  const ClientEntity    &clEnt = client->getEntity();
+  const std::string     &clId = clInfo.getId();
+  const Vector2f        &position = clEnt.getPosition();
+  const Vector2i        &chunkId = clEnt.getChunkId();
 
-  std::fstream		file;
-  std::ostringstream	newLine("");
+  std::fstream          file;
+  std::ostringstream    newLine("");
   std::vector<std::string> content;
-  std::string		line;
-  bool			found = false;
-  unsigned int		lineIdx = 0;
+  std::string           line;
+  bool                  found = false;
+  unsigned int          lineIdx = 0;
 
   file.open(LOGFILE, std::ios::binary | std::ios::in);
   printv(newLine, "%;% %;% %",
-	  clId, chunkId.x, chunkId.y,
-	  position.x, position.y);
+         clId, chunkId.x, chunkId.y,
+         position.x, position.y);
   if (!file)
     {
       file.open(LOGFILE, std::ios::binary | std::ios::out);
       if (!file)
-	throw std::invalid_argument(std::string(LOGFILE) + ": File not found");
+        throw std::invalid_argument(std::string(LOGFILE) + ": File not found");
       file << newLine.str() << std::endl;
       file.close();
       return ;
@@ -245,9 +242,9 @@ void	Server::saveClientId(Client *client)
     {
       content.push_back(line);
       if (!found && line.find(clId) != std::string::npos)
-	found = true;
+        found = true;
       else if (!found)
-	++lineIdx;
+        ++lineIdx;
     }
   if (found)
     content[lineIdx] = newLine.str();
@@ -262,32 +259,32 @@ void	Server::saveClientId(Client *client)
   file.close();
 }
 
-void		Server::actDisplacement(Client *client, Action act)
+void            Server::actDisplacement(Client *client, Action act)
 {
-  ClientEntity	&clEnt = client->getEntity();
-  Vector2f	ratio = {CHUNKWIDTH / 256.f, CHUNKHEIGHT / 256.f};
+  ClientEntity  &clEnt = client->getEntity();
+  Vector2f      ratio = {CHUNKWIDTH / 256.f, CHUNKHEIGHT / 256.f};
   // to remove, let me maintain the speed
 
   clEnt.move(Vector2f(act == Action::Left ? -0.01 / ratio.x :
-		      act == Action::Right ? 0.01 / ratio.x :
-		      0,
-		      act == Action::Forward ? 0.01 / ratio.y :
-		      act == Action::Back ? -0.01 / ratio.y :
-		      0));
+                      act == Action::Right ? 0.01 / ratio.x :
+                      0,
+                      act == Action::Forward ? 0.01 / ratio.y :
+                      act == Action::Back ? -0.01 / ratio.y :
+                      0));
 
 
   // petite partie en dur :D
-  const Vector2f	&plPos = clEnt.getPosition();
-  const Vector2i	&plChunk = clEnt.getChunkId();
+  const Vector2f        &plPos = clEnt.getPosition();
+  const Vector2i        &plChunk = clEnt.getChunkId();
 
   ProtocolMessage       msg;
-  Displacement		*displacement = new Displacement;
-  VectorFloat		*acceleration = new VectorFloat;
-  VectorFloat		*velocity = new VectorFloat;
-  Position		*position = new Position;
-  VectorInt		*chunkId = new VectorInt;
-  VectorFloat		*pos = new VectorFloat;
-  std::string		serialized;
+  Displacement          *displacement = new Displacement;
+  VectorFloat           *acceleration = new VectorFloat;
+  VectorFloat           *velocity = new VectorFloat;
+  Position              *position = new Position;
+  VectorInt             *chunkId = new VectorInt;
+  VectorFloat           *pos = new VectorFloat;
+  std::string           serialized;
 
   // quick hard coded value
   acceleration->set_x(0);
@@ -312,9 +309,9 @@ void		Server::actDisplacement(Client *client, Action act)
   client->sendPacket(0, serialized);
 }
 
-void		Server::trigger(const t_event &event)
+void            Server::trigger(const t_event &event)
 {
-  Client	*client = event.client;
+  Client        *client = event.client;
 
   _clients.push_back(client);
   client->sendPacket(0, _set.serialize());
