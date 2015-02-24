@@ -53,7 +53,7 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
   pSound->addWidget({wHeader, wFirst, wSecond, wThird, wFourth});
   pSound->construct(texture, set, panels);
   pSound->setHide(true);
-  addPanel({pSound});
+  addPanel(pSound);
   _world.reset(new World{set});
   resizeWidgets({gWidth, gHeight});
   _proto.setSetting(&set);

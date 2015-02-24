@@ -144,7 +144,7 @@ void	OptionKeyPanel::createContPanel(Settings &set, const sf::Texture &texture)
   contPanel->addWidget({wContBg, wScroll});
   contPanel->addPanel({keyPanel, eventPanel});
   contPanel->construct(texture, set, {});
-  addPanel({contPanel});
+  addPanel(contPanel);
 }
 
 void	OptionKeyPanel::fillOptionBg(const sf::Texture &texture UNUSED, Widget *wPanOption)
