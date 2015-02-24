@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <ctgmath>
+#include <functional>
 #include <stdexcept>
 #include <complex>
 
@@ -38,8 +39,8 @@ void		World::setPlayerPosition(const Vector2i &chunkId,
     }
 }
 void   	World::fillChunkData(const VectorInt &pos,
-			     const RepeatedField<uint32> &bgTiles,
-			     const RepeatedField<uint32> &fgTiles)
+			     const RepeatedField<google::protobuf::uint32> &bgTiles,
+			     const RepeatedField<google::protobuf::uint32> &fgTiles)
 {
   auto	chunk = _chunks.find(Vector2i(pos.x(), pos.y()));
 
