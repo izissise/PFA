@@ -18,7 +18,7 @@ public:
   virtual std::shared_ptr<T>	load(const std::string &path, const std::string &name) = 0;
   virtual void			free(const std::string &) = 0;
 
-  std::shared_ptr<T>		Get(const std::string &name);
+  std::shared_ptr<T>		get(const std::string &name);
 
 protected:
   void	addObject(const std::string &name, const std::shared_ptr<T> &resource);
@@ -29,7 +29,7 @@ private:
 };
 
 template <typename T>
-std::shared_ptr<T>	RessourceManager<T>::Get(const std::string &name)
+std::shared_ptr<T>	RessourceManager<T>::get(const std::string &name)
 {
   auto	it = _resources.find(name);
 

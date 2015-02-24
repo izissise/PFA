@@ -5,21 +5,22 @@
 
 #include "World.hpp"
 #include "Perlin.h"
+#include "TextureManager.hpp"
 
 World::World(Settings& settings) :
   _settings(settings),
   _camera(),
   _player(_camera),
-  _b2World(new b2World(b2Vec2(0.0f, -9.81f)) ),
+  _b2World(new b2World(b2Vec2(0.0f, -9.81f))),
   _loaded(false)
 {
   CvarList	&cvarList = _settings.getCvarList();
-  chunkId	first;
-  chunkId	last;
+  auto		&tm = TextureManager<>::instance();
 
   _screenSize =	{std::stoi(cvarList.getCvar("r_width")),
 		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_camera.sToWPos(_screenSize));
+  tm.load(TexturePath, "bg.png");
 }
 
 void		World::setPlayerPosition(const Vector2i &chunkId,
