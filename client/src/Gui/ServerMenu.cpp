@@ -6,7 +6,7 @@
 #include "StringUtils.hpp"
 
 ServerMenu::ServerMenu(const sf::FloatRect &zone) :
-  APanelScreen(zone), _update(true)
+  APanelScreen(zone), _update(true), _masterSocket()
 {
   addFont("default", "../client/assets/default.TTF");
   _hide = true;
@@ -19,41 +19,178 @@ ServerMenu::~ServerMenu()
 void	ServerMenu::construct(const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels)
 {
-  Panel *cont = createContPanel(set, texture, {panels.at(1)}); // pass the gamepanel
-  Panel *serv = createServListPanel(set, texture, {cont});
-  Panel *fav = createFavPanel(set, texture, {cont});
+  _texture = &texture;
+  _cont = createContPanel(set, texture, {panels.at(1)}); // pass the gamepanel
+  Panel *serv = createServListPanel(set, texture, {_cont});
+  Panel *fav = createFavPanel(set, texture, {_cont});
   Widget	*bgWidget = new Widget("bg", _zone, sf::Text(), wFlag::None);
-  cont->addPanel({serv, fav});
-  cont->construct(texture, set, {});
-  addPanel(cont);
+  _cont->addPanel({serv, fav});
+  _cont->construct(texture, set, {});
+  addPanel(_cont);
 
   addSpriteForWidget(bgWidget, sf::Color(39, 43, 42, 255), {_zone.width, _zone.height});
   createTabBar(set, texture, {serv, fav});
   Panel *popup = createCoPopup(set, texture, panels);
   createHeader(set, texture, {panels[0], popup});
-  createListHeader(set, texture, {cont});
+  createListHeader(set, texture, {_cont});
   _panelCo = createServerPopup(set, texture, {panels.at(1), this});
 
-  for (unsigned int i = 0; i < 50; ++i)
-    addServerToList(set, texture, "127.0.0.1:6060", {serv, cont});
+  // for (unsigned int i = 0; i < 50; ++i)
+  //   addServerToList(set, texture, "127.0.0.1:6060", {serv, _cont});
 
   _widgets.push_back(bgWidget);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }
 
-void	ServerMenu::updateContent()
+void	ServerMenu::parseServerPacket(UNUSED Settings &set, const void *data, int size)
 {
+  MasterServerResponse	packet;
 
+  if (packet.ParseFromString(std::string((char *)data, size)))
+    {
+      if (!packet.has_content())
+	return ;
+      if (packet.content() == MasterServerResponse::IP)
+	{
+	  std::lock_guard<std::mutex>	lock(_mutex);
+	  const std::vector<APanelScreen *>	&containers = _cont->getSubPanels();
+	  const ServerInfo			&server = packet.server();
+
+	  std::cout << "add Server: " << server.ip() << ":" << server.port() << std::endl;
+	  _servers.push(t_server(_cont, containers.at(packet.place()), server));
+	}
+    }
+  else
+    std::cerr << "Cannot DeSerialize Data" << std::endl;
+}
+
+void	ServerMenu::updateContent(Settings &set)
+{
+  const CvarList	&cvars = set.getCvarList();
+  ENetEvent		evt;
+  bool			pull = true;
+  std::function<void ()> dequeueMessages =
+    [this]()
+    {
+      std::lock_guard<std::mutex>	lock(_messageMutex);
+      while (!_messages.empty())
+	{
+	  if (_masterSocket.sendPacket(0, _messages.front()))
+	    _messages.pop();
+	  else
+	    break ;
+	}
+    };
+  if (_masterSocket.isOnline())
+    {
+      dequeueMessages();
+      while (_masterSocket.pullEvent(evt, 0, pull))
+	{
+	  switch (evt.type)
+	    {
+	    case ENET_EVENT_TYPE_RECEIVE:
+	      parseServerPacket(set, evt.packet->data, evt.packet->dataLength);
+	      break;
+	    default:
+	      break;
+	    }
+	}
+    }
+  else
+    _masterSocket.connect(cvars.getCvar("sv_masterIP"),
+			  cvars.getCvar("sv_masterPort"),
+			  2);
 }
 
 void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
 {
+  if (_hide)
+    return ;
+  std::vector<APanelScreen *>	&containers = _cont->getSubPanels();
+
   if (_update)
     {
-      updateContent();
+      std::lock_guard<std::mutex>	lock(_messageMutex);
+      MasterServerRequest	msg;
+      std::string		packet;
+
+      msg.set_content(MasterServerRequest::GETSERVERS);
+      msg.set_port("");
+      msg.SerializeToString(&packet);
+      _messages.push(packet);
       _update = false;
     }
+  {
+    std::lock_guard<std::mutex>	lock(_mutex);
+    for (auto &panel : containers)
+      {
+	if (!panel->isHidden())
+	  {
+	    std::vector<APanelScreen *>	&servers = panel->getSubPanels();
+
+	    for (auto &server : servers)
+	      server->update(timeStep, set);
+	  }
+      }
+  }
+  updateContent(set);
+  _update = false;
+}
+
+int	ServerMenu::updateHud(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
+{
+  int	retVal = 0;
+  bool  overlap = _flag & APanelScreen::Display::Overlap;
+
+  if (_state & APanelScreen::State::Inactive)
+    {
+      if (_countdown.update() == false)
+        return 0;
+      else
+        removeState(APanelScreen::State::Inactive);
+    }
+
+  for (auto rit = _panels.rbegin(); rit != _panels.rend(); ++rit)
+    {
+     if (!(*rit)->isHidden())
+        {
+          if (!(overlap) || (overlap && checkPanelBounds(*rit)))
+            {
+              if ((retVal = (*rit)->event(ev, ref, set)) != 0)
+                return retVal;
+              else if ((*rit)->getState() == APanelScreen::State::Leader)
+                return 1;
+            }
+        }
+    }
+  for (auto rrrit = _widgets.rbegin(); rrrit != _widgets.rend(); ++rrrit)
+    {
+     if (checkPanelBounds(*rrrit)) // update widget even if hidden
+        if ((retVal = (*rrrit)->update(ev, ref, set)) != 0)
+          return retVal;
+    }
+  return retVal;
+}
+
+int	ServerMenu::event(const sf::Event &evt, sf::RenderWindow &ref, Settings &set)
+{
+  while (!_servers.empty())
+    {
+      const t_server &s = _servers.front();
+      const ServerInfo &packet = s.packet;
+
+      ServerItem *item = addServerToList(set, *_texture, packet.ip() + ":" + packet.port(),
+					 {s.list, s.container});
+
+      item->updateItem("Name", packet.name());
+      item->updateItem("Country", packet.country());
+      item->updateItem("Players", std::to_string(packet.currentplayer()) +
+		       "/" + std::to_string(packet.maxplayer()));
+      item->updateItem("Ping", "0");
+      _servers.pop();
+    }
+  return updateHud(evt, ref, set);
 }
 
 void	ServerMenu::createHeader(Settings &set UNUSED,
@@ -164,7 +301,7 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 					    Scroll::Vertical, content,
 					    sf::Text(), wFlag::None);
 
-  setFavTrigger(set, texture, content, panels[0]); // container
+  setFavTrigger(set, texture, content); // container
   content->setDisplayFlag(APanelScreen::Display::Overlap);
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
@@ -176,11 +313,11 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
 }
 
 void	ServerMenu::setFavTrigger(Settings &set, const sf::Texture &texture,
-				  Panel *panel, APanelScreen *container)
+				  Panel *panel)
 {
   std::function<void (const t_event &ev)>  func;
 
-  func = [&, panel, container](const t_event &ev)
+  func = [&, panel](const t_event &ev)
     {
       if (ev.e & wEvent::Hide)
   	{
@@ -189,22 +326,25 @@ void	ServerMenu::setFavTrigger(Settings &set, const sf::Texture &texture,
   	  else
 	    panel->setHide(true);
 	  if (!panel->isHidden()) // load the panel content
-	    loadFavServers(set, texture, panel, container);
+	    loadFavServers(set, texture, panel);
 	}
       if (ev.e & wEvent::Reset)
 	{
 	  if (!panel->isHidden()) // refresh the panel content
-	    loadFavServers(set, texture, panel, container);
+	    loadFavServers(set, texture, panel);
 	}
     };
   panel->setTrigger(func);
 }
 
 void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
-				   Panel *panel, APanelScreen *container)
+				   Panel *panel)
 {
   std::vector<std::string>	content;
-  File	file;
+  File		file;
+  StringUtils	su;
+  std::vector<std::string> serverInfo;
+  std::vector<APanelScreen *> &itemList = panel->getSubPanels();
 
   try
     {
@@ -213,10 +353,41 @@ void	ServerMenu::loadFavServers(Settings &set, const sf::Texture &texture,
   catch (const std::invalid_argument &e)
     { // Do nothing, file just doesnt exist
     }
-  panel->getSubPanels().clear();
-  for (const std::string &s : content)
+  auto it = std::remove_if(itemList.begin(), itemList.end(),
+			   [&content](APanelScreen *panel) -> bool
+			   {
+			     ServerItem *item = dynamic_cast<ServerItem *>(panel);
+			     return (std::find_if(content.begin(), content.end(),
+						  [&item](const std::string &ip)
+						  {
+						    return (item->getIp() == ip);
+						  }) == content.end());
+			   });
+  itemList.erase(it, itemList.end());
+  for (const std::string &ip : content)
     {
-      addServerToList(set, texture, s, {panel, container});
+      std::lock_guard<std::mutex>	lock(_messageMutex);
+
+      if (std::find_if(itemList.begin(), itemList.end(),
+		       [&ip](APanelScreen *panel) -> bool
+		       {
+			 ServerItem *item = dynamic_cast<ServerItem *>(panel);
+
+			 return (ip == item->getIp());
+		       }) != itemList.end())
+	continue ; // means the server is already in the list
+      MasterServerRequest	msg;
+      std::string		packet;
+      ServerId			*id = new ServerId;
+
+      su.split(ip, ':', serverInfo); // ip:port
+      id->set_ip(serverInfo.at(0));
+      id->set_port(serverInfo.at(1));
+      msg.set_content(MasterServerRequest::GETIP);
+      msg.set_port("");
+      msg.set_allocated_id(id);
+      msg.SerializeToString(&packet);
+      _messages.push(packet);
     }
   panel->construct(texture, set, {});
 }
@@ -271,11 +442,12 @@ void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
   addPanel(content);
 }
 
-void	ServerMenu::addServerToList(Settings &set,
-				    const sf::Texture &texture,
-				    const std::string &ip,
-				    const std::vector<APanelScreen *> &panels)
+ServerItem	*ServerMenu::addServerToList(Settings &set,
+					     const sf::Texture &texture,
+					     const std::string &ip,
+					     const std::vector<APanelScreen *> &panels)
 {
+  std::lock_guard<std::mutex>	lock(_mutex);
   APanelScreen	*list = panels[0];
   sf::FloatRect zone = list->getZone();
   sf::FloatRect	widgetZone(zone.left + zone.width / 6.f, 0, zone.width / 2.f, 60);
@@ -285,6 +457,7 @@ void	ServerMenu::addServerToList(Settings &set,
   ServerItem *pan = new ServerItem(widgetZone, ip);
   pan->construct(texture, set, {_panelCo});
   list->addPanel(pan);
+  return pan;
 }
 
 // Server Popup
@@ -818,7 +991,7 @@ void	ServerMenu::createConnectButton(Widget *widget, const sf::Texture &texture)
   widget->setUpdate(updateFunc);
 }
 
-void	ServerMenu::createScrollBar(ScrollWidget *widget, const sf::Texture &texture)
+void	ServerMenu::createScrollBar(ScrollWidget *widget, UNUSED const sf::Texture &texture)
 {
   sf::FloatRect zone = widget->getZone();
 

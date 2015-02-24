@@ -1,4 +1,3 @@
-#include <fstream>
 #include "ServerProtocol.hpp"
 #include "StringUtils.hpp"
 #include "GuidGenerator.hpp"
@@ -7,7 +6,6 @@
 ServerProtocol::ServerProtocol(World &world, ThreadPool &threadPool) :
   _world(world), _threadPool(threadPool)
 {
-  _func[ClientMessage::CONNECTION] = &ServerProtocol::handleConnection;
   _func[ClientMessage::ACTION] = &ServerProtocol::handleActions;
   _func[ClientMessage::QUERYCHUNK] = &ServerProtocol::queryChunks;
 }
@@ -41,38 +39,6 @@ void	ServerProtocol::parseCmd(const void *data, int size,
   }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;
-}
-
-void  ServerProtocol::handleConnection(const ClientMessage &message,
-				       Client *client,
-				       const std::vector<Client *> &clients)
-{
-  ClientInfo			&clInfo = client->getInfo();
-  ClientEntity			&clEnt = client->getEntity();
-  const ConnectionMessage	&coInfo = message.co();
-  const std::string		&userId = coInfo.userid();
-  std::string			newId;
-
-  std::cout << "USERID " << userId << std::endl;
-  if (userId.empty())
-    {
-      generateNewId(newId);
-      client->getInfo().setId(newId);
-    }
-  else
-    client->getInfo().setId(userId);
-  auto it = std::find_if(clients.begin(), clients.end(), [client, &userId](Client *cl)
-			 {
-			   return (client != cl && cl->getInfo().getId() == userId);
-			 });
-  if (it != clients.end())
-    {
-      enet_peer_disconnect(client->getPeer(), 0);
-      return ;
-    }
-  loadClientProfile(clients, client, userId);
-  client->initialize();
-  sendClientProfile(client, newId);
 }
 
 void	ServerProtocol::handleActions(const ClientMessage &message,
@@ -112,87 +78,4 @@ void	ServerProtocol::queryChunks(const ClientMessage &message,
     }
   for (auto &chunkId : newChunks)
     client->sendPacket(2, _world.serialize(chunkId)); // send on 2 because it's a huge transfer
-}
-
-void		ServerProtocol::generateNewId(std::string &guid)
-{
-  GuidGenerator	gen;
-
-  guid = gen.generate();
-}
-
-void	ServerProtocol::spawnClient(const std::vector<Client *> &clients,
-				    Client *client)
-{
-  Spawner	spawner(_world);
-
-  spawner.spawnClient(clients, client);
-}
-
-void	ServerProtocol::loadClientProfile(const std::vector<Client *> &clients,
-					  Client *client, const std::string &userId)
-{
-  std::fstream			file;
-  StringUtils			utils;
-  std::vector<std::string>	clientInfo;
-  std::vector<std::string>	vec;
-  ClientEntity			&clEnt = client->getEntity();
-
-  if (userId.empty())
-    {
-      spawnClient(clients, client);
-      return ;
-    }
-  file.open(LOGFILE, std::ios::binary | std::ios::in);
-  if (!file) // Can be the first client joining
-    {
-      std::cout << "File doesnt exist yet" << std::endl;
-      spawnClient(clients, client);
-      return ;
-    }
-  for (std::string line; getline(file, line);)
-    {
-      if (line.find(userId) != std::string::npos)
-	{
-	  std::cout << "Found in database -> load client's data" << std::endl;
-	  utils.split(line, ';', clientInfo);
-	  utils.split(clientInfo.at(1), ' ', vec);
-	  clEnt.setChunkId({std::stoi(vec.at(0)), std::stoi(vec.at(1))});
-	  vec.clear();
-	  utils.split(clientInfo.at(2), ' ', vec);
-	  clEnt.setPosition({std::stof(vec.at(0)), std::stof(vec.at(1))});
-	  file.close();
-	  return ;
-	}
-    }
-  file.close();
-  spawnClient(clients, client);
-}
-
-void	ServerProtocol::sendClientProfile(Client *client,
-					  const std::string &newId)
-{
-  ProtocolMessage	msg;
-  InitClient		*initInfo = new InitClient;
-  Position		*pos = new Position;
-  VectorInt		*chunkId = new VectorInt;
-  VectorFloat		*clPos = new VectorFloat;
-  std::string		*guid = new std::string(newId);
-  ClientEntity		&clEnt = client->getEntity();
-  std::string		serialized;
-
-  chunkId->set_x(clEnt.getChunkId().x);
-  chunkId->set_y(clEnt.getChunkId().y);
-  pos->set_allocated_chunkid(chunkId);
-
-  clPos->set_x(clEnt.getPosition().x);
-  clPos->set_y(clEnt.getPosition().y);
-  pos->set_allocated_pos(clPos);
-
-  initInfo->set_allocated_pos(pos);
-  initInfo->set_allocated_guid(guid);
-  msg.set_content(ProtocolMessage::CLINIT);
-  msg.set_allocated_clinit(initInfo);
-  msg.SerializeToString(&serialized);
-  client->sendPacket(0, serialized);
 }

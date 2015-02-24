@@ -1,4 +1,5 @@
 #include "masterServer.hpp"
+#include "printv.hpp"
 
 MasterServer::MasterServer()
 : _db("server.db", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)
@@ -90,18 +91,17 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
     std::cout << "Delete" << std::endl;
 }
 
-void MasterServer::getServer(ENetPeer *peer)
+void MasterServer::sendServers(ENetPeer *peer)
 {
   try
     {
       SQLite::Statement   query(_db, "SELECT * FROM server");
 
-      // Loop to execute the query step by step, to get rows of result
       while (query.executeStep())
 	{
 	  MasterServerResponse response;
+	  std::string message;
 	  ServerInfo *server = new ServerInfo();
-	  // Demonstrate how to get some typed column value
 	  const char* ip = query.getColumn(0).getText("N/A");
 	  const char* port = query.getColumn(1).getText("N/A");
 	  const char* name = query.getColumn(2).getText("N/A");
@@ -115,9 +115,8 @@ void MasterServer::getServer(ENetPeer *peer)
 	  server->set_country("FR");
 
 	  response.set_content(MasterServerResponse::IP);
+	  response.set_place(0);
 	  response.set_allocated_server(server);
-
-	  std::string message;
 	  response.SerializeToString(&message);
 
 	  ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
@@ -135,58 +134,103 @@ void MasterServer::getServer(ENetPeer *peer)
     }
 }
 
+void	MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
+{
+  try
+    {
+      SQLite::Statement   query(_db, "SELECT * from server WHERE ip LIKE ? AND port LIKE ?");
+
+      query.bind(1, id.ip());
+      query.bind(2, id.port());
+      while (query.executeStep())
+	{
+	  MasterServerResponse response;
+	  std::string message;
+	  ServerInfo *server = new ServerInfo();
+	  const char* ip = query.getColumn(0).getText("N/A");
+	  const char* port = query.getColumn(1).getText("N/A");
+	  const char* name = query.getColumn(2).getText("N/A");
+	  unsigned int slots = query.getColumn(3).getInt();
+
+	  server->set_ip(ip);
+	  server->set_port(port);
+	  server->set_name(name);
+	  server->set_currentplayer(0);
+	  server->set_maxplayer(slots);
+	  server->set_country("FR");
+
+	  response.set_content(MasterServerResponse::IP);
+	  response.set_place(1);
+	  response.set_allocated_server(server);
+	  response.SerializeToString(&message);
+
+	  ENetPacket *packet = enet_packet_create(message.c_str(), message.size(),
+						  ENET_PACKET_FLAG_RELIABLE);
+	  if (packet == nullptr || enet_peer_send(peer, 0, packet) != 0)
+	    {
+	      std::cerr << "row: " << ip << ", " << port << " Cannot be send"<< std::endl;
+	    }
+	  std::cout << "row: " << ip << ", " << port << std::endl;
+        }
+    }
+  catch (std::exception& e)
+    {
+      std::cout << "exception: " << e.what() << std::endl;
+    }
+}
+
 void MasterServer::run()
 {
-    ENetEvent event;
-    MasterServerRequest request;
+  ENetEvent event;
+  MasterServerRequest request;
 
-    while ((enet_host_service (_server, &event, 50)) >= 0)
+  while ((enet_host_service (_server, &event, 50)) >= 0)
     {
-        switch (event.type)
+      switch (event.type)
         {
-            case ENET_EVENT_TYPE_CONNECT:
-                printf ("A new client connected from %x:%u.\n",
-                        event.peer -> address.host,
-                        event.peer -> address.port);
-                /* Store any relevant client information here. */
-                event.peer -> data = (char *)"Client information";
-                break;
-            case ENET_EVENT_TYPE_RECEIVE:
-            {
-                printf ("A packet of length %zu containing %s was received from %s on channel %u.\n",
-                        event.packet -> dataLength,
-                        event.packet -> data,
-                        event.peer -> data,
-                        event.channelID);
-                if (request.ParseFromArray(event.packet->data, event.packet->dataLength))
-                {
-                    std::cout << "Parse Good" << std::endl;
-                    switch (request.content()) {
-                        case MasterServerRequest::GETIP:
-                            getServer(event.peer);
-                            break;
-                        case MasterServerRequest::CREATESERVER:
-			  createServer(event.peer, request.port(), request.info());
-			  break;
-                        case MasterServerRequest::DELETESERVER:
-                            deleteServer(event.peer, request.port());
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
-                /* Clean up the packet now that we're done using it. */
-                enet_packet_destroy (event.packet);
-
-                break;
-            }
-            case ENET_EVENT_TYPE_DISCONNECT:
-                printf ("%s disconnected.\n", event.peer -> data);
-                /* Reset the peer's client information. */
-                event.peer -> data = NULL;
-            default:
-                break;
+	case ENET_EVENT_TYPE_CONNECT:
+	  printv(std::cout, "A new client connected from %:%.\n", event.peer->address.host, event.peer->address.port);
+	  /* Store any relevant client information here. */
+	  event.peer->data = const_cast<void*>(static_cast<const void*>("Client information"));
+	  break;
+	case ENET_EVENT_TYPE_RECEIVE:
+	  {
+	  	printv(std::cout, "A packet of length % containing % was received from % on channel %.\n",
+		    static_cast<size_t>(event.packet->dataLength),
+		    static_cast<unsigned char*>(event.packet->data),
+		    static_cast<char*>(event.peer->data),
+		    static_cast<unsigned>(event.channelID));
+	    if (request.ParseFromArray(event.packet->data, event.packet->dataLength))
+	      {
+		std::cout << "Parse Good" << std::endl;
+		switch (request.content())
+		  {
+		  case MasterServerRequest::GETSERVERS:
+		    sendServers(event.peer);
+		    break;
+		  case MasterServerRequest::GETIP:
+		    sendServer(event.peer, request.id());
+		    break;
+		  case MasterServerRequest::CREATESERVER:
+		    createServer(event.peer, request.port(), request.info());
+		    break;
+		  case MasterServerRequest::DELETESERVER:
+		    deleteServer(event.peer, request.port());
+		    break;
+		  default:
+		    break;
+		  }
+	      }
+	    /* Clean up the packet now that we're done using it. */
+	    enet_packet_destroy (event.packet);
+	    break;
+	  }
+	case ENET_EVENT_TYPE_DISCONNECT:
+	  printv(std::cout, "% disconnected.\n", static_cast<const char*>(event.peer->data));
+	  /* Reset the peer's client information. */
+	  event.peer -> data = NULL;
+	default:
+	  break;
         }
     }
 }

@@ -16,4 +16,5 @@ message MasterServerResponse {
   }
   required PacketContent content = 1;
   optional ServerInfo server = 2;
+  required uint32 place = 3;
 }

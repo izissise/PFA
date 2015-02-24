@@ -198,7 +198,7 @@ APanelScreen::State     APanelScreen::getState() const
 int	APanelScreen::event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)
 {
   int	retVal = 0;
-    bool        overlap = _flag & APanelScreen::Display::Overlap;
+  bool  overlap = _flag & APanelScreen::Display::Overlap;
 
   if (_state & APanelScreen::State::Inactive)
     {

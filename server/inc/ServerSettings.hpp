@@ -6,12 +6,6 @@
 # include "Observer.hpp"
 # include "ISerialize.hpp"
 
-
-typedef struct  s_event
-{
-  std::string   change;
-}               t_event;
-
 class ServerSettings : public ACvar, public Observable, public ISerialize
 {
 public:

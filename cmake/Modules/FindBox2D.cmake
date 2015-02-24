@@ -22,7 +22,8 @@ find_path(BOX2D_INCLUDE_DIR Box2D/Box2D.h
   /opt/csw     # Blastwave
   /opt
   ${BOX2DDIR}
-  $ENV{BOX2DDIR})
+  ${ENV}${BOX2DDIR}
+)
 
 find_library(BOX2D_LIBRARY_DEBUG
   Box2D-d
@@ -37,7 +38,8 @@ find_library(BOX2D_LIBRARY_DEBUG
   /opt/csw     # Blastwave
   /opt
   ${BOX2DDIR}
-  $ENV{BOX2DDIR})
+  ${ENV}${BOX2DDIR}
+  )
 
 find_library(BOX2D_LIBRARY_RELEASE
   Box2D
@@ -52,7 +54,8 @@ find_library(BOX2D_LIBRARY_RELEASE
   /opt/csw     # Blastwave
   /opt
   ${BOX2DDIR}
-  $ENV{BOX2DDIR})
+  ${ENV}${BOX2DDIR}
+)
 
 if(BOX2D_LIBRARY_DEBUG OR BOX2D_LIBRARY_RELEASE)
   # Library found
