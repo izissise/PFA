@@ -447,7 +447,7 @@ void	Chunk::constructLine()
   int	leftPoint = _roundDownToMult(_pos.x, Chunk::lineLenght);
   int	rightPoint =  _roundUpToMult(_pos.x + 1, Chunk::lineLenght);
   float	chunkWidth = Chunk::width * TileCodex::tileSize;
-  float chunkHeight = Chunk::height * TileCodex::tileSize;
+  UNUSED float chunkHeight = Chunk::height * TileCodex::tileSize;
 
   _line.points.resize(size + 1);
   leftHeight = MAXVARIATION * raw_noise_2d

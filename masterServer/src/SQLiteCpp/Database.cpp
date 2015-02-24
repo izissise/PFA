@@ -57,6 +57,7 @@ Database::Database(const std::string& aFilename, const int aFlags /*= SQLITE_OPE
 Database::~Database() noexcept // nothrow
 {
     int ret = sqlite3_close(mpSQLite);
+    (void) ret;
     // Never throw an exception in a destructor
     SQLITECPP_ASSERT(SQLITE_OK == ret, sqlite3_errmsg(mpSQLite));  // See SQLITECPP_ENABLE_ASSERT_HANDLER
 }

@@ -1,4 +1,7 @@
 #include "Spawner.hpp"
+#include "Unused.hpp"
+
+#include "Unused.hpp"
 
 Spawner::Spawner(World &world) : _world(world)
 {
@@ -9,7 +12,8 @@ Spawner::~Spawner()
 }
 
 int			Spawner::isChunkSpawnable(Chunk *chunk,
-							 const std::vector<Client *> &clients)
+						  const std::vector<Client *> &clients UNUSED)
+// for the future clients will be used so the new player isnt spawn to a dangerous zone
 {
   const Vector2i	&pos = chunk->getPosition();
 
