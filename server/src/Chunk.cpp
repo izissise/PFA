@@ -252,8 +252,10 @@ void		Chunk::_generateFieldBackground(int x, int y, int distance)
   float		nVal;
 
   if (distance > GROUND_T_HEIGHT)
-    _tiles[y * Chunk::width + x] = TileType::Ground;
-
+    {
+      _tiles[y * Chunk::width + x] = TileType::Ground;
+      return ;
+    }
   hVal = 0.15f // Adjust the height land padding
     - static_cast<float>(distance)
     / (static_cast<float>(GROUND_T_HEIGHT) / 1.5f);
@@ -273,6 +275,7 @@ void		Chunk::_fillSurface(const Vector2f &offset,
   float		p;
 
   // _generateBackground(x, y, lineY, tile);
+  _bgTiles[y * Chunk::width + x] = TileType::Ground;
   surfaceDistance = lineY - realY;
   if (surfaceDistance >= FADEH)
     off = 0.f;
@@ -720,7 +723,7 @@ void	Chunk::_generate(void)
   std::fill(_tiles.begin(), _tiles.end(), TileType::Empty);
   if (_pos.y >= 0)
     {
-      std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Ground);
+      // std::fill(_bgTiles.begin(), _bgTiles.end(), TileType::Ground);
       constructLine();
       fillChunkInfo();
       _completeField();

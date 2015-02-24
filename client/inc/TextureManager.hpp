@@ -5,6 +5,8 @@
 #include "RessourceManager.hpp"
 #include "Singleton.hpp"
 
+#define TexturePath "../client/assets/"
+
 template <typename T = sf::Texture>
 class TextureManager : public RessourceManager<T>, public Singleton< TextureManager<T> >
 {
