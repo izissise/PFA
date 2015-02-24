@@ -32,7 +32,7 @@ find_package(Threads)
 find_package(SFML 2.1 COMPONENTS system window graphics audio)
 find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
 find_package(Box2D REQUIRED)
-find_package(ENet)
+find_package(ENet REQUIRED)
 find_package(Protobuf)
 find_package(Sqlite3)
 
