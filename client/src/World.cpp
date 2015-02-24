@@ -20,7 +20,7 @@ World::World(Settings& settings) :
   _screenSize =	{std::stoi(cvarList.getCvar("r_width")),
 		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_camera.sToWPos(_screenSize));
-  tm.load(TexturePath, "bg.png");
+  tm.load(TexturePath, "nightBg.png");
 }
 
 void		World::setPlayerPosition(const Vector2i &chunkId,
@@ -92,10 +92,39 @@ void	World::draw(sf::RenderTarget &window) const
   screenPos	screenOrigin = _getScreenOrigin();
   screenPos	screenCoord = screenOrigin;
   const Range2i	&range = _player.getVisibleRange();
+  const Vector2f &plPos = _player.getPosition();
+  const Vector2i &chunkId = _player.getChunkId();
+  Vector2i pixelCoor = _camera.wToSPos(plPos + static_cast<Vector2f>(chunkId));
+  auto		&tm = TextureManager<>::instance();
+  auto		skyTexture = tm.get("nightBg.png");
+  sf::Sprite	bgSprite(*skyTexture);
+  const sf::Vector2u	&textureSize = skyTexture->getSize();
+  int		screenHeight = std::stoi(_settings.getCvarList().getCvar("r_height"));
+  int		screenWidth = std::stoi(_settings.getCvarList().getCvar("r_width"));
   int		x;
 
   if (!_loaded)
     return ;
+  // hard coded value from server defines 5000 - 2000
+  if (pixelCoor.y +
+      screenWidth / 2 > 3000)
+    {
+      pixelCoor.x %= textureSize.x;
+      pixelCoor.y %= textureSize.y;
+      if (pixelCoor.x > 0)
+	pixelCoor.x -= textureSize.x;
+      if (pixelCoor.y > 0)
+	pixelCoor.y -= textureSize.y;
+      for (int ty = pixelCoor.y; ty < screenHeight; ty += textureSize.y)
+	{
+	  for (int tx = screenWidth - pixelCoor.x;
+	       tx > -static_cast<int>(textureSize.x); tx -= textureSize.x)
+	    {
+	      bgSprite.setPosition(tx, ty);
+	      window.draw(bgSprite);
+	    }
+	}
+    }
   for (int y = range.top(); y >= range.bottom(); --y) {
     for (x = range.left(); x <= range.right(); ++x) {
       _drawChunk(window, {x, y}, screenCoord);
