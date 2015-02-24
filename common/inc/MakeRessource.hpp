@@ -9,12 +9,12 @@
 //
 template<typename Creator, typename Destructor, typename... Arguments>
 auto make_resource(Creator c, Destructor d, Arguments&&... args)
-    -> std::unique_ptr<typename std::decay<decltype(*c(std::forward<Arguments>(args)...))>::type, std::function<void(typename std::decay<decltype(*c(std::forward<Arguments>(args)...))>::type*)>>
+    -> std::unique_ptr<typename std::decay<decltype(*c(std::forward<Arguments>(args)...))>::type, Destructor>
 {
     auto r = c(std::forward<Arguments>(args)...);
     if (!r) { throw std::runtime_error {"Unable to create resource"}; }
     typedef typename std::decay<decltype(*r)>::type ResourceType;
-    return std::unique_ptr<ResourceType, std::function<void(ResourceType*)>>(r, d);
+    return std::unique_ptr<ResourceType, Destructor>(r, d);
 }
 
 #endif // MAKERESSOURCE_HPP_INCLUDED
