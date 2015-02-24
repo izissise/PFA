@@ -66,6 +66,7 @@ if (UNIX)
 elseif (MSVC)
   COMPILER_FLAGS(FLAGS "/wd4251" # needs to have dll-interface to be used by clients
 			   "/wd4275" # exported class derived from non-exported class
+				 "/EHsc" # activate C++ style exceptions
 			   )
 endif()
 
@@ -144,9 +145,9 @@ configure_file (
   "${NAME_LIB}/inc/Config.h"
 )
 
-if(PROTOBUF_FOUND)
+# if(PROTOBUF_FOUND)
 
-  execute_process( COMMAND protoc --proto_path "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/proto" --cpp_out "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp" ${proto_files} )
+  # execute_process( COMMAND protoc --proto_path "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/proto" --cpp_out "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp" ${proto_files} )
 
   file(
   GLOB_RECURSE
@@ -154,9 +155,11 @@ if(PROTOBUF_FOUND)
   ${PROTO_DIR}/cpp/*.cc
   )
 
-  foreach(source_file ${PROTO_SRCS})
-    set_source_files_properties(${source_file} PROPERTIES COMPILE_FLAGS -Wno-shadow)
-  endforeach(source_file)
+	if(UNIX)
+	  foreach(source_file ${PROTO_SRCS})
+	    set_source_files_properties(${source_file} PROPERTIES COMPILE_FLAGS -Wno-shadow)
+	  endforeach(source_file)
+	endif(UNIX)
 
   file(
   GLOB_RECURSE
@@ -166,7 +169,7 @@ if(PROTOBUF_FOUND)
 
   include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/${PROTO_DIR}/cpp/")
 
-endif()
+# endif()
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
 
@@ -233,7 +236,7 @@ if (Boost_FOUND)
 endif()
 
 if (BOX2D_FOUND)
-   include(${BOX2D_INCLUDE_DIR})
+   include_directories(${BOX2D_INCLUDE_DIR})
    target_link_libraries (${NAME_LIB} ${BOX2D_LIBRARIES})
 endif()
 
