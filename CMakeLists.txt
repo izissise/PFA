@@ -28,9 +28,9 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CppUnit)
 find_package(Threads)
 find_package(SFML 2.1 COMPONENTS system window graphics audio)
-find_package(Boost 1.55.0 COMPONENTS system program_options REQUIRED)
-find_package(Box2D REQUIRED)
-find_package(Protobuf REQUIRED)
+find_package(Boost 1.55.0 COMPONENTS system program_options)
+find_package(Box2D)
+find_package(Protobuf)
 find_package(ENet)
 find_package(Sqlite3)
 
@@ -74,6 +74,10 @@ CMAKE_DEPENDENT_OPTION(VALGRIND_CHECK "Decide if valgrind should be executed wit
 OPTION(CODE_METRICS "Decide if code's metrics should be generated." OFF)
 OPTION(CODE_CHECK "Decide if code should be checked for common errors." OFF)
 OPTION(GENERATE_DOC "Decide if documentation should be generated." OFF)
+
+OPTION(BUILD_SERVER "Does the compilation will build the server ?." ON)
+OPTION(BUILD_CLIENT "Does the compilation will build the client ?." ON)
+OPTION(BUILD_MASTER_SERVER "Does the compilation will build the master server ?." ON)
 
 # --- global definitions ---
 DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
@@ -137,97 +141,123 @@ configure_file (
 
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
 
-add_subdirectory(${PROTO_DIR})
+#Generate message library
+if(BUILD_CLIENT OR BUILD_SERVER OR BUILD_MASTER_SERVER)
+  if(NOT Boost_FOUND OR NOT PROTOBUF_FOUND OR NOT ENET_FOUND OR NOT THREADS_FOUND)
+   message(SEND_ERROR "Protobuf, Enet, Boost and Thread library are required to build the client, server and master server.")
+  endif()
 
-add_library(
-  messages STATIC 
-  ${PROTO_SRC} 
-  ${PROTO_HEADER}
-)
+  add_subdirectory(${PROTO_DIR})
 
-set_target_properties(messages PROPERTIES LINKER_LANGUAGE CXX)
-set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER} PROPERTIES GENERATED TRUE)
-include_directories("${CMAKE_BINARY_DIR}/${PROTO_DIR}")
-add_dependencies(messages protobuf_compilation)
-target_link_libraries(messages ${Boost_LIBRARIES} ${PROTOBUF_LIBRARY})
+  add_library(
+    messages STATIC 
+    ${PROTO_SRC} 
+    ${PROTO_HEADER}
+  )
 
-add_library(
-# executable name
-  ${NAME_LIB} STATIC
-# source files
-  ${lib_source_files}
-  ${lib_include_files}
-)
-
-set_property(TARGET ${NAME_LIB} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
-
-add_executable(
-# executable name
-  ${NAME_CLIENT}
-# source files
-  ${client_source_files}
-  ${client_include_files}
-)
-
-set_property(TARGET ${NAME_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc")
-set_property(TARGET ${NAME_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/Gui")
-set_property(TARGET ${NAME_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
-
-add_executable(
-  ${NAME_SERVER}
-# source files
-  ${server_source_files}
-  ${server_include_files}
-)
-
-set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc")
-set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
-
-add_executable(
-	${NAME_MASTERSERVER}
-# source files
-	${masterserver_source_files}
-	${masterserver_include_files}
-)
-
-set_property(TARGET ${NAME_MASTERSERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/inc")
-
-target_link_libraries(${NAME_LIB} messages)
-target_link_libraries(${NAME_MASTERSERVER} messages)
-target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
-target_link_libraries(${NAME_SERVER} ${NAME_LIB})
-
-if (THREADS_FOUND)
-  target_link_libraries(${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
-  target_link_libraries(${NAME_MASTERSERVER} ${CMAKE_THREAD_LIBS_INIT})
+  set_target_properties(messages PROPERTIES LINKER_LANGUAGE CXX)
+  set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER} PROPERTIES GENERATED TRUE)
+  include_directories("${CMAKE_BINARY_DIR}/${PROTO_DIR}")
+  add_dependencies(messages protobuf_compilation)
+  
+  include_directories(${Boost_INCLUDE_DIRS})
+  include_directories(${ENet_INCLUDE_DIRS})
+  
+  target_link_libraries(messages ${Boost_LIBRARIES} ${PROTOBUF_LIBRARY})
+  target_link_libraries(messages ${ENet_LIBRARIES})  
+  target_link_libraries(messages ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-if (SFML_FOUND)
+#Common library
+if(BUILD_CLIENT OR BUILD_SERVER)
+  if(NOT BOX2D_FOUND)
+      message(SEND_ERROR "Box2D is required to build the client or server.")
+  endif()
+  
+  add_library(
+  # executable name
+    ${NAME_LIB} STATIC
+  # source files
+    ${lib_source_files}
+    ${lib_include_files}
+  )
+
+  set_property(TARGET ${NAME_LIB} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+  
+  include_directories(${BOX2D_INCLUDE_DIR})
+  target_link_libraries (${NAME_LIB} ${BOX2D_LIBRARIES})
+  target_link_libraries(${NAME_LIB} messages)
+endif()
+
+#Client Binary
+if(BUILD_CLIENT)
+  if (NOT SFML_FOUND)
+    message(SEND_ERROR "SFML is required to build the client.")
+  endif()
+
+  add_executable(
+  # executable name
+    ${NAME_CLIENT}
+  # source files
+    ${client_source_files}
+    ${client_include_files}
+  )
+
+  set_property(TARGET ${NAME_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc")
+  set_property(TARGET ${NAME_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/Gui")
+  set_property(TARGET ${NAME_CLIENT} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+
   include_directories(${SFML_INCLUDE_DIR})
   target_link_libraries(${NAME_CLIENT} ${SFML_LIBRARIES})
+  target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
 endif()
 
-if (Boost_FOUND)
-   include_directories(${Boost_INCLUDE_DIRS})
-   target_link_libraries(${NAME_LIB} ${Boost_LIBRARIES})
-   target_link_libraries(${NAME_MASTERSERVER} ${Boost_LIBRARIES})
+#Server Binary
+if(BUILD_SERVER)
+  add_executable(
+    ${NAME_SERVER}
+  # source files
+    ${server_source_files}
+    ${server_include_files}
+  )
+
+  set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc")
+  set_property(TARGET ${NAME_SERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
+
+  target_link_libraries(${NAME_SERVER} ${NAME_LIB})
 endif()
 
-if (BOX2D_FOUND)
-   include_directories(${BOX2D_INCLUDE_DIR})
-   target_link_libraries (${NAME_LIB} ${BOX2D_LIBRARIES})
-endif()
+#Master Server Binary
+if(BUILD_MASTER_SERVER)
 
-if (ENET_FOUND)
-   include_directories(${ENet_INCLUDE_DIRS})
-   target_link_libraries(${NAME_LIB} ${ENet_LIBRARIES})
-   target_link_libraries(${NAME_MASTERSERVER} ${ENet_LIBRARIES})
-endif()
+  if(NOT SQLITE3_FOUND)
+    message(SEND_ERROR "SQLite3 is required to build the master server.")
+  endif()
 
-if (SQLITE3_FOUND)
+  add_executable(
+        ${NAME_MASTERSERVER}
+  # source files
+	${masterserver_source_files}
+	${masterserver_include_files}
+  )
+
+  set_property(TARGET ${NAME_MASTERSERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/inc")
+
   include_directories(${SQLITE3_INCLUDE_DIR})
   target_link_libraries(${NAME_MASTERSERVER} ${SQLITE3_LIBRARIES})
+  target_link_libraries(${NAME_MASTERSERVER} messages)
 endif()
+
+
+
+
+
+
+
+###############
+#Other Targets#
+###############
+
 
 # --- enable unit tests if desired ---
 if(BUILD_TESTS)
@@ -347,5 +377,3 @@ if(GENERATE_DOC)
                         "${PROJECT_SOURCE_DIR}/test" ${DOC_PATH}
                         VERSION "${PROJECTVERSION}")
 endif()
-
-#SET_TARGET_PROPERTIES(${NAME_CLIENT} PROPERTIES COMPILE_FLAGS "-pg" LINK_FLAGS "-pg")

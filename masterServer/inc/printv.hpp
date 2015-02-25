@@ -6,6 +6,7 @@
 # include <stdexcept>
 # include <sstream>
 
+std::ostream& printv(std::ostream& f, const std::string& s);
 /**
  * \fn std::ostream& printv(std::ostream& f, const std::string& s)
  * \brief Printf like function but using variadic template.
