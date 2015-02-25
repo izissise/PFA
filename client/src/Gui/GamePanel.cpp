@@ -257,6 +257,8 @@ void	GamePanel::update(std::chrono::milliseconds timeStep, Settings &set)
 {
   if (_hide)
     return ;
+  if (_actAnalyzer.getInputChanges(set))
+    _socket.sendPacket(1, _actAnalyzer.serialize());
   updateNetwork(set);
   _world->update(timeStep);
 }
@@ -267,10 +269,6 @@ int		GamePanel::event(const sf::Event &ev,
 {
   int		retVal;
 
-  if (_actAnalyzer.getInputChanges(set))
-    {
-      _socket.sendPacket(1, _actAnalyzer.serialize());
-    }
   retVal = updateHud(ev, ref, set);
   return retVal;
 }
