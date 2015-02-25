@@ -191,43 +191,42 @@ add_executable(
 )
 
 set_property(TARGET ${NAME_MASTERSERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/inc")
-set_property(TARGET ${NAME_MASTERSERVER} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
 
 target_link_libraries(${NAME_LIB} messages)
+target_link_libraries(${NAME_MASTERSERVER} messages)
 target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
 target_link_libraries(${NAME_SERVER} ${NAME_LIB})
-target_link_libraries(${NAME_MASTERSERVER} ${NAME_LIB})
 
 if (THREADS_FOUND)
-  target_link_libraries (${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(${NAME_LIB} ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(${NAME_MASTERSERVER} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 if (SFML_FOUND)
   include_directories(${SFML_INCLUDE_DIR})
-  target_link_libraries (${NAME_CLIENT} ${SFML_LIBRARIES})
+  target_link_libraries(${NAME_CLIENT} ${SFML_LIBRARIES})
 endif()
 
 if (Boost_FOUND)
    include_directories(${Boost_INCLUDE_DIRS})
-   target_link_libraries (${NAME_LIB} ${Boost_LIBRARIES})
+   target_link_libraries(${NAME_LIB} ${Boost_LIBRARIES})
+   target_link_libraries(${NAME_MASTERSERVER} ${Boost_LIBRARIES})
 endif()
 
 if (BOX2D_FOUND)
-	 include_directories(${BOX2D_INCLUDE_DIR})
+   include_directories(${BOX2D_INCLUDE_DIR})
    target_link_libraries (${NAME_LIB} ${BOX2D_LIBRARIES})
 endif()
 
 if (ENET_FOUND)
    include_directories(${ENet_INCLUDE_DIRS})
    target_link_libraries(${NAME_LIB} ${ENet_LIBRARIES})
+   target_link_libraries(${NAME_MASTERSERVER} ${ENet_LIBRARIES})
 endif()
-
-target_link_libraries(${NAME_CLIENT} ${NAME_LIB})
-target_link_libraries(${NAME_SERVER} ${NAME_LIB})
 
 if (SQLITE3_FOUND)
   include_directories(${SQLITE3_INCLUDE_DIR})
-  target_link_libraries (${NAME_MASTERSERVER} ${SQLITE3_LIBRARIES})
+  target_link_libraries(${NAME_MASTERSERVER} ${SQLITE3_LIBRARIES})
 endif()
 
 # --- enable unit tests if desired ---
