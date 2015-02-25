@@ -29,7 +29,7 @@ public:
   void		trigger(const t_event &event);
 
 private:
-  void		createMessageEntry(const sf::Texture &texture, TextWidget *widget);
+  void		createMessageEntry(const sf::Texture &texture, Controls &controls, TextWidget *widget);
   void		createButton(const sf::Texture &texture, Widget *w);
   void		createVoiceButton(const sf::Texture &texture, Widget *w,
 				  Controls &controls, int idx);

@@ -13,6 +13,7 @@ enum class	Action
     MoveDown,
     ToggleConsole,
     ToggleQuickMenu,
+    Chat,
     Last
     };
 

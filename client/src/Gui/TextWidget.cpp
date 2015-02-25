@@ -47,7 +47,11 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
       catched = _isActive;
       _isActive = !getInput(event);
       if (!_isActive)
-	setToDefault(event, ref);
+	{
+	  setToDefault(event, ref);
+	  if (_update)
+	    retVal = _update(*this, event, ref);
+	}
       else
 	{
 	  _textContent.setString(getString());
@@ -56,9 +60,9 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 	    retVal = _update(*this, event, ref);
 	  _cursor.update();
 	  _cursor.setCursorPos(_text);
-	  if (retVal)
-	    return retVal;
 	}
+      if (retVal)
+	return retVal;
     }
   else
     setToDefault(event, ref);
@@ -176,4 +180,9 @@ void	TextWidget::trigger(const t_event &event)
     clearWidget();
   else
     AWidget::trigger(event);
+}
+
+bool	TextWidget::getState() const
+{
+  return _isActive;
 }
