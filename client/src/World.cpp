@@ -88,11 +88,8 @@ auto World::_getScreenOrigin(void) const -> screenPos
   return _camera.wToSPos(worldOrigin);
 }
 
-void	World::draw(sf::RenderTarget &window) const
+void	World::_drawBackground(sf::RenderTarget &window) const
 {
-  screenPos	screenOrigin = _getScreenOrigin();
-  screenPos	screenCoord = screenOrigin;
-  const Range2i	&range = _player.getVisibleRange();
   const Vector2f &plPos = _player.getPosition();
   const Vector2i &chunkId = _player.getChunkId();
   Vector2i pixelCoor = _camera.wToSPos(plPos + static_cast<Vector2f>(chunkId));
@@ -102,10 +99,7 @@ void	World::draw(sf::RenderTarget &window) const
   const sf::Vector2u	&textureSize = skyTexture->getSize();
   int		screenHeight = std::stoi(_settings.getCvarList().getCvar("r_height"));
   int		screenWidth = std::stoi(_settings.getCvarList().getCvar("r_width"));
-  int		x;
 
-  if (!_loaded)
-    return ;
   // hard coded value from server defines 5000 - 2000
   if (pixelCoor.y +
       screenWidth / 2 > 3000)
@@ -126,6 +120,18 @@ void	World::draw(sf::RenderTarget &window) const
 	    }
 	}
     }
+}
+
+void	World::draw(sf::RenderTarget &window) const
+{
+  screenPos	screenOrigin = _getScreenOrigin();
+  screenPos	screenCoord = screenOrigin;
+  const Range2i	&range = _player.getVisibleRange();
+  int		x;
+
+  if (!_loaded)
+    return ;
+  _drawBackground(window);
   for (int y = range.top(); y >= range.bottom(); --y) {
     for (x = range.left(); x <= range.right(); ++x) {
       _drawChunk(window, {x, y}, screenCoord);

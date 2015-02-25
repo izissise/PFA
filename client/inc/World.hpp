@@ -62,10 +62,9 @@ public:
 protected:
 private:
   float		_getGridOffset(float w) const;
-
   void		_calculateVisibleRange(void);
-
   screenPos	_getScreenOrigin(void) const;
+  void		_drawBackground(sf::RenderTarget &window) const;
   void		_drawChunk(sf::RenderTarget &window,
 			   const chunkId& cursor,
 			   screenPos& windowCoord) const;
