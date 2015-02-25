@@ -134,7 +134,7 @@ unsigned int	World::removeUnusedChunks(const Vector2i &entId,
 
 				       distance = pointDist(std::abs(pos.x - entId.x) * Chunk::width,
 							    std::abs(pos.y - entId.y) * Chunk::height);
-				       distance = min(getClosestPlayer(clients,
+				       distance = std::min(getClosestPlayer(clients,
 									    pos.x * Chunk::width,
 									    pos.y * Chunk::height),
 							   distance);
