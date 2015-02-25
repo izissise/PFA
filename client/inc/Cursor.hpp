@@ -15,8 +15,7 @@ public:
   void		setCursorPos(const sf::Text &text);
   void		setText(const sf::Text &text);
   void		update();
-  void		draw(sf::RenderTexture &window) const;
-  void		draw(sf::RenderWindow &window) const;
+  void		draw(sf::RenderTarget &window) const;
   std::size_t	getWidth() const;
   unsigned int	getSize() const;
   void		setColor(const sf::Color &color);

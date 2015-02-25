@@ -38,8 +38,14 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
 				     sf::Text("3.", _font["default"], 22));
   Widget	*wFourth = new Widget("sound4", {panZone.left, panZone.top + 228, panZone.width, 60},
 				      sf::Text("4.", _font["default"], 22));
+  TextWidget	*input = new TextWidget("", sf::FloatRect(_zone.left + _zone.width / 2 - 300
+							  , _zone.top + _zone.height / 2 - 25,
+							  600, 50),
+					sf::Text("", _font["default"], 20),
+					sf::Text("", _font["default"], 20), 30);
 
   addObserver(panels[0]);
+  createMessageEntry(texture, input);
   createButton(texture, wHeader);
   createVoiceButton(texture, wFirst, controls, sf::Keyboard::Num1);
   createVoiceButton(texture, wSecond, controls, sf::Keyboard::Num2);
@@ -54,6 +60,7 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
   pSound->construct(texture, set, panels);
   pSound->setHide(true);
   addPanel(pSound);
+  addWidget(input);
   _world.reset(new World{set});
   resizeWidgets({gWidth, gHeight});
   _proto.setSetting(&set);
@@ -66,6 +73,29 @@ void	GamePanel::createButton(const sf::Texture &texture, Widget *w)
 
   w->alignTextLeft({zone.left,zone.top}, {zone.width, zone.height}, 8, 50);
   w->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
+}
+
+void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
+				      TextWidget *widget)
+{
+  sf::FloatRect zone = widget->getZone();
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [](AWidget &widget, const sf::Event &ev UNUSED, sf::RenderWindow &ref UNUSED)
+    -> int
+    {
+      sf::FloatRect wZone = widget.getZone();
+
+      widget.alignTextLeft({wZone.left,wZone.top}, {wZone.width, wZone.height}, 1, 50);
+      return 0;
+    };
+  addSpriteForWidget(widget, sf::Color(255, 255, 255, 200), {zone.width, zone.height});
+  widget->setUpdate(updateFunc);
+  widget->setColor(sf::Color(0,0,0));
+  widget->getCursor().setColor(sf::Color(0,0,0));
+  widget->setEdge(sf::Vector2f(zone.width, zone.height),
+		  2.f);
 }
 
 void	GamePanel::createVoiceButton(const sf::Texture &texture, Widget *w,

@@ -7,6 +7,7 @@
 #include "ClientProtocol.hpp"
 #include "ActionAnalyzer.hpp"
 #include "GamePanel.hpp"
+#include "TextWidget.hpp"
 
 #define ITERATIONS 5
 #define MHEIGHT 300
@@ -28,6 +29,7 @@ public:
   void		trigger(const t_event &event);
 
 private:
+  void		createMessageEntry(const sf::Texture &texture, TextWidget *widget);
   void		createButton(const sf::Texture &texture, Widget *w);
   void		createVoiceButton(const sf::Texture &texture, Widget *w,
 				  Controls &controls, int idx);

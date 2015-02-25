@@ -31,7 +31,7 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 			   Settings &set UNUSED)
 {
   int	catched = 0;
-  int	retVal;
+  int	retVal = 0;
 
   if (isClicked(event, sf::Mouse::Left))
     {
@@ -44,6 +44,7 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
     }
   if (_isActive)
     {
+      catched = _isActive;
       _isActive = !getInput(event);
       if (!_isActive)
 	setToDefault(event, ref);
@@ -52,10 +53,11 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
 	  _textContent.setString(getString());
 	  setDrawableText();
 	  if (_update)
-	    if ((retVal = _update(*this, event, ref)) != 0)
-	      return retVal;
+	    retVal = _update(*this, event, ref);
 	  _cursor.update();
 	  _cursor.setCursorPos(_text);
+	  if (retVal)
+	    return retVal;
 	}
     }
   else
@@ -100,7 +102,7 @@ void		TextWidget::setDrawableText()
     }
 }
 
-void		TextWidget::draw(sf::RenderTexture &window) const
+void		TextWidget::draw(sf::RenderTarget &window) const
 {
   AWidget::draw(window);
   if (_isActive)

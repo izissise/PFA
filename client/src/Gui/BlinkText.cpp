@@ -3,7 +3,7 @@
 BlinkText::BlinkText(unsigned int blinkTime) :
   _time(),
   _blinkTime(blinkTime),
-  _display(false)
+  _display(true)
 {
 }
 
