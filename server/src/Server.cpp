@@ -9,7 +9,7 @@ Server::Server(ServerSettings &set)
   : _clients(),
     _masterSocket(),
     _set(set),
-    _threadPool(200),
+    _threadPool(6),
     _world(_set),
     _proto(_world, _threadPool),
     _auth(_world, _clients)

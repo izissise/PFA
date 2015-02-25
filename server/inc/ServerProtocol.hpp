@@ -34,6 +34,9 @@ private:
   void	queryChunks(const ClientMessage &message,
 		    Client *client,
 		    const std::vector<Client *> &clients);
+  void	chat(const ClientMessage &message,
+	     Client *client,
+	     const std::vector<Client *> &clients);
 
   std::map<ClientMessage::PacketContent, parseFunc> _func;
   World		&_world;
