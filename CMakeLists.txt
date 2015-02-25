@@ -139,8 +139,6 @@ configure_file (
   "${NAME_LIB}/inc/Config.h"
 )
 
-include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
-
 #Generate message library
 if(BUILD_CLIENT OR BUILD_SERVER OR BUILD_MASTER_SERVER)
   if(NOT Boost_FOUND OR NOT PROTOBUF_FOUND OR NOT ENET_FOUND OR NOT THREADS_FOUND)
@@ -182,6 +180,7 @@ if(BUILD_CLIENT OR BUILD_SERVER)
     ${lib_include_files}
   )
 
+  include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
   set_property(TARGET ${NAME_LIB} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
   
   include_directories(${BOX2D_INCLUDE_DIR})

@@ -1,4 +1,9 @@
 # Fusion Master Server
+#
+#
+# Lauch the master server
+#
+#
 # Version 1
 
 FROM      debian:wheezy
