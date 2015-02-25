@@ -28,8 +28,6 @@ unsigned int	ActionAnalyzer::getInputChanges(Settings &set)
 	  _diffState[idx] = cuState;
 	  ++changes;
 	}
-      else
-	_diffState[idx] = -1;
     }
   return changes;
 }

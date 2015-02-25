@@ -83,7 +83,7 @@ void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
   std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [this, &controls](AWidget &widget, const sf::Event &ev,
+  updateFunc = [this, &controls](AWidget &widget, const sf::Event &ev UNUSED,
 				 sf::RenderWindow &ref UNUSED)
     -> int
     {
@@ -98,7 +98,7 @@ void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
 	  ClientMessage		msg;
 	  std::string		serialized;
 
-	  msg.set_content(ClientMessage::CONNECTION);
+	  msg.set_content(ClientMessage::CHAT);
 	  msg.set_chat(content);
 	  msg.SerializeToString(&serialized);
 
