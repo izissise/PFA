@@ -123,6 +123,7 @@ Controls::Controls()
   _actions.push_back(t_action("movedown"));
   _actions.push_back(t_action("console", actionType::Toggle));
   _actions.push_back(t_action("quickMenu", actionType::Toggle));
+  _actions.push_back(t_action("chat", actionType::Toggle));
 
   for (unsigned int i = 0; i < static_cast<int>(Action::Last); ++i)
     _actionKeys.insert(std::pair<Action, std::array<t_entry, 5>> (static_cast<Action>(i),

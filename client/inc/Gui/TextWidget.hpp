@@ -22,12 +22,13 @@ public:
   void		setDefaultColor(const sf::Color &color);
   Cursor	&getCursor();
   void		trigger(const t_event &event);
+  bool		getState() const;
+  void		clearWidget();
 
 private:
   void	setDrawableText();
   void	scaleText(sf::Text &text, float ratioX, float ratioY);
   int	setToDefault(const sf::Event &event, sf::RenderWindow &ref);
-  void	clearWidget();
 
 private:
   Cursor	_cursor;

@@ -11,10 +11,12 @@ message ClientMessage {
     QUERYCHUNK = 2;
     ACTION = 3;
     PING = 4;
+    CHAT = 5;
   }
   required PacketContent content = 1;
   optional ConnectionMessage co = 2;
   optional QueryChunk queryChunk = 3;
   optional ClientActions actions = 4;
   optional PingTime ping = 5;
+  optional string chat = 6;
 }
