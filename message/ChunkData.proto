@@ -1,7 +1,12 @@
 import "Vectors.proto";
 
+message Tile {
+  required uint32 number = 1;
+  required uint32 tilecode = 2;
+}
+
 message  ChunkData {
   required VectorInt  id = 1;
-  repeated uint32 bgTiles = 2 [packed=true];
-  repeated uint32 fgTiles = 3 [packed=true];
+  repeated Tile bgTiles = 2;
+  repeated Tile fgTiles = 3;
 }
