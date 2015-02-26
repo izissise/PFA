@@ -23,6 +23,17 @@ World::World(Settings& settings) :
 		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_camera.sToWPos(_screenSize));
   tm.load(TexturePath, "nightBg.png");
+
+  _entities.push_back(std::shared_ptr<AEntity>(new AEntity(_b2World)));
+
+    b2BodyDef groundBodyDef;
+  groundBodyDef.position.Set(0.0f, -100.0f);
+
+  b2PolygonShape groundBox;
+  groundBox.SetAsBox(50.0f, 10.0f);
+
+  _tmpGround = Box2DHelpers::createBody(_b2World, groundBodyDef, groundBox, 0.0f);
+
 }
 
 void		World::setPlayerPosition(const Vector2i &chunkId,
@@ -78,6 +89,10 @@ void	World::update(const std::chrono::milliseconds& timeStep)
 {
 	//The suggested iteration count for Box2D is 8 for velocity and 3 for position.
 	_b2World->Step(timeStep.count() / 1000.0f, 8, 3);
+	for (auto&& i : _entities)
+	{
+		i->update(timeStep);
+	}
 }
 
 auto World::_getScreenOrigin(void) const -> screenPos
@@ -140,6 +155,10 @@ void	World::draw(sf::RenderTarget &window) const
     }
     screenCoord.x = screenOrigin.x;
     screenCoord.y += Chunk::height * TileCodex::tileSize;
+  }
+  for (auto&& i : _entities)
+  {
+	i->draw(window, std::chrono::milliseconds(0));
   }
 }
 

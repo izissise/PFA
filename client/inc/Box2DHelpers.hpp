@@ -15,14 +15,20 @@ class Box2DHelpers
 public:
   static auto createBody(std::shared_ptr<b2World> const& world,
                          b2BodyDef const& bodyDef, b2Shape const& shape,
-                         float density)
+                         float density, std::function<void(b2FixtureDef&)> fixtureInfo = [](b2FixtureDef&) {})
   {
     std::weak_ptr<b2World> weakWorld(world);
 
-    auto constructor = [](std::shared_ptr<b2World> const& world, b2BodyDef const & bodyDef, b2Shape const & shape, float density)
+    auto constructor = [](std::shared_ptr<b2World> const & world,
+                          b2BodyDef const & bodyDef, b2Shape const & shape,
+                          float density, std::function<void(b2FixtureDef&)> fixtureInfo)
     {
       b2Body* body = world->CreateBody(&bodyDef);
-      body->CreateFixture(&shape, density);
+      b2FixtureDef fixtureDef;
+      fixtureDef.shape = &shape;
+      fixtureDef.density = density;
+      fixtureInfo(fixtureDef);
+      body->CreateFixture(&fixtureDef);
       return body;
     };
 
@@ -30,7 +36,7 @@ public:
       if (auto world = weakWorld.lock())
         world->DestroyBody(bud);
     };
-    return make_resource(constructor, deconstructor, world, bodyDef, shape, density);
+    return make_resource(constructor, deconstructor, world, bodyDef, shape, density, fixtureInfo);
   };
 
 };

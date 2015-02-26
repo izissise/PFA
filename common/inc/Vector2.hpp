@@ -1,6 +1,8 @@
 #ifndef	VECTOR2_H
 # define VECTOR2_H
 
+# include <Box2D/Box2D.h>
+
 template<typename T>
 class Vector2
 {
@@ -11,8 +13,11 @@ public:
   template <typename U>
   Vector2(const U& value) : x(static_cast<T>(value)), y(static_cast<T>(value)) {}
 
+  Vector2(b2Vec2 const& val) : x(static_cast<T>(val.x)), y(static_cast<T>(val.y)) {}
+
   template <typename U, typename V>
   Vector2(const U& p_x, const V& p_y) : x(static_cast<T>(p_x)), y(static_cast<T>(p_y)) {}
+
 
   template <typename U>
   Vector2(const Vector2<U>& vec) :

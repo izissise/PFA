@@ -38,15 +38,15 @@ Server::~Server()
   ENetEvent             event;
   int                   hasEvent;
   bool                  pull = true;
-  bool                  passed = false;
+//  bool                  passed = false;
 
   enet_host_destroy(_server);
   _masterSocket.connect(_set.getCvar("sv_masterIP"),
                         _set.getCvar("sv_masterPort"),
                         2);
   std::cout << "Shutting down server" << std::endl;
-  while (!passed)
-    {
+ // while (!passed)
+ //   {
       if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
         {
           switch (event.type)
@@ -57,15 +57,15 @@ Server::~Server()
               msg.SerializeToString(&packet);
               _masterSocket.sendPacket(0, packet);
               enet_host_flush(_masterSocket.getHost());
-              passed = true;
+             // passed = true;
               break;
             default:
               break;
             }
         }
-      else if (hasEvent < 0)
-        break ;
-    }
+//      else if (hasEvent < 0)
+//        break ;
+ //   }
   _masterSocket.disconnect();
 }
 
@@ -76,13 +76,13 @@ void    Server::registerToMaster()
   ENetEvent             event;
   int                   hasEvent;
   bool                  pull = true;
-  bool                  passed = false;
+ // bool                  passed = false;
 
   _masterSocket.connect(_set.getCvar("sv_masterIP"),
                         _set.getCvar("sv_masterPort"),
                         2);
-  while (!passed)
-    {
+ // while (!passed)
+ //   {
       if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
         {
           switch (event.type)
@@ -99,7 +99,7 @@ void    Server::registerToMaster()
                 msg.SerializeToString(&packet);
                 _masterSocket.sendPacket(0, packet);
                 enet_host_flush(_masterSocket.getHost());
-                passed = true;
+              //  passed = true;
               }
               break;
             default:
@@ -108,7 +108,7 @@ void    Server::registerToMaster()
         }
       else if (hasEvent < 0)
         throw (NetworkException("Authentification to master server failed"));
-    }
+ //   }
   _masterSocket.disconnect();
 }
 

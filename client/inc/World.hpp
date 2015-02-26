@@ -11,6 +11,7 @@
 
 # include <Box2D/Box2D.h>
 
+# include "Box2DHelpers.hpp"
 # include "Settings.hpp"
 # include "Camera.hpp"
 # include "Player.hpp"
@@ -79,7 +80,8 @@ private:
   screenPos	_screenSize;
   TileCodex	_codex;
   Camera	_camera;
-  std::deque<AMovable> _entities;
+  std::deque<std::shared_ptr<AEntity>> _entities;
+  std::unique_ptr<b2Body, std::function<void(b2Body*)>> _tmpGround;
   Player	_player;
   bool		_loaded;
 };
