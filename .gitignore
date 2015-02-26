@@ -88,3 +88,4 @@ log/*
 guid.txt
 
 docker/masterServer/buildContainer/PFA
+docker/masterServer/ressources/masterServer
