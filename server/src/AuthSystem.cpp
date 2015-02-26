@@ -3,12 +3,14 @@
 #include "StringUtils.hpp"
 #include "GuidGenerator.hpp"
 #include "Spawner.hpp"
+#include "ServerResponse.pb.h"
 
 AuthSystem::AuthSystem(World &world, std::vector<Client *> &clients) :
   _clients(clients), _world(world)
 {
   _func[ClientMessage::CONNECTION] = &AuthSystem::handleConnection;
   _func[ClientMessage::PING] = &AuthSystem::ping;
+  _func[ClientMessage::GETPLAYER] = &AuthSystem::getPlayer;
 }
 
 void	AuthSystem::parseCmd(const void *data, int size,
@@ -17,15 +19,15 @@ void	AuthSystem::parseCmd(const void *data, int size,
   ClientMessage          packet;
 
   if (packet.ParseFromString(std::string((char *)data, size)))
-  {
-    ClientMessage::PacketContent  act = packet.content();
-    auto it = _func.find(act);
+    {
+      ClientMessage::PacketContent  act = packet.content();
+      auto it = _func.find(act);
 
-    if (it != _func.end())
-      {
-	(this->*(it->second))(packet, peer);
-      }
-  }
+      if (it != _func.end())
+	{
+	  (this->*(it->second))(packet, peer);
+	}
+    }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;
 
@@ -159,4 +161,18 @@ void	AuthSystem::sendClientProfile(Client *client,
   msg.set_allocated_clinit(initInfo);
   msg.SerializeToString(&serialized);
   client->sendPacket(0, serialized);
+}
+
+void    AuthSystem::getPlayer(const ClientMessage &message UNUSED,
+                              ENetPeer *peer)
+{
+  Client cl(peer);
+  ServerResponse response;
+  std::string str;
+
+  std::cout << "Receive Packet" << std::endl;
+  response.set_content(ServerResponse::PLAYER);
+  response.set_player(_clients.size());
+  response.SerializeToString(&str);
+  cl.sendPacket(0, str);
 }

@@ -78,7 +78,7 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
 
 void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server)
 {
-  int laps = 2 * 60; // 2 minutes
+  int laps = 60; // 1 minutes
 
   // Demonstrate how to get some typed column value
   const char* ip = query.getColumn(0).getText("N/A");
@@ -120,13 +120,12 @@ void MasterServer::getServerInfo(SQLite::Statement &query, ServerInfo *server)
 int MasterServer::getServerPlayer(const char *ip, const char *port) const
 {
   Network client;
-  int currentPlayer;
   ENetEvent event;
   bool first = true;
   int i = 0;
 
   client.connect(ip, port, 1);
-  while (client.pullEvent(event, 1000, first) && i < 3)
+  while (client.pullEvent(event, 1000, first) >= 0 && i < 3)
     {
       switch (event.type)
         {
@@ -147,22 +146,19 @@ int MasterServer::getServerPlayer(const char *ip, const char *port) const
             if (response.ParseFromArray(event.packet->data, event.packet->dataLength)
                 && response.content() == ServerResponse::PLAYER)
               {
-                currentPlayer = response.player();
                 client.disconnect();
-                return currentPlayer;
+                return response.player();
               }
-            else
-              currentPlayer = -1;
             break;
           }
         default:
           break;
         }
       ++i;
+      first = true;
     }
-  if (i == 3)
-    throw NetworkException(std::string("No Response Received from ") + ip + ":" + port);
-  return currentPlayer;
+  client.disconnect();
+  throw NetworkException(std::string("No Response Received from ") + ip + ":" + port);
 }
 
 void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)

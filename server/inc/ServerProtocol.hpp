@@ -36,11 +36,6 @@ private:
 		    Client *client,
 		    const std::vector<Client *> &clients);
 
-  void  getPlayer(const ClientMessage &message,
-                  Client *client,
-                  const std::vector<Client *> &clients);
-
-
   std::map<ClientMessage::PacketContent, parseFunc> _func;
   World		&_world;
   ThreadPool	&_threadPool;

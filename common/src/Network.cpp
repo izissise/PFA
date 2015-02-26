@@ -32,7 +32,7 @@ void	Network::connect(const std::string &address, const std::string &port, int n
 void	Network::disconnect()
 {
   if (_peer)
-    enet_peer_reset(_peer);
+    enet_peer_disconnect(_peer, 0);
   if (_host)
     enet_host_destroy(_host);
   _peer = nullptr;
