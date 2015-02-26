@@ -194,11 +194,11 @@ int	ServerMenu::event(const sf::Event &evt, sf::RenderWindow &ref, Settings &set
 }
 
 void	ServerMenu::createHeader(Settings &set UNUSED,
-				 const sf::Texture &texture UNUSED,
-				 const std::vector<APanelScreen *> &panels)
+    const sf::Texture &texture UNUSED,
+    const std::vector<APanelScreen *> &panels)
 {
-  Panel		*header = new Panel({_zone.left, _zone.top, _zone.width, 80});
-  sf::FloatRect	zone = header->getZone();
+  sf::FloatRect	zone(_zone.left, _zone.top, _zone.width, 80);
+  Panel		*header = new Panel(zone);
   Widget	*wBg = new Widget("bg", zone);
   Widget	*wTitle = new Widget("title", zone,
 				     sf::Text("Server List", _font["default"], 30));
@@ -281,7 +281,8 @@ Panel	*ServerMenu::createServListPanel(Settings &set, const sf::Texture &texture
   content->setDisplayFlag(APanelScreen::Display::Overlap);
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
-  content->addWidget({wScroll});
+  content->addWidget(wScroll);
+ // content->addWidget({wScroll});
   content->construct(texture, set, {});
   return content;
 }
@@ -305,7 +306,7 @@ Panel	*ServerMenu::createFavPanel(Settings &set, const sf::Texture &texture,
   content->setState(APanelScreen::State::Static);
   createScrollBar(wScroll, texture);
 
-  content->addWidget({wScroll});
+  content->addWidget(wScroll);
   content->construct(texture, set, {});
   content->setHide(true);
   return content;
@@ -438,7 +439,7 @@ void	ServerMenu::createTabBar(Settings &set, const sf::Texture &texture,
   tabFav->addObserver(tabServer);
   content->addWidget({tabServer, tabFav});
   content->construct(texture, set, {});
-  addPanel({content});
+  addPanel(content);
 }
 
 ServerItem	*ServerMenu::addServerToList(Settings &set,
@@ -510,7 +511,7 @@ Panel	*ServerMenu::createServerPopup(Settings &set, const sf::Texture &texture,
   popup->addWidget({bgWidget, serverName, serverIp, ip, serverPing, ping, serverPl, pl, join});
   setServerPopupTrigger(popup);
   popup->construct(texture, set, {});
-  addPanel({popup});
+  addPanel(popup);
   return popup;
 }
 
@@ -766,10 +767,10 @@ Panel	*ServerMenu::createCoPopup(Settings &set, const sf::Texture &texture,
   popup->addObserver({panels[1], this}); // gamePanel
   setPopupTrigger(popup);
   caButton->addObserver(popup);
-  coButton->addObserver({popup});
+  coButton->addObserver(popup);
   popup->addWidget({bgWidget, header, input, caButton, coButton});
   popup->construct(texture, set, {});
-  addPanel({popup});
+  addPanel(popup);
   return popup;
 }
 

@@ -45,7 +45,7 @@ void	SelectList::construct(const sf::Texture &texture, Settings &set,
   container->addWidget({wFirst, wSecond, wThird, wFourth, wScroll});
   container->construct(texture, set, panels);
   container->setHide(true);
-  addPanel({container});
+  addPanel(container);
   resizeWidgets({std::stof(set.getCvarList().getCvar("r_width")),
 	std::stof(set.getCvarList().getCvar("r_height"))});
 }

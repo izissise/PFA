@@ -1,0 +1,12 @@
+To build the master server with the right dependencies:
+
+cd buildContainer
+./buildContainer.sh
+
+To build running image:
+
+docker build -t fusion .
+
+To run:
+
+docker run -d -p 25255:25255/udp --name="fusion_master_server" fusion

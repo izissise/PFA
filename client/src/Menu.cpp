@@ -32,7 +32,7 @@ Menu::Menu(Settings &settings, Parser &parser) :
   _panels.push_back(serverMenu);
   _panels.push_back(gamePanel);
 
-  mainMenu->addPanel({optTabPanel});
+  mainMenu->addPanel(optTabPanel);
   optTabPanel->addPanel({optGamePanel, optKeyPanel});
 
   mainMenu->construct(_menuTexture, settings, {optTabPanel, serverMenu});

@@ -164,8 +164,8 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
 
   const ChunkData	&chunk = packet.chunkdata();
   const VectorInt	&chunkId = chunk.id();
-  const RepeatedField<uint32> &bgTiles = chunk.bgtiles();
-  const RepeatedField<uint32> &fgTiles = chunk.fgtiles();
+  const RepeatedField<google::protobuf::uint32> &bgTiles = chunk.bgtiles();
+  const RepeatedField<google::protobuf::uint32> &fgTiles = chunk.fgtiles();
 
   _world->fillChunkData(chunkId, bgTiles, fgTiles);
 }

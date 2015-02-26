@@ -8,7 +8,7 @@ ServerSettings::ServerSettings()
   ACvar::addCvar("sv_port", new t_cvar({"0", "65535"}, "6000", "6000", Number));
   ACvar::addCvar("sv_hostname", new t_cvar({}, "ServerName", "ServerName", String, Restriction::None));
   ACvar::addCvar("sv_slot", new t_cvar({"1", "4294967295"}, "30", "30", Number));
-  ACvar::addCvar("sv_masterIP", new t_cvar({"127.0.0.1"}, "127.0.0.1",
+  ACvar::addCvar("sv_masterIP", new t_cvar({"127.0.0.1"/*"62.210.136.56"*/}, "127.0.0.1",
                                            "127.0.0.1", String, Restriction::Value));
   ACvar::addCvar("sv_masterPort", new t_cvar({"25255"}, "25255",
                                              "25255", String, Restriction::Value));
