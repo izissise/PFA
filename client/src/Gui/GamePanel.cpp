@@ -6,8 +6,11 @@
 
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
-  _oldY(SHEIGHT), _dir(true),  _threadPool(15),
-  _world(nullptr), _socket(), _proto(_socket, _threadPool),
+  _oldY(SHEIGHT),
+  _dir(true),
+  _threadPool(4),
+  _chat(),
+  _world(nullptr), _socket(), _proto(_socket, _threadPool, _chat),
   _actAnalyzer(), _adjustedNet(false)
 {
   addFont("default", "../client/assets/default.TTF");
@@ -90,6 +93,7 @@ void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
       TextWidget	*twidget = dynamic_cast<TextWidget *>(&widget);
       sf::FloatRect	wZone = widget.getZone();
       std::string	content = twidget->getContent();
+      bool		hideState = widget.isHidden();
 
       widget.alignTextLeft({wZone.left,wZone.top}, {wZone.width, wZone.height}, 1, 50);
       if (twidget->getState() == false && !content.empty())
@@ -106,7 +110,9 @@ void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
 	  twidget->clearWidget();
 	  controls.pressKey(entry);
 	}
-      twidget->setHidden(!controls.getActionState(Action::Chat));
+      widget.setHidden(!controls.getActionState(Action::Chat));
+      if (hideState == true && widget.isHidden() == false) // will appear next frame
+	twidget->setState(true);
       return 0;
     };
   addSpriteForWidget(widget, sf::Color(255, 255, 255, 200), {zone.width, zone.height});
@@ -154,6 +160,7 @@ void	GamePanel::createVoiceButton(const sf::Texture &texture, Widget *w,
 void	GamePanel::drawHud(sf::RenderTarget &window, bool toWin)
 {
   APanelScreen::draw(window, toWin);
+  _chat.draw(window);
 }
 
 void	GamePanel::draw(sf::RenderTarget &window, bool toWin)
@@ -310,6 +317,7 @@ void	GamePanel::update(std::chrono::milliseconds timeStep, Settings &set)
   if (_actAnalyzer.getInputChanges(set))
     _socket.sendPacket(1, _actAnalyzer.serialize());
   updateNetwork(set);
+  _chat.update();
   _world->update(timeStep);
 }
 

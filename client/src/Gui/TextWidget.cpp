@@ -186,3 +186,9 @@ bool	TextWidget::getState() const
 {
   return _isActive;
 }
+
+void	TextWidget::setState(bool state)
+{
+  _isActive = state;
+  _text.setColor(_textContent.getColor());
+}

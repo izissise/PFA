@@ -1,13 +1,14 @@
 #include <fstream>
 #include "ClientProtocol.hpp"
 
-ClientProtocol::ClientProtocol(Network &net, ThreadPool &tPool) :
-  _socket(net), _threadPool(tPool)
+ClientProtocol::ClientProtocol(Network &net, ThreadPool &tPool, Chat &chat) :
+  _socket(net), _threadPool(tPool), _chat(chat)
 {
   _func[ProtocolMessage::SETTING] = &ClientProtocol::handleSetting;
   _func[ProtocolMessage::CLINIT] = &ClientProtocol::initClient;
   _func[ProtocolMessage::CHUNK] = &ClientProtocol::fillChunk;
   _func[ProtocolMessage::DISPLACEMENT] = &ClientProtocol::handleDisplacements;
+  _func[ProtocolMessage::CHAT] = &ClientProtocol::handleChat;
 }
 
 ClientProtocol::~ClientProtocol()
@@ -193,4 +194,9 @@ void	ClientProtocol::handleDisplacements(const ProtocolMessage &packet)
 
   if (_world->movePlayer(chunkId, pos))
     getNewChunks();
+}
+
+void	ClientProtocol::handleChat(const ProtocolMessage &packet)
+{
+  _chat.addMessages(packet.chat());
 }
