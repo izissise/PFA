@@ -33,8 +33,8 @@ public:
   Chunk&	operator=(const Chunk& other) = delete;
 
   void load(const TileCodex& codex);
-  void fillTiles(const RepeatedField<google::protobuf::uint32> &bgTiles,
-		 const RepeatedField<google::protobuf::uint32> &fgTiles);
+  void fillTiles(const RepeatedPtrField<Tile> &bgTiles,
+		 const RepeatedPtrField<Tile> &fgTiles);
   void draw(sf::RenderTarget& window,
 	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;

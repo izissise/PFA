@@ -39,20 +39,40 @@ void Chunk::load(const TileCodex& codex)
   _bgTiles.clear();
 }
 
-void	Chunk::fillTiles(const RepeatedField<uint32> &bgTiles,
-			 const RepeatedField<uint32> &fgTiles)
+void	Chunk::fillTiles(const RepeatedPtrField<Tile> &bgTiles,
+			 const RepeatedPtrField<Tile> &fgTiles)
 {
-  unsigned int x;
-  unsigned int y;
-  unsigned int index;
+  unsigned int	x;
+  unsigned int	y;
+  unsigned int	index;
+  Tile		fgtile = fgTiles.Get(0);
+  Tile		bgtile = bgTiles.Get(0);
+  unsigned int	fgCounter = 0;
+  unsigned int	bgCounter = 0;
+  uint32	fgTileCounter = 0;
+  uint32	bgTileCounter = 0;
 
   std::cout << "Filling chunk at pos " << _pos.x << " " << _pos.y << std::endl;
   for (y = 0; y < Chunk::height; ++y)
     for (x = 0; x < Chunk::width; ++x)
       {
+	if (fgTileCounter >= fgtile.number())
+	  {
+	    fgTileCounter = 0;
+	    ++fgCounter;
+	    fgtile = fgTiles.Get(fgCounter);
+	  }
+	if (bgTileCounter >= bgtile.number())
+	  {
+	    bgTileCounter = 0;
+	    ++bgCounter;
+	    bgtile = bgTiles.Get(bgCounter);
+	  }
 	index = y * Chunk::width + x;
-	_bgTiles[index] = static_cast<TileType>(bgTiles.Get(index));
-	_tiles[index] = static_cast<TileType>(fgTiles.Get(index));
+	_bgTiles[index] = static_cast<TileType>(bgtile.tilecode());
+	_tiles[index] = static_cast<TileType>(fgtile.tilecode());
+	++fgTileCounter;
+	++bgTileCounter;
       }
   _generated = true;
 }

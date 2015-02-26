@@ -40,8 +40,8 @@ void		World::setPlayerPosition(const Vector2i &chunkId,
     }
 }
 void   	World::fillChunkData(const VectorInt &pos,
-			     const RepeatedField<google::protobuf::uint32> &bgTiles,
-			     const RepeatedField<google::protobuf::uint32> &fgTiles)
+			     const RepeatedPtrField<Tile> &bgTiles,
+			     const RepeatedPtrField<Tile> &fgTiles)
 {
   auto	chunk = _chunks.find(Vector2i(pos.x(), pos.y()));
 
