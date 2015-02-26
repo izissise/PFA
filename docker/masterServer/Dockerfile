@@ -15,7 +15,7 @@ EXPOSE 25255/udp
 #Install dependencies
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
-  libenet1a libprotobuf7 libboost-system1.49.0 libboost-program-options1.49.0 libsqlite3-0
+  libenet2a libprotoc8 libsqlite3-0
   
  
 #Create new user
