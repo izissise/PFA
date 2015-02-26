@@ -20,7 +20,6 @@ public:
   {
     std::call_once(get_once_flag(), []()
 		   {
-		     std::cout << "New implementation" << std::endl;
 		     _instance.reset(new IMPL());
 		   });
     return *(_instance.get());

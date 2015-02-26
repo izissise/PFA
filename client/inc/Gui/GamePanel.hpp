@@ -50,6 +50,7 @@ private:
   int		_oldY;
   bool		_dir;
   ThreadPool		_threadPool;
+  Chat			_chat;
   std::shared_ptr<World>	_world;
   Network		_socket;
   ClientProtocol	_proto;

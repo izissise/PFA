@@ -23,6 +23,7 @@ public:
   Cursor	&getCursor();
   void		trigger(const t_event &event);
   bool		getState() const;
+  void		setState(bool state);
   void		clearWidget();
 
 private:
