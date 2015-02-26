@@ -6,6 +6,7 @@ set(NAME_LIB "common")
 set(NAME_CLIENT "client")
 set(NAME_SERVER "server")
 set(NAME_MASTERSERVER "masterServer")
+set(NAME_NETWORKLIB "network")
 set(TEST_EXEC_LIB "UnitTesterLib")
 set(TEST_EXEC_CLIENT "UnitTesterClient")
 set(TEST_EXEC_SERVER "UnitTesterServer")
@@ -14,11 +15,13 @@ set(PROTO_DIR "message")
 set(INCLUDE_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc/"
 					  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/inc/"
 					  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/inc/"
-						"${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/inc/")
+						"${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/inc/"
+						"${PROJECT_SOURCE_DIR}/${NAME_NETWORKLIB}/inc/")
 set(SRC_DIRECTORY "${PROJECT_SOURCE_DIR}/${NAME_LIB}/src/"
 				  "${PROJECT_SOURCE_DIR}/${NAME_CLIENT}/src/"
 				  "${PROJECT_SOURCE_DIR}/${NAME_SERVER}/src/"
-					"${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/src/")
+					"${PROJECT_SOURCE_DIR}/${NAME_MASTERSERVER}/src/"
+					"${PROJECT_SOURCE_DIR}/${NAME_NETWORKLIB}/src/")
 set(DOC_PATH "${PROJECT_SOURCE_DIR}/doc")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
@@ -133,6 +136,18 @@ file(
 	${NAME_MASTERSERVER}/inc/*
 )
 
+file(
+	GLOB_RECURSE
+	networklib_source_files
+	${NAME_NETWORKLIB}/src/*
+)
+
+file(
+	GLOB_RECURSE
+	networklib_include_files
+	${NAME_NETWORKLIB}/inc/*
+)
+
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
@@ -149,22 +164,25 @@ if(BUILD_CLIENT OR BUILD_SERVER OR BUILD_MASTER_SERVER)
   add_subdirectory(${PROTO_DIR})
 
   add_library(
-    messages STATIC 
-    ${PROTO_SRC} 
+		${NAME_NETWORKLIB} STATIC
+    ${PROTO_SRC}
     ${PROTO_HEADER}
+		${networklib_source_files}
+		${networklib_include_files}
   )
 
-  set_target_properties(messages PROPERTIES LINKER_LANGUAGE CXX)
+  set_target_properties(${NAME_NETWORKLIB} PROPERTIES LINKER_LANGUAGE CXX)
   set_source_files_properties(${PROTO_SRC} ${PROTO_HEADER} PROPERTIES GENERATED TRUE)
-  include_directories("${CMAKE_BINARY_DIR}/${PROTO_DIR}")
-  add_dependencies(messages protobuf_compilation)
-  
+	include_directories("${CMAKE_BINARY_DIR}/${PROTO_DIR}")
+	include_directories("${PROJECT_SOURCE_DIR}/${NAME_NETWORKLIB}/inc")
+  add_dependencies(${NAME_NETWORKLIB} protobuf_compilation)
+
   include_directories(${Boost_INCLUDE_DIRS})
   include_directories(${ENet_INCLUDE_DIRS})
-  
-  target_link_libraries(messages ${Boost_LIBRARIES} ${PROTOBUF_LIBRARY})
-  target_link_libraries(messages ${ENet_LIBRARIES})  
-  target_link_libraries(messages ${CMAKE_THREAD_LIBS_INIT})
+
+  target_link_libraries(${NAME_NETWORKLIB} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARY})
+  target_link_libraries(${NAME_NETWORKLIB} ${ENet_LIBRARIES})
+  target_link_libraries(${NAME_NETWORKLIB} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 #Common library
@@ -172,7 +190,7 @@ if(BUILD_CLIENT OR BUILD_SERVER)
   if(NOT BOX2D_FOUND)
       message(SEND_ERROR "Box2D is required to build the client or server.")
   endif()
-  
+
   add_library(
   # executable name
     ${NAME_LIB} STATIC
@@ -183,10 +201,10 @@ if(BUILD_CLIENT OR BUILD_SERVER)
 
   include_directories("${CMAKE_CURRENT_BINARY_DIR}/${NAME_LIB}/inc/")
   set_property(TARGET ${NAME_LIB} APPEND PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/${NAME_LIB}/inc")
-  
+
   include_directories(${BOX2D_INCLUDE_DIR})
   target_link_libraries (${NAME_LIB} ${BOX2D_LIBRARIES})
-  target_link_libraries(${NAME_LIB} messages)
+  target_link_libraries(${NAME_LIB} ${NAME_NETWORKLIB})
 endif()
 
 #Client Binary
@@ -244,7 +262,7 @@ if(BUILD_MASTER_SERVER)
 
   include_directories(${SQLITE3_INCLUDE_DIR})
   target_link_libraries(${NAME_MASTERSERVER} ${SQLITE3_LIBRARIES})
-  target_link_libraries(${NAME_MASTERSERVER} messages)
+  target_link_libraries(${NAME_MASTERSERVER} ${NAME_NETWORKLIB})
 endif()
 
 

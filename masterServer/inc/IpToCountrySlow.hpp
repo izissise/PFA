@@ -47,7 +47,7 @@ class IpToCountrySlow
     std::vector<IpAddressMapping> m_countryIpList;
 public:
     /** Construct new IP-to-country mapper from the specified file. */
-    IpToCountrySlow(const std::string &FileName = "IpToCountry.csv");
+    IpToCountrySlow(const std::string &FileName = "../IpToCountry.csv");
     /** Find the country for given IP address or throw std::exception. */
     IpAddressMapping GetCountry(const std::string &address) const;
     
