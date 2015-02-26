@@ -8,7 +8,7 @@ CvarList::CvarList()
   addCvar("com_gameFps", new t_cvar({"20", "300"}, "125", "125", Number));
   addCvar("net_upBandwidth", new t_cvar({"0", "2147483647"}, "60000", "60000", Number));
   addCvar("net_downBandwidth", new t_cvar({"0", "2147483647"}, "1000000", "1000000", Number));
-  addCvar("sv_masterIP", new t_cvar({"127.0.0.1"/*"62.210.136.56"*/}, "127.0.0.1",
+  addCvar("sv_masterIP", new t_cvar({"127.0.0.1", "62.210.136.56"}, "127.0.0.1",
 				    "127.0.0.1", String, Restriction::Value));
   addCvar("sv_masterPort", new t_cvar({"25255"}, "25255",
 				      "25255", String, Restriction::Value));
