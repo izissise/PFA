@@ -21,7 +21,7 @@ typedef struct	s_chatElem
 class Chat
 {
 private:
-  static const int	timeDelay = 3000;
+  static const int	timeDelay = 8000;
 public:
   Chat() = default;
   virtual ~Chat() = default;
