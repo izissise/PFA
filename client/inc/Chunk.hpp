@@ -33,8 +33,7 @@ public:
   Chunk&	operator=(const Chunk& other) = delete;
 
   void load(const TileCodex& codex);
-  void fillTiles(const RepeatedPtrField<Tile> &bgTiles,
-		 const RepeatedPtrField<Tile> &fgTiles);
+  void fillTiles(const ChunkData &packet);
   void draw(sf::RenderTarget& window,
 	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;

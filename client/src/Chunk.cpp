@@ -39,14 +39,15 @@ void Chunk::load(const TileCodex& codex)
   _bgTiles.clear();
 }
 
-void	Chunk::fillTiles(const RepeatedPtrField<Tile> &bgTiles,
-			 const RepeatedPtrField<Tile> &fgTiles)
+void	Chunk::fillTiles(const ChunkData &packet)
 {
   unsigned int	x;
   unsigned int	y;
-  unsigned int	index;
-  Tile		fgtile = fgTiles.Get(0);
-  Tile		bgtile = bgTiles.Get(0);
+  unsigned int	index = 0;
+  const google::protobuf::RepeatedField<uint32> &fgTile = packet.fgtilecode();
+  const google::protobuf::RepeatedField<uint32> &bgTile = packet.bgtilecode();
+  const google::protobuf::RepeatedField<uint32> &fgNumber = packet.fgnumber();
+  const google::protobuf::RepeatedField<uint32> &bgNumber = packet.bgnumber();
   unsigned int	fgCounter = 0;
   unsigned int	bgCounter = 0;
   uint32	fgTileCounter = 0;
@@ -56,23 +57,21 @@ void	Chunk::fillTiles(const RepeatedPtrField<Tile> &bgTiles,
   for (y = 0; y < Chunk::height; ++y)
     for (x = 0; x < Chunk::width; ++x)
       {
-	if (fgTileCounter >= fgtile.number())
+	if (fgTileCounter >= fgNumber.Get(fgCounter))
 	  {
 	    fgTileCounter = 0;
 	    ++fgCounter;
-	    fgtile = fgTiles.Get(fgCounter);
 	  }
-	if (bgTileCounter >= bgtile.number())
+	if (bgTileCounter >= bgNumber.Get(bgCounter))
 	  {
 	    bgTileCounter = 0;
 	    ++bgCounter;
-	    bgtile = bgTiles.Get(bgCounter);
 	  }
-	index = y * Chunk::width + x;
-	_bgTiles[index] = static_cast<TileType>(bgtile.tilecode());
-	_tiles[index] = static_cast<TileType>(fgtile.tilecode());
+	_bgTiles[index] = static_cast<TileType>(bgTile.Get(bgCounter));
+	_tiles[index] = static_cast<TileType>(fgTile.Get(fgCounter));
 	++fgTileCounter;
 	++bgTileCounter;
+	++index;
       }
   _generated = true;
 }

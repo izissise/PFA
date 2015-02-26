@@ -29,6 +29,7 @@ void  ClientProtocol::parseCmd(const void *data, int size)
 {
   ProtocolMessage          packet;
 
+  std::cout << "size: " << size << std::endl;
   if (packet.ParseFromString(std::string((char *)data, size)))
     {
       ProtocolMessage::PacketContent  act = packet.content();
@@ -162,10 +163,8 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
 
   const ChunkData	&chunk = packet.chunkdata();
   const VectorInt	&chunkId = chunk.id();
-  const RepeatedPtrField<Tile> &bgTiles = chunk.bgtiles();
-  const RepeatedPtrField<Tile> &fgTiles = chunk.fgtiles();
 
-  _world->fillChunkData(chunkId, bgTiles, fgTiles);
+  _world->fillChunkData(chunkId, chunk);
 }
 
 void			ClientProtocol::getNewChunks()
