@@ -4,6 +4,7 @@
 #include "CvarParser.hpp"
 #include "printv.hpp"
 #include "demangle.hpp"
+#include "Filesystem.hpp"
 
 Server::Server(ServerSettings &set)
   : _clients(),
@@ -245,7 +246,10 @@ void    Server::saveClientId(Client *client)
   std::string           line;
   bool                  found = false;
   unsigned int          lineIdx = 0;
+  Filesystem		fs;
 
+  if (!fs.exist("../", "log"))
+    fs.createDirectory("../", "log");
   file.open(LOGFILE, std::ios::binary | std::ios::in);
   printv(newLine, "%;% %;% %",
          clId, chunkId.x, chunkId.y,
