@@ -21,6 +21,7 @@ Menu::Menu(Settings &settings, Parser &parser) :
   auto	&fm = FontManager<>::instance();
 
   fm.load(FontPath, "default.TTF");
+  fm.load(FontPath, "Title-font.ttf");
   parser.loadConfigFile("../config.cfg");
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
     throw (Exception("Can't load Menu texture"));

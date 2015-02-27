@@ -28,7 +28,7 @@ void	Chat::draw(sf::RenderTarget &window)
   unsigned int		count = 0;
   auto			&fm = FontManager<>::instance();
   Widget		widget("", sf::FloatRect(0,size.y,size.x, 40),
-			       sf::Text("", *fm.get("default.TTF"), 25));
+			       sf::Text("", *fm.get("Title-font.ttf"), 22));
   const sf::FloatRect	&zone = widget.getZone();
 
   for (auto it = _messages.rbegin(); it != _messages.rend(); ++it)

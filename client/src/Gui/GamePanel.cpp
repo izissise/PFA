@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 #include "GamePanel.hpp"
 #include "SimplexNoise.h"
+#include "FontManager.hpp"
 
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
@@ -26,6 +27,7 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
 			     const std::vector<APanelScreen *> &panels)
 {
   Controls	&controls = set.getControls();
+  auto		&fm = FontManager<>::instance();
   float	gWidth = std::stof(set.getCvarList().getCvar("r_width"));
   float gHeight = std::stof(set.getCvarList().getCvar("r_height"));
   sf::FloatRect panZone = {gWidth / 2 - 150, gHeight / 2 - 250, 300, 500};
@@ -44,8 +46,8 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
   TextWidget	*input = new TextWidget("", sf::FloatRect(_zone.left + _zone.width / 2 - 300
 							  , _zone.top + _zone.height / 2 - 25,
 							  600, 50),
-					sf::Text("", _font["default"], 20),
-					sf::Text("", _font["default"], 20), 60);
+					sf::Text("", *fm.get("Title-font.ttf"), 20),
+					sf::Text("", *fm.get("Title-font.ttf"), 20), 60);
 
   addObserver(panels[0]);
   createMessageEntry(texture, set, input);
