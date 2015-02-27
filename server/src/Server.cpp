@@ -12,7 +12,8 @@ Server::Server(ServerSettings &set)
     _threadPool(6),
     _world(_set),
     _proto(_world, _threadPool),
-    _auth(_world, _clients)
+    _auth(_world, _clients),
+    _masterAuthenticate(false)
 {
   // enet_initialize is called in the _masterSocket()
   _address.host = ENET_HOST_ANY;
@@ -35,34 +36,45 @@ Server::~Server()
   int                   hasEvent;
   bool                  pull = true;
   bool                  passed = false;
+  unsigned int		delay = 50;
+  unsigned int		timeout = 3000;
+  unsigned int		cuTime = 0;
 
   enet_host_destroy(_server);
-  _masterSocket.connect(_set.getCvar("sv_masterIP"),
-                        _set.getCvar("sv_masterPort"),
-                        2);
-  std::cout << "Shutting down server" << std::endl;
-  while (!passed)
+  if (_masterAuthenticate)
     {
-      if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
-        {
-          switch (event.type)
-            {
-            case ENET_EVENT_TYPE_CONNECT:
-              msg.set_content(MasterServerRequest::DELETESERVER);
-              msg.set_port(_set.getCvar("sv_port"));
-              msg.SerializeToString(&packet);
-              _masterSocket.sendPacket(0, packet);
-              enet_host_flush(_masterSocket.getHost());
-              passed = true;
-              break;
-            default:
-              break;
-            }
-        }
-      else if (hasEvent < 0)
-        break ;
+      _masterSocket.connect(_set.getCvar("sv_masterIP"),
+			    _set.getCvar("sv_masterPort"),
+			    2);
+      std::cout << "Shutting down server" << std::endl;
+      while (!passed)
+	{
+	  if ((hasEvent = _masterSocket.pullEvent(event, delay, pull)) >= 0)
+	    {
+	      switch (event.type)
+		{
+		case ENET_EVENT_TYPE_CONNECT:
+		  msg.set_content(MasterServerRequest::DELETESERVER);
+		  msg.set_port(_set.getCvar("sv_port"));
+		  msg.SerializeToString(&packet);
+		  _masterSocket.sendPacket(0, packet);
+		  enet_host_flush(_masterSocket.getHost());
+		  passed = true;
+		  break;
+		case ENET_EVENT_TYPE_NONE:
+		  cuTime += delay;
+		  if (cuTime >= timeout)
+		    passed = true;
+		  break;
+		default:
+		  break;
+		}
+	    }
+	  else
+	    break;
+	}
+      _masterSocket.disconnect();
     }
-  _masterSocket.disconnect();
 }
 
 void    Server::registerToMaster()
@@ -70,16 +82,19 @@ void    Server::registerToMaster()
   MasterServerRequest   msg;
   std::string           packet;
   ENetEvent             event;
-  int                   hasEvent;
+  int			hasEvent;
   bool                  pull = true;
   bool                  passed = false;
+  unsigned int		timeout = 3000;
+  unsigned int		delay = 50;
+  unsigned int		cuTime = 0;
 
   _masterSocket.connect(_set.getCvar("sv_masterIP"),
                         _set.getCvar("sv_masterPort"),
                         2);
   while (!passed)
     {
-      if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
+      if ((hasEvent = _masterSocket.pullEvent(event, delay, pull)) >= 0)
         {
           switch (event.type)
             {
@@ -96,7 +111,13 @@ void    Server::registerToMaster()
                 _masterSocket.sendPacket(0, packet);
                 enet_host_flush(_masterSocket.getHost());
                 passed = true;
+		_masterAuthenticate = true;
               }
+	      break;
+	    case ENET_EVENT_TYPE_NONE:
+	      cuTime += delay;
+	      if (cuTime >= timeout)
+		passed = true;
               break;
             default:
               break;

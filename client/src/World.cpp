@@ -39,9 +39,7 @@ void		World::setPlayerPosition(const Vector2i &chunkId,
       _chunks[cursor]->setPosition({cursor.x, cursor.y});
     }
 }
-void   	World::fillChunkData(const VectorInt &pos,
-			     const RepeatedField<google::protobuf::uint32> &bgTiles,
-			     const RepeatedField<google::protobuf::uint32> &fgTiles)
+void   	World::fillChunkData(const VectorInt &pos, const ChunkData &packet)
 {
   auto	chunk = _chunks.find(Vector2i(pos.x(), pos.y()));
 
@@ -50,7 +48,7 @@ void   	World::fillChunkData(const VectorInt &pos,
       std::cout << "Could not find Chunks at pos " << pos.x() << " " << pos.y() << std::endl;
       return ;
     }
-  (chunk->second)->fillTiles(bgTiles, fgTiles);
+  (chunk->second)->fillTiles(packet);
   (chunk->second)->load(_codex);
   _loaded = true;
 }

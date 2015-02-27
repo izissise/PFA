@@ -2,6 +2,8 @@ import "Vectors.proto";
 
 message  ChunkData {
   required VectorInt  id = 1;
-  repeated uint32 bgTiles = 2 [packed=true];
-  repeated uint32 fgTiles = 3 [packed=true];
+  repeated uint32     fgnumber = 2 [packed=true];
+  repeated uint32     fgtilecode = 3 [packed=true];
+  repeated uint32     bgnumber = 4 [packed=true];
+  repeated uint32     bgtilecode = 5 [packed=true];
 }

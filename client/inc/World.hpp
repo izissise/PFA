@@ -55,8 +55,7 @@ public:
   bool			isLoaded() const	{ return _loaded; }
   bool			isChunkLoaded(const Vector2i &chunkPos) const;
   void			fillChunkData(const VectorInt &pos,
-				      const RepeatedField<google::protobuf::uint32> &bgTiles,
-				      const RepeatedField<google::protobuf::uint32> &fgTiles);
+				      const ChunkData &packet);
   bool			getNewChunks(std::vector<Vector2i> &chunks);
 
 protected:

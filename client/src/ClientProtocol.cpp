@@ -29,6 +29,7 @@ void  ClientProtocol::parseCmd(const void *data, int size)
 {
   ProtocolMessage          packet;
 
+  std::cout << "size: " << size << std::endl;
   if (packet.ParseFromString(std::string((char *)data, size)))
     {
       ProtocolMessage::PacketContent  act = packet.content();
@@ -132,10 +133,7 @@ void			ClientProtocol::queryInitialChunks()
   	   x <= chunkPos.x + (static_cast<int>(sideSize.x) - 1) / 2; ++x)
 	chunks.push_back({x, y});
     }
-  _threadPool.addTask([this, chunks]()
-		      {
-			queryChunks(chunks);
-		      });
+  queryChunks(chunks);
 }
 
 void			ClientProtocol::queryChunks(const std::vector<Vector2i> &chunkIds) const
@@ -165,10 +163,8 @@ void	ClientProtocol::fillChunk(const ProtocolMessage &packet)
 
   const ChunkData	&chunk = packet.chunkdata();
   const VectorInt	&chunkId = chunk.id();
-  const RepeatedField<google::protobuf::uint32> &bgTiles = chunk.bgtiles();
-  const RepeatedField<google::protobuf::uint32> &fgTiles = chunk.fgtiles();
 
-  _world->fillChunkData(chunkId, bgTiles, fgTiles);
+  _world->fillChunkData(chunkId, chunk);
 }
 
 void			ClientProtocol::getNewChunks()
@@ -176,10 +172,7 @@ void			ClientProtocol::getNewChunks()
   std::vector<Vector2i>	chunks;
 
   if (_world->getNewChunks(chunks))
-      _threadPool.addTask([this, chunks]()
-			  {
-			    queryChunks(chunks);
-			  });
+    queryChunks(chunks);
 }
 
 void	ClientProtocol::handleDisplacements(const ProtocolMessage &packet)
