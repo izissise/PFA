@@ -48,7 +48,7 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
 					sf::Text("", _font["default"], 20), 60);
 
   addObserver(panels[0]);
-  createMessageEntry(texture, controls, input);
+  createMessageEntry(texture, set, input);
   createButton(texture, wHeader);
   createVoiceButton(texture, wFirst, controls, sf::Keyboard::Num1);
   createVoiceButton(texture, wSecond, controls, sf::Keyboard::Num2);
@@ -79,14 +79,14 @@ void	GamePanel::createButton(const sf::Texture &texture, Widget *w)
 }
 
 void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
-				      Controls &controls,
+				      Settings &set,
 				      TextWidget *widget)
 {
   sf::FloatRect zone = widget->getZone();
   std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
     updateFunc;
 
-  updateFunc = [this, &controls](AWidget &widget, const sf::Event &ev UNUSED,
+  updateFunc = [this, &set](AWidget &widget, const sf::Event &ev UNUSED,
 				 sf::RenderWindow &ref UNUSED)
     -> int
     {
@@ -94,6 +94,7 @@ void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
       sf::FloatRect	wZone = widget.getZone();
       std::string	content = twidget->getContent();
       bool		hideState = widget.isHidden();
+      Controls		&controls = set.getControls();
 
       widget.alignTextLeft({wZone.left,wZone.top}, {wZone.width, wZone.height}, 1, 50);
       if (twidget->getState() == false && !content.empty())
@@ -103,7 +104,7 @@ void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
 	  std::string		serialized;
 
 	  msg.set_content(ClientMessage::CHAT);
-	  msg.set_chat(content);
+	  msg.set_chat(set.getCvarList().getCvar("cl_name") + ": " + content);
 	  msg.SerializeToString(&serialized);
 
 	  _socket.sendPacket(1, serialized);
@@ -269,10 +270,10 @@ void	GamePanel::handlePackets(ENetEvent &ev)
   enet_packet_destroy(ev.packet);
 }
 
-void	GamePanel::connectClient(ENetPeer * const peer, Settings &set UNUSED)
+void	GamePanel::connectClient(ENetPeer * const peer, Settings &set)
 {
   peer->data = (char *)("Server");
-  sendConnectionInfo();
+  sendConnectionInfo(set);
 }
 
 void	GamePanel::disconnectClient(UNUSED ENetPeer * const peer)
@@ -294,15 +295,17 @@ void			GamePanel::getGuidFromFile(std::string *guid) const
     }
 }
 
-void			GamePanel::sendConnectionInfo() const
+void			GamePanel::sendConnectionInfo(Settings &set)
 {
   ClientMessage		msg;
   ConnectionMessage	*co = new ConnectionMessage;
   std::string		*userId = new std::string;
+  std::string		*name = new std::string(set.getCvarList().getCvar("cl_name"));
   std::string		serialized;
 
   getGuidFromFile(userId);
   co->set_allocated_userid(userId);
+  co->set_allocated_name(name);
   msg.set_content(ClientMessage::CONNECTION);
   msg.set_allocated_co(co);
   msg.SerializeToString(&serialized);

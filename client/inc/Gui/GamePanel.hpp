@@ -29,7 +29,7 @@ public:
   void		trigger(const t_event &event);
 
 private:
-  void		createMessageEntry(const sf::Texture &texture, Controls &controls, TextWidget *widget);
+  void		createMessageEntry(const sf::Texture &texture, Settings &set, TextWidget *widget);
   void		createButton(const sf::Texture &texture, Widget *w);
   void		createVoiceButton(const sf::Texture &texture, Widget *w,
 				  Controls &controls, int idx);
@@ -42,7 +42,7 @@ private:
   void		connectClient(ENetPeer * const peer, Settings &set);
   void		disconnectClient(ENetPeer * const peer);
 
-  void		sendConnectionInfo() const;
+  void		sendConnectionInfo(Settings &set);
   void		getGuidFromFile(std::string *guid) const;
 
   int		_pad;

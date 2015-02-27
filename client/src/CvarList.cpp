@@ -4,6 +4,7 @@ CvarList::CvarList()
 {
   addCvar("r_width", new t_cvar({"1", "1920"}, "600", "1600", Number));
   addCvar("r_height", new t_cvar({"1", "1080"}, "800", "900", Number));
+  addCvar("cl_name", new t_cvar({}, "DefaultName", "DefaultName", String, Restriction::None));
   addCvar("com_displayFps", new t_cvar({"1", "1000"}, "60", "60", Number));
   addCvar("com_gameFps", new t_cvar({"20", "300"}, "125", "125", Number));
   addCvar("net_upBandwidth", new t_cvar({"0", "2147483647"}, "60000", "60000", Number));
