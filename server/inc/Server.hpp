@@ -42,6 +42,7 @@ private:
   World                 _world;
   ServerProtocol        _proto;
   AuthSystem            _auth;
+  bool			_masterAuthenticate;
 };
 
 #endif
