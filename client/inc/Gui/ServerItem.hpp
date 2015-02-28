@@ -16,7 +16,7 @@ class ServerItem : public APanelScreen
 {
 public:
   ServerItem(const sf::FloatRect &zone, const std::string &ip);
-  virtual ~ServerItem() = default;
+  virtual ~ServerItem();
 
   void	construct(const sf::Texture &texture, Settings &set,
 		  const std::vector<APanelScreen *> &panels);

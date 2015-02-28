@@ -20,6 +20,7 @@ GamePanel::GamePanel(const sf::FloatRect &zone) :
 
 GamePanel::~GamePanel()
 {
+  _socket.disconnectPeer(Moment::Now, 0);
   _socket.disconnect();
 }
 

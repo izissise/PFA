@@ -8,7 +8,7 @@ class MainMenu : public APanelScreen
 {
 public:
   MainMenu(const sf::FloatRect &zone);
-  virtual ~MainMenu();
+  virtual ~MainMenu() = default;
 
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);

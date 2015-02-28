@@ -7,6 +7,8 @@
 
 # include "NetworkException.hpp"
 
+enum class Moment { Default, Now, Later };
+
 class Network
 {
 public:
@@ -24,6 +26,7 @@ public:
   void		setConnected();
   bool		isConnected() const;
   bool		isOnline() const;
+  void		disconnectPeer(Moment m, enet_uint32 data);
 
 private:
   ENetHost	*_host;

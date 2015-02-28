@@ -113,3 +113,15 @@ bool	Network::isOnline() const
 {
   return _host && _peer;
 }
+
+void	Network::disconnectPeer(Moment m, enet_uint32 data)
+{
+  if (!_connected)
+    throw (NetworkException("Not connected"));
+  if (m == Moment::Now)
+    enet_peer_disconnect_now(_peer, data);
+  else if (m == Moment::Later)
+    enet_peer_disconnect_later(_peer, data);
+  else
+    enet_peer_disconnect(_peer, data);
+}

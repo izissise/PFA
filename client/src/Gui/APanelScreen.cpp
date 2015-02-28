@@ -9,6 +9,14 @@ APanelScreen::APanelScreen(const sf::FloatRect &zone) :
 {
 }
 
+APanelScreen::~APanelScreen()
+{
+  for (auto &widget : _widgets)
+    delete widget;
+  for (auto &panel : _panels)
+    delete panel;
+}
+
 void         APanelScreen::draw(sf::RenderTarget &window, bool first)
 {
   sf::RenderTarget &target = (_flag & APanelScreen::Display::Overlap ? _rt : window);

@@ -29,7 +29,7 @@ public:
 
 public:
   APanelScreen(const sf::FloatRect &zone);
-  virtual ~APanelScreen() = default;
+  virtual ~APanelScreen();
 
   /**
     * \fn void update(std::chrono::milliseconds timeStep, Settings &set)

@@ -50,6 +50,8 @@ Menu::Menu(Settings &settings, Parser &parser) :
 
 Menu::~Menu()
 {
+  for (auto &panel : _panels)
+    delete panel;
 }
 
 void	Menu::update(const std::chrono::milliseconds timeStep, Settings &set)

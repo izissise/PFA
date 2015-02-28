@@ -7,12 +7,6 @@ MainMenu::MainMenu(const sf::FloatRect &zone) :
   addFont("default", "../client/assets/default.TTF");
 }
 
-MainMenu::~MainMenu()
-{
-  for (auto &widget : _widgets)
-    delete widget;
-}
-
 void	MainMenu::construct(const sf::Texture &texture, Settings &set,
 			    const std::vector<APanelScreen *> &panels)
 {
