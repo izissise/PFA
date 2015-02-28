@@ -30,7 +30,7 @@ MasterServer::MasterServer()
     }
   catch (std::exception& e)
     {
-      std::cerr << "exception: " << e.what() << std::endl;
+      std::cerr << "Creation exception: " << e.what() << std::endl;
     }
 }
 
@@ -72,7 +72,7 @@ void MasterServer::createServer(ENetPeer *peer, const std::string &port,
     }
   catch (std::exception& e)
     {
-      std::cerr << "exception: " << e.what() << std::endl;
+      std::cerr << "Insertion exception: " << e.what() << std::endl;
     }
 }
 
@@ -178,7 +178,7 @@ void MasterServer::deleteServer(ENetPeer *peer, const std::string &port)
     }
   catch (std::exception& e)
     {
-      std::cerr << "exception: " << e.what() << std::endl;
+      std::cerr << "Delete exception: " << e.what() << std::endl;
     }
 }
 
@@ -205,7 +205,7 @@ void MasterServer::sendServers(ENetPeer *peer)
     }
   catch (std::exception& e)
     {
-      std::cerr << "exception: " << e.what() << std::endl;
+      std::cerr << "Query exception: " << e.what() << std::endl;
     }
 }
 
@@ -234,7 +234,7 @@ void    MasterServer::sendServer(ENetPeer *peer, const ServerId &id)
     }
   catch (std::exception& e)
     {
-      std::cerr << "exception: " << e.what() << std::endl;
+      std::cerr << "Query exception: " << e.what() << std::endl;
     }
 }
 
