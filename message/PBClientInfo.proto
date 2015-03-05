@@ -1,0 +1,5 @@
+import "Position.proto";
+
+message PBClientInfo {
+  required Position	posInfo = 1;
+}

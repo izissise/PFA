@@ -6,6 +6,7 @@ ClientProtocol::ClientProtocol(Network &net, ThreadPool &tPool, Chat &chat) :
 {
   _func[ProtocolMessage::SETTING] = &ClientProtocol::handleSetting;
   _func[ProtocolMessage::CLINIT] = &ClientProtocol::initClient;
+  _func[ProtocolMessage::CLSPAWN] = &ClientProtocol::spawnClient;
   _func[ProtocolMessage::CHUNK] = &ClientProtocol::fillChunk;
   _func[ProtocolMessage::DISPLACEMENT] = &ClientProtocol::handleDisplacements;
   _func[ProtocolMessage::CHAT] = &ClientProtocol::handleChat;
@@ -91,6 +92,19 @@ void	ClientProtocol::initClient(const ProtocolMessage &packet)
   if (!guid.empty())
     writeNewGuid(guid);
   queryInitialChunks();
+}
+
+void	ClientProtocol::spawnClient(const ProtocolMessage &packet)
+{
+  if (!packet.has_clinfo())
+    return ;
+  const PBClientInfo	&clInfo = packet.clinfo();
+  const Position	&position = clInfo.posinfo();
+  const VectorFloat	&chunkPos = position.pos();
+  const VectorInt	&chunkId = position.chunkid();
+
+  std::cout << "spawn client at pos: " << chunkId.x() << " " << chunkId.y() << " in "
+	    << chunkPos.x() << " " << chunkPos.y() << std::endl;
 }
 
 void		ClientProtocol::writeNewGuid(const std::string &guid) const

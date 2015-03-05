@@ -313,7 +313,6 @@ void			GamePanel::sendConnectionInfo(Settings &set)
   msg.set_content(ClientMessage::CONNECTION);
   msg.set_allocated_co(co);
   msg.SerializeToString(&serialized);
-
   _socket.sendPacket(1, serialized);
 }
 
