@@ -200,7 +200,7 @@ void		World::_unloadChunks()
 {
   Range2i	&loadedRange = _player.getLoadedRange();
   bool		found;
-  auto		it = std::begin(_chunks);
+  std::map<chunkId, std::unique_ptr<Chunk>>::const_iterator		it = std::begin(_chunks);
 
   while (it != std::end(_chunks))
     {
