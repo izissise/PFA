@@ -15,6 +15,7 @@
 # include "Settings.hpp"
 # include "Camera.hpp"
 # include "Player.hpp"
+# include "Chunk.hpp"
 
 class WorldTester;
 

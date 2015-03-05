@@ -42,3 +42,8 @@ auto	Camera::sToWPos(const Vector2i &chunkId, const Vector2f &position) const ->
   return worldPos(static_cast<float>(chunkId.x) + position.x,
 		  static_cast<float>(chunkId.y) + position.y);
 }
+
+auto Camera::physWorldToSPos(Vector2f const& objPos) const -> screenPos
+{
+  return (objPos * static_cast<int>(TileCodex::tileSize)) * Vector2i(1, -1);
+}

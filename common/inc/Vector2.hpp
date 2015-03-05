@@ -1,6 +1,8 @@
 #ifndef	VECTOR2_H
 # define VECTOR2_H
 
+# include <iostream>
+
 # include <Box2D/Box2D.h>
 
 template<typename T>
@@ -116,6 +118,13 @@ public:
     T	height;
   };
 };
+
+template<typename T>
+std::ostream& operator<<(std::ostream& f, Vector2<T> const& vec)
+{
+	f << "{" << vec.x << ", " << vec.y << "}";
+	return f;
+}
 
 typedef Vector2<float>		Vector2f;
 typedef Vector2<double>		Vector2d;

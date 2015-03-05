@@ -35,6 +35,8 @@ public:
   worldPos	sToWPos(const Vector2i &chunkId, const Vector2f &position) const;
   screenPos	wToSPos(const worldPos &pos) const;
 
+  screenPos physWorldToSPos(Vector2f const& objPos) const;
+
 private:
   worldPos	_botLeft;
   worldPos	_size;

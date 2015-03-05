@@ -3,6 +3,7 @@
 #include <functional>
 #include <stdexcept>
 #include <complex>
+#include <iostream>
 #include <iomanip>
 
 #include "World.hpp"
@@ -93,7 +94,7 @@ void	World::update(const std::chrono::milliseconds& timeStep)
 	}
 }
 
-auto World::_getScreenOrigin(void) const -> screenPos
+auto World::_getScreenOrigin() const -> screenPos
 {
   worldPos worldOrigin;
 
@@ -142,6 +143,9 @@ void	World::draw(sf::RenderTarget &window) const
   screenPos	screenCoord = screenOrigin;
   const Range2i	&range = _player.getVisibleRange();
   int		x;
+  Vector2i chunkSize;
+  chunkSize.x = Chunk::width;
+  chunkSize.y = Chunk::height;
 
   if (!_loaded)
     return ;
@@ -154,8 +158,21 @@ void	World::draw(sf::RenderTarget &window) const
     screenCoord.x = screenOrigin.x;
     screenCoord.y += Chunk::height * TileCodex::tileSize;
   }
+  static auto print = false;
   for (auto&& i : _entities)
   {
+  	if (!print)
+	{
+       auto entPos = i->getPosition();
+       auto camPos = _camera.center() * chunkSize;
+       auto screenOri = _getScreenOrigin();
+       auto chunkPos = Vector2i(range.left(), range.top());
+       std::cout << "Entity pos: " << entPos << "\n"
+       << "Camera pos: " << camPos << "\n"
+       << "Screen Origine: " << screenOri << "\n"
+       << "Chunk pos: " << chunkPos << std::endl;
+	   print = true;
+	}
 	i->draw(_camera, window, std::chrono::milliseconds(0));
   }
 }
