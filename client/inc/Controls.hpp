@@ -135,6 +135,7 @@ public:
   const std::string	&getCodeFromKey(const t_entry &entry) const;
   const std::string	&getCodeFromAction(Action act) const;
   const std::array<t_entry, 5>	&getBoundKeys(Action act) const;
+  const sf::Vector2i	&getClickPosition(sf::Mouse::Button button) const;
 
   void		unbindKey(const t_entry &entry);
   void		unbindKeyFromAction(const t_entry &entry, Action act);

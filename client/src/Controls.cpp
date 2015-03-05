@@ -353,3 +353,8 @@ void	Controls::mouseMoved(const sf::Event &event)
       ++i;
     }
 }
+
+const sf::Vector2i	&Controls::getClickPosition(sf::Mouse::Button button) const
+{
+  return _mousePosition[static_cast<int>(button)];
+}
