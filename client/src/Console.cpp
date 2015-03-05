@@ -1,3 +1,4 @@
+#include <functional>
 #include "Settings.hpp"
 #include "Console.hpp"
 #include "Exception.hpp"
@@ -40,6 +41,12 @@ void	Console::getInput()
 void		Console::run(const sf::Event& event, Controls &ctrl)
 {
   t_entry	entry;
+  std::function<bool (Action act,
+		      const std::initializer_list<Action> &actions)> isConsoleKey =
+    [](Action act, const std::initializer_list<Action> &actions)
+    {
+      return std::find(actions.begin(), actions.end(), act) != actions.end();
+    };
 
   if (_input.getInput(event)) // means enter got pressed
     getInput();
@@ -53,10 +60,12 @@ void		Console::run(const sf::Event& event, Controls &ctrl)
   switch (event.type)
     {
     case sf::Event::KeyPressed:
-      ctrl.pressKey(entry);
+      if (isConsoleKey(ctrl.getActionFromKey(entry), {Action::ToggleConsole}))
+	ctrl.pressKey(entry);
       break;
     case sf::Event::KeyReleased:
-      ctrl.releaseKey(entry);
+      if (isConsoleKey(ctrl.getActionFromKey(entry), {Action::ToggleConsole}))
+	ctrl.releaseKey(entry);
       break;
     case sf::Event::MouseWheelMoved:
       _historical.setPos((static_cast<int>(_historical.getPos()) + event.mouseWheel.delta < 0) ? 0 :

@@ -10,6 +10,13 @@ ServerItem::ServerItem(const sf::FloatRect &zone, const std::string &ip) :
   addFont("default", "../client/assets/default.TTF");
 }
 
+ServerItem::~ServerItem()
+{
+  if (_socket.isConnected())
+    _socket.disconnectPeer(Moment::Now, 0);
+  _socket.disconnect();
+}
+
 void	ServerItem::construct(UNUSED const sf::Texture &texture, Settings &set,
 			      const std::vector<APanelScreen *> &panels)
 {

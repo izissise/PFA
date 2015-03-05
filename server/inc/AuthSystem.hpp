@@ -42,6 +42,9 @@ private:
   void	generateNewId(std::string &guid);
   void	sendClientProfile(Client *client, const std::string &newId);
 
+  void    getPlayer(const ClientMessage &message,
+		    ENetPeer *peer);
+
 private:
   typedef void (AuthSystem::*parseFunc)(const ClientMessage &message,
 					ENetPeer *peer);

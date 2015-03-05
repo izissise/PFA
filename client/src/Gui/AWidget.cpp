@@ -21,6 +21,8 @@ void		AWidget::draw(sf::RenderTarget &window) const
       window.draw(elem.sprite);
   if (edge)
     window.draw(*edge);
+  // const sf::FloatRect &size = _text.getGlobalBounds();
+
   window.draw(_text);
 }
 

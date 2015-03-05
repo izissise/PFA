@@ -11,12 +11,17 @@
 #include "OptionTabPanel.hpp"
 #include "OptionGamePanel.hpp"
 #include "OptionKeyPanel.hpp"
+#include "FontManager.hpp"
 
 Menu::Menu(Settings &settings, Parser &parser) :
     _consoleActive(false),
     _console(settings, &parser),
     _panelPos(0)
 {
+  auto	&fm = FontManager<>::instance();
+
+  fm.load(FontPath, "default.TTF");
+  fm.load(FontPath, "Title-font.ttf");
   parser.loadConfigFile("../config.cfg");
   if (!_menuTexture.loadFromFile("../client/assets/menuTexture.png"))
     throw (Exception("Can't load Menu texture"));
@@ -45,6 +50,8 @@ Menu::Menu(Settings &settings, Parser &parser) :
 
 Menu::~Menu()
 {
+  for (auto &panel : _panels)
+    delete panel;
 }
 
 void	Menu::update(const std::chrono::milliseconds timeStep, Settings &set)

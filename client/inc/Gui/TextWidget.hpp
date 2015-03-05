@@ -14,7 +14,7 @@ public:
 	     wFlag flg = wFlag::Movable | wFlag::Resizable | wFlag::Getable);
 
   int		update(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
-  void		draw(sf::RenderTexture &window) const;
+  void		draw(sf::RenderTarget &window) const;
   std::string	getContent() const;
   void		scale(const sf::Vector2f &size);
   void		resize(float pX, float pY);
@@ -22,12 +22,14 @@ public:
   void		setDefaultColor(const sf::Color &color);
   Cursor	&getCursor();
   void		trigger(const t_event &event);
+  bool		getState() const;
+  void		setState(bool state);
+  void		clearWidget();
 
 private:
   void	setDrawableText();
   void	scaleText(sf::Text &text, float ratioX, float ratioY);
   int	setToDefault(const sf::Event &event, sf::RenderWindow &ref);
-  void	clearWidget();
 
 private:
   Cursor	_cursor;

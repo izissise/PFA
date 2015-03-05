@@ -70,13 +70,17 @@ void	OptionKeyPanel::createEventPanel(Panel *eventPanel, const sf::FloatRect &zo
   Widget	*wTextConsole = new Widget("textConsole", {zone.left, zone.top + 5 * 4 + 40 * 4,
 						zone.width, 40},
 						sf::Text("Console", _font["default"], 20));
+  Widget	*wChat = new Widget("textChat", {zone.left, zone.top + 5 * 5 + 40 * 5,
+						zone.width, 40},
+						sf::Text("Chat", _font["default"], 20));
 
   createTextWidget(wTextForward);
   createTextWidget(wTextBack);
   createTextWidget(wTextRight);
   createTextWidget(wTextLeft);
   createTextWidget(wTextConsole);
-  eventPanel->addWidget({wTextForward, wTextBack, wTextRight, wTextLeft, wTextConsole});
+  createTextWidget(wChat);
+  eventPanel->addWidget({wTextForward, wTextBack, wTextRight, wTextLeft, wTextConsole, wChat});
   eventPanel->construct(texture, set, {});
 }
 
@@ -94,9 +98,12 @@ void	OptionKeyPanel::createKeyPanel(Panel *keyPanel, const sf::FloatRect &zone,
 					Action::Right, ctrl, txt);
   KeyWidget	*wLeft = new KeyWidget("Left", {zone.left, zone.top + 5 * 3 + 40 * 3, zone.width, 40},
 				       Action::Left, ctrl, txt);
-  KeyWidget	*wConsole = new KeyWidget("Left", {zone.left, zone.top + 5 * 4 + 40 * 4,
+  KeyWidget	*wConsole = new KeyWidget("Console", {zone.left, zone.top + 5 * 4 + 40 * 4,
 					zone.width, 40},
 					Action::ToggleConsole, ctrl, txt);
+  KeyWidget	*wChat = new KeyWidget("Chat", {zone.left, zone.top + 5 * 5 + 40 * 5,
+					zone.width, 40},
+					Action::Chat, ctrl, txt);
   std::function<void (const t_event &ev)> eventFunc;
 
   eventFunc = [keyPanel](const t_event &ev)
@@ -104,13 +111,14 @@ void	OptionKeyPanel::createKeyPanel(Panel *keyPanel, const sf::FloatRect &zone,
       if (ev.e & wEvent::Update)
 	keyPanel->notify(ev);
     };
-  keyPanel->addObserver({wForward, wBack, wRight, wLeft, wConsole});
+  keyPanel->addObserver({wForward, wBack, wRight, wLeft, wConsole, wChat});
   createKeyWidget(texture, wForward, keyPanel);
   createKeyWidget(texture, wBack, keyPanel);
   createKeyWidget(texture, wRight, keyPanel);
   createKeyWidget(texture, wLeft, keyPanel);
   createKeyWidget(texture, wConsole, keyPanel);
-  keyPanel->addWidget({wForward, wBack, wRight, wLeft, wConsole});
+  createKeyWidget(texture, wChat, keyPanel);
+  keyPanel->addWidget({wForward, wBack, wRight, wLeft, wConsole, wChat});
   keyPanel->setTrigger(eventFunc);
   keyPanel->construct(texture, set, {});
 }

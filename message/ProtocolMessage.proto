@@ -3,7 +3,6 @@ import "InitClient.proto";
 import "ChunkData.proto";
 import "ChunkZone.proto";
 import "Displacement.proto";
-import "PingTime.proto";
 
 message ProtocolMessage {
   enum PacketContent
@@ -14,6 +13,7 @@ message ProtocolMessage {
     CHUNK = 3;
     CHUNKZONE = 4;
     DISPLACEMENT = 5;
+    CHAT = 6;
   }
   required PacketContent content = 1;
   optional SettingMessage settings = 2;
@@ -21,4 +21,5 @@ message ProtocolMessage {
   optional ChunkData chunkData = 4;
   optional WorldZone worldZone = 5;
   optional Displacement displacement = 6;
+  optional string chat = 7;
 }

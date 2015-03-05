@@ -5,6 +5,7 @@
 #include <vector>
 #include "ProtocolMessage.pb.h"
 #include "ClientMessage.pb.h"
+#include "ServerResponse.pb.h"
 #include "World.hpp"
 #include "Client.hpp"
 #include "Unused.hpp"
@@ -34,6 +35,9 @@ private:
   void	queryChunks(const ClientMessage &message,
 		    Client *client,
 		    const std::vector<Client *> &clients);
+  void	chat(const ClientMessage &message,
+	     Client *client,
+	     const std::vector<Client *> &clients);
 
   std::map<ClientMessage::PacketContent, parseFunc> _func;
   World		&_world;

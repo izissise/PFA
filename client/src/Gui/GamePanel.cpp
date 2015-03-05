@@ -2,15 +2,18 @@
 #include <iostream>
 #include <SFML/Audio.hpp>
 
-
 #include "GamePanel.hpp"
 #include "SimplexNoise.h"
 #include "World.hpp"
+#include "FontManager.hpp"
 
 GamePanel::GamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone), _pad(0), _padup(0),
-  _oldY(SHEIGHT), _dir(true),  _threadPool(15),
-  _world(nullptr), _socket(), _proto(_socket, _threadPool),
+  _oldY(SHEIGHT),
+  _dir(true),
+  _threadPool(4),
+  _chat(),
+  _world(nullptr), _socket(), _proto(_socket, _threadPool, _chat),
   _actAnalyzer(), _adjustedNet(false)
 {
   addFont("default", "../client/assets/default.TTF");
@@ -19,6 +22,8 @@ GamePanel::GamePanel(const sf::FloatRect &zone) :
 
 GamePanel::~GamePanel()
 {
+  if (_socket.isConnected())
+    _socket.disconnectPeer(Moment::Now, 0);
   _socket.disconnect();
 }
 
@@ -26,6 +31,7 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
 			     const std::vector<APanelScreen *> &panels)
 {
   Controls	&controls = set.getControls();
+  auto		&fm = FontManager<>::instance();
   float	gWidth = std::stof(set.getCvarList().getCvar("r_width"));
   float gHeight = std::stof(set.getCvarList().getCvar("r_height"));
   sf::FloatRect panZone = {gWidth / 2 - 150, gHeight / 2 - 250, 300, 500};
@@ -41,8 +47,14 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
 				     sf::Text("3.", _font["default"], 22));
   Widget	*wFourth = new Widget("sound4", {panZone.left, panZone.top + 228, panZone.width, 60},
 				      sf::Text("4.", _font["default"], 22));
+  TextWidget	*input = new TextWidget("", sf::FloatRect(_zone.left + _zone.width / 2 - 300
+							  , _zone.top + _zone.height / 2 - 25,
+							  600, 50),
+					sf::Text("", *fm.get("Title-font.ttf"), 20),
+					sf::Text("", *fm.get("Title-font.ttf"), 20), 60);
 
   addObserver(panels[0]);
+  createMessageEntry(texture, set, input);
   createButton(texture, wHeader);
   createVoiceButton(texture, wFirst, controls, sf::Keyboard::Num1);
   createVoiceButton(texture, wSecond, controls, sf::Keyboard::Num2);
@@ -57,6 +69,7 @@ void	GamePanel::construct(const sf::Texture &texture UNUSED, Settings &set UNUSE
   pSound->construct(texture, set, panels);
   pSound->setHide(true);
   addPanel(pSound);
+  addWidget(input);
   _world.reset(new World{set});
   resizeWidgets({gWidth, gHeight});
   _proto.setSetting(&set);
@@ -69,6 +82,53 @@ void	GamePanel::createButton(const sf::Texture &texture, Widget *w)
 
   w->alignTextLeft({zone.left,zone.top}, {zone.width, zone.height}, 8, 50);
   w->addSprite(texture, sf::IntRect(0, 1080, 260, 60));
+}
+
+void	GamePanel::createMessageEntry(const sf::Texture &texture UNUSED,
+				      Settings &set,
+				      TextWidget *widget)
+{
+  sf::FloatRect zone = widget->getZone();
+  std::function	<int (AWidget &widget, const sf::Event &ev, sf::RenderWindow &ref)>
+    updateFunc;
+
+  updateFunc = [this, &set](AWidget &widget, const sf::Event &ev UNUSED,
+				 sf::RenderWindow &ref UNUSED)
+    -> int
+    {
+      TextWidget	*twidget = dynamic_cast<TextWidget *>(&widget);
+      sf::FloatRect	wZone = widget.getZone();
+      std::string	content = twidget->getContent();
+      bool		hideState = widget.isHidden();
+      Controls		&controls = set.getControls();
+
+      widget.alignTextLeft({wZone.left,wZone.top}, {wZone.width, wZone.height}, 1, 50);
+      if (twidget->getState() == false && !content.empty())
+	{
+	  t_entry		entry = controls.getKeyFromAction(Action::Chat);
+	  ClientMessage		msg;
+	  std::string		serialized;
+
+	  msg.set_content(ClientMessage::CHAT);
+	  msg.set_chat(set.getCvarList().getCvar("cl_name") + ": " + content);
+	  msg.SerializeToString(&serialized);
+
+	  _socket.sendPacket(1, serialized);
+	  twidget->clearWidget();
+	  controls.pressKey(entry);
+	}
+      widget.setHidden(!controls.getActionState(Action::Chat));
+      if (hideState == true && widget.isHidden() == false) // will appear next frame
+	twidget->setState(true);
+      return 0;
+    };
+  addSpriteForWidget(widget, sf::Color(255, 255, 255, 200), {zone.width, zone.height});
+  widget->setUpdate(updateFunc);
+  widget->setColor(sf::Color(0,0,0));
+  widget->getCursor().setColor(sf::Color(0,0,0));
+  widget->setEdge(sf::Vector2f(zone.width, zone.height),
+		  2.f);
+  widget->setHidden(true);
 }
 
 void	GamePanel::createVoiceButton(const sf::Texture &texture, Widget *w,
@@ -107,6 +167,7 @@ void	GamePanel::createVoiceButton(const sf::Texture &texture, Widget *w,
 void	GamePanel::drawHud(sf::RenderTarget &window, bool toWin)
 {
   APanelScreen::draw(window, toWin);
+  _chat.draw(window);
 }
 
 void	GamePanel::draw(sf::RenderTarget &window, bool toWin)
@@ -215,10 +276,10 @@ void	GamePanel::handlePackets(ENetEvent &ev)
   enet_packet_destroy(ev.packet);
 }
 
-void	GamePanel::connectClient(ENetPeer * const peer, UNUSED Settings &set)
+void	GamePanel::connectClient(ENetPeer * const peer, Settings &set)
 {
   peer->data = (char *)("Server");
-  sendConnectionInfo();
+  sendConnectionInfo(set);
 }
 
 void	GamePanel::disconnectClient(UNUSED ENetPeer * const peer)
@@ -240,15 +301,17 @@ void			GamePanel::getGuidFromFile(std::string *guid) const
     }
 }
 
-void			GamePanel::sendConnectionInfo() const
+void			GamePanel::sendConnectionInfo(Settings &set)
 {
   ClientMessage		msg;
   ConnectionMessage	*co = new ConnectionMessage;
   std::string		*userId = new std::string;
+  std::string		*name = new std::string(set.getCvarList().getCvar("cl_name"));
   std::string		serialized;
 
   getGuidFromFile(userId);
   co->set_allocated_userid(userId);
+  co->set_allocated_name(name);
   msg.set_content(ClientMessage::CONNECTION);
   msg.set_allocated_co(co);
   msg.SerializeToString(&serialized);
@@ -263,6 +326,7 @@ void	GamePanel::update(std::chrono::milliseconds const & timeStep, Settings &set
   if (_actAnalyzer.getInputChanges(set))
     _socket.sendPacket(1, _actAnalyzer.serialize());
   updateNetwork(set);
+  _chat.update();
   _world->update(timeStep);
 }
 

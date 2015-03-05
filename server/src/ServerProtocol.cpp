@@ -8,6 +8,7 @@ ServerProtocol::ServerProtocol(World &world, ThreadPool &threadPool) :
 {
   _func[ClientMessage::ACTION] = &ServerProtocol::handleActions;
   _func[ClientMessage::QUERYCHUNK] = &ServerProtocol::queryChunks;
+  _func[ClientMessage::CHAT] = &ServerProtocol::chat;
 }
 
 ServerProtocol::~ServerProtocol()
@@ -21,29 +22,29 @@ void	ServerProtocol::parseCmd(const void *data, int size,
   ClientMessage          packet;
 
   if (packet.ParseFromString(std::string((char *)data, size)))
-  {
-    ClientMessage::PacketContent  act = packet.content();
-    auto it = _func.find(act);
+    {
+      ClientMessage::PacketContent  act = packet.content();
+      auto it = _func.find(act);
 
-    if (it != _func.end())
-      {
-	std::cout << (int)act << std::endl;
-	if (act == ClientMessage::QUERYCHUNK)
-	  _threadPool.addTask([this, &clients, packet, client]()
-			      {
-				queryChunks(packet, client, clients);
-			      });
-	else
-	  (this->*(it->second))(packet, client, clients);
-      }
-  }
+      if (it != _func.end())
+	{
+	  std::cout << (int)act << std::endl;
+	  if (act == ClientMessage::QUERYCHUNK)
+	    _threadPool.addTask([this, &clients, packet, client]()
+				{
+				  queryChunks(packet, client, clients);
+				});
+	  else
+	    (this->*(it->second))(packet, client, clients);
+	}
+    }
   else
     std::cerr << "Cannot DeSerialize Data" << std::endl;
 }
 
 void	ServerProtocol::handleActions(const ClientMessage &message,
 				      Client *client,
-				     UNUSED const std::vector<Client *> &clients)
+				      UNUSED const std::vector<Client *> &clients)
 {
   const ClientActions	&clientActions = message.actions();
   unsigned int		nbActions = clientActions.actions_size();
@@ -78,4 +79,20 @@ void	ServerProtocol::queryChunks(const ClientMessage &message,
     }
   for (auto &chunkId : newChunks)
     client->sendPacket(2, _world.serialize(chunkId)); // send on 2 because it's a huge transfer
+}
+
+void	ServerProtocol::chat(const ClientMessage &message,
+			     Client *client UNUSED,
+			     const std::vector<Client *> &clients)
+{
+  ProtocolMessage	msg;
+  std::string		serialized;
+
+  msg.set_content(ProtocolMessage::CHAT);
+  msg.set_chat(message.chat());
+  msg.SerializeToString(&serialized);
+  for (auto cl : clients)
+    {
+      cl->sendPacket(0, serialized);
+    }
 }

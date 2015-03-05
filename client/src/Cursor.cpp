@@ -33,13 +33,7 @@ void	Cursor::update()
   BlinkText::update();
 }
 
-void	Cursor::draw(sf::RenderWindow &window) const
-{
-  if (getDisplayState())
-    window.draw(_cursor);
-}
-
-void	Cursor::draw(sf::RenderTexture &window) const
+void	Cursor::draw(sf::RenderTarget &window) const
 {
   if (getDisplayState())
     window.draw(_cursor);

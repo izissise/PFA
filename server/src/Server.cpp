@@ -4,15 +4,17 @@
 #include "CvarParser.hpp"
 #include "printv.hpp"
 #include "demangle.hpp"
+#include "Filesystem.hpp"
 
 Server::Server(ServerSettings &set)
   : _clients(),
     _masterSocket(),
     _set(set),
-    _threadPool(200),
+    _threadPool(6),
     _world(_set),
     _proto(_world, _threadPool),
-    _auth(_world, _clients)
+    _auth(_world, _clients),
+    _masterAuthenticate(false)
 {
   // enet_initialize is called in the _masterSocket()
   _address.host = ENET_HOST_ANY;
@@ -38,35 +40,46 @@ Server::~Server()
   ENetEvent             event;
   int                   hasEvent;
   bool                  pull = true;
-//  bool                  passed = false;
+  bool                  passed = false;
+  unsigned int		delay = 50;
+  unsigned int		timeout = 3000;
+  unsigned int		cuTime = 0;
 
   enet_host_destroy(_server);
-  _masterSocket.connect(_set.getCvar("sv_masterIP"),
-                        _set.getCvar("sv_masterPort"),
-                        2);
-  std::cout << "Shutting down server" << std::endl;
- // while (!passed)
- //   {
-      if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
-        {
-          switch (event.type)
-            {
-            case ENET_EVENT_TYPE_CONNECT:
-              msg.set_content(MasterServerRequest::DELETESERVER);
-              msg.set_port(_set.getCvar("sv_port"));
-              msg.SerializeToString(&packet);
-              _masterSocket.sendPacket(0, packet);
-              enet_host_flush(_masterSocket.getHost());
-             // passed = true;
-              break;
-            default:
-              break;
-            }
-        }
-//      else if (hasEvent < 0)
-//        break ;
- //   }
-  _masterSocket.disconnect();
+  if (_masterAuthenticate)
+    {
+      _masterSocket.connect(_set.getCvar("sv_masterIP"),
+			    _set.getCvar("sv_masterPort"),
+			    2);
+      std::cout << "Shutting down server" << std::endl;
+      while (!passed)
+	{
+	  if ((hasEvent = _masterSocket.pullEvent(event, delay, pull)) >= 0)
+	    {
+	      switch (event.type)
+		{
+		case ENET_EVENT_TYPE_CONNECT:
+		  msg.set_content(MasterServerRequest::DELETESERVER);
+		  msg.set_port(_set.getCvar("sv_port"));
+		  msg.SerializeToString(&packet);
+		  _masterSocket.sendPacket(0, packet);
+		  enet_host_flush(_masterSocket.getHost());
+		  passed = true;
+		  break;
+		case ENET_EVENT_TYPE_NONE:
+		  cuTime += delay;
+		  if (cuTime >= timeout)
+		    passed = true;
+		  break;
+		default:
+		  break;
+		}
+	    }
+	  else
+	    break;
+	}
+      _masterSocket.disconnect();
+    }
 }
 
 void    Server::registerToMaster()
@@ -74,16 +87,19 @@ void    Server::registerToMaster()
   MasterServerRequest   msg;
   std::string           packet;
   ENetEvent             event;
-  int                   hasEvent;
+  int			hasEvent;
   bool                  pull = true;
- // bool                  passed = false;
+  bool                  passed = false;
+  unsigned int		timeout = 3000;
+  unsigned int		delay = 50;
+  unsigned int		cuTime = 0;
 
   _masterSocket.connect(_set.getCvar("sv_masterIP"),
                         _set.getCvar("sv_masterPort"),
                         2);
- // while (!passed)
- //   {
-      if ((hasEvent = _masterSocket.pullEvent(event, 50, pull)) > 0)
+  while (!passed)
+    {
+      if ((hasEvent = _masterSocket.pullEvent(event, delay, pull)) >= 0)
         {
           switch (event.type)
             {
@@ -99,8 +115,14 @@ void    Server::registerToMaster()
                 msg.SerializeToString(&packet);
                 _masterSocket.sendPacket(0, packet);
                 enet_host_flush(_masterSocket.getHost());
-              //  passed = true;
+                passed = true;
+		_masterAuthenticate = true;
               }
+	      break;
+	    case ENET_EVENT_TYPE_NONE:
+	      cuTime += delay;
+	      if (cuTime >= timeout)
+		passed = true;
               break;
             default:
               break;
@@ -108,7 +130,6 @@ void    Server::registerToMaster()
         }
       else if (hasEvent < 0)
         throw (NetworkException("Authentification to master server failed"));
- //   }
   _masterSocket.disconnect();
 }
 
@@ -228,7 +249,10 @@ void    Server::saveClientId(Client *client)
   std::string           line;
   bool                  found = false;
   unsigned int          lineIdx = 0;
+  Filesystem		fs;
 
+  if (!fs.exist("../", "log"))
+    fs.createDirectory("../", "log");
   file.open(LOGFILE, std::ios::binary | std::ios::in);
   printv(newLine, "%;% %;% %",
          clId, chunkId.x, chunkId.y,

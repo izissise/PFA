@@ -61,7 +61,6 @@ void ClientMain::run()
 		  event.type == sf::Event::MouseButtonPressed ||
 		  event.type == sf::Event::MouseWheelMoved)
                 {
-		  //std::cout << "keypress" << std::endl;
 		  if (event.type == sf::Event::KeyPressed ||
 		      event.type == sf::Event::MouseButtonPressed)
 		    ctrl.pressKey(entry);

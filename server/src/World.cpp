@@ -164,6 +164,12 @@ std::string		World::serialize(const Vector2i &chunkId)
   VectorInt		*vecInt;
   std::string		serialized;
   Chunk			*chunk;
+  unsigned int		fgcont = 0;
+  unsigned int		bgcont = 0;
+  TileType		fgtile;
+  TileType		bgtile;
+  TileType		oldfgtile;
+  TileType		oldbgtile;
 
   if ((chunk = getChunk(chunkId)) != nullptr)
     {
@@ -171,11 +177,39 @@ std::string		World::serialize(const Vector2i &chunkId)
 	{
 	  for (unsigned int x = 0; x < Chunk::width; ++x)
 	    {
-	      chunkData->add_bgtiles(static_cast<unsigned int>(chunk->getBgTile(x, y)));
-	      chunkData->add_fgtiles(static_cast<unsigned int>(chunk->getTile(x, y)));
+	      fgtile = chunk->getTile(x, y);
+	      bgtile = chunk->getBgTile(x, y);
+	      if (x == 0 && y == 0)
+		{
+		  oldfgtile = fgtile;
+		  oldbgtile = bgtile;
+		}
+	      else
+		{
+		  if (fgtile != oldfgtile)
+		    {
+		      chunkData->add_fgnumber(fgcont);
+		      chunkData->add_fgtilecode(static_cast<unsigned int>(oldfgtile));
+		      fgcont = 0;
+		      oldfgtile = fgtile;
+		    }
+		  if (bgtile != oldbgtile)
+		    {
+		      chunkData->add_bgnumber(bgcont);
+		      chunkData->add_bgtilecode(static_cast<unsigned int>(oldbgtile));
+		      bgcont = 0;
+		      oldbgtile = bgtile;
+		    }
+		}
+	      ++fgcont;
+	      ++bgcont;
 	    }
 	}
     }
+  chunkData->add_bgnumber(bgcont);
+  chunkData->add_bgtilecode(static_cast<unsigned int>(oldbgtile));
+  chunkData->add_fgnumber(fgcont);
+  chunkData->add_fgtilecode(static_cast<unsigned int>(oldfgtile));
   vecInt = new VectorInt;
   vecInt->set_x(chunkId.x);
   vecInt->set_y(chunkId.y);
