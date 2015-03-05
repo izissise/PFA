@@ -11,6 +11,10 @@ BUILD_PATH="/PFA/build/masterServer"
 DEST_PATH="`pwd`/../ressources/"
 
 docker build -t ${CONT_NAME} .
+if [ "$?" != "0" ]
+then
+  exit 1;
+fi
 
 echo "Build finished time to retrieve payload."
 docker run --name="${CONT_ID}" ${CONT_NAME}
