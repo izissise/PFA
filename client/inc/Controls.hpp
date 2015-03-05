@@ -5,6 +5,7 @@
 #include <map>
 #include <array>
 #include <vector>
+#include <deque>
 
 #include "ActionEnum.hpp"
 
@@ -105,6 +106,18 @@ typedef struct	s_action
   }
 }		t_action;
 
+struct			s_mouseEvent
+{
+  sf::Mouse::Button	button;
+  sf::Vector2i		position;
+
+  s_mouseEvent(sf::Mouse::Button b,
+	       const sf::Vector2i &p) :
+    button(b), position(p)
+  {
+  }
+};
+
 class Controls
 {
 public:
@@ -128,6 +141,8 @@ public:
   void		bindKeyOnAction(const t_entry &entry, Action act);
   void		pressKey(const t_entry &entry);
   void		releaseKey(const t_entry &entry);
+  void		mouseButtonPressed(const sf::Event &event);
+  void		mouseMoved(const sf::Event &event);
 
 private:
   std::array<std::map<ctrl::key, bool>,
@@ -135,6 +150,7 @@ private:
   std::map<Action, std::array<t_entry, 5>>		_actionKeys;
   std::map<std::string, t_entry>			_keycode;
   std::vector<t_action>					_actions;
+  std::array<sf::Vector2i, static_cast<int>(sf::Mouse::ButtonCount)>	_mousePosition;
 };
 
 #endif /* _CONTROLS_H_ */

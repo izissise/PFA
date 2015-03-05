@@ -327,3 +327,29 @@ void		Controls::releaseKey(const t_entry &entry)
   if (action.type != actionType::Toggle)
     action.state = false;
 }
+
+void	Controls::mouseButtonPressed(const sf::Event &event)
+{
+  sf::Vector2i &pos = _mousePosition[static_cast<int>(event.mouseButton.button)];
+
+  pos.x = event.mouseButton.x;
+  pos.y = event.mouseButton.y;
+}
+
+void	Controls::mouseMoved(const sf::Event &event)
+{
+  std::map<ctrl::key, bool>	&mouseButtons = _keyState[static_cast<int>(ctrl::type::Mouse)];
+  unsigned int	i = 0;
+
+  for (auto &pair : mouseButtons)
+    {
+      if (pair.second == true)
+	{
+	  sf::Vector2i &pos = _mousePosition[i];
+
+	  pos.x = event.mouseMove.x;
+	  pos.y = event.mouseMove.y;
+	}
+      ++i;
+    }
+}
