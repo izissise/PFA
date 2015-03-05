@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   cmake build-essential ssh g++ gcc protobuf-c-compiler protobuf-compiler
 
 RUN apt-get install --no-install-recommends -y \
-  libenet-dev libprotobuf-dev libboost-system-dev libboost-program-options-dev libsqlite0-dev libsqlite3-dev
+  libenet-dev libprotobuf-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libsqlite0-dev libsqlite3-dev
 
 #Build here
 RUN mkdir PFA
