@@ -5,6 +5,7 @@
 
 #include "Unused.hpp"
 #include "Box2DHelpers.hpp"
+#include "coordinateSystemConversion.hpp"
 
 AEntity::AEntity(std::shared_ptr<b2World> const& world)
   : _body(nullptr, nullptr)
@@ -33,13 +34,13 @@ void AEntity::update(UNUSED std::chrono::milliseconds const & timeStep)
 
 }
 
-void AEntity::draw(sf::RenderTarget& window, std::chrono::milliseconds const & timeStep) const
+void AEntity::draw(Camera const& cam, sf::RenderTarget& window, std::chrono::milliseconds const & timeStep) const
 {
-  sf::Vector2u winSize = window.getSize();
   sf::CircleShape circle(32);
 
- // std::cout << "Pos at drawing: {" << _pos.x << ", " << _pos.y << "}" << std::endl;
-  circle.setPosition(_pos.x, winSize.y - _pos.y);
+ Vector2i pos = physWorldToScreen(cam.center(), _pos);
+  std::cout << "Pos at drawing: {" << pos.x << ", " << pos.y << "}" << std::endl;
+  circle.setPosition(pos.x, pos.y);
 
 // change the radius to 40
   circle.setRadius(40);

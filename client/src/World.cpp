@@ -156,7 +156,7 @@ void	World::draw(sf::RenderTarget &window) const
   }
   for (auto&& i : _entities)
   {
-	i->draw(window, std::chrono::milliseconds(0));
+	i->draw(_camera, window, std::chrono::milliseconds(0));
   }
 }
 

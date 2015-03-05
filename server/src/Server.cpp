@@ -130,6 +130,7 @@ void    Server::registerToMaster()
         }
       else if (hasEvent < 0)
         throw (NetworkException("Authentification to master server failed"));
+    }
   _masterSocket.disconnect();
 }
 
