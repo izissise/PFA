@@ -41,6 +41,7 @@ private:
   void	loadClientProfile(Client *client, const std::string &userId);
   void	generateNewId(std::string &guid);
   void	sendClientProfile(Client *client, const std::string &newId);
+  void	sendSpawnInfo(Client *client) const;
 
   void    getPlayer(const ClientMessage &message,
 		    ENetPeer *peer);

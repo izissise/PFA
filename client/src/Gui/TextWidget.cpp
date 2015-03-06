@@ -33,6 +33,11 @@ int	TextWidget::update(const sf::Event &event, sf::RenderWindow &ref,
   int	catched = 0;
   int	retVal = 0;
 
+  if (_hide == true) // some fuckery
+    {
+      _update(*this, event, ref);
+      return 0;
+    }
   if (isClicked(event, sf::Mouse::Left))
     {
       _isActive = isOver(ref);

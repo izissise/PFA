@@ -9,6 +9,7 @@
 #include "World.hpp"
 #include "Perlin.h"
 #include "TextureManager.hpp"
+#include "FastMath.h"
 
 World::World(Settings& settings) :
   _b2World(new b2World(b2Vec2(0.0f, -9.81f))),
@@ -84,14 +85,32 @@ bool		World::movePlayer(const VectorInt &chunkId,
 		    - _camera.center());
 }
 
+void	World::_processHitAction(const Controls &ctrl)
+{
+  const sf::Vector2i	&clickPos = ctrl.getClickPosition(sf::Mouse::Left);
+  const CvarList	&cvar = _settings.getCvarList();
+  unsigned int		rwidth = std::stoi(cvar.getCvar("r_width"));
+  unsigned int		rheight = std::stoi(cvar.getCvar("r_height"));
+  unsigned int		distance = pointDist(std::abs(clickPos.x - rwidth / 2),
+					     std::abs(clickPos.y - rheight / 2));
+
+  std::cout << "Clicked at " << clickPos.x << " " << clickPos.y
+	    << " distance: " << distance / TileCodex::tileSize << std::endl <<std::endl;
+}
+
 void	World::update(const std::chrono::milliseconds& timeStep)
 {
-	//The suggested iteration count for Box2D is 8 for velocity and 3 for position.
-	_b2World->Step(timeStep.count() / 1000.0f, 8, 3);
-	for (auto&& i : _entities)
-	{
-		i->update(timeStep);
-	}
+  //The suggested iteration count for Box2D is 8 for velocity and 3 for position.
+  Controls	&ctrl = _settings.getControls();
+
+  if (ctrl.isPressed(t_entry(sf::Mouse::Left, ctrl::type::Mouse)))
+    _processHitAction(ctrl);
+
+  _b2World->Step(timeStep.count() / 1000.0f, 8, 3);
+  for (auto&& i : _entities)
+    {
+      i->update(timeStep);
+    }
 }
 
 auto World::_getScreenOrigin() const -> screenPos

@@ -72,6 +72,7 @@ private:
 			   screenPos& windowCoord) const;
   void		_loadChunks();
   void		_unloadChunks();
+  void		_processHitAction(const Controls &ctrl);
 
 private:
   std::shared_ptr<b2World>	_b2World;

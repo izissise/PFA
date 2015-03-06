@@ -63,11 +63,17 @@ void ClientMain::run()
                 {
 		  if (event.type == sf::Event::KeyPressed ||
 		      event.type == sf::Event::MouseButtonPressed)
-		    ctrl.pressKey(entry);
+		    {
+		      if (event.type == sf::Event::MouseButtonPressed)
+			ctrl.mouseButtonPressed(event);
+		      ctrl.pressKey(entry);
+		    }
                 }
               else if (event.type == sf::Event::KeyReleased ||
 		       event.type == sf::Event::MouseButtonReleased)
                 ctrl.releaseKey(entry);
+	      else if (event.type == sf::Event::MouseMoved)
+		ctrl.mouseMoved(event);
             }
         }
       time.endFrame();

@@ -17,6 +17,17 @@
 
 using namespace google::protobuf;
 
+struct	tile
+{
+  TileType	type;
+  uint8_t	life;
+
+  tile(TileType t, uint8_t l = 10) :
+    type(t), life(l)
+  {
+  }
+};
+
 class Chunk
 {
 public:
@@ -39,28 +50,28 @@ public:
 	    const TileCodex& codex) const;
 
   void		setPosition(const Vector2i &vec);
-  TileType getTile(unsigned index) const	{ return _tiles[index]; }
-  void setTile(unsigned index, TileType val)	{ _tiles[index] = val; }
-  TileType getBgTile(unsigned index) const	{ return _bgTiles[index]; }
-  void setBgTile(unsigned index, TileType val)	{ _bgTiles[index] = val; }
-  bool isLoaded(void) const			{ return _loaded; }
-  bool isGenerated() const			{ return _generated; }
+  tile		getTile(unsigned index) const	{ return _tiles[index]; }
+  void		setTile(unsigned index, tile t)	{ _tiles[index] = t; }
+  tile		getBgTile(unsigned index) const	{ return _bgTiles[index]; }
+  void		setBgTile(unsigned index, tile t)	{ _bgTiles[index] = t; }
+  bool		isLoaded(void) const			{ return _loaded; }
+  bool		isGenerated() const			{ return _generated; }
 
   /*
   ** Conveniance wrappers
   */
-  TileType getTile(unsigned x, unsigned y) const	{ return getTile(y * width + x); }
-  void setTile(unsigned x, unsigned y, TileType val)	{ setTile(y * width + x, val); }
-  TileType getBgTile(unsigned x, unsigned y) const	{ return getBgTile(y * width + x); }
-  void setBgTile(unsigned x, unsigned y, TileType val)	{ setBgTile(y * width + x, val); }
+  tile	getTile(unsigned x, unsigned y) const	{ return getTile(y * width + x); }
+  void	setTile(unsigned x, unsigned y, tile t)	{ setTile(y * width + x, t); }
+  tile getBgTile(unsigned x, unsigned y) const	{ return getBgTile(y * width + x); }
+  void setBgTile(unsigned x, unsigned y, tile t) { setBgTile(y * width + x, t); }
 
   const Vector2i	&getPosition() const;
 
 private:
   void	_generateVBO(const TileCodex& codex);
 
-  std::vector<TileType>	_tiles;
-  std::vector<TileType> _bgTiles;
+  std::vector<tile>	_tiles;
+  std::vector<tile>	_bgTiles;
   sf::VertexArray	_fgVertices;
   sf::VertexArray	_bgVertices;
   Vector2i		_pos;

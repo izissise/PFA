@@ -69,6 +69,7 @@ void	AuthSystem::handleConnection(const ClientMessage &message,
   loadClientProfile(client, userId);
   client->initialize();
   sendClientProfile(client, newId);
+  sendSpawnInfo(client);
 }
 
 void	AuthSystem::ping(const ClientMessage &message,
@@ -161,6 +162,37 @@ void	AuthSystem::sendClientProfile(Client *client,
   msg.set_allocated_clinit(initInfo);
   msg.SerializeToString(&serialized);
   client->sendPacket(0, serialized);
+}
+
+void	AuthSystem::sendSpawnInfo(Client *client) const
+{
+  const ClientEntity	&clEnt = client->getEntity();
+
+  std::for_each(_clients.begin(), _clients.end(), [&](Client *cl)
+		{
+		  if (cl != client)
+		    {
+		      ProtocolMessage	msg;
+		      PBClientInfo	*clinfo = new PBClientInfo;
+		      Position		*pos = new Position;
+		      VectorInt		*chunkId = new VectorInt;
+		      VectorFloat	*clPos = new VectorFloat;
+		      std::string	serialized;
+
+		      chunkId->set_x(clEnt.getChunkId().x);
+		      chunkId->set_y(clEnt.getChunkId().y);
+		      pos->set_allocated_chunkid(chunkId);
+
+		      clPos->set_x(clEnt.getPosition().x);
+		      clPos->set_y(clEnt.getPosition().y);
+		      pos->set_allocated_pos(clPos);
+		      clinfo->set_allocated_posinfo(pos);
+		      msg.set_content(ProtocolMessage::CLSPAWN);
+		      msg.set_allocated_clinfo(clinfo);
+		      msg.SerializeToString(&serialized);
+		      cl->sendPacket(0, serialized);
+		    }
+		});
 }
 
 void    AuthSystem::getPlayer(const ClientMessage &message UNUSED,

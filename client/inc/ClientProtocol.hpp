@@ -29,6 +29,7 @@ private:
   typedef void	(ClientProtocol::*func)(const ProtocolMessage &packet);
   void  handleSetting(const ProtocolMessage &packet);
   void	initClient(const ProtocolMessage &packet);
+  void	spawnClient(const ProtocolMessage &packet);
   void	fillChunk(const ProtocolMessage &packet);
   void	handleDisplacements(const ProtocolMessage &packet);
   void	handleChat(const ProtocolMessage &packet);
