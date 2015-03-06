@@ -69,6 +69,7 @@ private:
 			   screenPos& windowCoord) const;
   void		_loadChunks();
   void		_unloadChunks();
+  void		_processHitAction(const Controls &ctrl);
 
 private:
   std::map<chunkId, std::unique_ptr<Chunk>>	_chunks;
