@@ -32,6 +32,7 @@ public:
 				  const Vector2f &position,
 				  float rWidth, float rHeight);
   void		hit(AItem &item);
+  bool		hit(tile &t);
 
 private:
   Range2i	_loadedRange;

@@ -85,3 +85,39 @@ void	Player::calculateVisibleRange()
   _visibleRange = {Vector2i(std::floor(_camera.left()), std::floor(_camera.bottom())),
 		   Vector2i(std::floor(_camera.right()), std::floor(_camera.top()))};
 }
+
+void	Player::hit(AItem &item)
+{
+  unsigned int	damages;
+
+  if (_tool != nullptr)
+    {
+      damages = _tool->getDamages();
+    }
+  else
+    {
+      damages = Player::defaultDamages;
+    }
+  item.takeDamages(damages);
+}
+
+bool	Player::hit(tile &t)
+{
+  unsigned int	damages;
+
+  if (_tool != nullptr)
+    {
+      damages = _tool->getDamages();
+    }
+  else
+    {
+      damages = Player::defaultDamages;
+    }
+  if (t.life <= damages)
+    {
+      t.life = 0;
+      return true;
+    }
+  t.life -= damages;
+  return false;
+}

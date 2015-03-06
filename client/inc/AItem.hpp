@@ -9,7 +9,7 @@ public:
 
   bool		takeDamages(unsigned int amount);
 protected:
-  int		_life;
+  unsigned int	_life;
 };
 
 #endif /* _AITEM_H_ */
