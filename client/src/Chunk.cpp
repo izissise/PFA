@@ -65,8 +65,8 @@ void	Chunk::fillTiles(const ChunkData &packet)
 	  bgTileCounter = 0;
 	  ++bgCounter;
 	}
-      _bgTiles[index] = static_cast<TileType>(bgTile.Get(bgCounter));
-      _tiles[index] = static_cast<TileType>(fgTile.Get(fgCounter));
+      _bgTiles[index] = tile(static_cast<TileType>(bgTile.Get(bgCounter)));
+      _tiles[index] = tile(static_cast<TileType>(fgTile.Get(fgCounter)));
       ++fgTileCounter;
       ++bgTileCounter;
     }
@@ -87,7 +87,7 @@ void		Chunk::_generateVBO(const TileCodex& codex)
     {
       for (x = 0; x < Chunk::width; ++x)
 	{
-	  if (_bgTiles[idx] != TileType::Empty)
+	  if (_bgTiles[idx].type != TileType::Empty)
 	    {
 	      unsigned int	vIdx = idx * 4;
 	      _bgVertices[vIdx].position = {static_cast<float>(x * TileCodex::tileSize),
@@ -98,9 +98,9 @@ void		Chunk::_generateVBO(const TileCodex& codex)
 						static_cast<float>((y + 1) * TileCodex::tileSize)};
 	      _bgVertices[vIdx + 3].position = {static_cast<float>(x * TileCodex::tileSize),
 						static_cast<float>((y + 1) * TileCodex::tileSize)};
-	      codex.applySpriteUV(static_cast<unsigned int>(_bgTiles[idx]), &_bgVertices[vIdx]);
+	      codex.applySpriteUV(static_cast<unsigned int>(_bgTiles[idx].type), &_bgVertices[vIdx]);
 	    }
-	  if (_tiles[idx] != TileType::Empty)
+	  if (_tiles[idx].type != TileType::Empty)
 	    {
 	      unsigned int	vIdx = idx * 4;
 	      _fgVertices[vIdx].position = {static_cast<float>(x * TileCodex::tileSize),
@@ -111,7 +111,7 @@ void		Chunk::_generateVBO(const TileCodex& codex)
 						static_cast<float>((y + 1) * TileCodex::tileSize)};
 	      _fgVertices[vIdx + 3].position = {static_cast<float>(x * TileCodex::tileSize),
 						static_cast<float>((y + 1) * TileCodex::tileSize)};
-	      codex.applySpriteUV(static_cast<unsigned int>(_tiles[idx]), &_fgVertices[vIdx]);
+	      codex.applySpriteUV(static_cast<unsigned int>(_tiles[idx].type), &_fgVertices[vIdx]);
 	    }
 	  ++idx;
 	}
