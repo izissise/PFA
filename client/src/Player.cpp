@@ -4,7 +4,7 @@
 #include "Player.hpp"
 
 Player::Player(std::shared_ptr<b2World> const& world, Camera &camera) :
-  AEntity(world), _camera(camera)
+  AEntity(world), _camera(camera), _tool(nullptr)
 {
 }
 
