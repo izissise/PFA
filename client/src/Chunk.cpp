@@ -31,6 +31,20 @@ Chunk::Chunk(const Vector2i &chunkPos) :
 {
 }
 
+void Chunk::createFixture(std::shared_ptr<b2World> const& b2World)
+{
+  for (int y = Chunk::height - 1; y >= 0; --y)
+    {
+      for (int x = 0; x < Chunk::width; ++x)
+		{
+			b2Vec2 b2dpos(static_cast<float>(x + (_pos.x * Chunk::width)),
+					      static_cast<float>(y + (_pos.y * Chunk::height)));
+			std::cout << Vector2f(b2dpos.x, b2dpos.y) << std::endl;
+		}
+
+    }
+}
+
 void Chunk::load(const TileCodex& codex)
 {
   _generateVBO(codex);

@@ -1,5 +1,10 @@
 #include "Camera.hpp"
 
+Camera::Camera(Settings& settings)
+  : _settings(settings)
+{
+}
+
 void Camera::translate(const worldPos& v)
 {
   _center += v;
@@ -28,22 +33,27 @@ void Camera::resize(const worldPos& s)
 auto	Camera::wToSPos(const worldPos &pos) const -> screenPos
 {
   return {static_cast<int>(pos.x * static_cast<float>(Chunk::pWidth)),
-      static_cast<int>(pos.y * static_cast<float>(Chunk::pHeight))};
+          static_cast<int>(pos.y * static_cast<float>(Chunk::pHeight))};
 }
 
 auto	Camera::sToWPos(const screenPos &pos) const -> worldPos
 {
   return {static_cast<float>(pos.x) / static_cast<float>(Chunk::pWidth),
-      static_cast<float>(pos.y) / static_cast<float>(Chunk::pHeight)};
+          static_cast<float>(pos.y) / static_cast<float>(Chunk::pHeight)};
 }
 
 auto	Camera::sToWPos(const Vector2i &chunkId, const Vector2f &position) const -> worldPos
 {
   return worldPos(static_cast<float>(chunkId.x) + position.x,
-		  static_cast<float>(chunkId.y) + position.y);
+                  static_cast<float>(chunkId.y) + position.y);
 }
 
 auto Camera::physWorldToSPos(Vector2f const& objPos) const -> screenPos
 {
-  return (objPos * static_cast<int>(TileCodex::tileSize)) * Vector2i(1, -1);
+  Vector2i originChange(0, std::stoi(_settings.getCvarList().getCvar("r_height")));
+  Vector2i tmp((objPos * static_cast<int>(TileCodex::tileSize)));
+
+  tmp = Vector2i(tmp.x, originChange.y - tmp.y);
+
+  return tmp;
 }

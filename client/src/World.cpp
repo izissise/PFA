@@ -14,7 +14,7 @@
 World::World(Settings& settings) :
   _b2World(new b2World(b2Vec2(0.0f, -9.81f))),
   _settings(settings),
-  _camera(),
+  _camera(settings),
   _player(_b2World, _camera),
   _loaded(false)
 {
@@ -25,16 +25,6 @@ World::World(Settings& settings) :
 		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_camera.sToWPos(_screenSize));
   tm.load(TexturePath, "nightBg.png");
-
-  _entities.push_back(std::shared_ptr<AEntity>(new AEntity(_b2World)));
-
-    b2BodyDef groundBodyDef;
-  groundBodyDef.position.Set(0.0f, -100.0f);
-
-  b2PolygonShape groundBox;
-  groundBox.SetAsBox(50.0f, 10.0f);
-
-  _tmpGround = Box2DHelpers::createBody(_b2World, groundBodyDef, groundBox, 0.0f);
 
 }
 
@@ -162,9 +152,6 @@ void	World::draw(sf::RenderTarget &window) const
   screenPos	screenCoord = screenOrigin;
   const Range2i	&range = _player.getVisibleRange();
   int		x;
-  Vector2i chunkSize;
-  chunkSize.x = Chunk::width;
-  chunkSize.y = Chunk::height;
 
   if (!_loaded)
     return ;
@@ -177,21 +164,8 @@ void	World::draw(sf::RenderTarget &window) const
     screenCoord.x = screenOrigin.x;
     screenCoord.y += Chunk::height * TileCodex::tileSize;
   }
-  static auto print = false;
   for (auto&& i : _entities)
   {
-  	if (!print)
-	{
-       auto entPos = i->getPosition();
-       auto camPos = _camera.center() * chunkSize;
-       auto screenOri = _getScreenOrigin();
-       auto chunkPos = Vector2i(range.left(), range.top());
-       std::cout << "Entity pos: " << entPos << "\n"
-       << "Camera pos: " << camPos << "\n"
-       << "Screen Origine: " << screenOri << "\n"
-       << "Chunk pos: " << chunkPos << std::endl;
-	   print = true;
-	}
 	i->draw(_camera, window, std::chrono::milliseconds(0));
   }
 }
@@ -210,7 +184,7 @@ void World::_drawChunk(sf::RenderTarget& window,
     if (target.isLoaded())
       target.draw(window, windowCoord, _codex);
   } catch (const std::out_of_range& e) {
-    // this means the chunk isn't loaded so we do nothing and skip it
+    // this means the chunk is not loaded so we do nothing and skip it
     return ;
   }
 }
@@ -266,8 +240,18 @@ void		World::_loadChunks()
 				 plChunkId.y + (sideSize.y - 1) / 2}));
   _unloadChunks();
   for (auto cursor : loadedRange) // be aware it has been updated just above
+  {
     if (!isChunkLoaded(cursor))
+	{
       _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
+	}
+	else
+	{
+		auto	it = _chunks.find(cursor);
+		if (it != _chunks.end())
+			it->second->createFixture(_b2World);
+	}
+  }
 }
 
 const Player	&World::getPlayer() const

@@ -24,7 +24,6 @@ AEntity::AEntity(std::shared_ptr<b2World> const& world)
 
 }
 
-
 void AEntity::update(UNUSED std::chrono::milliseconds const & timeStep)
 {
   Vector2f position = _body->GetPosition();
@@ -36,7 +35,7 @@ void AEntity::update(UNUSED std::chrono::milliseconds const & timeStep)
 void AEntity::draw(Camera const& cam, sf::RenderTarget& window, std::chrono::milliseconds const & timeStep) const
 {
   sf::CircleShape circle(32);
-    Vector2i chunkSize;
+  Vector2i chunkSize;
   chunkSize.x = -Chunk::width;
   chunkSize.y = Chunk::height;
 

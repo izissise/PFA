@@ -2,6 +2,7 @@
 # define CHUNK_H
 
 # include <array>
+# include <memory>
 # include <cstdint>
 # include <utility>
 # include <vector>
@@ -9,6 +10,7 @@
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
+# include "Box2DHelpers.hpp"
 # include "TileCodex.hpp"
 # include "TileType.hpp"
 # include "Vector2.hpp"
@@ -43,6 +45,7 @@ public:
   Chunk(const Chunk& other) = delete;
   Chunk&	operator=(const Chunk& other) = delete;
 
+  void createFixture(std::shared_ptr<b2World> const& b2World);
   void load(const TileCodex& codex);
   void fillTiles(const ChunkData &packet);
   void draw(sf::RenderTarget& window,
@@ -54,7 +57,7 @@ public:
   void		setTile(unsigned index, tile t)	{ _tiles[index] = t; }
   tile		getBgTile(unsigned index) const	{ return _bgTiles[index]; }
   void		setBgTile(unsigned index, tile t)	{ _bgTiles[index] = t; }
-  bool		isLoaded(void) const			{ return _loaded; }
+  bool		isLoaded() const			{ return _loaded; }
   bool		isGenerated() const			{ return _generated; }
 
   /*

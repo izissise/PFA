@@ -1,6 +1,7 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
+# include "Settings.hpp"
 # include "Vector2.hpp"
 # include "Chunk.hpp"
 
@@ -12,7 +13,7 @@ private:
   typedef Vector2i	chunkId;
 
 public:
-  Camera() = default;
+  Camera(Settings& settings);
   ~Camera() = default;
   Camera(const Camera& other) = default;
   Camera&	operator=(const Camera& other) = default;
@@ -41,6 +42,7 @@ private:
   worldPos	_botLeft;
   worldPos	_size;
   worldPos	_center;
+  Settings& _settings;
 };
 
 #endif /* _CAMERA_H_ */
