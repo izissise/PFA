@@ -15,16 +15,16 @@ using namespace std;
 using namespace noise;
 
 Chunk::Chunk() :
-  _tiles(width *height, TileType::Empty),
-  _bgTiles(width *height, TileType::Empty),
+  _tiles(width * height, tile(TileType::Empty)),
+  _bgTiles(width * height, tile(TileType::Empty)),
   _generated(false),
   _loaded(false)
 {
 }
 
 Chunk::Chunk(const Vector2i &chunkPos) :
-  _tiles(width * height, TileType::Empty),
-  _bgTiles(width * height, TileType::Empty),
+  _tiles(width * height, tile(TileType::Empty)),
+  _bgTiles(width * height, tile(TileType::Empty)),
   _pos(chunkPos),
   _generated(false),
   _loaded(false)
@@ -49,8 +49,8 @@ void Chunk::load(const TileCodex& codex)
 {
   _generateVBO(codex);
   _loaded = true;
-  _tiles.clear();
-  _bgTiles.clear();
+  // _tiles.clear();
+  // _bgTiles.clear();
 }
 
 void	Chunk::fillTiles(const ChunkData &packet)
@@ -85,6 +85,29 @@ void	Chunk::fillTiles(const ChunkData &packet)
       ++bgTileCounter;
     }
   _generated = true;
+}
+
+void	Chunk::setTile(const Vector2i &pos, const tile &t,
+		       const TileCodex& codex)
+{
+  unsigned int	idx = pos.y * Chunk::width + pos.x;
+
+  if (t.type != _tiles[idx].type)
+    {
+      unsigned int	rIdx = idx * 4;
+      if (t.type == TileType::Empty)
+	{
+	  _fgVertices[rIdx] = sf::Vertex();
+	  _fgVertices[rIdx + 1] = sf::Vertex();
+	  _fgVertices[rIdx + 2] = sf::Vertex();
+	  _fgVertices[rIdx + 3] = sf::Vertex();
+	}
+      else
+      	{
+      	  codex.applySpriteUV(static_cast<unsigned int>(t.type), &_fgVertices[rIdx]);
+      	}
+    }
+  _tiles[idx] = t;
 }
 
 void		Chunk::_generateVBO(const TileCodex& codex)
@@ -127,6 +150,13 @@ void		Chunk::_generateVBO(const TileCodex& codex)
 						static_cast<float>((y + 1) * TileCodex::tileSize)};
 	      codex.applySpriteUV(static_cast<unsigned int>(_tiles[idx].type), &_fgVertices[vIdx]);
 	    }
+	  // else
+	  //   {
+	  //     unsigned int	vIdx = idx * 4;
+
+	  //     // std::cout << _fgVertices[vIdx].texCoords.x << " "
+	  //     // 		<< _fgVertices[vIdx].texCoords.y << std::endl;
+	  //   }
 	  ++idx;
 	}
     }
