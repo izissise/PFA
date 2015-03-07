@@ -22,7 +22,7 @@ struct	tile
   TileType	type;
   uint8_t	life;
 
-  tile(TileType t, uint8_t l = 10) :
+  tile(TileType t, uint8_t l = 1) :
     type(t), life(l)
   {
   }
@@ -50,20 +50,18 @@ public:
 	    const TileCodex& codex) const;
 
   void		setPosition(const Vector2i &vec);
-  tile		getTile(unsigned index) const	{ return _tiles[index]; }
-  void		setTile(unsigned index, tile t)	{ _tiles[index] = t; }
-  tile		getBgTile(unsigned index) const	{ return _bgTiles[index]; }
-  void		setBgTile(unsigned index, tile t)	{ _bgTiles[index] = t; }
+  tile		&getTile(unsigned index)	{ return _tiles[index]; }
+  tile		&getBgTile(unsigned index)	{ return _bgTiles[index]; }
   bool		isLoaded(void) const			{ return _loaded; }
   bool		isGenerated() const			{ return _generated; }
 
   /*
   ** Conveniance wrappers
   */
-  tile	getTile(unsigned x, unsigned y) const	{ return getTile(y * width + x); }
-  void	setTile(unsigned x, unsigned y, tile t)	{ setTile(y * width + x, t); }
-  tile getBgTile(unsigned x, unsigned y) const	{ return getBgTile(y * width + x); }
-  void setBgTile(unsigned x, unsigned y, tile t) { setBgTile(y * width + x, t); }
+  tile	&getTile(unsigned x, unsigned y)	{ return getTile(y * width + x); }
+  tile	&getBgTile(unsigned x, unsigned y)	{ return getBgTile(y * width + x); }
+  void	setTile(const Vector2i &pos, const tile &t,
+		const TileCodex& codex);
 
   const Vector2i	&getPosition() const;
 

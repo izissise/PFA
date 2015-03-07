@@ -93,9 +93,22 @@ void	World::_processHitAction(const Controls &ctrl)
   unsigned int		rheight = std::stoi(cvar.getCvar("r_height"));
   unsigned int		distance = pointDist(std::abs(clickPos.x - rwidth / 2),
 					     std::abs(clickPos.y - rheight / 2));
+  Vector2f		plPos = static_cast<Vector2f>(_player.getChunkId()) + _player.getPosition();
+  Vector2f		hitVector((clickPos.x - rwidth / 2.f) / static_cast<float>(Chunk::pWidth),
+				  (clickPos.y - rheight / 2.f) / static_cast<float>(Chunk::pHeight));
+  Vector2f		hitPos = plPos + Vector2f(hitVector.x, -hitVector.y);
+  Vector2i		tileCoor = (hitPos - static_cast<Vector2i>(hitPos)) *
+    Vector2f(static_cast<float>(Chunk::width), static_cast<float>(Chunk::height));
+  Chunk			*chunk = _chunks[static_cast<Vector2i>(hitPos)].get();
 
-  std::cout << "Clicked at " << clickPos.x << " " << clickPos.y
-	    << " distance: " << distance / TileCodex::tileSize << std::endl <<std::endl;
+  // std::cout << tileCoor.x << " " << tileCoor.y << std::endl;
+  if (_player.hit(chunk->getTile(tileCoor.x, tileCoor.y))) // means the cube is broken
+    {
+      chunk->setTile(tileCoor, tile(TileType::Empty, 100),
+		     _codex);
+    }
+  // std::cout << "Player: " << plPos.x << " " << plPos.y << " "
+  // 	    << "Hit: " << hitPos.x << " " << hitPos.y << std::endl;
 }
 
 void	World::update(const std::chrono::milliseconds& timeStep)
