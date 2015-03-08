@@ -5,7 +5,7 @@ ClientMain::ClientMain()
     _parser(&_settings),
     _menu(_settings, _parser),
     _window(sf::VideoMode(std::stoi(_settings.getCvarList().getCvar("r_width")),
-                          std::stoi(_settings.getCvarList().getCvar("r_height"))), "Name"),
+                          std::stoi(_settings.getCvarList().getCvar("r_height"))), "Fusion"),
   _showMenu(false),
   _updateThread(std::bind(&ClientMain::update, this))
 {
