@@ -1,6 +1,8 @@
 PFA
 ===
 
+[![Build Status](http://jenkins.izissise.net/buildStatus/icon?job=Projet Fin Annee tek3)](http://jenkins.izissise.net/job/Projet%20Fin%20Annee%20tek3/)
+
 Tek3 End of Year's Project
 
 How to develop:

@@ -84,7 +84,7 @@ OPTION(BUILD_CLIENT "Does the compilation will build the client ?." ON)
 OPTION(BUILD_MASTER_SERVER "Does the compilation will build the master server ?." ON)
 
 # --- global definitions ---
-DEFINE_PROJECT_VERSION(PROJECT 0 0 1 "snapshot")
+DEFINE_PROJECT_VERSION(PROJECT 1 0 0 "snapshot")
 CURRENT_DATE(PROJECT_BUILD_DATE)
 
 # All source files using globs
