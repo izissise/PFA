@@ -82,7 +82,6 @@ private:
   TileCodex	_codex;
   Camera	_camera;
   std::deque<std::shared_ptr<AEntity>> _entities;
-  std::unique_ptr<b2Body, std::function<void(b2Body*)>> _tmpGround;
   Player	_player;
   bool		_loaded;
 };

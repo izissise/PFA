@@ -33,16 +33,33 @@ Chunk::Chunk(const Vector2i &chunkPos) :
 
 void Chunk::createFixture(std::shared_ptr<b2World> const& b2World)
 {
+  std::vector<b2Vec2> tmpFix;
+  size_t			  idx = 0;
+
   for (int y = Chunk::height - 1; y >= 0; --y)
     {
       for (int x = 0; x < Chunk::width; ++x)
 		{
+			if (_tiles[idx].type != TileType::Empty)
+			{
 			b2Vec2 b2dpos(static_cast<float>(x + (_pos.x * Chunk::width)),
 					      static_cast<float>(y + (_pos.y * Chunk::height)));
-			std::cout << Vector2f(b2dpos.x, b2dpos.y) << std::endl;
+			tmpFix.push_back(b2dpos);
+			}
+		  ++idx;
 		}
-
     }
+    if (tmpFix.size() > 2)
+	{
+  b2ChainShape chain;
+  chain.CreateChain(tmpFix.data(), tmpFix.size());
+
+  b2BodyDef bodyDef;
+  bodyDef.type = b2_staticBody;
+  bodyDef.position.Set(_pos.x * static_cast<int>(Chunk::width),
+					   _pos.y * static_cast<int>(Chunk::height));
+  _body = Box2DHelpers::createBody(b2World, bodyDef, chain, 0.0f);
+	}
 }
 
 void Chunk::load(const TileCodex& codex)
@@ -150,13 +167,6 @@ void		Chunk::_generateVBO(const TileCodex& codex)
 						static_cast<float>((y + 1) * TileCodex::tileSize)};
 	      codex.applySpriteUV(static_cast<unsigned int>(_tiles[idx].type), &_fgVertices[vIdx]);
 	    }
-	  // else
-	  //   {
-	  //     unsigned int	vIdx = idx * 4;
-
-	  //     // std::cout << _fgVertices[vIdx].texCoords.x << " "
-	  //     // 		<< _fgVertices[vIdx].texCoords.y << std::endl;
-	  //   }
 	  ++idx;
 	}
     }

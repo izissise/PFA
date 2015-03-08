@@ -72,6 +72,8 @@ public:
 private:
   void	_generateVBO(const TileCodex& codex);
 
+private:
+  std::unique_ptr<b2Body, std::function<void(b2Body*)>> _body;
   std::vector<tile>	_tiles;
   std::vector<tile>	_bgTiles;
   sf::VertexArray	_fgVertices;
