@@ -1,8 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <SFML/Audio.hpp>
+
 #include "GamePanel.hpp"
 #include "SimplexNoise.h"
+#include "World.hpp"
 #include "FontManager.hpp"
 
 GamePanel::GamePanel(const sf::FloatRect &zone) :
@@ -183,7 +185,7 @@ void	GamePanel::trigger(const t_event &ev)
       _hide = false;
       try
 	{
-	  const std::string defaultPort("6060");
+	  const std::string defaultPort("6000");
 	  std::string	ip(ev.str);
 	  size_t nbColon = std::count(ip.begin(), ip.end(), ':');
       std::string realIp = (nbColon % 2 == 0 ? ip : ip.substr(0, ip.find_last_of(':')));
@@ -313,11 +315,10 @@ void			GamePanel::sendConnectionInfo(Settings &set)
   msg.set_content(ClientMessage::CONNECTION);
   msg.set_allocated_co(co);
   msg.SerializeToString(&serialized);
-
   _socket.sendPacket(1, serialized);
 }
 
-void	GamePanel::update(std::chrono::milliseconds timeStep, Settings &set)
+void	GamePanel::update(std::chrono::milliseconds const & timeStep, Settings &set)
 {
   if (_hide)
     return ;

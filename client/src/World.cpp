@@ -3,16 +3,19 @@
 #include <functional>
 #include <stdexcept>
 #include <complex>
+#include <iostream>
+#include <iomanip>
 
 #include "World.hpp"
 #include "Perlin.h"
 #include "TextureManager.hpp"
+#include "FastMath.h"
 
 World::World(Settings& settings) :
-  _settings(settings),
-  _camera(),
-  _player(_camera),
   _b2World(new b2World(b2Vec2(0.0f, -9.81f))),
+  _settings(settings),
+  _camera(settings),
+  _player(_b2World, _camera),
   _loaded(false)
 {
   CvarList	&cvarList = _settings.getCvarList();
@@ -22,6 +25,8 @@ World::World(Settings& settings) :
 		 std::stoi(cvarList.getCvar("r_height"))};
   _camera.resize(_camera.sToWPos(_screenSize));
   tm.load(TexturePath, "nightBg.png");
+
+ //_entities.push_back(std::shared_ptr<AEntity>(new AEntity(_b2World)));
 }
 
 void		World::setPlayerPosition(const Vector2i &chunkId,
@@ -71,13 +76,48 @@ bool		World::movePlayer(const VectorInt &chunkId,
 		    - _camera.center());
 }
 
-void	World::update(const std::chrono::milliseconds& timeStep)
+void	World::_processHitAction(const Controls &ctrl)
 {
-	//The suggested iteration count for Box2D is 8 for velocity and 3 for position.
-	_b2World->Step(timeStep.count() / 1000.0f, 8, 3);
+  const sf::Vector2i	&clickPos = ctrl.getClickPosition(sf::Mouse::Left);
+  const CvarList	&cvar = _settings.getCvarList();
+  unsigned int		rwidth = std::stoi(cvar.getCvar("r_width"));
+  unsigned int		rheight = std::stoi(cvar.getCvar("r_height"));
+  unsigned int		distance = pointDist(std::abs(clickPos.x - rwidth / 2),
+					     std::abs(clickPos.y - rheight / 2));
+  Vector2f		plPos = static_cast<Vector2f>(_player.getChunkId()) + _player.getPosition();
+  Vector2f		hitVector((clickPos.x - rwidth / 2.f) / static_cast<float>(Chunk::pWidth),
+				  (clickPos.y - rheight / 2.f) / static_cast<float>(Chunk::pHeight));
+  Vector2f		hitPos = plPos + Vector2f(hitVector.x, -hitVector.y);
+  Vector2i		tileCoor = (hitPos - static_cast<Vector2i>(hitPos)) *
+    Vector2f(static_cast<float>(Chunk::width), static_cast<float>(Chunk::height));
+  Chunk			*chunk = _chunks[static_cast<Vector2i>(hitPos)].get();
+
+  // std::cout << tileCoor.x << " " << tileCoor.y << std::endl;
+  if (_player.hit(chunk->getTile(tileCoor.x, tileCoor.y))) // means the cube is broken
+    {
+      chunk->setTile(tileCoor, tile(TileType::Empty, 100),
+		     _codex);
+    }
+  // std::cout << "Player: " << plPos.x << " " << plPos.y << " "
+  // 	    << "Hit: " << hitPos.x << " " << hitPos.y << std::endl;
 }
 
-auto World::_getScreenOrigin(void) const -> screenPos
+void	World::update(const std::chrono::milliseconds& timeStep)
+{
+  Controls	&ctrl = _settings.getControls();
+
+  if (ctrl.isPressed(t_entry(sf::Mouse::Left, ctrl::type::Mouse)))
+    _processHitAction(ctrl);
+
+  //The suggested iteration count for Box2D is 8 for velocity and 3 for position.
+  _b2World->Step(timeStep.count() / 1000.0f, 8, 3);
+  for (auto&& i : _entities)
+    {
+      i->update(timeStep);
+    }
+}
+
+auto World::_getScreenOrigin() const -> screenPos
 {
   worldPos worldOrigin;
 
@@ -138,6 +178,10 @@ void	World::draw(sf::RenderTarget &window) const
     screenCoord.x = screenOrigin.x;
     screenCoord.y += Chunk::height * TileCodex::tileSize;
   }
+  for (auto&& i : _entities)
+  {
+	i->draw(_camera, window, std::chrono::milliseconds(0));
+  }
 }
 
 float World::_getGridOffset(float w) const
@@ -154,7 +198,7 @@ void World::_drawChunk(sf::RenderTarget& window,
     if (target.isLoaded())
       target.draw(window, windowCoord, _codex);
   } catch (const std::out_of_range& e) {
-    // this means the chunk isn't loaded so we do nothing and skip it
+    // this means the chunk is not loaded so we do nothing and skip it
     return ;
   }
 }
@@ -163,7 +207,7 @@ void		World::_unloadChunks()
 {
   Range2i	&loadedRange = _player.getLoadedRange();
   bool		found;
-  auto		it = std::begin(_chunks);
+  std::map<chunkId, std::unique_ptr<Chunk>>::const_iterator		it = std::begin(_chunks);
 
   while (it != std::end(_chunks))
     {
@@ -210,8 +254,18 @@ void		World::_loadChunks()
 				 plChunkId.y + (sideSize.y - 1) / 2}));
   _unloadChunks();
   for (auto cursor : loadedRange) // be aware it has been updated just above
+  {
     if (!isChunkLoaded(cursor))
+	{
       _chunks.emplace(cursor, std::unique_ptr<Chunk>(new Chunk(cursor)));
+	}
+	else
+	{
+		auto	it = _chunks.find(cursor);
+		if (it != _chunks.end())
+			it->second->createFixture(_b2World);
+	}
+  }
 }
 
 const Player	&World::getPlayer() const

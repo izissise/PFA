@@ -1,50 +1,107 @@
 #ifndef	VECTOR2_H
 # define VECTOR2_H
 
+# include <iostream>
+
+# include <Box2D/Box2D.h>
+
 template<typename T>
 class Vector2
 {
 public:
-  Vector2(void) {}
-  Vector2(const T& value) : x(value), y(value) {}
-  Vector2(const T& p_x, const T& p_y) : x(p_x), y(p_y) {}
-  Vector2(const Vector2& rhs) : x(rhs.x), y(rhs.y) {}
+
+  Vector2() : x(static_cast<T>(0)), y(static_cast<T>(0)) {}
+
   template <typename U>
-  explicit Vector2(const Vector2<U>& vec) :
-    x(static_cast<T>(vec.x)),
-    y(static_cast<T>(vec.y))
-  {
-  }
-  Vector2&	operator=(const Vector2& rhs) {
-    x = rhs.x;
-    y = rhs.y;
+  Vector2(const U& value) : x(static_cast<T>(value)), y(static_cast<T>(value)) {}
+
+  Vector2(b2Vec2 const& val) : x(static_cast<T>(val.x)), y(static_cast<T>(val.y)) {}
+
+  template <typename U, typename V>
+  Vector2(const U& p_x, const V& p_y) : x(static_cast<T>(p_x)), y(static_cast<T>(p_y)) {}
+
+
+  template <typename U>
+  Vector2(const Vector2<U>& vec) :
+    x(static_cast<T>(vec.x)), y(static_cast<T>(vec.y))
+  {}
+
+  virtual ~Vector2() {};
+
+  template <typename U>
+  Vector2<T>&	operator=(const Vector2<U>& rhs) {
+    x = static_cast<T>(rhs.x);
+    y = static_cast<T>(rhs.y);
     return *this;
   }
 
-  Vector2	operator+(const Vector2& rhs) const { return {x + rhs.x, y + rhs.y}; }
-  Vector2	operator-(const Vector2& rhs) const { return {x - rhs.x, y - rhs.y}; }
-  Vector2	operator*(const Vector2& rhs) const { return {x * rhs.x, y * rhs.y}; }
-  Vector2	operator/(const Vector2& rhs) const { return {x / rhs.x, y / rhs.y}; }
-  Vector2	operator%(const Vector2& rhs) const { return {x % rhs.x, y % rhs.y}; }
+  template <typename U>
+  Vector2<T>	operator+(const U& rhs) const {
+    Vector2<T> ret(*this);
+    ret += rhs;
+    return ret;
+  }
 
-  Vector2	operator*(const T& rhs) const { return {x * rhs, y * rhs}; }
-  Vector2	operator/(const T& rhs) const { return {x / rhs, y / rhs}; }
-  Vector2	operator%(const T& rhs) const { return {x % rhs, y % rhs}; }
+  template <typename U>
+  Vector2<T>	operator-(const U& rhs) const {
+    Vector2<T> ret(*this);
+    ret -= rhs;
+    return ret;
+  }
 
-  Vector2&	operator+=(const Vector2& rhs) { x += rhs.x; y += rhs.y; return *this; }
-  Vector2&	operator-=(const Vector2& rhs) { x -= rhs.x; y -= rhs.y; return *this; }
-  Vector2&	operator*=(const Vector2& rhs) { x *= rhs.x; y *= rhs.y; return *this; }
-  Vector2&	operator/=(const Vector2& rhs) { x /= rhs.x; y /= rhs.y; return *this; }
-  Vector2&	operator%=(const Vector2& rhs) { x %= rhs.x; y %= rhs.y; return *this; }
+  template <typename U>
+  Vector2<T>	operator*(const U& rhs) const {
+    Vector2<T> ret(*this);
+    ret *= rhs;
+    return ret;
+  }
 
-  Vector2&	operator*=(const T& rhs) { x *= rhs; y *= rhs; return *this; }
-  Vector2&	operator/=(const T& rhs) { x /= rhs; y /= rhs; return *this; }
-  Vector2&	operator%=(const T& rhs) { x %= rhs; y %= rhs; return *this; }
+  template <typename U>
+  Vector2<T>	operator/(const U& rhs) const {
+    Vector2<T> ret(*this);
+    ret /= rhs;
+    return ret;
+  }
 
-  bool		operator==(const Vector2& rhs) const { return (x == rhs.x && y == rhs.y); }
-  bool		operator!=(const Vector2& rhs) const { return (x != rhs.x || y != rhs.y); }
+  template <typename U>
+  Vector2<T>	operator%(const U& rhs) const {
+    Vector2<T> ret(*this);
+    ret %= rhs;
+    return ret;
+  }
 
-  bool		operator<(const Vector2& rhs) const {
+  template <typename U>
+  Vector2<T>&	operator+=(const Vector2<U>& rhs) { x += rhs.x; y += rhs.y; return *this; }
+
+  template <typename U>
+  Vector2<T>&	operator-=(const Vector2<U>& rhs) { x -= rhs.x; y -= rhs.y; return *this; }
+
+  template <typename U>
+  Vector2<T>&	operator*=(const Vector2<U>& rhs) { x *= rhs.x; y *= rhs.y; return *this; }
+
+  template <typename U>
+  Vector2<T>&	operator/=(const Vector2<U>& rhs) { x /= rhs.x; y /= rhs.y; return *this; }
+
+  template <typename U>
+  Vector2<T>&	operator%=(const Vector2<U>& rhs) { x %= rhs.x; y %= rhs.y; return *this; }
+
+  template <typename U>
+  Vector2<T>&	operator*=(const U& rhs) { x *= rhs; y *= rhs; return *this; }
+
+  template <typename U>
+  Vector2<T>&	operator/=(const U& rhs) { x /= rhs; y /= rhs; return *this; }
+
+  template <typename U>
+  Vector2<T>&	operator%=(const U& rhs) { x %= rhs; y %= rhs; return *this; }
+
+  template <typename U>
+  bool		operator==(const Vector2<U>& rhs) const { return (x == rhs.x && y == rhs.y); }
+
+  template <typename U>
+  bool		operator!=(const Vector2<U>& rhs) const { return !(*this == rhs); }
+
+  template <typename U>
+  bool		operator<(const Vector2<U>& rhs) const {
     return (y < rhs.y || (y == rhs.y && x < rhs.x));
   }
 
@@ -61,6 +118,13 @@ public:
     T	height;
   };
 };
+
+template<typename T>
+std::ostream& operator<<(std::ostream& f, Vector2<T> const& vec)
+{
+	f << "{" << vec.x << ", " << vec.y << "}";
+	return f;
+}
 
 typedef Vector2<float>		Vector2f;
 typedef Vector2<double>		Vector2d;

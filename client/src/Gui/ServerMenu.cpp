@@ -103,7 +103,7 @@ void	ServerMenu::updateContent(Settings &set)
 			  2);
 }
 
-void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
+void	ServerMenu::update(const std::chrono::milliseconds &timeStep, Settings &set)
 {
   if (_hide)
     return ;
@@ -135,7 +135,6 @@ void	ServerMenu::update(std::chrono::milliseconds timeStep, Settings &set)
       }
   }
   updateContent(set);
-  _update = false;
 }
 
 int	ServerMenu::updateHud(const sf::Event &ev, sf::RenderWindow &ref, Settings &set)

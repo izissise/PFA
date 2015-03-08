@@ -34,7 +34,7 @@ public:
   ServerMenu(const sf::FloatRect &zone);
   virtual ~ServerMenu();
 
-  void		update(std::chrono::milliseconds timeStep, Settings &set);
+  void		update(const std::chrono::milliseconds &timeStep, Settings &set);
   int		event(const sf::Event &event, sf::RenderWindow &ref, Settings &set);
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);

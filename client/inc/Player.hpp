@@ -2,18 +2,25 @@
 #define _PLAYER_H_
 
 #include <cmath>
+#include <memory>
 
-#include "AMovable.hpp"
+#include "AEntity.hpp"
 #include "Range2.hpp"
 #include "Camera.hpp"
+#include "ATool.hpp"
+#include "AItem.hpp"
 
-class Player : public AMovable
+class Player : public AEntity
 {
+private:
+  static const unsigned int defaultDamages = 1;
 public:
-  Player(Camera &camera);
-  virtual ~Player();
+  Player(std::shared_ptr<b2World> const& world, Camera &camera);
+  virtual ~Player() {};
 
-  bool		move(const Vector2f &dir);
+  void update(std::chrono::milliseconds const & timeStep) override;
+ // void draw(sf::RenderTarget& window, std::chrono::milliseconds const & timeStep) const override;
+  bool		move(const Vector2f &dir) override;
 
   Range2i	&getLoadedRange();
   Range2i	&getVisibleRange();
@@ -24,11 +31,14 @@ public:
   void		setPlayerPosition(const Vector2i &chunkId,
 				  const Vector2f &position,
 				  float rWidth, float rHeight);
+  void		hit(AItem &item);
+  bool		hit(tile &t);
 
 private:
   Range2i	_loadedRange;
   Range2i	_visibleRange;
   Camera	&_camera;
+  std::unique_ptr<ATool>	_tool;
 };
 
 #endif /* _PLAYER_H_ */

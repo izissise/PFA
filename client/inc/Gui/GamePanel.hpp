@@ -22,7 +22,7 @@ public:
   void		construct(const sf::Texture &texture, Settings &set,
 			  const std::vector<APanelScreen *> &panels);
 
-  void		update(std::chrono::milliseconds timeStep, Settings &set) override;
+  void		update(std::chrono::milliseconds const & timeStep, Settings &set) override;
   void		draw(sf::RenderTarget &window, bool toWin) override;
   int		event(const sf::Event &ev, sf::RenderWindow &ref, Settings &set) override;
 

@@ -2,6 +2,7 @@
 # define CHUNK_H
 
 # include <array>
+# include <memory>
 # include <cstdint>
 # include <utility>
 # include <vector>
@@ -9,6 +10,7 @@
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
+# include "Box2DHelpers.hpp"
 # include "TileCodex.hpp"
 # include "TileType.hpp"
 # include "Vector2.hpp"
@@ -16,6 +18,17 @@
 # include "Config.h"
 
 using namespace google::protobuf;
+
+struct	tile
+{
+  TileType	type;
+  uint8_t	life;
+
+  tile(TileType t, uint8_t l = 1) :
+    type(t), life(l)
+  {
+  }
+};
 
 class Chunk
 {
@@ -32,6 +45,7 @@ public:
   Chunk(const Chunk& other) = delete;
   Chunk&	operator=(const Chunk& other) = delete;
 
+  void createFixture(std::shared_ptr<b2World> const& b2World);
   void load(const TileCodex& codex);
   void fillTiles(const ChunkData &packet);
   void draw(sf::RenderTarget& window,
@@ -39,28 +53,29 @@ public:
 	    const TileCodex& codex) const;
 
   void		setPosition(const Vector2i &vec);
-  TileType getTile(unsigned index) const	{ return _tiles[index]; }
-  void setTile(unsigned index, TileType val)	{ _tiles[index] = val; }
-  TileType getBgTile(unsigned index) const	{ return _bgTiles[index]; }
-  void setBgTile(unsigned index, TileType val)	{ _bgTiles[index] = val; }
-  bool isLoaded(void) const			{ return _loaded; }
-  bool isGenerated() const			{ return _generated; }
+
+  tile		&getTile(unsigned index)	{ return _tiles[index]; }
+  tile		&getBgTile(unsigned index)	{ return _bgTiles[index]; }
+  bool		isLoaded(void) const			{ return _loaded; }
+  bool		isGenerated() const			{ return _generated; }
 
   /*
   ** Conveniance wrappers
   */
-  TileType getTile(unsigned x, unsigned y) const	{ return getTile(y * width + x); }
-  void setTile(unsigned x, unsigned y, TileType val)	{ setTile(y * width + x, val); }
-  TileType getBgTile(unsigned x, unsigned y) const	{ return getBgTile(y * width + x); }
-  void setBgTile(unsigned x, unsigned y, TileType val)	{ setBgTile(y * width + x, val); }
+  tile	&getTile(unsigned x, unsigned y)	{ return getTile(y * width + x); }
+  tile	&getBgTile(unsigned x, unsigned y)	{ return getBgTile(y * width + x); }
+  void	setTile(const Vector2i &pos, const tile &t,
+		const TileCodex& codex);
 
   const Vector2i	&getPosition() const;
 
 private:
   void	_generateVBO(const TileCodex& codex);
 
-  std::vector<TileType>	_tiles;
-  std::vector<TileType> _bgTiles;
+private:
+  std::unique_ptr<b2Body, std::function<void(b2Body*)>> _body;
+  std::vector<tile>	_tiles;
+  std::vector<tile>	_bgTiles;
   sf::VertexArray	_fgVertices;
   sf::VertexArray	_bgVertices;
   Vector2i		_pos;

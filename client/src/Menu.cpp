@@ -33,10 +33,6 @@ Menu::Menu(Settings &settings, Parser &parser) :
   OptionGamePanel	*optGamePanel = new OptionGamePanel(sf::FloatRect(380,100,1130,730));
   OptionKeyPanel	*optKeyPanel = new OptionKeyPanel(sf::FloatRect(380,100,1130,730));
 
-  _panels.push_back(mainMenu);
-  _panels.push_back(serverMenu);
-  _panels.push_back(gamePanel);
-
   mainMenu->addPanel(optTabPanel);
   optTabPanel->addPanel({optGamePanel, optKeyPanel});
 
@@ -46,6 +42,11 @@ Menu::Menu(Settings &settings, Parser &parser) :
   optTabPanel->construct(_menuTexture, settings, {optGamePanel, optKeyPanel});
   optGamePanel->construct(_menuTexture, settings, {});
   optKeyPanel->construct(_menuTexture, settings, {});
+
+  _panels.push_back(mainMenu);
+  _panels.push_back(serverMenu);
+  _panels.push_back(gamePanel);
+  std::cout << "Servermenu: " << serverMenu << std::endl;
 }
 
 Menu::~Menu()
@@ -54,7 +55,7 @@ Menu::~Menu()
     delete panel;
 }
 
-void	Menu::update(const std::chrono::milliseconds timeStep, Settings &set)
+void	Menu::update(const std::chrono::milliseconds &timeStep, Settings &set)
 {
   for (auto &panel : _panels)
     panel->update(timeStep, set);

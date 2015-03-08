@@ -37,7 +37,7 @@ public:
     * \param[in] The elapsed time since the last call
     * \param[in] set The game's settings
     */
-   virtual void update(UNUSED std::chrono::milliseconds timeStep, UNUSED Settings &set) {};
+   virtual void update(UNUSED std::chrono::milliseconds const & timeStep, UNUSED Settings &set) {};
 
   /**
    * \fn int event(const sf::Event &event, sf::RenderWindow &ref, Settings &set);

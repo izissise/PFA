@@ -1,9 +1,6 @@
 #include "ClientEntity.hpp"
 
-ClientEntity::ClientEntity()
+void ClientEntity::update(UNUSED std::chrono::milliseconds const & timeStep)
 {
-}
 
-ClientEntity::~ClientEntity()
-{
 }

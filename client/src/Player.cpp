@@ -1,15 +1,25 @@
 #include <functional>
+#include <iostream>
+
 #include "Player.hpp"
 
-Player::Player(Camera &camera) :
-  _camera(camera)
+Player::Player(std::shared_ptr<b2World> const& world, Camera &camera) :
+  AEntity(world), _camera(camera), _tool(nullptr)
 {
 }
 
-Player::~Player()
+void Player::update(std::chrono::milliseconds const & timeStep)
 {
+  AMovable::update(timeStep);
 }
-#include <iostream>
+
+/*
+void Player::draw(sf::RenderTarget& window, std::chrono::milliseconds const & timeStep) const
+{
+  AMovable::draw(window, timeStep);
+}
+*/
+
 bool	Player::move(const Vector2f &dir)
 {
   bool	retVal;
@@ -74,4 +84,40 @@ void	Player::calculateVisibleRange()
 {
   _visibleRange = {Vector2i(std::floor(_camera.left()), std::floor(_camera.bottom())),
 		   Vector2i(std::floor(_camera.right()), std::floor(_camera.top()))};
+}
+
+void	Player::hit(AItem &item)
+{
+  unsigned int	damages;
+
+  if (_tool != nullptr)
+    {
+      damages = _tool->getDamages();
+    }
+  else
+    {
+      damages = Player::defaultDamages;
+    }
+  item.takeDamages(damages);
+}
+
+bool	Player::hit(tile &t)
+{
+  unsigned int	damages;
+
+  if (_tool != nullptr)
+    {
+      damages = _tool->getDamages();
+    }
+  else
+    {
+      damages = Player::defaultDamages;
+    }
+  if (t.life <= damages)
+    {
+      t.life = 0;
+      return true;
+    }
+  t.life -= damages;
+  return false;
 }

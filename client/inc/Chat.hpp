@@ -27,7 +27,7 @@ public:
   virtual ~Chat() = default;
 
   void	update();
-void	draw(sf::RenderTarget &window);
+  void	draw(sf::RenderTarget &window);
   void	addMessages(const std::string &str);
 
 private:

@@ -16,7 +16,7 @@ public:
   Menu(Settings &set, Parser &parser);
   virtual ~Menu();
 
-  void		update(const std::chrono::milliseconds timeStep, Settings &set);
+  void		update(const std::chrono::milliseconds &timeStep, Settings &set);
   bool		run(const sf::Event &event, sf::RenderWindow &window, Settings &set);
   void		draw(sf::RenderWindow &window);
 

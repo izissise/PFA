@@ -229,10 +229,10 @@ int	APanelScreen::event(const sf::Event &ev, sf::RenderWindow &ref, Settings &se
             }
         }
     }
-  for (auto rrrit = _widgets.rbegin(); rrrit != _widgets.rend(); ++rrrit)
+  for (auto rit = _widgets.rbegin(); rit != _widgets.rend(); ++rit)
     {
-     if (checkPanelBounds(*rrrit)) // update widget even if hidden
-        if ((retVal = (*rrrit)->update(ev, ref, set)) != 0)
+     if (checkPanelBounds(*rit)) // update widget even if hidden
+        if ((retVal = (*rit)->update(ev, ref, set)) != 0)
           return retVal;
     }
   return retVal;

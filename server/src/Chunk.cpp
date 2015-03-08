@@ -691,10 +691,10 @@ void	Chunk::_generateOres()
 {
   const t_OreInfo	ores[static_cast<int>(Ore::Count)] =
     {
-      {Ore::Coal,TileType::CoalOre, 0.5, 16, 24, 0, 500, 100},
-      {Ore::Iron, TileType::IronOre, 0.5, 10, 16, -2, 300, 80},
-      {Ore::Copper, TileType::GoldOre, 0.5, 10, 16, -3, 300, 80},
-      {Ore::Diamond, TileType::DiamondOre, 0.9, 5, 9, -5, 200, 50},
+      {Ore::Coal,TileType::CoalOre, 0.5, 16, 24, 0, 50, 100},
+      {Ore::Iron, TileType::IronOre, 0.5, 10, 16, -1, 30, 70},
+      {Ore::Copper, TileType::GoldOre, 0.5, 10, 16, -2, 30, 70},
+      {Ore::Diamond, TileType::DiamondOre, 0.9, 5, 9, -3, 20, 40},
     };
   unsigned int	randNb;
 

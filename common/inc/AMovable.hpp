@@ -1,6 +1,11 @@
 #ifndef _AMOVABLE_H_
 #define _AMOVABLE_H_
 
+#include <chrono>
+
+#include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
+
 #include "Vector2.hpp"
 #include "Config.h"
 
@@ -8,7 +13,9 @@ class AMovable
 {
 public:
   AMovable();
-  virtual ~AMovable();
+  virtual ~AMovable() {};
+
+  virtual void update(std::chrono::milliseconds const & timeStep) = 0;
 
   virtual bool		move(const Vector2f &dir);
   const Vector2f	&getPosition() const;
@@ -17,7 +24,7 @@ public:
   void			setPosition(const Vector2f &position);
   void			setChunkId(const Vector2i chunkId);
 
-private:
+protected:
   Vector2f	_pos;
   Vector2i	_chunkId;
 };
