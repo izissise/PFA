@@ -33,7 +33,7 @@ Chunk::Chunk(const Vector2i &chunkPos) :
 
 void Chunk::createFixture(std::shared_ptr<b2World> const& b2World)
 {
-  std::vector<b2Vec2> tmpFix;
+/*  std::vector<b2Vec2> tmpFix;
   size_t			  idx = 0;
 
   for (int y = Chunk::height - 1; y >= 0; --y)
@@ -59,7 +59,7 @@ void Chunk::createFixture(std::shared_ptr<b2World> const& b2World)
   bodyDef.position.Set(_pos.x * static_cast<int>(Chunk::width),
 					   _pos.y * static_cast<int>(Chunk::height));
   _body = Box2DHelpers::createBody(b2World, bodyDef, chain, 0.0f);
-	}
+	}*/
 }
 
 void Chunk::load(const TileCodex& codex)

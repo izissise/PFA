@@ -40,7 +40,7 @@ void AEntity::draw(Camera const& cam, sf::RenderTarget& window, std::chrono::mil
 
  Vector2i pos = cam.physWorldToSPos(_pos);
  pos += cam.center() * chunkSize * static_cast<int>(TileCodex::tileSize);
-   std::cout << "Pos at drawing: " << pos << std::endl;
+//   std::cout << "Pos at drawing: " << pos << std::endl;
   circle.setPosition(pos.x, pos.y);
 
 // change the radius to 40

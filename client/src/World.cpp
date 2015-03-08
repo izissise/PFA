@@ -26,7 +26,7 @@ World::World(Settings& settings) :
   _camera.resize(_camera.sToWPos(_screenSize));
   tm.load(TexturePath, "nightBg.png");
 
- _entities.push_back(std::shared_ptr<AEntity>(new AEntity(_b2World)));
+ //_entities.push_back(std::shared_ptr<AEntity>(new AEntity(_b2World)));
 }
 
 void		World::setPlayerPosition(const Vector2i &chunkId,
@@ -115,15 +115,6 @@ void	World::update(const std::chrono::milliseconds& timeStep)
     {
       i->update(timeStep);
     }
-    Vector2i tmp;
-    tmp.x = Chunk::width;
-    tmp.y = Chunk::height;
-    std::cout << "CAmErea\\a pos" << _camera.center() * tmp << std::endl;
-    static int y = 0;
-    if ( y > 19 )
-    y++;
-  //  exit(74);
-y++;
 }
 
 auto World::_getScreenOrigin() const -> screenPos
