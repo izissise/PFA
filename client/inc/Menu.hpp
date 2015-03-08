@@ -1,18 +1,22 @@
 #ifndef _MENU_H_
 #define _MENU_H_
 
-# include <SFML/Graphics.hpp>
 # include <string>
-# include "Settings.hpp"
+# include <chrono>
+
+# include <SFML/Graphics.hpp>
+
+# include "Parser.hpp"
 # include "Console.hpp"
 # include "APanelScreen.hpp"
 
 class Menu
 {
 public:
-  Menu(Settings &set);
+  Menu(Settings &set, Parser &parser);
   virtual ~Menu();
 
+  void		update(const std::chrono::milliseconds &timeStep, Settings &set);
   bool		run(const sf::Event &event, sf::RenderWindow &window, Settings &set);
   void		draw(sf::RenderWindow &window);
 

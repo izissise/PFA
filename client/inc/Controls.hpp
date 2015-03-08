@@ -1,10 +1,13 @@
 #ifndef _CONTROLS_H_
 #define _CONTROLS_H_
 
-# include <SFML/Window.hpp>
-# include <map>
-# include <array>
-# include <vector>
+#include <SFML/Window.hpp>
+#include <map>
+#include <array>
+#include <vector>
+#include <deque>
+
+#include "ActionEnum.hpp"
 
 namespace ctrl
 {
@@ -23,19 +26,10 @@ namespace ctrl
       };
 }
 
-enum class	Action
+inline Action	operator++(Action &x)
 {
-  Unknown = -1,
-    Forward = 0,
-    Back,
-    Right,
-    Left,
-    Use,
-    MoveUp,
-    MoveDown,
-    ToggleConsole,
-    Last
-    };
+  return (x = static_cast<Action>(static_cast<int>(x) + 1));
+}
 
 enum class	actionType
 {
@@ -112,6 +106,18 @@ typedef struct	s_action
   }
 }		t_action;
 
+struct			s_mouseEvent
+{
+  sf::Mouse::Button	button;
+  sf::Vector2i		position;
+
+  s_mouseEvent(sf::Mouse::Button b,
+	       const sf::Vector2i &p) :
+    button(b), position(p)
+  {
+  }
+};
+
 class Controls
 {
 public:
@@ -125,12 +131,19 @@ public:
   t_entry		getKeyFromCode(const std::string &code) const;
   t_entry		getKeyFromAction(Action act) const;
   t_entry		getLastKey(Action act) const;
+  bool			isKnownKey(const t_entry &entry) const;
   const std::string	&getCodeFromKey(const t_entry &entry) const;
   const std::string	&getCodeFromAction(Action act) const;
+  const std::array<t_entry, 5>	&getBoundKeys(Action act) const;
+  const sf::Vector2i	&getClickPosition(sf::Mouse::Button button) const;
 
-  void		bindActionOnKey(const t_entry &entry, Action act);
+  void		unbindKey(const t_entry &entry);
+  void		unbindKeyFromAction(const t_entry &entry, Action act);
+  void		bindKeyOnAction(const t_entry &entry, Action act);
   void		pressKey(const t_entry &entry);
   void		releaseKey(const t_entry &entry);
+  void		mouseButtonPressed(const sf::Event &event);
+  void		mouseMoved(const sf::Event &event);
 
 private:
   std::array<std::map<ctrl::key, bool>,
@@ -138,6 +151,7 @@ private:
   std::map<Action, std::array<t_entry, 5>>		_actionKeys;
   std::map<std::string, t_entry>			_keycode;
   std::vector<t_action>					_actions;
+  std::array<sf::Vector2i, static_cast<int>(sf::Mouse::ButtonCount)>	_mousePosition;
 };
 
 #endif /* _CONTROLS_H_ */

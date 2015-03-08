@@ -122,6 +122,17 @@ Controls::Controls()
   _actions.push_back(t_action("moveup"));
   _actions.push_back(t_action("movedown"));
   _actions.push_back(t_action("console", actionType::Toggle));
+  _actions.push_back(t_action("quickMenu", actionType::Toggle));
+  _actions.push_back(t_action("chat", actionType::Toggle));
+
+  for (unsigned int i = 0; i < static_cast<int>(Action::Last); ++i)
+    _actionKeys.insert(std::pair<Action, std::array<t_entry, 5>> (static_cast<Action>(i),
+      {t_entry(sf::Keyboard::Unknown),
+	  t_entry(sf::Keyboard::Unknown),
+	  t_entry(sf::Keyboard::Unknown),
+	  t_entry(sf::Keyboard::Unknown),
+	  t_entry(sf::Keyboard::Unknown)}));
+
 }
 
 Controls::~Controls()
@@ -202,6 +213,14 @@ t_entry	Controls::getLastKey(Action act) const
   return last;
 }
 
+bool	Controls::isKnownKey(const t_entry &entry) const
+{
+  for (auto &it : _keycode)
+    if (it.second == entry)
+      return true;
+  return false;
+}
+
 const std::string	&Controls::getCodeFromKey(const t_entry &entry) const
 {
   for (auto &it : _keycode)
@@ -212,10 +231,50 @@ const std::string	&Controls::getCodeFromKey(const t_entry &entry) const
   throw (Exception("Key not bound"));
 }
 
-void	Controls::bindActionOnKey(const t_entry &entry, Action act)
+const std::array<t_entry, 5>	&Controls::getBoundKeys(Action act) const
+{
+  auto  it = _actionKeys.find(act);
+
+  return it->second;
+}
+
+void	Controls::unbindKey(const t_entry &entry)
+{
+  Action	act;
+
+  while ((act = getActionFromKey(entry)) != Action::Unknown)
+    unbindKeyFromAction(entry, act);
+}
+
+void	Controls::unbindKeyFromAction(const t_entry &entry, Action act)
+{
+  auto	it = _actionKeys.find(act);
+  unsigned int	i;
+
+  if (it == _actionKeys.end())
+    return ;
+
+  std::array<t_entry, 5>	&keys = it->second;
+  for (i = 0; i < keys.size(); ++i)
+    if (entry == keys[i])
+      break ;
+  while (i < keys.size() - 1)
+    {
+      keys[i] = keys[i + 1];
+      ++i;
+    }
+  while (i < keys.size())
+    {
+      keys[i] = ctrl::state::Unset;
+      ++i;
+    }
+}
+
+void	Controls::bindKeyOnAction(const t_entry &entry, Action act)
 {
   auto	it = _actionKeys.find(act);
 
+  unbindKey(entry);
   if (it == _actionKeys.end())
     {
       _actionKeys.insert(std::pair<Action, std::array<t_entry, 5>> (act,
@@ -267,4 +326,35 @@ void		Controls::releaseKey(const t_entry &entry)
   t_action &action = _actions[static_cast<unsigned int>(act)];
   if (action.type != actionType::Toggle)
     action.state = false;
+}
+
+void	Controls::mouseButtonPressed(const sf::Event &event)
+{
+  sf::Vector2i &pos = _mousePosition[static_cast<int>(event.mouseButton.button)];
+
+  pos.x = event.mouseButton.x;
+  pos.y = event.mouseButton.y;
+}
+
+void	Controls::mouseMoved(const sf::Event &event)
+{
+  std::map<ctrl::key, bool>	&mouseButtons = _keyState[static_cast<int>(ctrl::type::Mouse)];
+  unsigned int	i = 0;
+
+  for (auto &pair : mouseButtons)
+    {
+      if (pair.second == true)
+	{
+	  sf::Vector2i &pos = _mousePosition[i];
+
+	  pos.x = event.mouseMove.x;
+	  pos.y = event.mouseMove.y;
+	}
+      ++i;
+    }
+}
+
+const sf::Vector2i	&Controls::getClickPosition(sf::Mouse::Button button) const
+{
+  return _mousePosition[static_cast<int>(button)];
 }

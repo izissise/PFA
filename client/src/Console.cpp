@@ -1,11 +1,14 @@
+#include <functional>
+#include "Settings.hpp"
 #include "Console.hpp"
 #include "Exception.hpp"
 
-Console::Console(Settings* set) : _set(set), _cursor(), _history()
+Console::Console(Settings &set, Parser *parser) :
+  _cursor(), _historical(), _parser(parser)
 {
   sf::Color	color(20, 20, 20);
-  int		width = std::stoi(set->getCvarList().getCvar("r_width"));
-  int		height = std::stoi(set->getCvarList().getCvar("r_height"));
+  int		width = std::stoi(set.getCvarList().getCvar("r_width"));
+  int		height = std::stoi(set.getCvarList().getCvar("r_height"));
 
   _rectangle.setSize(sf::Vector2f(width, height / 2));
   _rectangle.setPosition(0, 0);
@@ -13,7 +16,7 @@ Console::Console(Settings* set) : _set(set), _cursor(), _history()
   _rectangle.setOutlineThickness(2);
   _rectangle.setFillColor(color);
 
-  if (!_font.loadFromFile("../client/assets/font.otf"))
+  if (!_font.loadFromFile("../client/assets/default.TTF"))
     std::cerr << "Can't load font" << std::endl; // replace this by a throw about ressources
   _text.setFont(_font);
   _text.setStyle(sf::Text::Regular);
@@ -26,41 +29,49 @@ Console::~Console()
 {
 }
 
-
-void		Console::run(const sf::Event& event)
+void	Console::getInput()
 {
-  Controls	&ctrl = _set->getControls();
+  const std::vector<std::string> &output = _parser->parseLine(_input.getString().toAnsiString());
+  _historical.addString(_input.getString());
+  _input.clear();
+  for (auto &it : output)
+    _historical.addString(it);
+}
 
-  if (_input.getInput(event))
+void		Console::run(const sf::Event& event, Controls &ctrl)
+{
+  t_entry	entry;
+  std::function<bool (Action act,
+		      const std::initializer_list<Action> &actions)> isConsoleKey =
+    [](Action act, const std::initializer_list<Action> &actions)
     {
-      try {
-          _set->parseCommandLine(_input.getString().toAnsiString());
-        }
-      catch (const Exception &e) {
-          std::cerr << e.what() << std::endl;
-        }
-      _history.content.push_front(_input.getString());
-      if (_history.content.size() > _history.maxSize)
-        _history.content.pop_back();
-      _input.clear();
-    }
+      return std::find(actions.begin(), actions.end(), act) != actions.end();
+    };
+
+  if (_input.getInput(event)) // means enter got pressed
+    getInput();
+  else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
+	   && sf::Keyboard::isKeyPressed(sf::Keyboard::L))
+    _historical.clear();
   _text.setString("]" + _input.getString());
   _cursor.update();
   _cursor.setCursorPos(_text);
+  entry.fill(event);
   switch (event.type)
     {
     case sf::Event::KeyPressed:
-      ctrl.pressKey(event.key.code);
+      if (isConsoleKey(ctrl.getActionFromKey(entry), {Action::ToggleConsole}))
+	ctrl.pressKey(entry);
       break;
     case sf::Event::KeyReleased:
-      ctrl.releaseKey(event.key.code);
+      if (isConsoleKey(ctrl.getActionFromKey(entry), {Action::ToggleConsole}))
+	ctrl.releaseKey(entry);
       break;
     case sf::Event::MouseWheelMoved:
-      _history.pos =
-        ((static_cast<int>(_history.pos) + event.mouseWheel.delta < 0) ? 0 :
-         (_history.pos + event.mouseWheel.delta > _history.content.size()) ?
-         _history.content.size() :
-         _history.pos + event.mouseWheel.delta);
+      _historical.setPos((static_cast<int>(_historical.getPos()) + event.mouseWheel.delta < 0) ? 0 :
+			 (_historical.getPos() + event.mouseWheel.delta > _historical.getSize()) ?
+			 _historical.getSize() :
+			 _historical.getPos() + event.mouseWheel.delta);
       break;
     default:
       break;
@@ -71,12 +82,14 @@ void		Console::draw(sf::RenderWindow &window)
 {
   unsigned int	wSize = (FONTSIZE + 2 * LINESPACING);
   unsigned int	cSize;
+  sf::FloatRect	rect;
 
-  cSize = std::stoi(_set->getCvarList().getCvar("r_height")) / 2 - wSize;
+  rect = _rectangle.getGlobalBounds();
+  cSize = rect.height - wSize;
   window.draw(_rectangle);
   _text.setPosition(0, cSize - (FONTSIZE + 3 * LINESPACING));
-  for (auto it = _history.content.cbegin() + _history.pos;
-       it != _history.content.cend() && wSize < cSize; ++it)
+  for (auto it = _historical.getContent().cbegin() + _historical.getPos();
+       it != _historical.getContent().cend() && wSize < cSize; ++it)
     {
       _text.setString(*it);
       window.draw(_text);

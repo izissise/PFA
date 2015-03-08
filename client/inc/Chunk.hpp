@@ -1,6 +1,8 @@
 #ifndef	CHUNK_H
 # define CHUNK_H
 
+# include <array>
+# include <memory>
 # include <cstdint>
 # include <utility>
 # include <vector>
@@ -8,67 +10,77 @@
 # include <SFML/Graphics.hpp>
 # include <SFML/System.hpp>
 
-# include "Lines.hpp"
+# include "Box2DHelpers.hpp"
 # include "TileCodex.hpp"
 # include "TileType.hpp"
 # include "Vector2.hpp"
+# include "ProtocolMessage.pb.h"
+# include "Config.h"
 
-# define PERSISTANCE 1.0f
-# define SCALE 0.05f
-# define MAXHEIGHT 100.f
-# define ROUGHNESS 0.5f // [0 - 1]
+using namespace google::protobuf;
+
+struct	tile
+{
+  TileType	type;
+  uint8_t	life;
+
+  tile(TileType t, uint8_t l = 1) :
+    type(t), life(l)
+  {
+  }
+};
 
 class Chunk
 {
 public:
-  static const int width = 256;
-  static const int height = 256;
-  static const int octaves = 2;
-  static const int iterations = 5;
+  static const int	width = CHUNKWIDTH;
+  static const int	height = CHUNKHEIGHT;
+  static const unsigned	pWidth = width * TileCodex::tileSize;
+  static const unsigned pHeight = height * TileCodex::tileSize;
 
-  Chunk(void);
-  virtual ~Chunk(void);
+  Chunk();
+  Chunk(const Vector2i &chunkPos);
+  virtual ~Chunk() = default;
 
   Chunk(const Chunk& other) = delete;
   Chunk&	operator=(const Chunk& other) = delete;
 
-  void load(int x, int y, const TileCodex& codex);
-  void draw(sf::RenderWindow& window,
+  void createFixture(std::shared_ptr<b2World> const& b2World);
+  void load(const TileCodex& codex);
+  void fillTiles(const ChunkData &packet);
+  void draw(sf::RenderTarget& window,
 	    Vector2i& windowCoord,
 	    const TileCodex& codex) const;
 
-  TileType getTile(unsigned index) const	{ return _tiles[index]; }
-  void setTile(unsigned index, TileType val)	{ _tiles[index] = val; }
-  TileType getBgTile(unsigned index) const	{ return _bgTiles[index]; }
-  void setBgTile(unsigned index, TileType val)	{ _bgTiles[index] = val; }
-  bool isLoaded(void) const			{ return _loaded; }
+  void		setPosition(const Vector2i &vec);
+
+  tile		&getTile(unsigned index)	{ return _tiles[index]; }
+  tile		&getBgTile(unsigned index)	{ return _bgTiles[index]; }
+  bool		isLoaded(void) const			{ return _loaded; }
+  bool		isGenerated() const			{ return _generated; }
 
   /*
   ** Conveniance wrappers
   */
-  TileType getTile(unsigned x, unsigned y) const	{ return getTile(y * width + x); }
-  void setTile(unsigned x, unsigned y, TileType val)	{ setTile(y * width + x, val); }
-  TileType getBgTile(unsigned x, unsigned y) const	{ return getBgTile(y * width + x); }
-  void setBgTile(unsigned x, unsigned y, TileType val)	{ setBgTile(y * width + x, val); }
+  tile	&getTile(unsigned x, unsigned y)	{ return getTile(y * width + x); }
+  tile	&getBgTile(unsigned x, unsigned y)	{ return getBgTile(y * width + x); }
+  void	setTile(const Vector2i &pos, const tile &t,
+		const TileCodex& codex);
 
-protected:
+  const Vector2i	&getPosition() const;
+
 private:
-  void _generate(void);
-  void _loadFromFile(void);
-  void _generateVBO(const TileCodex& codex);
-  void _fillVertex(sf::Vector2f &prev, sf::Vector2f &next, int x);
-  void _constructLine(void);
-  void _completeField(void);
+  void	_generateVBO(const TileCodex& codex);
 
-  std::vector<TileType>	_tiles;
-  std::vector<TileType> _bgTiles;
-  bool			_loaded;
-  sf::Font		_font;
-  sf::Text		_id;
-  Vector2i		_pos;
+private:
+  std::unique_ptr<b2Body, std::function<void(b2Body*)>> _body;
+  std::vector<tile>	_tiles;
+  std::vector<tile>	_bgTiles;
   sf::VertexArray	_fgVertices;
   sf::VertexArray	_bgVertices;
-  Lines			_line;
+  Vector2i		_pos;
+  bool			_generated;
+  bool			_loaded;
 };
 
 #endif		/* CHUNK_H */

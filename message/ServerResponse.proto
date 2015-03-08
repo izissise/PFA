@@ -1,0 +1,10 @@
+message ServerResponse {
+  enum PacketContent
+  {
+    SUCCESS = 0;
+    FAILURE = 1;
+    PLAYER = 2;
+  }
+  required PacketContent content = 1;
+  optional uint32 player = 2;
+}

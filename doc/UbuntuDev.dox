@@ -1,0 +1,12 @@
+/*
+\page Developpement environnement under ubuntu:
+
+Required packages are:
+cmake cmake-data libenet-dev libsfml-dev g++ build-essential make libboost1.55-dev libboost-system1.55-dev libboost-program-options1.55-dev
+
+For extra features:
+valgrind cccc doxygen graphviz libcppunit-dev lcov gcovr cppcheck sloccount
+
+Use apt-get install
+
+*/

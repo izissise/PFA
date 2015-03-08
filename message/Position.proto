@@ -1,0 +1,6 @@
+import "Vectors.proto";
+
+message Position {
+  required VectorInt	chunkId = 1;
+  required VectorFloat 	pos = 2;
+}
