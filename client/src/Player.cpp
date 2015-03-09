@@ -29,8 +29,8 @@ bool	Player::move(const Vector2f &dir)
   retVal = AMovable::move(dir);
   Vector2i mchunkId = getChunkId();
   Vector2f mposition = getPosition();
-  std::cout << "Chunk: " << mchunkId.x << " " << mchunkId.y << " "
-	    << "Pos : " << mposition.x << " " << mposition.y << std::endl;
+  // std::cout << "Chunk: " << mchunkId.x << " " << mchunkId.y << " "
+  // 	    << "Pos : " << mposition.x << " " << mposition.y << std::endl;
   return retVal;
 }
 

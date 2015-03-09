@@ -295,7 +295,7 @@ bool			World::getNewChunks(std::vector<Vector2i> &chunks)
     };
 
 
-  std::cout << "Player idpos: " << chunkPos.x << " " << chunkPos.y << std::endl;
+  // std::cout << "Player idpos: " << chunkPos.x << " " << chunkPos.y << std::endl;
   // +1 is the Center, X * 2 for what is bordering it, + 2 for the sides
   sideSize.x = 2 + roundFunc(res.x / Chunk::pWidth, 2) + 1;
   sideSize.y = 2 + roundFunc(res.y / Chunk::pHeight, 2) + 1;

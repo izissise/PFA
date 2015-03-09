@@ -30,7 +30,7 @@ void  ClientProtocol::parseCmd(const void *data, int size)
 {
   ProtocolMessage          packet;
 
-  std::cout << "size: " << size << std::endl;
+  // std::cout << "size: " << size << std::endl;
   if (packet.ParseFromString(std::string((char *)data, size)))
     {
       ProtocolMessage::PacketContent  act = packet.content();
