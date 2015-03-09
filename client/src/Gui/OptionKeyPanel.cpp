@@ -6,7 +6,6 @@ OptionKeyPanel::OptionKeyPanel(const sf::FloatRect &zone) :
 {
   addFont("default", "../client/assets/default.TTF");
   addFont("Title", "../client/assets/Title-font.ttf");
-  _hide = true;
 }
 
 OptionKeyPanel::~OptionKeyPanel()

@@ -29,9 +29,9 @@ void	OptionTabPanel::construct(const sf::Texture &texture UNUSED, Settings &set,
 			       const std::vector<APanelScreen *> &panels)
 {
   TabWidget	*wBarGame = new TabWidget("gameBar", {380, 50, 260, _zone.height},
-					  sf::Text("Game", _font["default"], 30), panels[0]);
+					  sf::Text("Keyboard", _font["default"], 30), panels[1]);
   TabWidget	*wBarKeyboard = new TabWidget("keyboardBar", {640, 50, 260, _zone.height},
-					      sf::Text("Keyboard", _font["default"], 30), panels[1]);
+					      sf::Text("Game", _font["default"], 30), panels[0]);
 
   createBarGame(texture, wBarGame);
   createBarKeyboard(texture, wBarKeyboard);

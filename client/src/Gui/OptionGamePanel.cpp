@@ -5,6 +5,7 @@ OptionGamePanel::OptionGamePanel(const sf::FloatRect &zone) :
   APanelScreen(zone)
 {
   addFont("default", "../client/assets/default.TTF");
+  _hide = true;
 }
 
 OptionGamePanel::~OptionGamePanel()
